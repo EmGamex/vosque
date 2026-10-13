@@ -1,0 +1,66 @@
+[gd_scene format=3 uid="uid://c8k73gfe30jxy"]
+
+[ext_resource type="Script" uid="uid://cg8fbqp0qq0e7" path="res://scripts/debug_info.gd" id="1_debug"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_debug"]
+bg_color = Color(0, 0, 0, 0.7)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="DebugInfo" type="CanvasLayer" unique_id=961028606]
+script = ExtResource("1_debug")
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=1338265683]
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 380.0
+offset_bottom = 220.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_debug")
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer" unique_id=862700147]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 12
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer" unique_id=2137275285]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Titulo" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=1992083892]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.9, 1, 1)
+text = "=== DEBUG: MOVIMIENTO ==="
+
+[node name="LabelFPS" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=1756717126]
+layout_mode = 2
+text = "FPS: 60"
+
+[node name="LabelVelocidad" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=2039625424]
+layout_mode = 2
+text = "Velocidad actual: 0.0 px/s"
+
+[node name="LabelVelMax" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=1478984524]
+layout_mode = 2
+text = "Velocidad máxima: 300.0 px/s"
+
+[node name="LabelAceleracion" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=1001500610]
+layout_mode = 2
+text = "Aceleración: 1200.0 px/s²"
+
+[node name="LabelFriccion" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=513923819]
+layout_mode = 2
+text = "Fricción: 1500.0 px/s²"
+
+[node name="LabelDireccion" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=543140729]
+layout_mode = 2
+text = "Input dirección: (X: 0.00, Y: 0.00)"
+
+[node name="LabelAyuda" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=2005092912]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 11
+text = "[F3] Ocultar / Mostrar panel"

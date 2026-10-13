@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://dl88w12yyd8ee"]
+
+[ext_resource type="PackedScene" uid="uid://b3dierpagcaih" path="res://escenas/personaje.tscn" id="1_p5vnh"]
+[ext_resource type="PackedScene" uid="uid://b1eu583e554ay" path="res://escenas/camara.tscn" id="2_avuvp"]
+[ext_resource type="Texture2D" uid="uid://ddjl04k42w54l" path="res://icon.svg" id="3_63whe"]
+[ext_resource type="PackedScene" uid="uid://c8k73gfe30jxy" path="res://escenas/debug_info.tscn" id="4_kcfdb"]
+
+[node name="Maain" type="Node2D" unique_id=1472011216]
+
+[node name="personaje" parent="." unique_id=1025630962 instance=ExtResource("1_p5vnh")]
+
+[node name="Camera2D" parent="personaje" unique_id=292125370 instance=ExtResource("2_avuvp")]
+
+[node name="Icon" type="Sprite2D" parent="." unique_id=35070930]
+position = Vector2(229, 163)
+texture = ExtResource("3_63whe")
+
+[node name="DebugInfo" parent="." unique_id=204110034 instance=ExtResource("4_kcfdb")]
