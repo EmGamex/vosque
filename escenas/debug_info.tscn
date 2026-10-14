@@ -1,42 +1,75 @@
 [gd_scene format=3 uid="uid://c8k73gfe30jxy"]
 
 [ext_resource type="Script" uid="uid://cg8fbqp0qq0e7" path="res://scripts/debug_info.gd" id="1_debug"]
+[ext_resource type="StyleBox" uid="uid://cqttojwkq103m" path="res://escenas/debug_key_bg.tres" id="2_iiocv"]
+[ext_resource type="StyleBox" uid="uid://b3ulhrcjolqpr" path="res://escenas/debug_center_bg.tres" id="3_h2i7j"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_debug"]
-bg_color = Color(0, 0, 0, 0.7)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nuvga"]
+bg_color = Color(0.08627451, 0.09803922, 0.13333334, 0.8666667)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.23137255, 0.25882354, 0.32156864, 1)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
+shadow_color = Color(0, 0, 0, 0.4)
+shadow_size = 8
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_75r28"]
+bg_color = Color(0.08627451, 0.09803922, 0.13333334, 0.8666667)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.23137255, 0.25882354, 0.32156864, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_color = Color(0, 0, 0, 0.4)
+shadow_size = 8
+shadow_offset = Vector2(0, 4)
 
 [node name="DebugInfo" type="CanvasLayer" unique_id=961028606]
+visible = false
 script = ExtResource("1_debug")
 
 [node name="PanelContainer" type="PanelContainer" parent="." unique_id=1338265683]
+visible = false
 offset_left = 20.0
 offset_top = 20.0
 offset_right = 380.0
 offset_bottom = 220.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_debug")
+theme_override_styles/panel = SubResource("StyleBoxFlat_nuvga")
 
 [node name="MarginContainer" type="MarginContainer" parent="PanelContainer" unique_id=862700147]
 layout_mode = 2
-theme_override_constants/margin_left = 14
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 14
-theme_override_constants/margin_bottom = 12
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 14
 
 [node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer" unique_id=2137275285]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 8
 
 [node name="Titulo" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=1992083892]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.3, 0.9, 1, 1)
-text = "=== DEBUG: MOVIMIENTO ==="
+theme_override_colors/font_color = Color(0.39215687, 0.70980394, 0.9647059, 1)
+theme_override_font_sizes/font_size = 15
+text = "DEBUG: MOVIMIENTO"
+horizontal_alignment = 1
+
+[node name="SeparadorTitulo" type="HSeparator" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=1106223638]
+layout_mode = 2
 
 [node name="LabelFPS" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=1756717126]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.5058824, 0.78039217, 0.5176471, 1)
 text = "FPS: 60"
 
 [node name="LabelVelocidad" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=2039625424]
@@ -59,8 +92,110 @@ text = "Fricción: 1500.0 px/s²"
 layout_mode = 2
 text = "Input dirección: (X: 0.00, Y: 0.00)"
 
+[node name="SeparadorPie" type="HSeparator" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=1379107460]
+layout_mode = 2
+
 [node name="LabelAyuda" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=2005092912]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_colors/font_color = Color(0.47058824, 0.5647059, 0.6117647, 1)
 theme_override_font_sizes/font_size = 11
 text = "[F3] Ocultar / Mostrar panel"
+horizontal_alignment = 1
+
+[node name="PanelContainerDireccion" type="PanelContainer" parent="." unique_id=1628375191]
+visible = false
+custom_minimum_size = Vector2(160, 0)
+offset_left = 20.0
+offset_top = 313.0
+offset_right = 180.0
+offset_bottom = 473.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_75r28")
+
+[node name="MarginContainerDir" type="MarginContainer" parent="PanelContainerDireccion" unique_id=492116902]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 12
+
+[node name="VBoxContainerDir" type="VBoxContainer" parent="PanelContainerDireccion/MarginContainerDir" unique_id=787065475]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TituloDir" type="Label" parent="PanelContainerDireccion/MarginContainerDir/VBoxContainerDir" unique_id=1195044719]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.39215687, 0.70980394, 0.9647059, 1)
+theme_override_font_sizes/font_size = 13
+text = "DIRECCIÓN"
+horizontal_alignment = 1
+
+[node name="SeparadorDir" type="HSeparator" parent="PanelContainerDireccion/MarginContainerDir/VBoxContainerDir" unique_id=994477097]
+layout_mode = 2
+
+[node name="GridContainerDir" type="GridContainer" parent="PanelContainerDireccion/MarginContainerDir/VBoxContainerDir" unique_id=2059084523]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 6
+columns = 3
+
+[node name="SpacerTL" type="Control" parent="PanelContainerDireccion/MarginContainerDir/VBoxContainerDir/GridContainerDir" unique_id=701623967]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+
+[node name="FlechaUp" type="Label" parent="PanelContainerDireccion/MarginContainerDir/VBoxContainerDir/GridContainerDir" unique_id=221469451]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2901961, 0.33333334, 0.40784314, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = ExtResource("2_iiocv")
+text = "▲"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SpacerTR" type="Control" parent="PanelContainerDireccion/MarginContainerDir/VBoxContainerDir/GridContainerDir" unique_id=1563951976]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+
+[node name="FlechaLeft" type="Label" parent="PanelContainerDireccion/MarginContainerDir/VBoxContainerDir/GridContainerDir" unique_id=1704742929]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2901961, 0.33333334, 0.40784314, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = ExtResource("2_iiocv")
+text = "◀"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PanelCenter" type="PanelContainer" parent="PanelContainerDireccion/MarginContainerDir/VBoxContainerDir/GridContainerDir" unique_id=471307]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+theme_override_styles/panel = ExtResource("3_h2i7j")
+
+[node name="FlechaRight" type="Label" parent="PanelContainerDireccion/MarginContainerDir/VBoxContainerDir/GridContainerDir" unique_id=537729685]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2901961, 0.33333334, 0.40784314, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = ExtResource("2_iiocv")
+text = "▶"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SpacerBL" type="Control" parent="PanelContainerDireccion/MarginContainerDir/VBoxContainerDir/GridContainerDir" unique_id=1831803796]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+
+[node name="FlechaDown" type="Label" parent="PanelContainerDireccion/MarginContainerDir/VBoxContainerDir/GridContainerDir" unique_id=1009143218]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2901961, 0.33333334, 0.40784314, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = ExtResource("2_iiocv")
+text = "▼"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SpacerBR" type="Control" parent="PanelContainerDireccion/MarginContainerDir/VBoxContainerDir/GridContainerDir" unique_id=1630716901]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2

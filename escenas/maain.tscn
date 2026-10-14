@@ -8,6 +8,9 @@
 [node name="Maain" type="Node2D" unique_id=1472011216]
 
 [node name="personaje" parent="." unique_id=1025630962 instance=ExtResource("1_p5vnh")]
+speed = 800.0
+acceleration = 5000.0
+friction = 5000.0
 
 [node name="Camera2D" parent="personaje" unique_id=292125370 instance=ExtResource("2_avuvp")]
 
@@ -15,4 +18,5 @@
 position = Vector2(229, 163)
 texture = ExtResource("3_63whe")
 
-[node name="DebugInfo" parent="." unique_id=204110034 instance=ExtResource("4_kcfdb")]
+[node name="DebugInfo" parent="." unique_id=204110034 node_paths=PackedStringArray("target_character") instance=ExtResource("4_kcfdb")]
+target_character = NodePath("../personaje")

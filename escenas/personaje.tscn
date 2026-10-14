@@ -6,11 +6,8 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g4v7s"]
 size = Vector2(128, 128)
 
-[node name="personaje" type="CharacterBody2D" unique_id=1025630962]
+[node name="EmGamex" type="CharacterBody2D" unique_id=1025630962]
 script = ExtResource("1_5nfxw")
-speed = 800.0
-acceleration = 1600.0
-friction = 2000.0
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1729578298]
 texture = ExtResource("1_v023a")
