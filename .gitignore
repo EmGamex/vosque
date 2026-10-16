@@ -3,4 +3,5 @@
 /android/
 
 # Addons
-addons/
+addons/*
+!addons/personaje_tools/

@@ -29,10 +29,10 @@ const COLOR_ACTIVO: Color = Color(0.40, 0.85, 1.0, 1.0)
 
 func _ready() -> void:
 	_update_visibility()
-	
+
 	if Engine.is_editor_hint():
 		return
-		
+
 	# Si no se asignó un personaje en el inspector, lo buscamos en la escena
 	if target_character == null:
 		target_character = _find_character(get_tree().current_scene)
@@ -50,7 +50,7 @@ func _update_visibility() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if Engine.is_editor_hint():
 		return
-		
+
 	# Permite alternar la visibilidad del debug con la tecla F3
 	if event is InputEventKey and event.pressed and not event.echo:
 		if event.keycode == KEY_F3:
@@ -62,7 +62,7 @@ func _process(_delta: float) -> void:
 		return
 
 	label_fps.text = "FPS: %d" % Engine.get_frames_per_second()
-	
+
 	if target_character == null:
 		target_character = _find_character(get_tree().current_scene)
 		if target_character == null:
@@ -75,7 +75,7 @@ func _process(_delta: float) -> void:
 	var spd: float = target_character.get("speed") if "speed" in target_character else 0.0
 	var accel: float = target_character.get("acceleration") if "acceleration" in target_character else 0.0
 	var fric: float = target_character.get("friction") if "friction" in target_character else 0.0
-	
+
 	var dir: Vector2 = Input.get_vector("personaje-izquierda", "personaje-derecha", "personaje-arriba", "personaje-abajo")
 	if dir == Vector2.ZERO:
 		dir = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")

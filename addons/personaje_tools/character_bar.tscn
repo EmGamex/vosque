@@ -1,0 +1,84 @@
+[gd_scene format=3 uid="uid://r3fxnvaekyih"]
+
+[ext_resource type="Script" uid="uid://bym466migk3c" path="res://addons/personaje_tools/character_bar.gd" id="1_fhfko"]
+[ext_resource type="Texture2D" uid="uid://ddjl04k42w54l" path="res://icon.svg" id="2_ukt26"]
+
+[node name="CharacterBar" type="PanelContainer" unique_id=2110405034]
+script = ExtResource("1_fhfko")
+
+[node name="HBox" type="HBoxContainer" parent="." unique_id=931106489]
+layout_mode = 2
+
+[node name="IconContainer" type="MarginContainer" parent="HBox" unique_id=231964373]
+layout_mode = 2
+
+[node name="TextureRectIcon" type="TextureRect" parent="HBox/IconContainer" unique_id=1410621375]
+custom_minimum_size = Vector2(28, 28)
+layout_mode = 2
+texture = ExtResource("2_ukt26")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="LabelNombre" type="Label" parent="HBox" unique_id=1454268828]
+layout_mode = 2
+text = "Personaje"
+
+[node name="Sep1" type="VSeparator" parent="HBox" unique_id=183197282]
+layout_mode = 2
+
+[node name="SpeedBox" type="HBoxContainer" parent="HBox" unique_id=1250172326]
+layout_mode = 2
+
+[node name="LabelSpeed" type="Label" parent="HBox/SpeedBox" unique_id=356807948]
+layout_mode = 2
+text = "Vel:"
+
+[node name="SpinSpeed" type="SpinBox" parent="HBox/SpeedBox" unique_id=394794887]
+layout_mode = 2
+max_value = 3000.0
+step = 10.0
+suffix = " px/s"
+
+[node name="AccelBox" type="HBoxContainer" parent="HBox" unique_id=2143319368]
+layout_mode = 2
+
+[node name="LabelAccel" type="Label" parent="HBox/AccelBox" unique_id=880340468]
+layout_mode = 2
+text = "Acel:"
+
+[node name="SpinAccel" type="SpinBox" parent="HBox/AccelBox" unique_id=160573188]
+layout_mode = 2
+max_value = 10000.0
+step = 50.0
+suffix = " px/s²"
+
+[node name="FrictionBox" type="HBoxContainer" parent="HBox" unique_id=1590964920]
+layout_mode = 2
+
+[node name="LabelFriction" type="Label" parent="HBox/FrictionBox" unique_id=1472838268]
+layout_mode = 2
+text = "Fric:"
+
+[node name="SpinFriction" type="SpinBox" parent="HBox/FrictionBox" unique_id=1059123590]
+layout_mode = 2
+max_value = 10000.0
+step = 50.0
+suffix = " px/s²"
+
+[node name="Sep2" type="VSeparator" parent="HBox" unique_id=769633714]
+layout_mode = 2
+
+[node name="PresetBox" type="HBoxContainer" parent="HBox" unique_id=189924219]
+layout_mode = 2
+
+[node name="BtnSigilo" type="Button" parent="HBox/PresetBox" unique_id=1132852273]
+layout_mode = 2
+text = "Sigilo"
+
+[node name="BtnNormal" type="Button" parent="HBox/PresetBox" unique_id=826289767]
+layout_mode = 2
+text = "Normal"
+
+[node name="BtnSprint" type="Button" parent="HBox/PresetBox" unique_id=1050701189]
+layout_mode = 2
+text = "Sprint"
