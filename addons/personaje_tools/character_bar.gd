@@ -60,15 +60,22 @@ func set_personaje(personaje: CharacterBody2D) -> void:
 	# Un script tool puede llamar antes de _ready; esperar evita perder la sincronización inicial.
 	if not is_node_ready():
 		await ready
-	_personaje_actual = personaje
+	# El nodo pudo liberarse antes de llegar aquí (p. ej. borrado desde el editor).
+	_personaje_actual = personaje if is_instance_valid(personaje) else null
 	_sincronizando = true
 	_configurar_spinboxes()
 	_sincronizar_desde_personaje()
 	_sincronizando = false
 
 
+## Un nodo borrado en el editor deja de ser válido pero no pasa a null: hay que
+## comprobarlo con is_instance_valid para no operar sobre una instancia liberada.
+func _personaje_valido() -> bool:
+	return is_instance_valid(_personaje_actual)
+
+
 func _configurar_spinboxes() -> void:
-	if _personaje_actual == null:
+	if not _personaje_valido():
 		return
 
 	_asegurar_estado()
@@ -147,7 +154,7 @@ func _aplicar_hint_range(spin: SpinBox, hint: String) -> void:
 
 
 func _avisar_si_fuera_de_rango(propiedad: String, spin: SpinBox) -> void:
-	if _personaje_actual == null or propiedad not in _personaje_actual:
+	if not _personaje_valido() or propiedad not in _personaje_actual:
 		return
 	var valor: float = _personaje_actual.get(propiedad)
 	if valor < spin.min_value or valor > spin.max_value:
@@ -213,7 +220,7 @@ func _ancho_cromo_spin(spin: SpinBox) -> float:
 
 
 func _sincronizar_desde_personaje() -> void:
-	if _personaje_actual == null:
+	if not _personaje_valido():
 		return
 
 	label_nombre.text = _personaje_actual.name
@@ -233,7 +240,7 @@ func _resolver_icono() -> Texture2D:
 	if icono_personalizado != null:
 		return icono_personalizado
 
-	if _personaje_actual != null:
+	if _personaje_valido():
 		var textura := _buscar_textura(_personaje_actual)
 		if textura != null:
 			return textura
@@ -268,7 +275,7 @@ func _textura_animada(sprite: AnimatedSprite2D) -> Texture2D:
 
 
 func _cambiar_propiedad_con_undo(nuevo_valor: float, propiedad: String) -> void:
-	if _sincronizando or _personaje_actual == null:
+	if _sincronizando or not _personaje_valido():
 		return
 	if _personaje_actual.get(propiedad) == nuevo_valor:
 		return
@@ -277,7 +284,7 @@ func _cambiar_propiedad_con_undo(nuevo_valor: float, propiedad: String) -> void:
 
 
 func _aplicar_preset(nombre: String) -> void:
-	if _personaje_actual == null:
+	if not _personaje_valido():
 		return
 	if nombre not in presets:
 		push_warning("Preset '%s' no definido en la barra de personaje." % nombre)
@@ -287,7 +294,7 @@ func _aplicar_preset(nombre: String) -> void:
 
 
 func _aplicar_con_undo(descripcion: String, cambios: Dictionary, combinar := false) -> void:
-	if _personaje_actual == null:
+	if not _personaje_valido():
 		return
 
 	# Ignoramos propiedades que el personaje no tiene para no registrar operaciones inválidas.
