@@ -8,18 +8,18 @@ const PRESETS := {
 	"Sprint": {"speed": 1000.0, "acceleration": 5000.0, "friction": 5000.0},
 }
 const ICONO_POR_DEFECTO := "res://icon.svg"
+const PADDING_SPIN := 12.0
 
-## Textura personalizable para el icono del personaje.
 @export var icono_personalizado: Texture2D:
 	set(val):
 		icono_personalizado = val
 		_actualizar_icono()
 
-## Valores por preset. Si se deja vacío, se usan los definidos en PRESETS.
 @export var presets: Dictionary = {}
 
 var _personaje_actual: CharacterBody2D = null
-var _spins: Dictionary = {}
+var _spins: Dictionary[String, SpinBox] = {}
+var _base_spins: Dictionary[String, Dictionary] = {}
 var _sincronizando := false
 
 @onready var texture_rect_icon: TextureRect = $HBox/IconContainer/TextureRectIcon
@@ -40,18 +40,26 @@ func _ready() -> void:
 		"friction": spin_friction,
 	}
 	for propiedad: String in _spins:
-		(_spins[propiedad] as SpinBox).value_changed.connect(_cambiar_propiedad_con_undo.bind(propiedad))
+		_spins[propiedad].value_changed.connect(_cambiar_propiedad_con_undo.bind(propiedad))
+	_asegurar_estado()
 
 	for nodo in preset_box.get_children():
 		var boton := nodo as Button
 		if boton == null:
 			continue
-		boton.pressed.connect(_aplicar_preset.bind(boton.text))
+		# El texto del botón puede traducirse o cambiar; la clave del preset se puede fijar aparte con metadata.
+		var clave: String = str(boton.get_meta("preset", boton.text))
+		if not presets.has(clave):
+			push_warning("El botón '%s' no corresponde a ningún preset definido." % boton.name)
+		boton.pressed.connect(_aplicar_preset.bind(clave))
 
 	_actualizar_icono()
 
 
 func set_personaje(personaje: CharacterBody2D) -> void:
+	# Un script tool puede llamar antes de _ready; esperar evita perder la sincronización inicial.
+	if not is_node_ready():
+		await ready
 	_personaje_actual = personaje
 	_sincronizando = true
 	_configurar_spinboxes()
@@ -62,25 +70,75 @@ func set_personaje(personaje: CharacterBody2D) -> void:
 func _configurar_spinboxes() -> void:
 	if _personaje_actual == null:
 		return
+
+	_asegurar_estado()
+	var hints := _hints_de_personaje()
 	for propiedad: String in _spins:
-		var spin := _spins[propiedad] as SpinBox
-		_aplicar_rango_del_personaje(propiedad, spin)
+		var spin := _spins[propiedad]
+		_restaurar_base_spin(propiedad, spin)
+		if hints.has(propiedad):
+			_aplicar_hint_range(spin, hints[propiedad])
 		_ajustar_ancho_spin(spin)
+		_avisar_si_fuera_de_rango(propiedad, spin)
 
 
-func _aplicar_rango_del_personaje(propiedad: String, spin: SpinBox) -> void:
+## Reconstruye el estado de trabajo si falta: un recargado en caliente del script
+## (frecuente en scripts @tool al guardar) puede dejar los miembros de instancia en null.
+func _asegurar_estado() -> void:
+	if _spins == null or _spins.is_empty():
+		_spins = {
+			"speed": spin_speed,
+			"acceleration": spin_accel,
+			"friction": spin_friction,
+		}
+	if _base_spins == null:
+		_base_spins = {}
+	if _base_spins.size() != _spins.size():
+		for propiedad: String in _spins:
+			_base_spins[propiedad] = _capturar_base_spin(_spins[propiedad])
+
+
+func _hints_de_personaje() -> Dictionary:
+	var hints: Dictionary = {}
 	for info in _personaje_actual.get_property_list():
-		if info.name == propiedad and info.hint == PROPERTY_HINT_RANGE:
-			_aplicar_hint_range(spin, info.hint_string)
-			return
+		if info.hint == PROPERTY_HINT_RANGE:
+			hints[String(info.name)] = info.hint_string
+	return hints
+
+
+## Los rangos base vienen de la escena: hay que recordarlos para no arrastrarlos de un personaje a otro.
+func _capturar_base_spin(spin: SpinBox) -> Dictionary:
+	return {
+		"min": spin.min_value,
+		"max": spin.max_value,
+		"step": spin.step,
+		"suffix": spin.suffix,
+		"ancho": spin.custom_minimum_size.x,
+	}
+
+
+func _restaurar_base_spin(propiedad: String, spin: SpinBox) -> void:
+	if not _base_spins.has(propiedad):
+		return
+	var base: Dictionary = _base_spins[propiedad]
+	spin.min_value = base["min"]
+	spin.max_value = base["max"]
+	spin.step = base["step"]
+	spin.suffix = base["suffix"]
+	spin.custom_minimum_size.x = base["ancho"]
 
 
 func _aplicar_hint_range(spin: SpinBox, hint: String) -> void:
 	var partes := hint.split(",")
 	if partes.size() >= 2:
-		spin.min_value = partes[0].strip_edges().to_float()
-		spin.max_value = partes[1].strip_edges().to_float()
-	if partes.size() >= 3:
+		var minimo := partes[0].strip_edges()
+		var maximo := partes[1].strip_edges()
+		if minimo.is_valid_float():
+			spin.min_value = minimo.to_float()
+		if maximo.is_valid_float():
+			spin.max_value = maximo.to_float()
+	# El tercer campo puede ser un modificador ("or_greater", "exp"...) en lugar de un paso numérico.
+	if partes.size() >= 3 and partes[2].strip_edges().is_valid_float():
 		spin.step = partes[2].strip_edges().to_float()
 	for parte in partes:
 		if parte.strip_edges().begins_with("suffix:"):
@@ -88,15 +146,45 @@ func _aplicar_hint_range(spin: SpinBox, hint: String) -> void:
 			break
 
 
-## Ajusta el ancho mínimo del SpinBox para que quepa el mayor valor posible con su sufijo,
-## midiendo la fuente real del tema en lugar de usar un ancho fijo.
+func _avisar_si_fuera_de_rango(propiedad: String, spin: SpinBox) -> void:
+	if _personaje_actual == null or propiedad not in _personaje_actual:
+		return
+	var valor: float = _personaje_actual.get(propiedad)
+	if valor < spin.min_value or valor > spin.max_value:
+		push_warning(
+			(
+				"El valor de '%s' en '%s' (%s) queda fuera del rango del control (%s a %s)."
+				% [propiedad, _personaje_actual.name, valor, spin.min_value, spin.max_value]
+			)
+		)
+
+
 func _ajustar_ancho_spin(spin: SpinBox) -> void:
 	if spin == null:
 		return
-	var muestra := "%d %s" % [int(spin.max_value), spin.get_suffix()]
-	var ancho := _ancho_texto_spin(spin, muestra) + _ancho_cromo_spin(spin) + 12.0
+	var sufijo := spin.get_suffix()
+	var ancho_texto := 0.0
+	for valor in [spin.min_value, spin.max_value]:
+		var muestra := _formatear_valor(valor, spin.step) + sufijo
+		ancho_texto = maxf(ancho_texto, _ancho_texto_spin(spin, muestra))
+	var ancho := ancho_texto + _ancho_cromo_spin(spin) + PADDING_SPIN
 	spin.custom_minimum_size.x = maxf(spin.custom_minimum_size.x, ancho)
 	spin.update_minimum_size()
+
+
+func _formatear_valor(valor: float, paso: float) -> String:
+	return String.num(valor, _decimales_de_paso(paso))
+
+
+func _decimales_de_paso(paso: float) -> int:
+	if paso <= 0.0:
+		return 0
+	var decimales := 0
+	var probado := paso
+	while decimales < 6 and not is_equal_approx(probado, roundf(probado)):
+		probado *= 10.0
+		decimales += 1
+	return decimales
 
 
 func _ancho_texto_spin(spin: SpinBox, muestra: String) -> float:
@@ -131,7 +219,7 @@ func _sincronizar_desde_personaje() -> void:
 	label_nombre.text = _personaje_actual.name
 	for propiedad: String in _spins:
 		if propiedad in _personaje_actual:
-			(_spins[propiedad] as SpinBox).set_value_no_signal(_personaje_actual.get(propiedad))
+			_spins[propiedad].set_value_no_signal(_personaje_actual.get(propiedad))
 	_actualizar_icono()
 
 
@@ -146,35 +234,46 @@ func _resolver_icono() -> Texture2D:
 		return icono_personalizado
 
 	if _personaje_actual != null:
-		for nodo in _personaje_actual.get_children():
-			var sprite := nodo as Sprite2D
-			if sprite != null and sprite.texture != null:
-				return sprite.texture
+		var textura := _buscar_textura(_personaje_actual)
+		if textura != null:
+			return textura
 
 	if ResourceLoader.exists(ICONO_POR_DEFECTO):
 		return load(ICONO_POR_DEFECTO) as Texture2D
 	return null
 
 
+func _buscar_textura(nodo: Node) -> Texture2D:
+	for hijo in nodo.get_children():
+		if hijo is Sprite2D and (hijo as Sprite2D).texture != null:
+			return (hijo as Sprite2D).texture
+		if hijo is AnimatedSprite2D:
+			var textura := _textura_animada(hijo as AnimatedSprite2D)
+			if textura != null:
+				return textura
+		var anidada := _buscar_textura(hijo)
+		if anidada != null:
+			return anidada
+	return null
+
+
+func _textura_animada(sprite: AnimatedSprite2D) -> Texture2D:
+	var cuadros := sprite.sprite_frames
+	if cuadros == null:
+		return null
+	var animacion := sprite.animation
+	if not cuadros.has_animation(animacion) or cuadros.get_frame_count(animacion) == 0:
+		return null
+	return cuadros.get_frame_texture(animacion, 0)
+
+
 func _cambiar_propiedad_con_undo(nuevo_valor: float, propiedad: String) -> void:
 	if _sincronizando or _personaje_actual == null:
 		return
-
-	var valor_antiguo: Variant = _personaje_actual.get(propiedad)
-	if valor_antiguo == nuevo_valor:
+	if _personaje_actual.get(propiedad) == nuevo_valor:
 		return
 
-	var undo_redo := EditorInterface.get_editor_undo_redo()
-	if undo_redo == null:
-		_personaje_actual.set(propiedad, nuevo_valor)
-		return
-
-	undo_redo.create_action("Física del personaje: %s" % propiedad, UndoRedo.MERGE_ENDS)
-	undo_redo.add_do_property(_personaje_actual, propiedad, nuevo_valor)
-	undo_redo.add_undo_property(_personaje_actual, propiedad, valor_antiguo)
-	undo_redo.add_do_method(self, "_sincronizar_desde_personaje")
-	undo_redo.add_undo_method(self, "_sincronizar_desde_personaje")
-	undo_redo.commit_action()
+	_aplicar_con_undo("Física del personaje: %s" % propiedad, {propiedad: nuevo_valor}, true)
 
 
 func _aplicar_preset(nombre: String) -> void:
@@ -184,17 +283,36 @@ func _aplicar_preset(nombre: String) -> void:
 		push_warning("Preset '%s' no definido en la barra de personaje." % nombre)
 		return
 
-	var valores: Dictionary = presets[nombre]
+	_aplicar_con_undo("Aplicar preset '%s' al personaje" % nombre, presets[nombre])
+
+
+func _aplicar_con_undo(descripcion: String, cambios: Dictionary, combinar := false) -> void:
+	if _personaje_actual == null:
+		return
+
+	# Ignoramos propiedades que el personaje no tiene para no registrar operaciones inválidas.
+	var cambios_validos: Dictionary = {}
+	for propiedad in cambios:
+		if propiedad in _personaje_actual:
+			cambios_validos[propiedad] = cambios[propiedad]
+	if cambios_validos.is_empty():
+		return
+
 	var undo_redo := EditorInterface.get_editor_undo_redo()
 	if undo_redo == null:
-		for propiedad: String in valores:
-			_personaje_actual.set(propiedad, valores[propiedad])
+		for propiedad in cambios_validos:
+			_personaje_actual.set(propiedad, cambios_validos[propiedad])
 		_sincronizar_desde_personaje()
 		return
 
-	undo_redo.create_action("Aplicar preset '%s' al personaje" % nombre)
-	for propiedad: String in valores:
-		undo_redo.add_do_property(_personaje_actual, propiedad, valores[propiedad])
+	# MERGE_ENDS fusiona ajustes seguidos del mismo control en una sola acción de deshacer.
+	undo_redo.create_action(
+		descripcion,
+		UndoRedo.MERGE_ENDS if combinar else UndoRedo.MERGE_DISABLE,
+		_personaje_actual
+	)
+	for propiedad in cambios_validos:
+		undo_redo.add_do_property(_personaje_actual, propiedad, cambios_validos[propiedad])
 		undo_redo.add_undo_property(_personaje_actual, propiedad, _personaje_actual.get(propiedad))
 	undo_redo.add_do_method(self, "_sincronizar_desde_personaje")
 	undo_redo.add_undo_method(self, "_sincronizar_desde_personaje")
