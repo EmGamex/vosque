@@ -27,9 +27,12 @@ $$\text{Velocidad}(n) = \text{Velocidad Base} \times (1 + \text{Tasa Incremento}
 
 ---
 
-## 3. Criterio de Reubicación de Notas
+## 3. Criterio de Reubicación de Notas y Mutación Espacial
 
-Para evitar situaciones injustas o notas que aparezcan encima del jugador o del monstruo:
-1. El mapa cuenta con múltiples nodos de posición fija (`Marker2D`).
-2. Al recoger una nota, se descartan los puntos que estén a una distancia menor a $R_{\min}$ del jugador.
-3. Se selecciona aleatoriamente entre los puntos lejanos restantes, asegurando que el jugador deba desplazarse hacia zonas oscuras del bosque.
+Para evitar situaciones injustas o notas que aparezcan encima del jugador o del monstruo, y para sacar provecho de la arquitectura de 4 sectores:
+1. Cada variante de sector contiene sus propios nodos candidatos de spawn (`Marker2D`).
+2. Al recoger una nota, se mutan las variantes de los **3 sectores lejanos** (donde no se encuentra el jugador).
+3. La nueva nota se genera aleatoriamente en uno de los puntos candidatos pertenecientes a cualquiera de los **3 sectores recién mutados**, garantizando:
+   - Que nunca aparezca en el sector actual del jugador ni a una distancia menor a $R_{\min}$.
+   - Que el jugador se vea obligado a desplazarse activamente hacia zonas oscuras cuya distribución y pasillos acaban de cambiar.
+

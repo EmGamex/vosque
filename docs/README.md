@@ -26,7 +26,7 @@ Un juego arcade de supervivencia y terror de vista cenital inspirado en la atmó
 ### 1.2. Pilares de Diseño
 1. **Inmediatez Arcade:** Sesiones de 60 a 120 segundos; controles instantáneos, reintentos rápidos y enfoque en superar la puntuación máxima (*High Score*).
 2. **Tensión y Atmósfera de Terror:** Sensación constante de vulnerabilidad, oscuridad opresiva, pasos inquietantes en el bosque y una amenaza implacable que acecha al jugador.
-3. **Producción Eficiente Asistida:** Alcance acotado a un solo mapa cerrado, pipeline híbrido 3D-Vectorial (Blender + Inkscape) para gráficos rápidos y consistentes, y lógica directa asistida por IA/MCP en Godot.
+3. **Producción Eficiente Asistida:** Alcance acotado a un mapa de 4 sectores mutables (cuadrícula 2x2), pipeline híbrido 3D-Vectorial (Blender + Inkscape) para gráficos rápidos y consistentes, y lógica directa asistida por IA/MCP en Godot.
 
 ---
 
@@ -36,15 +36,15 @@ Para facilitar la lectura y desarrollo, la documentación está dividida en las 
 
 ### [Gameplay y Mecánicas](gameplay/mecanicas_y_entidades.md)
 - [Personaje y Habilidades](gameplay/personaje_y_habilidades.md): Atributos físicos, sprint con barra de estamina, linterna híbrida y máquina de estados del jugador.
-- [Mecánicas y Entidades](gameplay/mecanicas_y_entidades.md): Core loop, jugador, IA del monstruo, notas y diseño del bosque.
-- [Dificultad y Balance](gameplay/dificultad_y_balance.md): Progresión por notas, fórmulas de velocidad y escalado.
+- [Mecánicas y Entidades](gameplay/mecanicas_y_entidades.md): Core loop, jugador, IA del monstruo, notas, bosque mutable de 4 sectores y cámara interactiva.
+- [Dificultad y Balance](gameplay/dificultad_y_balance.md): Progresión por notas, fórmulas de velocidad y reubicación en sectores mutados.
 
 ### [Arte y Pipeline Visual](arte/pipeline_hibrido.md)
 - [Pipeline Híbrido](arte/pipeline_hibrido.md): Flujo paso a paso (Blender ➔ Inkscape ➔ Godot).
 - [Guía de Estilo y Assets](arte/guia_estilo_y_assets.md): Estética visual y checklist de sprites necesarios.
 
 ### [Interfaz y Audio](interfaz_y_audio/controles_y_hud.md)
-- [Controles y HUD](interfaz_y_audio/controles_y_hud.md): Entradas de teclado, HUD in-game, flash de nota y pantalla de Game Over.
+- [Controles y HUD](interfaz_y_audio/controles_y_hud.md): Entradas de teclado, HUD in-game, menú de pausa, pantalla de Game Over e integración con el gestor de escenas.
 - [Audio y Feedback](interfaz_y_audio/audio_y_feedback.md): Efectos de sonido, detección de proximidad y tensión auditiva.
 
 ### [Producción](produccion/roadmap_y_hitos.md)
