@@ -9,6 +9,7 @@ const PRESETS := {
 }
 const ICONO_POR_DEFECTO := "res://icon.svg"
 const PADDING_SPIN := 12.0
+const INTERVALO_SYNC := 0.15
 
 @export var icono_personalizado: Texture2D:
 	set(val):
@@ -21,6 +22,7 @@ var _personaje_actual: CharacterBody2D = null
 var _spins: Dictionary[String, SpinBox] = {}
 var _base_spins: Dictionary[String, Dictionary] = {}
 var _sincronizando := false
+var _t_sync := 0.0
 
 @onready var texture_rect_icon: TextureRect = $HBox/IconContainer/TextureRectIcon
 @onready var label_nombre: Label = $HBox/LabelNombre
@@ -31,6 +33,7 @@ var _sincronizando := false
 
 
 func _ready() -> void:
+	set_process(false)
 	if presets == null or presets.is_empty():
 		presets = PRESETS.duplicate(true)
 
@@ -56,12 +59,39 @@ func _ready() -> void:
 	_actualizar_icono()
 
 
+func _process(delta: float) -> void:
+	# El Inspector y el historial (Ctrl+Z) cambian el personaje sin avisar: sondeamos
+	# para que la barra nunca muestre valores desincronizados.
+	if not is_visible_in_tree() or not _personaje_valido() or _spins == null or _spins.is_empty():
+		return
+	_t_sync += delta
+	if _t_sync < INTERVALO_SYNC:
+		return
+	_t_sync = 0.0
+	for propiedad: String in _spins:
+		_sincronizar_spin_si_procede(propiedad, _spins[propiedad])
+
+
+func _sincronizar_spin_si_procede(propiedad: String, spin: SpinBox) -> void:
+	# No pisar lo que el usuario está escribiendo en el control.
+	var line := spin.get_line_edit()
+	if line != null and line.has_focus():
+		return
+	var valor: float = _personaje_actual.get(propiedad)
+	# Fuera del rango del control ya avisa _avisar_si_fuera_de_rango; aquí no luchamos contra el clamp.
+	if valor < spin.min_value or valor > spin.max_value:
+		return
+	if not is_equal_approx(spin.value, valor):
+		spin.set_value_no_signal(valor)
+
+
 func set_personaje(personaje: CharacterBody2D) -> void:
 	# Un script tool puede llamar antes de _ready; esperar evita perder la sincronización inicial.
 	if not is_node_ready():
 		await ready
 	# El nodo pudo liberarse antes de llegar aquí (p. ej. borrado desde el editor).
 	_personaje_actual = personaje if is_instance_valid(personaje) else null
+	set_process(_personaje_valido())
 	_sincronizando = true
 	_configurar_spinboxes()
 	_sincronizar_desde_personaje()
