@@ -28,9 +28,12 @@ flowchart TD
 ## 2. Especificación de Entidades
 
 ### 2.1. Jugador (`CharacterBody2D`)
-* **Movimiento:** 8 direcciones con velocidad fija (sin aceleración resbaladiza para garantizar control preciso e instantáneo).
-* **Iluminación:** Nodo `PointLight2D` con textura de degradado circular que simula el haz de una linterna con poco alcance.
-* **Colisión:** `CollisionShape2D` circular pequeño en los pies para evitar atascarse en esquinas y troncos.
+> 📄 **Especificación completa:** Consulta **[Personaje y Habilidades](personaje_y_habilidades.md)** para el desglose detallado de atributos físicos, máquina de estados y arquitectura de nodos.
+
+* **Movimiento:** 8 direcciones con aceleración y fricción altas (`5000 px/s²`) para un control preciso, responsivo y sin deslizamiento residual (`stop_threshold`).
+* **Habilidad de Sprint:** Carrera temporal (`1000 px/s`) regulada por una **barra de estamina** recargable.
+* **Iluminación (Linterna Decorativa):** Nodo `PointLight2D` siempre activo con halo de proximidad y orientación híbrida (apunta al cursor del ratón o se alinea con la dirección de movimiento si se juega solo con teclado).
+* **Colisión:** `CollisionShape2D` compacto en los pies para evitar atascarse en esquinas y troncos.
 
 ### 2.2. El Monstruo (`CharacterBody2D` o `Area2D`)
 * **IA de Persecución:** Movimiento vectorial directo hacia las coordenadas del jugador:

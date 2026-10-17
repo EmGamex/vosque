@@ -1,0 +1,30 @@
+[gd_scene format=3 uid="uid://cdg7eeqnykjnu"]
+
+[ext_resource type="Script" uid="uid://ccr00dcd1n8h6" path="res://scripts/enemigo.gd" id="1_sms58"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_uhebs"]
+radius = 42.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_743j8"]
+radius = 56.0
+
+[node name="Enemigo" type="CharacterBody2D" unique_id=1591042193]
+script = ExtResource("1_sms58")
+
+[node name="BocetoVisual" type="Node2D" parent="." unique_id=372931188]
+
+[node name="SombraExterior" type="Polygon2D" parent="BocetoVisual" unique_id=1863695207]
+color = Color(0.54509807, 0.08235294, 0.1254902, 0.9019608)
+polygon = PackedVector2Array(55, 0, 0, 40, -45, 0, 0, -40)
+
+[node name="Nucleo" type="Polygon2D" parent="BocetoVisual" unique_id=914408147]
+color = Color(0.9019608, 0.14901961, 0.2, 1)
+polygon = PackedVector2Array(30, 0, 0, 20, -20, 0, 0, -20)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=437516853]
+shape = SubResource("CircleShape2D_uhebs")
+
+[node name="AreaCaptura" type="Area2D" parent="." unique_id=634841124]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaCaptura" unique_id=235146397]
+shape = SubResource("CircleShape2D_743j8")

@@ -10,6 +10,7 @@ El audio es un elemento de jugabilidad fundamental, ya que sirve como radar sono
 
 ### Catálogo de Efectos de Sonido (SFX)
 * **Pasos del Jugador:** Pasos sordos y crujidos de hojas secas en el bosque.
+* **Salto y Caída de Plancha:** Salto sordo y golpe seco/resbalón de cuerpo contra la hojarasca al caer en plancha, acompañado de un jadeo agitado mientras se recupera en el suelo.
 * **Proximidad del Monstruo:** Sonido gutural bajo o zumbido de estática radial que aumenta de volumen a medida que la criatura se acerca a la posición del jugador.
 * **Recolección de Nota:** Golpe de cuerda disonante, rasgado de papel o acorde tenso que resalta el logro pero aumenta la alarma.
 * **Jumpscare / Atrapado:** Golpe orquestal repentino o chillido distorsionado sincronizado con el contacto del monstruo.

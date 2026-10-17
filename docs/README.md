@@ -35,6 +35,7 @@ Un juego arcade de supervivencia y terror de vista cenital inspirado en la atmó
 Para facilitar la lectura y desarrollo, la documentación está dividida en las siguientes áreas técnicas:
 
 ### [Gameplay y Mecánicas](gameplay/mecanicas_y_entidades.md)
+- [Personaje y Habilidades](gameplay/personaje_y_habilidades.md): Atributos físicos, sprint con barra de estamina, linterna híbrida y máquina de estados del jugador.
 - [Mecánicas y Entidades](gameplay/mecanicas_y_entidades.md): Core loop, jugador, IA del monstruo, notas y diseño del bosque.
 - [Dificultad y Balance](gameplay/dificultad_y_balance.md): Progresión por notas, fórmulas de velocidad y escalado.
 

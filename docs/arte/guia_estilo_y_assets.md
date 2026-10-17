@@ -19,7 +19,7 @@ Este documento define la dirección artística, paleta de colores y el catálogo
 ## 2. Catálogo de Sprites (Checklist de Producción)
 
 ### 2.1. Entidades Principales
-- [ ] **Jugador:** Sprite / Spritesheet de movimiento en 8 direcciones ($128 \times 128$ px).
+- [ ] **Jugador:** Spritesheet de movimiento en 8 direcciones, pose de elevación de salto, pose horizontal de plancha (*dive*) y frame de recuperación en el suelo ($128 \times 128$ px).
 - [ ] **Monstruo:** Sprite / Spritesheet de persecución y estado frenético ($128 \times 128$ px).
 - [ ] **Nota Coleccionable:** Sprite con animación leve de destello o rotación ($64 \times 64$ px).
 

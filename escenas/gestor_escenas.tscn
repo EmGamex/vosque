@@ -61,8 +61,6 @@ libraries/ = SubResource("AnimationLibrary_5bi3b")
 [node name="Contenedor" type="Node" parent="." unique_id=1002276879]
 
 [node name="MenuInicio" parent="Contenedor" unique_id=987334960 instance=ExtResource("2_05fps")]
-grow_horizontal = 2
-grow_vertical = 2
 
 [node name="Maain" parent="Contenedor" unique_id=1472011216 instance=ExtResource("3_jbqwm")]
 process_mode = 4
