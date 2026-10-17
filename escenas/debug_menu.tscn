@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://b74g6q4tcthym"]
 
-[ext_resource type="Script" uid="uid://byb3r3mdn2lns" path="res://scripts/debug_menu.gd" id="1_5npcy"]
-[ext_resource type="Script" uid="uid://jqibmsc5a26i" path="res://scripts/debug_overlay.gd" id="2_knsa1"]
+[ext_resource type="Script" uid="uid://bm3vcl3iyab1w" path="res://scripts/debug_menu/debug_menu.gd" id="1_5npcy"]
+[ext_resource type="Script" uid="uid://cjuqj2hl4gtyx" path="res://scripts/debug_menu/debug_overlay.gd" id="2_knsa1"]
 
 [node name="DebugMenu" type="CanvasLayer" unique_id=85566436]
 process_mode = 3
@@ -9,9 +9,8 @@ layer = 100
 visible = false
 script = ExtResource("1_5npcy")
 
-[node name="DebugOverlay" type="Node2D" parent="." unique_id=517704006 node_paths=PackedStringArray("menu_debug")]
+[node name="DebugOverlay" type="Node2D" parent="." unique_id=517704006]
 script = ExtResource("2_knsa1")
-menu_debug = NodePath("..")
 
 [node name="ControlRaiz" type="Control" parent="." unique_id=1519865449]
 layout_mode = 3

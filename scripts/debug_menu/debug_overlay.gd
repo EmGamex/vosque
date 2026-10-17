@@ -59,4 +59,3 @@ func _draw() -> void:
 		draw_string(ThemeDB.fallback_font, Vector2(480, -540), "SECTOR NE", HORIZONTAL_ALIGNMENT_CENTER, -1, tamano_fuente, Color(0.85, 0.92, 1.0, 0.75))
 		draw_string(ThemeDB.fallback_font, Vector2(-600, 540), "SECTOR SO", HORIZONTAL_ALIGNMENT_CENTER, -1, tamano_fuente, Color(0.85, 0.92, 1.0, 0.75))
 		draw_string(ThemeDB.fallback_font, Vector2(480, 540), "SECTOR SE", HORIZONTAL_ALIGNMENT_CENTER, -1, tamano_fuente, Color(0.85, 0.92, 1.0, 0.75))
-

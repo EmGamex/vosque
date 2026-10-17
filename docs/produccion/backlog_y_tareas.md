@@ -159,7 +159,7 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 
 ## 9. Módulo: Herramientas de Depuración y Diagnóstico
 > 📄 **Especificación de referencia:** [`docs/herramientas/herramientas_de_debug.md`](../herramientas/herramientas_de_debug.md)  
-> 💻 **Archivos clave:** `escenas/debug_menu.tscn`, `scripts/debug_menu.gd`, `addons/personaje_tools/`
+> 💻 **Archivos clave:** `escenas/debug_menu.tscn`, `scripts/debug_menu/`, `addons/personaje_tools/`
 
 - [x] **Toolbar de Personaje en Editor:** Plugin contextual `addons/personaje_tools` para ajuste de velocidad, aceleración y fricción.
 - [ ] **Menú Unificado de Debug In-Game (`escenas/debug_menu.tscn`):**

@@ -37,7 +37,19 @@ El acceso al sistema de depuración se gestiona mediante un ciclo **Tri-Estado**
 
 ## 3. Menú Unificado de Debug In-Game (`escenas/debug_menu.tscn`)
 
-La escena maestra del menú de depuración reside en `escenas/debug_menu.tscn` (controlada por `scripts/debug_menu.gd`) y está estructurada en un `CanvasLayer` con prioridad alta (`layer = 100`).
+La escena maestra del menú de depuración reside en `escenas/debug_menu.tscn` (controlada por la arquitectura modular en `scripts/debug_menu/debug_menu.gd`) y está estructurada en un `CanvasLayer` con prioridad alta (`layer = 100`).
+
+Los componentes del menú están desacoplados en la carpeta `scripts/debug_menu/`:
+- `debug_menu.gd`: Fachada y orquestador del `CanvasLayer`.
+- `debug_context.gd`: Resolución y caché de referencias a nodos diana y cálculo de cuadrantes.
+- `debug_cheats_controller.gd`: Gestión de estamina infinita e invencibilidad (`god_mode`).
+- `debug_physics_controller.gd`: Live tweaking de velocidades, aceleración y escalado proporcional.
+- `debug_scenario_controller.gd`: Gestión de God View (cámara cenital) y mutación forzada de escenario.
+- `debug_enemy_controller.gd`: Tácticas de IA, rayo de visión y reubicación de la criatura.
+- `debug_system_controller.gd`: TimeScale, pausa y recarga de escena.
+- `debug_telemetry_presenter.gd`: Formateo de métricas para MiniHUD, pestañas y pad direccional.
+- `debug_custom_monitors.gd`: Monitores de rendimiento personalizados de Godot Engine.
+- `debug_overlay.gd`: Dibujo vectorial en coordenadas de mundo (corredores de 160 px y cuadrantes).
 
 ```text
 DebugMenu (CanvasLayer, layer=100)
