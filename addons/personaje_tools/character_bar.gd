@@ -63,7 +63,9 @@ func _configurar_spinboxes() -> void:
 	if _personaje_actual == null:
 		return
 	for propiedad: String in _spins:
-		_aplicar_rango_del_personaje(propiedad, _spins[propiedad] as SpinBox)
+		var spin := _spins[propiedad] as SpinBox
+		_aplicar_rango_del_personaje(propiedad, spin)
+		_ajustar_ancho_spin(spin)
 
 
 func _aplicar_rango_del_personaje(propiedad: String, spin: SpinBox) -> void:
@@ -84,6 +86,42 @@ func _aplicar_hint_range(spin: SpinBox, hint: String) -> void:
 		if parte.strip_edges().begins_with("suffix:"):
 			spin.suffix = parte.strip_edges().trim_prefix("suffix:")
 			break
+
+
+## Ajusta el ancho mínimo del SpinBox para que quepa el mayor valor posible con su sufijo,
+## midiendo la fuente real del tema en lugar de usar un ancho fijo.
+func _ajustar_ancho_spin(spin: SpinBox) -> void:
+	if spin == null:
+		return
+	var muestra := "%d %s" % [int(spin.max_value), spin.get_suffix()]
+	var ancho := _ancho_texto_spin(spin, muestra) + _ancho_cromo_spin(spin) + 12.0
+	spin.custom_minimum_size.x = maxf(spin.custom_minimum_size.x, ancho)
+	spin.update_minimum_size()
+
+
+func _ancho_texto_spin(spin: SpinBox, muestra: String) -> float:
+	var line := spin.get_line_edit()
+	if line == null:
+		return 0.0
+	var fuente := line.get_theme_font("font")
+	if fuente == null:
+		return 0.0
+	var tamano := line.get_theme_font_size("font_size")
+	return fuente.get_string_size(muestra, HORIZONTAL_ALIGNMENT_LEFT, -1, tamano).x
+
+
+func _ancho_cromo_spin(spin: SpinBox) -> float:
+	var ancho := 0.0
+	if spin.has_theme_constant("buttons_width"):
+		ancho += float(spin.get_theme_constant("buttons_width"))
+	if spin.has_theme_constant("field_and_buttons_separation"):
+		ancho += float(spin.get_theme_constant("field_and_buttons_separation"))
+	var line := spin.get_line_edit()
+	if line != null:
+		var estilo := line.get_theme_stylebox("normal")
+		if estilo != null:
+			ancho += estilo.get_minimum_size().x
+	return ancho
 
 
 func _sincronizar_desde_personaje() -> void:
