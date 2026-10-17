@@ -1,14 +1,15 @@
 @tool
 extends PanelContainer
 
+const SpinSizing = preload("res://addons/personaje_tools/character_spin_sizing.gd")
+const IconoPersonaje = preload("res://addons/personaje_tools/character_icon.gd")
+
 const PROPIEDADES := ["speed", "acceleration", "friction"]
 const PRESETS := {
 	"Sigilo": {"speed": 150.0, "acceleration": 800.0, "friction": 1000.0},
 	"Normal": {"speed": 800.0, "acceleration": 5000.0, "friction": 5000.0},
 	"Sprint": {"speed": 1000.0, "acceleration": 5000.0, "friction": 5000.0},
 }
-const ICONO_POR_DEFECTO := "res://icon.svg"
-const PADDING_SPIN := 12.0
 const INTERVALO_SYNC := 0.15
 
 @export var icono_personalizado: Texture2D:
@@ -115,7 +116,7 @@ func _configurar_spinboxes() -> void:
 		_restaurar_base_spin(propiedad, spin)
 		if hints.has(propiedad):
 			_aplicar_hint_range(spin, hints[propiedad])
-		_ajustar_ancho_spin(spin)
+		SpinSizing.ajustar_ancho(spin)
 		_avisar_si_fuera_de_rango(propiedad, spin)
 
 
@@ -196,59 +197,6 @@ func _avisar_si_fuera_de_rango(propiedad: String, spin: SpinBox) -> void:
 		)
 
 
-func _ajustar_ancho_spin(spin: SpinBox) -> void:
-	if spin == null:
-		return
-	var sufijo := spin.get_suffix()
-	var ancho_texto := 0.0
-	for valor in [spin.min_value, spin.max_value]:
-		var muestra := _formatear_valor(valor, spin.step) + sufijo
-		ancho_texto = maxf(ancho_texto, _ancho_texto_spin(spin, muestra))
-	var ancho := ancho_texto + _ancho_cromo_spin(spin) + PADDING_SPIN
-	spin.custom_minimum_size.x = maxf(spin.custom_minimum_size.x, ancho)
-	spin.update_minimum_size()
-
-
-func _formatear_valor(valor: float, paso: float) -> String:
-	return String.num(valor, _decimales_de_paso(paso))
-
-
-func _decimales_de_paso(paso: float) -> int:
-	if paso <= 0.0:
-		return 0
-	var decimales := 0
-	var probado := paso
-	while decimales < 6 and not is_equal_approx(probado, roundf(probado)):
-		probado *= 10.0
-		decimales += 1
-	return decimales
-
-
-func _ancho_texto_spin(spin: SpinBox, muestra: String) -> float:
-	var line := spin.get_line_edit()
-	if line == null:
-		return 0.0
-	var fuente := line.get_theme_font("font")
-	if fuente == null:
-		return 0.0
-	var tamano := line.get_theme_font_size("font_size")
-	return fuente.get_string_size(muestra, HORIZONTAL_ALIGNMENT_LEFT, -1, tamano).x
-
-
-func _ancho_cromo_spin(spin: SpinBox) -> float:
-	var ancho := 0.0
-	if spin.has_theme_constant("buttons_width"):
-		ancho += float(spin.get_theme_constant("buttons_width"))
-	if spin.has_theme_constant("field_and_buttons_separation"):
-		ancho += float(spin.get_theme_constant("field_and_buttons_separation"))
-	var line := spin.get_line_edit()
-	if line != null:
-		var estilo := line.get_theme_stylebox("normal")
-		if estilo != null:
-			ancho += estilo.get_minimum_size().x
-	return ancho
-
-
 func _sincronizar_desde_personaje() -> void:
 	if not _personaje_valido():
 		return
@@ -263,45 +211,7 @@ func _sincronizar_desde_personaje() -> void:
 func _actualizar_icono() -> void:
 	if texture_rect_icon == null:
 		return
-	texture_rect_icon.texture = _resolver_icono()
-
-
-func _resolver_icono() -> Texture2D:
-	if icono_personalizado != null:
-		return icono_personalizado
-
-	if _personaje_valido():
-		var textura := _buscar_textura(_personaje_actual)
-		if textura != null:
-			return textura
-
-	if ResourceLoader.exists(ICONO_POR_DEFECTO):
-		return load(ICONO_POR_DEFECTO) as Texture2D
-	return null
-
-
-func _buscar_textura(nodo: Node) -> Texture2D:
-	for hijo in nodo.get_children():
-		if hijo is Sprite2D and (hijo as Sprite2D).texture != null:
-			return (hijo as Sprite2D).texture
-		if hijo is AnimatedSprite2D:
-			var textura := _textura_animada(hijo as AnimatedSprite2D)
-			if textura != null:
-				return textura
-		var anidada := _buscar_textura(hijo)
-		if anidada != null:
-			return anidada
-	return null
-
-
-func _textura_animada(sprite: AnimatedSprite2D) -> Texture2D:
-	var cuadros := sprite.sprite_frames
-	if cuadros == null:
-		return null
-	var animacion := sprite.animation
-	if not cuadros.has_animation(animacion) or cuadros.get_frame_count(animacion) == 0:
-		return null
-	return cuadros.get_frame_texture(animacion, 0)
+	texture_rect_icon.texture = IconoPersonaje.resolver(icono_personalizado, _personaje_actual)
 
 
 func _cambiar_propiedad_con_undo(nuevo_valor: float, propiedad: String) -> void:
