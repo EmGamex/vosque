@@ -34,6 +34,7 @@ layout_mode = 2
 text = "Vel:"
 
 [node name="SpinSpeed" type="SpinBox" parent="HBox/SpeedBox" unique_id=394794887]
+custom_minimum_size = Vector2(90, 0)
 layout_mode = 2
 max_value = 3000.0
 step = 10.0
@@ -47,6 +48,7 @@ layout_mode = 2
 text = "Acel:"
 
 [node name="SpinAccel" type="SpinBox" parent="HBox/AccelBox" unique_id=160573188]
+custom_minimum_size = Vector2(110, 0)
 layout_mode = 2
 max_value = 10000.0
 step = 50.0
@@ -60,6 +62,7 @@ layout_mode = 2
 text = "Fric:"
 
 [node name="SpinFriction" type="SpinBox" parent="HBox/FrictionBox" unique_id=1059123590]
+custom_minimum_size = Vector2(110, 0)
 layout_mode = 2
 max_value = 10000.0
 step = 50.0
