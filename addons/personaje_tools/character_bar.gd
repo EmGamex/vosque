@@ -20,6 +20,7 @@ const ICONO_POR_DEFECTO := "res://icon.svg"
 
 var _personaje_actual: CharacterBody2D = null
 var _spins: Dictionary = {}
+var _sincronizando := false
 
 @onready var texture_rect_icon: TextureRect = $HBox/IconContainer/TextureRectIcon
 @onready var label_nombre: Label = $HBox/LabelNombre
@@ -30,7 +31,7 @@ var _spins: Dictionary = {}
 
 
 func _ready() -> void:
-	if presets.is_empty():
+	if presets == null or presets.is_empty():
 		presets = PRESETS.duplicate(true)
 
 	_spins = {
@@ -52,8 +53,10 @@ func _ready() -> void:
 
 func set_personaje(personaje: CharacterBody2D) -> void:
 	_personaje_actual = personaje
+	_sincronizando = true
 	_configurar_spinboxes()
 	_sincronizar_desde_personaje()
+	_sincronizando = false
 
 
 func _configurar_spinboxes() -> void:
@@ -116,7 +119,7 @@ func _resolver_icono() -> Texture2D:
 
 
 func _cambiar_propiedad_con_undo(nuevo_valor: float, propiedad: String) -> void:
-	if _personaje_actual == null:
+	if _sincronizando or _personaje_actual == null:
 		return
 
 	var valor_antiguo: Variant = _personaje_actual.get(propiedad)
