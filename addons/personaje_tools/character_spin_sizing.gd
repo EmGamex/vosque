@@ -7,7 +7,6 @@ extends RefCounted
 const PADDING_SPIN := 12.0
 
 
-## Ensancha el control lo justo para que quepan sus valores extremos y el sufijo.
 static func ajustar_ancho(spin: SpinBox) -> void:
 	if spin == null:
 		return

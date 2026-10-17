@@ -44,4 +44,5 @@ static func _textura_animada(sprite: AnimatedSprite2D) -> Texture2D:
 	var animacion := sprite.animation
 	if not cuadros.has_animation(animacion) or cuadros.get_frame_count(animacion) == 0:
 		return null
+	# La barra solo muestra una miniatura estática: con el primer cuadro de la animación actual basta.
 	return cuadros.get_frame_texture(animacion, 0)
