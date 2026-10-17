@@ -36,6 +36,7 @@ flowchart LR
 * **Cámara:** 
   - Modo: `Orthographic`.
   - Inclinación: Cenital inclinada (vista isométrica/top-down de $45^\circ$ o $60^\circ$ tipo 3/4).
+  - **Ángulos Clave para Personajes:** Para minimizar renders y entintado, solo se capturan **3 orientaciones**: Frente ($0^\circ$), Perfil ($90^\circ$) y Espalda ($180^\circ$). El perfil opuesto se obtiene por volteo horizontal (`flip_h`) en Godot.
 * **Gestión de Color (Color Management):**
   - Display Device: `sRGB`.
   - View Transform: **Standard** (evitar *AgX* o *Filmic*, ya que desaturan y alteran los valores requeridos como plantilla de calcado).
@@ -50,10 +51,13 @@ flowchart LR
   1. `Capa 1: Guía 3D` ➔ Render de Blender con opacidad fija al $40\%$ para trazar sobre él.
   2. `Capa 2: Entintado (Lineart)` ➔ Trazado vectorial con trazos negros marcados y expresivos.
   3. `Capa 3: Color y Cel-Shading` ➔ Tonos desaturados y sombras duras de alto contraste.
-* **Exportación de Sprites:**
-  - Formato: PNG optimizado (RGBA).
-  - Personajes: $128 \times 128$ px.
-  - Obstáculos y elementos grandes (árboles, rocas): $256 \times 256$ px.
+* **Exportación de Sprites y Assets:**
+  - Formato: PNG optimizado (RGBA) con canal alfa.
+  - Personajes (Jugador y Criatura): $128 \times 128$ px.
+  - Obstáculos de Entorno (Árboles): $256 \times 256$ px; Rocas y Valla: $128 \times 128$ px; Tronco caído: $192 \times 64$ px.
+  - Coleccionable Arcade (Nota): $64 \times 64$ px (Icono HUD: $32 \times 32$ px).
+  - Menú Principal (Capas de Portada / Key Art): $1080 \times 1080$ px en capas PNG transparentes.
+  - Jumpscare Game Over: $512 \times 512$ px.
 
 ---
 

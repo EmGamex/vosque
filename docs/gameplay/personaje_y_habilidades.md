@@ -51,38 +51,43 @@ El proyecto cuenta con un plugin de editor dedicado (`character_bar.gd`) que per
 
 ### 3.2. Sprint y Barra de Estamina (Habilidad Activa)
 * **Propósito:** Permitir al jugador romper la distancia o escapar de emboscadas críticas, especialmente en las fases avanzadas (*Persecución Media* y *Cacería Frenética* con 4+ notas) donde el monstruo iguala o supera la velocidad base de caminata.
-* **Mecánica de Consumo:**
+* **Mecánica de Consumo y Parámetros Cuantitativos:**
+  - **Capacidad Máxima:** $100.0\text{ puntos}$ de estamina.
   - Al mantener presionada la acción de Sprint mientras el personaje se mueve, la velocidad máxima pasa del valor **Normal** (`800 px/s`) al valor **Sprint** (`1000 px/s`).
-  - Consume estamina de forma continua desde una reserva máxima ($100\%$).
+  - **Tasa de Consumo:** $-25.0\text{ pts/s}$ continuos (permite un sprint continuo máximo de $4.0\text{ segundos}$ desde barra llena).
+  - **Reutilización de Sprites:** El sprint no requiere animación propia dibujada; acelera el ciclo de caminata en motor (`speed_scale = 1.6`) con una inclinación procedural de $5^\circ$.
 * **Mecánica de Recuperación y Fatiga:**
-  - Al soltar el botón de Sprint (o detenerse), la barra de estamina se regenera gradualmente tras un breve retardo.
-  - **Agotamiento (Fatiga):** Si la barra llega a $0\%$, el sprint se desactiva forzosamente y el jugador no podrá volver a correr hasta que la barra recupere un umbral mínimo de seguridad (ej. $25\% - 30\%$), evitando el *spam* de micro-sprints.
+  - **Retardo de Regeneración (*Regen Delay*):** Al soltar el botón de Sprint (o detenerse), la barra espera $0.8\text{ s}$ antes de iniciar la recarga.
+  - **Tasa de Regeneración:** $+20.0\text{ pts/s}$ continuos (recarga completa de $0\%$ a $100\%$ en $5.0\text{ segundos}$).
+  - **Coste de Salto Libre:** $-20.0\text{ pts}$ instantáneos al despegar.
+  - **Coste de Plancha (*Dive*):** $-30.0\text{ pts}$ instantáneos adicionales al lanzarse en el aire.
+  - **Agotamiento (Fatiga):** Si la estamina llega a $0.0$, el sprint se desactiva forzosamente y el jugador queda en estado de fatiga. No podrá volver a correr ni saltar hasta que la barra recupere al menos el **umbral de seguridad del $30.0\%$** ($30\text{ pts}$), evitando el *spam* de micro-sprints.
 
 ### 3.3. Salto Libre y Salto de Plancha (*Dive* en el Aire)
 * **Propósito:** Mecánica evasiva y de riesgo/recompensa de alta tensión que permite sortear obstáculos bajos y zafarse de emboscadas in extremis.
 * **Fase 1: Salto Libre (Despegue en Suelo):**
   - Se activa pulsando la tecla de salto (`Espacio`) mientras el personaje está en el suelo y posee estamina suficiente ($\ge 20\%$).
   - Consume un $20\%$ de estamina base.
-  - **Eje Z Simulado:** En el plano 2D, se simula visualmente la elevación mediante una parábola en el eje vertical local del sprite (`Sprite2D.position.y`), encogiendo sutilmente la sombra en el suelo.
+  - **Eje Z Simulado y Visuales Minimalistas:** En el plano 2D, se utiliza $1$ solo cuadro estático con rodillas flexionadas (`jugador_salto_aire`). La elevación física se simula mediante una parábola vertical en `position.y` del nodo visual, encogiendo proceduralmente el sprite elíptico de la sombra en el suelo (`jugador_sombra`).
   - **Superación de Obstáculos Bajos:** Durante el vuelo ($\approx 0.45\text{ s}$), el personaje desactiva temporalmente la colisión con obstáculos bajos (como troncos caídos y piedras pequeñas), permitiendo cruzarlos mientras que el monstruo debe rodearlos. Los árboles altos y los límites perimetrales del bosque mantienen su colisión física total en todo momento.
   - Si aterriza sin realizar ninguna maniobra adicional, toca tierra de pie y continúa su marcha sin penalización.
 * **Fase 2: Salto de Plancha (*Belly Dive* en el Aire):**
   - Si el jugador vuelve a presionar `Espacio` mientras el personaje está en el aire (y tiene al menos $30\%$ de estamina adicional), se lanza de bruces hacia adelante.
-  - **Impulso Extra:** Otorga un fuerte estirón direccional instantáneo hacia adelante alcanzando $\approx 1200\text{ px/s}$, permitiendo ganar 2 metros críticos de distancia respecto a la criatura.
+  - **Impulso Extra y Pose Estática:** Otorga un fuerte estirón direccional instantáneo hacia adelante alcanzando $\approx 1200\text{ px/s}$, mostrando $1$ solo cuadro horizontal aerodinámico (`jugador_plancha_aire`).
   - Consume un $30\%$ de estamina adicional.
 * **Fase 3: Impacto en Suelo y Ventana de Recuperación (*Recovery Window*):**
-  - Al impactar el suelo tras la plancha, el personaje cae sobre su estómago/pecho y se desliza levemente por inercia.
-  - **Vulnerabilidad Total:** Queda incapacitado para moverse durante $\approx 0.6\text{ s}$ mientras se reincorpora del suelo presa del pánico. Si el monstruo se encuentra demasiado cerca, alcanzará al jugador indefenso, culminando en Game Over.
+  - Al impactar el suelo tras la plancha, el personaje muestra $1$ cuadro tendido boca abajo en la hojarasca (`jugador_suelo_recuperacion`) y se desliza levemente por inercia.
+  - **Vulnerabilidad Total:** Queda incapacitado para moverse durante $\approx 0.6\text{ s}$ mientras se reincorpora presa del pánico antes de regresar a *Reposo* o *Caminando*. Si el monstruo se encuentra demasiado cerca, alcanzará al jugador indefenso, culminando en Game Over.
   - No es posible saltar ni lanzarse en plancha si el personaje está en estado de *Fatiga* (estamina agotada).
 
-### 3.4. Linterna Atmosférica (Mecánica Visual / Pasiva)
+### 3.4. Linterna Atmosférica y Desacople de Orientación
 * **Comportamiento:** La linterna es un elemento **decorativo y atmosférico siempre activo**. No requiere recarga de baterías ni posee interruptor de apagado manual, manteniendo el foco del jugador en el movimiento y la evasión arcade.
 * **Estructura de Iluminación (`PointLight2D`):**
   1. **Halo de Proximidad:** Luz radial tenue alrededor del cuerpo del personaje para asegurar que siempre vea sus pies y los obstáculos inmediatos.
-  2. **Haz Direccional:** Cono de luz frontal que proyecta visión a media distancia hacia donde mira el personaje.
-* **Sistema de Orientación Híbrido (Ratón + Teclado):**
-  - **Prioridad Ratón (Modo Cómodo):** Si se detecta movimiento del cursor en pantalla, la linterna rota suavemente para apuntar hacia `get_global_mouse_position()`, permitiendo explorar visualmente ángulos laterales mientras se camina en otra dirección.
-  - **Fallback a Teclado (Modo 100% Teclas):** Si el jugador juega exclusivamente con teclado sin mover el ratón, la linterna se alinea automáticamente con el último vector de dirección de movimiento (`velocity.angle()`), garantizando que el juego sea completamente jugable con una sola mano o sin ratón.
+  2. **Haz Direccional:** Cono de luz frontal que proyecta visión a media distancia hacia donde apunta.
+* **Desacople entre Sprite y Linterna (Ahorro Artístico):**
+  - **Sprite del Personaje:** Siempre adopta una de las 3 vistas (Frente, Perfil o Espalda con `flip_h`) según el vector de movimiento de las teclas de dirección (`velocity`). Esto evita la necesidad de dibujar animaciones complejas de caminata hacia atrás (*backpedal*).
+  - **Haz de Luz Frontal:** Rota independientemente en $360^\circ$ apuntando suavemente hacia el cursor del ratón (`get_global_mouse_position()`). Si el jugador no mueve el ratón o juega solo con teclado, el haz se alinea automáticamente con el ángulo del vector de movimiento (`velocity.angle()`).
 
 ### 3.5. Recolección de Notas (Pasiva / Proximidad)
 * **Activación:** Automática al entrar en contacto con el área de una nota (`Area2D`).
@@ -138,13 +143,19 @@ stateDiagram-v2
 ### 5.1. Jerarquía de Escena (`escenas/personaje.tscn`)
 
 ```text
-Personaje (CharacterBody2D) [scripts/personaje.gd]
-├── Sprite2D / AnimatedSprite2D     # Representación visual del protagonista
-├── CollisionShape2D                # Colisión física en los pies
-├── PointLight2D                    # Iluminación de la linterna
-├── Camera2D                        # Cámara principal (instanciada en escena principal)
-└── AudioPasos (AudioStreamPlayer2D)# Reproductor de sonidos de pisadas
+Personaje (CharacterBody2D) [scripts/personaje.gd, y_sort_enabled=true]
+├── Sombra (Sprite2D)                 # Óvalo en los pies (jugador_sombra, 64x32 px)
+├── Visual (Node2D)                   # Contenedor para elevación en eje Z durante salto
+│   └── Anim (AnimatedSprite2D)       # 15 frames divididos en 3 vistas + poses estáticas (pivote en pies)
+├── CollisionShape2D                  # Colisión física circular compacta en los pies
+├── LinternaFrontal (PointLight2D)    # Haz cónico libremente orientable en 360° hacia el ratón
+├── LuzCuerpo (PointLight2D)          # Halo radial 360° tenue centrado en el protagonista
+├── Camera2D                          # Cámara principal de seguimiento
+└── AudioPasos (AudioStreamPlayer2D)  # Reproductor de pisadas en hojarasca
 ```
+
+* **Gestión de Pivote y Profundidad:** El nodo raíz `Personaje` y el mapa tienen `y_sort_enabled = true`. El pivote (`offset`) del `AnimatedSprite2D` se ubica exactamente en la base de los pies para ordenar correctamente el renderizado delante o detrás de los árboles.
+* **Simulación de Elevación:** Durante el salto o plancha, solo se desplaza el contenedor `Visual` en el eje local $-Y$, permitiendo que la `Sombra` permanezca fija en el suelo mientras reduce su escala suavemente (`scale = Vector2(0.6, 0.6)`).
 
 ### 5.2. Mapa de Entradas (`InputMap` en `project.godot`)
 

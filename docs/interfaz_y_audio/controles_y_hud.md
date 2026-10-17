@@ -23,29 +23,58 @@ Este documento especifica los esquemas de entrada para teclado en PC y las panta
 
 ## 2. Elementos del HUD (En Partida)
 
-* **Filosofía:** Minimalismo extremo para potenciar la inmersión y el miedo a la oscuridad.
-* **Contador de Páginas:**
-  - Posición: Esquina superior izquierda.
-  - Formato: Texto simple y limpio (ejemplo: `Notas: 0`).
+* **Filosofía:** Minimalismo extremo y ritmo arcade puro para potenciar la inmersión y el miedo a la oscuridad sin obstrucciones visuales.
+* **Contador de Coleccionables (Notas):**
+  - Posición: Esquina superior izquierda (`Vector2(32, 32)`).
+  - Componentes: Icono vectorial simple de página (`hud_icono_nota`, $32 \times 32$ px) seguido del valor numérico con tipografía limpia y de alto contraste (ejemplo: `x 0`).
+  - Animación de Recogida: Al tomar una nota, el contador realiza un salto de escala elástico mediante un `Tween` (`scale` $1.3 \to 1.0$ en $0.25\text{ s}$) y un breve destello blanco.
 * **Barra de Estamina (Resistencia):**
-  - Indicador visual discreto que muestra la reserva de energía disponible para la habilidad de **Sprint** (ver [Personaje y Habilidades](../gameplay/personaje_y_habilidades.md)).
-  - Disminuye al correr y se recarga gradualmente al caminar o detenerse; cambia de color o parpadea si entra en estado de agotamiento (*Fatiga*).
-* **Flash de Nota (Feedback de Recolección):**
-  - Al recoger una página, se muestra una ilustración o texto perturbador en el centro de la pantalla durante **1 segundo exacto**.
-  - **No pausa el juego:** La criatura sigue desplazándose durante este segundo, elevando el pánico del jugador. (Nota: si el jugador pausa manualmente con `Escape` mientras el flash está activo, el temporizador del flash se congela junto con el resto del juego).
+  - Indicador visual discreto construido 100% mediante nodos nativos de Godot (`ProgressBar` con `StyleBoxFlat`, **cero dibujo manual**).
+  - Fondo: Rectángulo delgado ($200 \times 12$ px) gris carbón oscuro (`#101216`) con borde de $1\text{ px}$.
+  - Relleno normal: Tono amarillo tenue o ámbar (`#D4A836`) que vacía de derecha a izquierda según el gasto de Sprint, Salto o Plancha.
+  - Estado de Fatiga: Cuando la estamina cae por debajo de los 30 pts o llega a 0, la barra pulsa en rojo carmesí (`#B82828`) y titila hasta superar el umbral de recuperación.
+* **Feedback de Recolección Arcade (Sin Pausas ni Flashes Bloqueantes):**
+  - Al hacer contacto con el `Area2D` de la nota, la recolección es **inmediata y desatendida** (estilo moneda o reliquia arcade).
+  - El jugador no sufre parones, ni se abre ninguna ilustración que le tape la pantalla.
+  - Efectos simultáneos en el instante de contacto:
+    1. **Audio:** Sonido seco y crujiente de papel antiguo desgarrado.
+    2. **Partículas:** Brote radial de 8 a 10 partículas diminutas de polvo blanco/dorado (`CPUParticles2D`) en el punto del mapa donde estaba la nota.
+    3. **HUD:** Incremento del contador numérico con el pulso elástico del icono.
+    4. **Comportamiento del Monstruo:** La criatura recibe la señal de aceleración de fase (ver [Dificultad y Balance](../gameplay/dificultad_y_balance.md)) sin interrumpir la persecución activa.
 
 ---
 
-## 3. Menú de Pausa (En Partida)
+## 3. Menú Principal (Key Art y Portada Dinámica)
+
+El Menú Principal (`escenas/menu_inicio.tscn`) es la pieza visual prioritaria del proyecto, funcionando simultáneamente como portada oficial (*Key Art* para plataformas como itch.io y Newgrounds) y pantalla de bienvenida interactiva.
+
+### 3.1. Arquitectura Visual en Capas de Profundidad (Paralaje 2D)
+En lugar de una imagen estática plana, el menú se compone de 3 planos en Godot:
+1. **Fondo (`TextureRect`):** Paisaje sombrío de copas de pinos lejanos envueltos en bruma fría azul petróleo (`#141824`).
+2. **Sujeto Central (`TextureRect` con canal alfa):** Silueta detallada a tinta negra de árboles en primer plano con la criatura oculta acechando, cuyos ojos brillan con material `unshaded`.
+3. **Capa Interactiva (UI / CanvasLayer):**
+   - **Logotipo "VOSQUE":** Tipografía vectorial raspada y angular, con una animación sutil de parpadeo estocástico y micro-temblor de pánico.
+   - **Niebla en Movimiento:** Emisor `CPUParticles2D` con partículas suaves semitransparentes cruzando horizontalmente la parte inferior de la pantalla.
+   - **Efecto de Ratón (Paralaje Dinámico):** Un script sencillo desplaza la capa de fondo y el sujeto ligeramente en dirección contraria a la posición del cursor del ratón ($\pm 15\text{ px}$ y $\pm 30\text{ px}$ respectivamente), generando un efecto 2.5D impresionante sin coste de renderizado.
+
+### 3.2. Botones y Tipografía
+* Se descartan los botones grises por defecto del motor.
+* Botones estilizados mediante `Theme` y `StyleBoxFlat`:
+  - Estado Normal: Fondo transparente, texto blanco desgastado con contorno negro sutil.
+  - Estado *Hover* / *Focus*: Resalte en rojo óxido (`#8A2020`) con una pequeña línea indicadora vertical y sonido grave de tensión al pasar el cursor.
+
+---
+
+## 4. Menú de Pausa (En Partida)
 
 El menú de pausa permite interrumpir temporalmente la sesión de juego sin perder el estado actual ni romper la inmersión visual.
 
-### 3.1. Estética y Comportamiento Visual
+### 4.1. Estética y Comportamiento Visual
 * **Superposición translúcida:** Un fondo oscuro semitransparente (`ColorRect` en `Color(0, 0, 0, 0.65)`) cubre la pantalla.
 * **Fondo congelado:** El bosque, el personaje y la criatura permanecen visibles bajo el velo en la posición exacta donde se pausó, y la `Camera2D` del personaje sigue centrando la vista en el viewport.
 * **Congelación de simulación:** Se desactivan las físicas (`_physics_process`), el movimiento de personajes, enemigos y temporizadores de notas.
 
-### 3.2. Opciones y Flujo de Interacción
+### 4.2. Opciones y Flujo de Interacción
 1. **Continuar:**
    - Cierra la superposición de pausa de inmediato (sin fundido a negro) y restaura la simulación.
    - Recibe el foco automático (`grab_focus()`) al abrir el menú de pausa para reanudación instantánea con `Espacio`, `Enter` o pulsando nuevamente `Escape`.
@@ -56,14 +85,18 @@ El menú de pausa permite interrumpir temporalmente la sesión de juego sin perd
 
 ---
 
-## 4. Pantalla de Game Over
+## 5. Pantalla de Game Over (Impacto y Jumpscare)
 
-Aparece de forma inmediata tras el contacto con el monstruo:
-1. **Arte de Impacto:** Ilustración de jumpscare/derrota en estilo cómic oscuro o estática roja.
-2. **Resultados de la Partida:**
+Aparece de forma inmediata tras el contacto mortal con el monstruo:
+1. **Arte de Impacto:** Ilustración de jumpscare de alto contraste (`game_over_jumpscare`, $512 \times 512$ px) enmarcada en el tercio superior/central.
+2. **Efectos en Motor:**
+   - Sacudida súbita de pantalla (*Camera Shake*) durante $0.3\text{ s}$.
+   - Flash rojo intenso instantáneo que se disuelve en oscuridad total.
+   - Estática y ruido sutil analógico.
+3. **Resultados de la Partida:**
    - Páginas recogidas en la sesión actual.
    - Récord histórico (*High Score* persistido en `LocalStorage` vía JavaScript / Web).
-3. **Acción Rápida:** Botón llamativo de "Reintentar" y soporte para presionar `Espacio` para reiniciar la partida en menos de 1 segundo.
+4. **Acción Rápida:** Botón llamativo de "Reintentar" y soporte para presionar `Espacio` para reiniciar la partida en menos de 1 segundo.
 
 ---
 

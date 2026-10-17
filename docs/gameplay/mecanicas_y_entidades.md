@@ -44,7 +44,11 @@ flowchart TD
   move_and_slide()
   ```
 * **Comportamiento ante obstáculos:** Si choca contra un árbol, se desliza alrededor de él utilizando la física y colisiones nativas de Godot (`move_and_slide()`).
-* **Feedback de proximidad:** Sonido ambiental gutural/estática o temblor leve de cámara cuando está dentro del radio de luz del jugador.
+* **Representación Visual y Rotación $360^\circ$ Continua:**
+  - El monstruo utiliza un spritesheet ultra-compacto de solo 2 a 3 cuadros (`monstruo_persecucion`) orientado de base hacia la derecha ($+X$).
+  - Su nodo visual rota matemáticamente en tiempo real (`_visual.rotation = velocity.angle()`), garantizando que sus garras y cabeza apunten siempre en el vector exacto de persecución sin tener que dibujar direcciones extra.
+  - **Ojos Auto-iluminados:** Ojos retro-reflectantes amarillo/rojo brillante con material sin sombreado (`unshaded`) o un pequeño `PointLight2D`, haciéndolos visibles como dos puntos amenazantes antes de que su silueta completa penetre en el haz de la linterna.
+* **Feedback de proximidad:** Sonido ambiental gutural/estática o temblor leve de cámara cuando está dentro del radio de luz del jugador. En la fase de *Cacería Frenética*, emite una estela sutil de humo negro con `CPUParticles2D`.
 
 #### Diagrama de Estados del Monstruo
 ```mermaid
@@ -65,26 +69,25 @@ stateDiagram-v2
     Atrapado --> [*]
 ```
 
-### 2.3. Sistema de Notas (`Area2D`)
+### 2.3. Sistema de Notas Coleccionables Arcade (`Area2D`)
 * Existe **solo una nota en pantalla a la vez** para forzar al jugador a explorar y recorrer los 4 sectores del mapa activamente.
 * **Jerarquía de la Escena (`escenas/nota.tscn`):**
   ```text
   Nota (Area2D) [Capa 5: Interactuables]
-  ├── Sprite2D (Hoja ensangrentada / envejecida de 64x64 px)
+  ├── Sprite2D (Hoja de papel viejo / reliquia de 64x64 px con flotación senoidal)
   ├── CollisionShape2D (Círculo de radio 32 px)
   ├── LuzPropia (PointLight2D - Halo tenue blanco/amarillento de ~200 px con pulso suave)
-  └── GPUParticles2D / CPUParticles2D (Partículas flotantes sutiles de polvo/brillo)
+  └── CPUParticles2D (Micro-partículas doradas/blancas emitidas al ser recogida)
   ```
 * **Visibilidad en Penumbra:**
-  - La nota emite su propio resplandor pulsante (`PointLight2D`), actuando como una **baliza visual a media distancia** para que el jugador pueda orientarse hacia ella en la oscuridad sin necesidad de barrer a ciegas.
-* **Proceso de Recolección Inmediata:**
+  - La nota emite su propio resplandor pulsante (`PointLight2D`), actuando como una **baliza visual a media distancia** para que el jugador pueda orientarse hacia ella en la penumbra sin necesidad de barrer a ciegas con la linterna.
+* **Proceso de Recolección Arcade Fluida (Estilo Moneda):**
   1. **Contacto:** Detección instantánea al entrar en contacto con el jugador (`body_entered`).
-  2. **Feedback Sonoro:** Reproduce un acorde tenso, rasgado de papel o golpe de cuerda disonante.
-  3. **Puntuación:** Incrementa el contador del HUD en $+1$.
-  4. **Flash de Nota (1 segundo):** Muestra una ilustración siniestra en pantalla completa durante 1 segundo exacto sin congelar el juego (el monstruo sigue persiguiendo).
-  5. **Escalado del Monstruo:** Aumenta la velocidad del enemigo según la fórmula exponencial.
-  6. **Mutación Espacial:** Dispara la mutación de los **3 sectores lejanos** (donde no está el jugador).
-  7. **Nueva Nota:** Se instancia una nueva nota en un `Marker2D` candidato de cualquiera de los 3 sectores recién mutados a una distancia $R_{\min} \ge 600\text{ px}$.
+  2. **Feedback Sonoro Inmediato:** Reproduce un rasgado seco de papel o sonido de reliquia antigua sin detener la acción.
+  3. **Partículas y HUD:** Estallido breve de 8 partículas en el mapa y rebote elástico en el contador del HUD (`+1`). No se despliegan pantallas de bloqueo ni textos que obstaculicen la visión.
+  4. **Escalado del Monstruo:** Aumenta la velocidad del enemigo según la fórmula exponencial (ver [Dificultad y Balance](dificultad_y_balance.md)).
+  5. **Mutación Espacial:** Dispara la mutación de los **3 sectores lejanos** (donde no está el jugador).
+  6. **Nueva Nota:** Se instancia una nueva nota en un `Marker2D` candidato de cualquiera de los 3 sectores recién mutados a una distancia $R_{\min} \ge 600\text{ px}$.
 
 ### 2.4. El Bosque: Cuadrícula 2x2 de Sectores Mutables
 > 📄 **Especificación completa:** Consulta **[Mapa y Sectores](mapa_y_sectores.md)** para la topología matemática, arquitectura de sub-escenas de variantes, límites físicos/visuales, corredores de conectividad y matriz de capas de colisión.
