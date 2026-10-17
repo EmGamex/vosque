@@ -15,6 +15,8 @@ extends CanvasLayer
 @onready var label_aceleracion: Label = $PanelContainer/MarginContainer/VBoxContainer/LabelAceleracion
 @onready var label_friccion: Label = $PanelContainer/MarginContainer/VBoxContainer/LabelFriccion
 @onready var label_direccion: Label = $PanelContainer/MarginContainer/VBoxContainer/LabelDireccion
+@onready var label_estado: Label = $PanelContainer/MarginContainer/VBoxContainer/LabelEstado
+@onready var label_estamina: Label = $PanelContainer/MarginContainer/VBoxContainer/LabelEstamina
 @onready var label_fps: Label = $PanelContainer/MarginContainer/VBoxContainer/LabelFPS
 @onready var panel_container: PanelContainer = $PanelContainer
 @onready var panel_direccion: PanelContainer = $PanelContainerDireccion
@@ -25,6 +27,8 @@ extends CanvasLayer
 
 const COLOR_INACTIVO: Color = Color(0.55, 0.60, 0.70, 0.6)
 const COLOR_ACTIVO: Color = Color(0.40, 0.85, 1.0, 1.0)
+const COLOR_ALERTA: Color = Color(1.0, 0.45, 0.45, 1.0)
+const COLOR_AMBAR: Color = Color(0.95, 0.75, 0.25, 1.0)
 
 
 func _ready() -> void:
@@ -85,6 +89,36 @@ func _process(_delta: float) -> void:
 	label_aceleracion.text = "Aceleración: %.1f px/s²" % accel
 	label_friccion.text = "Fricción: %.1f px/s²" % fric
 	label_direccion.text = "Input dirección: (X: %.2f, Y: %.2f)" % [dir.x, dir.y]
+
+	if label_estado != null:
+		var nombre_estado: String = ""
+		if target_character.has_method("obtener_nombre_estado"):
+			nombre_estado = target_character.obtener_nombre_estado()
+		elif "estado_actual" in target_character:
+			nombre_estado = str(target_character.get("estado_actual"))
+		else:
+			nombre_estado = "N/A"
+		label_estado.text = "Estado: %s" % nombre_estado
+		if nombre_estado in ["FATIGA", "RECUPERANDOSE"]:
+			label_estado.modulate = COLOR_ALERTA
+		elif nombre_estado in ["SPRINT", "SALTO", "PLANCHA_AIRE"]:
+			label_estado.modulate = COLOR_AMBAR
+		else:
+			label_estado.modulate = Color.WHITE
+
+	if label_estamina != null:
+		var st: float = target_character.get("stamina") if "stamina" in target_character else 0.0
+		var max_st: float = target_character.get("max_stamina") if "max_stamina" in target_character else 100.0
+		var fat: bool = bool(target_character.get("fatigado")) if "fatigado" in target_character else false
+		var pct: float = (st / max_st * 100.0) if max_st > 0.0 else 0.0
+		var sufijo_fatiga: String = " [FATIGA]" if fat else ""
+		label_estamina.text = "Estamina: %.1f / %.1f (%.0f%%)%s" % [st, max_st, pct, sufijo_fatiga]
+		if fat:
+			label_estamina.modulate = COLOR_ALERTA
+		elif st < 30.0:
+			label_estamina.modulate = COLOR_AMBAR
+		else:
+			label_estamina.modulate = Color.WHITE
 
 	_actualizar_flechas(dir)
 
