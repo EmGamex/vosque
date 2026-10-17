@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Vosque"
-run/main_scene="uid://dl88w12yyd8ee"
+run/main_scene="res://escenas/gestor_escenas.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 

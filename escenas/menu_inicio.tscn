@@ -1,0 +1,42 @@
+[gd_scene format=3 uid="uid://d3e688a28kpuq"]
+
+[ext_resource type="Script" uid="uid://b6jiwn4xdtmcp" path="res://scripts/menu_inicio.gd" id="1_leqng"]
+
+[node name="MenuInicio" type="Control" unique_id=987334960]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_leqng")
+
+[node name="Fondo" type="ColorRect" parent="." unique_id=1010292177]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.05, 0.06, 0.08, 1)
+
+[node name="Layout" type="CenterContainer" parent="." unique_id=406213008]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Columna" type="VBoxContainer" parent="Layout" unique_id=496350804]
+layout_mode = 2
+theme_override_constants/separation = 28
+alignment = 1
+
+[node name="Titulo" type="Label" parent="Layout/Columna" unique_id=734086782]
+layout_mode = 2
+theme_override_font_sizes/font_size = 72
+text = "VOSQUE"
+horizontal_alignment = 1
+
+[node name="BotonJugar" type="Button" parent="Layout/Columna" unique_id=899550942]
+custom_minimum_size = Vector2(240, 52)
+layout_mode = 2
+text = "Jugar"
+
+[node name="BotonSalir" type="Button" parent="Layout/Columna" unique_id=49091203]
+custom_minimum_size = Vector2(240, 52)
+layout_mode = 2
+text = "Salir"

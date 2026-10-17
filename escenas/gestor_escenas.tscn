@@ -1,0 +1,75 @@
+[gd_scene format=3 uid="uid://bxv11d4inma1h"]
+
+[ext_resource type="Script" uid="uid://dbhas6loawsia" path="res://scripts/gestor_escenas.gd" id="1_ve7em"]
+[ext_resource type="PackedScene" uid="uid://d3e688a28kpuq" path="res://escenas/menu_inicio.tscn" id="2_05fps"]
+[ext_resource type="PackedScene" uid="uid://dl88w12yyd8ee" path="res://escenas/maain.tscn" id="3_jbqwm"]
+[ext_resource type="PackedScene" uid="uid://c7acatnude74i" path="res://escenas/game_over.tscn" id="4_tepdp"]
+
+[sub_resource type="Animation" id="Animation_srsjv"]
+length = 0.25
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Velo:modulate:a")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.25),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [1.0, 0.0]
+}
+
+[sub_resource type="Animation" id="Animation_ve7em"]
+length = 0.25
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Velo:modulate:a")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.25),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_5bi3b"]
+_data = {
+&"fundido_entrada": SubResource("Animation_srsjv"),
+&"fundido_salida": SubResource("Animation_ve7em")
+}
+
+[node name="GestorEscenas" type="Node" unique_id=1515374323]
+script = ExtResource("1_ve7em")
+
+[node name="Transicion" type="CanvasLayer" parent="." unique_id=968021334]
+layer = 100
+
+[node name="Velo" type="ColorRect" parent="Transicion" unique_id=2029228719]
+modulate = Color(1, 1, 1, 0)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Anim" type="AnimationPlayer" parent="Transicion" unique_id=764417678]
+libraries/ = SubResource("AnimationLibrary_5bi3b")
+
+[node name="Contenedor" type="Node" parent="." unique_id=1002276879]
+
+[node name="MenuInicio" parent="Contenedor" unique_id=987334960 instance=ExtResource("2_05fps")]
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Maain" parent="Contenedor" unique_id=1472011216 instance=ExtResource("3_jbqwm")]
+process_mode = 4
+visible = false
+
+[node name="GameOver" parent="Contenedor" unique_id=813482028 instance=ExtResource("4_tepdp")]
+process_mode = 4
+visible = false
+grow_horizontal = 2
+grow_vertical = 2
