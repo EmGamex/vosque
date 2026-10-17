@@ -36,6 +36,7 @@ Para facilitar la lectura y desarrollo, la documentación está dividida en las 
 
 ### [Gameplay y Mecánicas](gameplay/mecanicas_y_entidades.md)
 - [Personaje y Habilidades](gameplay/personaje_y_habilidades.md): Atributos físicos, sprint con barra de estamina, linterna híbrida y máquina de estados del jugador.
+- [Mapa y Sectores](gameplay/mapa_y_sectores.md): Topología 2x2, composición modular, límites físicos/visuales, corredores de conectividad y matriz de capas de colisión.
 - [Mecánicas y Entidades](gameplay/mecanicas_y_entidades.md): Core loop, jugador, IA del monstruo, notas, bosque mutable de 4 sectores y cámara interactiva.
 - [Dificultad y Balance](gameplay/dificultad_y_balance.md): Progresión por notas, fórmulas de velocidad y reubicación en sectores mutados.
 

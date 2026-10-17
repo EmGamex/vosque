@@ -28,11 +28,12 @@ $$\text{Velocidad}(n) = \text{Velocidad Base} \times (1 + \text{Tasa Incremento}
 ---
 
 ## 3. Criterio de Reubicación de Notas y Mutación Espacial
+> 📄 **Especificación técnica:** Para el algoritmo completo y manejo de colisiones, consulta **[Mapa y Sectores](mapa_y_sectores.md)**.
 
 Para evitar situaciones injustas o notas que aparezcan encima del jugador o del monstruo, y para sacar provecho de la arquitectura de 4 sectores:
-1. Cada variante de sector contiene sus propios nodos candidatos de spawn (`Marker2D`).
+1. Cada variante de sector contiene sus propios nodos candidatos de spawn (`Marker2D` con grupo `"puntos_nota"`).
 2. Al recoger una nota, se mutan las variantes de los **3 sectores lejanos** (donde no se encuentra el jugador).
 3. La nueva nota se genera aleatoriamente en uno de los puntos candidatos pertenecientes a cualquiera de los **3 sectores recién mutados**, garantizando:
-   - Que nunca aparezca en el sector actual del jugador ni a una distancia menor a $R_{\min}$.
+   - Que nunca aparezca en el sector actual del jugador ni a una distancia menor a $R_{\min} \approx 600\text{ px}$.
    - Que el jugador se vea obligado a desplazarse activamente hacia zonas oscuras cuya distribución y pasillos acaban de cambiar.
 
