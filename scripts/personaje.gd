@@ -42,6 +42,8 @@ signal estado_cambiado(nuevo_estado: Estado, nombre_estado: String)
 var estado_actual: Estado = Estado.REPOSO
 var stamina: float = 100.0
 var fatigado: bool = false
+var god_mode: bool = false
+var sin_gasto_estamina: bool = false
 
 var _regen_timer: float = 0.0
 var _tiempo_aire: float = 0.0
@@ -81,22 +83,26 @@ func _physics_process(delta: float) -> void:
 
 	match estado_actual:
 		Estado.REPOSO, Estado.CAMINANDO, Estado.SPRINT, Estado.FATIGA:
-			if quiere_salto and not fatigado and stamina >= jump_stamina_cost:
+			if quiere_salto and not fatigado and (sin_gasto_estamina or stamina >= jump_stamina_cost):
 				_iniciar_salto_libre()
 				estamina_consumida_en_frame = true
 			else:
 				var vel_objetivo: float = speed
-				if quiere_sprint and is_moving and not fatigado and stamina > 0.0:
+				if quiere_sprint and is_moving and not fatigado and (sin_gasto_estamina or stamina > 0.0):
 					_cambiar_estado(Estado.SPRINT)
 					vel_objetivo = sprint_speed
-					stamina = max(0.0, stamina - sprint_drain_rate * delta)
-					_regen_timer = stamina_regen_delay
-					estamina_consumida_en_frame = true
-					if stamina <= 0.0:
-						stamina = 0.0
-						fatigado = true
-						_cambiar_estado(Estado.FATIGA)
-					estamina_cambiada.emit(stamina, max_stamina, fatigado)
+					if not sin_gasto_estamina:
+						stamina = max(0.0, stamina - sprint_drain_rate * delta)
+						_regen_timer = stamina_regen_delay
+						estamina_consumida_en_frame = true
+						if stamina <= 0.0:
+							stamina = 0.0
+							fatigado = true
+							_cambiar_estado(Estado.FATIGA)
+						estamina_cambiada.emit(stamina, max_stamina, fatigado)
+					else:
+						# En modo sin gasto no reiniciamos _regen_timer ni agotamos la barra
+						pass
 				elif fatigado:
 					_cambiar_estado(Estado.FATIGA)
 					vel_objetivo = speed
@@ -116,7 +122,7 @@ func _physics_process(delta: float) -> void:
 				_actualizar_procedural_suelo(direction, delta)
 
 		Estado.SALTO:
-			if quiere_salto and not fatigado and stamina >= dive_stamina_cost:
+			if quiere_salto and not fatigado and (sin_gasto_estamina or stamina >= dive_stamina_cost):
 				_iniciar_plancha(direction)
 				estamina_consumida_en_frame = true
 			else:
@@ -154,12 +160,13 @@ func _physics_process(delta: float) -> void:
 
 
 func _iniciar_salto_libre() -> void:
-	stamina = max(0.0, stamina - jump_stamina_cost)
-	_regen_timer = stamina_regen_delay
-	if stamina <= 0.0:
-		stamina = 0.0
-		fatigado = true
-	estamina_cambiada.emit(stamina, max_stamina, fatigado)
+	if not sin_gasto_estamina:
+		stamina = max(0.0, stamina - jump_stamina_cost)
+		_regen_timer = stamina_regen_delay
+		if stamina <= 0.0:
+			stamina = 0.0
+			fatigado = true
+		estamina_cambiada.emit(stamina, max_stamina, fatigado)
 
 	_tiempo_aire = 0.0
 	_duracion_aire_actual = jump_duration
@@ -183,12 +190,13 @@ func _finalizar_salto_libre(is_moving: bool) -> void:
 
 
 func _iniciar_plancha(direccion_actual: Vector2) -> void:
-	stamina = max(0.0, stamina - dive_stamina_cost)
-	_regen_timer = stamina_regen_delay
-	if stamina <= 0.0:
-		stamina = 0.0
-		fatigado = true
-	estamina_cambiada.emit(stamina, max_stamina, fatigado)
+	if not sin_gasto_estamina:
+		stamina = max(0.0, stamina - dive_stamina_cost)
+		_regen_timer = stamina_regen_delay
+		if stamina <= 0.0:
+			stamina = 0.0
+			fatigado = true
+		estamina_cambiada.emit(stamina, max_stamina, fatigado)
 
 	if direccion_actual != Vector2.ZERO:
 		_direccion_plancha = direccion_actual.normalized()

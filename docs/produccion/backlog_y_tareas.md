@@ -154,3 +154,20 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
   - [ ] Captura de foco de canvas y anulación de scroll de página en Espacio/Flechas.
 - [ ] **Persistencia de High Score:** Guardado de récord histórico mediante `user://` (IndexedDB en navegador) con fallback a `localStorage`.
 - [ ] **Validación en Plataformas:** Pruebas de empaquetado `.zip` y ejecución en itch.io y Newgrounds.
+
+---
+
+## 9. Módulo: Herramientas de Depuración y Diagnóstico
+> 📄 **Especificación de referencia:** [`docs/herramientas/herramientas_de_debug.md`](../herramientas/herramientas_de_debug.md)  
+> 💻 **Archivos clave:** `escenas/debug_menu.tscn`, `scripts/debug_menu.gd`, `addons/personaje_tools/`
+
+- [x] **Toolbar de Personaje en Editor:** Plugin contextual `addons/personaje_tools` para ajuste de velocidad, aceleración y fricción.
+- [ ] **Menú Unificado de Debug In-Game (`escenas/debug_menu.tscn`):**
+  - [ ] Ciclo tri-estado con <kbd>F3</kbd>: Oculto ➔ Mini-HUD ➔ Menú Completo.
+  - [ ] Mini-HUD con FPS, memoria, cuadrante y velocidad en esquina superior.
+  - [ ] Pestaña Jugador: telemetría física, pad 8-dir y cheats de prueba (estamina infinita, god mode).
+  - [ ] Pestaña Escenario (Issue #3): cuadrante activo, forzado manual de mutación, vista global (God View) y toggles visuales de corredores ($160\text{ px}$).
+  - [ ] Pestaña Monstruo: estado de persecución, anti-atascamiento, cálculo de velocidad y botón de reubicación segura.
+  - [ ] Pestaña Sistema: escala de tiempo (`Engine.time_scale`), reinicio rápido de escena y simulador de notas.
+- [ ] **Linter de Escenario (`addons/escenario_tools`):** Guías visuales de exclusión ($80\text{ px}$) y validación estática de colisiones en variantes.
+

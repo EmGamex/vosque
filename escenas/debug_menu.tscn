@@ -1,0 +1,512 @@
+[gd_scene format=3 uid="uid://b74g6q4tcthym"]
+
+[ext_resource type="Script" uid="uid://byb3r3mdn2lns" path="res://scripts/debug_menu.gd" id="1_5npcy"]
+[ext_resource type="Script" uid="uid://jqibmsc5a26i" path="res://scripts/debug_overlay.gd" id="2_knsa1"]
+
+[node name="DebugMenu" type="CanvasLayer" unique_id=85566436]
+process_mode = 3
+layer = 100
+visible = false
+script = ExtResource("1_5npcy")
+
+[node name="DebugOverlay" type="Node2D" parent="." unique_id=517704006 node_paths=PackedStringArray("menu_debug")]
+script = ExtResource("2_knsa1")
+menu_debug = NodePath("..")
+
+[node name="ControlRaiz" type="Control" parent="." unique_id=1519865449]
+layout_mode = 3
+anchors_preset = 0
+mouse_filter = 2
+
+[node name="MiniHUD" type="PanelContainer" parent="ControlRaiz" unique_id=1321673468]
+visible = false
+layout_mode = 0
+offset_left = 840.0
+offset_top = 20.0
+offset_right = 1060.0
+
+[node name="Margin" type="MarginContainer" parent="ControlRaiz/MiniHUD" unique_id=2013754511]
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="ControlRaiz/MiniHUD/Margin" unique_id=1684433013]
+layout_mode = 2
+
+[node name="LabelMiniFPS" type="Label" parent="ControlRaiz/MiniHUD/Margin/VBox" unique_id=2141941429]
+layout_mode = 2
+
+[node name="LabelMiniCuadrante" type="Label" parent="ControlRaiz/MiniHUD/Margin/VBox" unique_id=777199661]
+layout_mode = 2
+
+[node name="LabelMiniVel" type="Label" parent="ControlRaiz/MiniHUD/Margin/VBox" unique_id=1867272120]
+layout_mode = 2
+
+[node name="LabelMiniEstamina" type="Label" parent="ControlRaiz/MiniHUD/Margin/VBox" unique_id=2019082139]
+layout_mode = 2
+
+[node name="BtnMiniExpandir" type="Button" parent="ControlRaiz/MiniHUD/Margin/VBox" unique_id=1033766114]
+layout_mode = 2
+text = "Expandir [F3]"
+
+[node name="PanelConsola" type="PanelContainer" parent="ControlRaiz" unique_id=916224818]
+visible = false
+layout_mode = 0
+offset_left = 40.0
+offset_top = 40.0
+offset_right = 720.0
+offset_bottom = 700.0
+
+[node name="Margin" type="MarginContainer" parent="ControlRaiz/PanelConsola" unique_id=306534353]
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="ControlRaiz/PanelConsola/Margin" unique_id=1431056550]
+layout_mode = 2
+
+[node name="BarraSuperior" type="HBoxContainer" parent="ControlRaiz/PanelConsola/Margin/VBox" unique_id=2135143242]
+layout_mode = 2
+
+[node name="Titulo" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/BarraSuperior" unique_id=1991116239]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "VOSQUE // CONSOLA DE DEBUG"
+
+[node name="CheckPausar" type="CheckBox" parent="ControlRaiz/PanelConsola/Margin/VBox/BarraSuperior" unique_id=27641551]
+layout_mode = 2
+text = "Pausar Simulación"
+
+[node name="BotonCerrar" type="Button" parent="ControlRaiz/PanelConsola/Margin/VBox/BarraSuperior" unique_id=1045357290]
+layout_mode = 2
+text = "X [F3]"
+
+[node name="TabContainer" type="TabContainer" parent="ControlRaiz/PanelConsola/Margin/VBox" unique_id=1432848411]
+layout_mode = 2
+size_flags_vertical = 3
+current_tab = 0
+
+[node name="Jugador" type="MarginContainer" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer" unique_id=1680788630]
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="VBox" type="VBoxContainer" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador" unique_id=1563908410]
+layout_mode = 2
+
+[node name="GridTelemetria" type="GridContainer" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox" unique_id=1996595814]
+layout_mode = 2
+columns = 2
+
+[node name="LblVel" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/GridTelemetria" unique_id=1469818602]
+layout_mode = 2
+text = "Velocidad actual:"
+
+[node name="ValVel" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/GridTelemetria" unique_id=1139988243]
+layout_mode = 2
+text = "0.0 px/s"
+
+[node name="LblVelMax" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/GridTelemetria" unique_id=851088513]
+layout_mode = 2
+text = "Velocidad máxima:"
+
+[node name="ValVelMax" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/GridTelemetria" unique_id=1943803262]
+layout_mode = 2
+text = "800.0 px/s"
+
+[node name="LblAcel" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/GridTelemetria" unique_id=2122338222]
+layout_mode = 2
+text = "Aceleración:"
+
+[node name="ValAcel" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/GridTelemetria" unique_id=1077834200]
+layout_mode = 2
+text = "5000.0 px/s²"
+
+[node name="LblFric" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/GridTelemetria" unique_id=1054408213]
+layout_mode = 2
+text = "Fricción:"
+
+[node name="ValFric" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/GridTelemetria" unique_id=1262630442]
+layout_mode = 2
+text = "5000.0 px/s²"
+
+[node name="LblEstado" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/GridTelemetria" unique_id=971045860]
+layout_mode = 2
+text = "Estado cinemático:"
+
+[node name="ValEstado" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/GridTelemetria" unique_id=1730409293]
+layout_mode = 2
+text = "REPOSO"
+
+[node name="LblEstamina" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/GridTelemetria" unique_id=547163383]
+layout_mode = 2
+text = "Estamina:"
+
+[node name="ValEstamina" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/GridTelemetria" unique_id=1222103160]
+layout_mode = 2
+text = "100.0 / 100.0"
+
+[node name="LblPosicion" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/GridTelemetria" unique_id=860709161]
+layout_mode = 2
+text = "Posición global:"
+
+[node name="ValPosicion" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/GridTelemetria" unique_id=674548733]
+layout_mode = 2
+text = "(0.0, 0.0)"
+
+[node name="LblCuadrante" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/GridTelemetria" unique_id=1895418772]
+layout_mode = 2
+text = "Cuadrante actual:"
+
+[node name="ValCuadrante" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/GridTelemetria" unique_id=1928683818]
+layout_mode = 2
+text = "NO"
+
+[node name="HBoxPad" type="HBoxContainer" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox" unique_id=1789013965]
+layout_mode = 2
+
+[node name="GridPad" type="GridContainer" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/HBoxPad" unique_id=1188832259]
+layout_mode = 2
+columns = 3
+
+[node name="SpacerTL" type="Control" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/HBoxPad/GridPad" unique_id=1778788225]
+layout_mode = 2
+
+[node name="FlechaUp" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/HBoxPad/GridPad" unique_id=842619574]
+layout_mode = 2
+text = "▲"
+
+[node name="SpacerTR" type="Control" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/HBoxPad/GridPad" unique_id=185676433]
+layout_mode = 2
+
+[node name="FlechaLeft" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/HBoxPad/GridPad" unique_id=95227815]
+layout_mode = 2
+text = "◀"
+
+[node name="SpacerCenter" type="Control" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/HBoxPad/GridPad" unique_id=421933305]
+layout_mode = 2
+
+[node name="FlechaRight" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/HBoxPad/GridPad" unique_id=2043641676]
+layout_mode = 2
+text = "▶"
+
+[node name="SpacerBL" type="Control" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/HBoxPad/GridPad" unique_id=67403661]
+layout_mode = 2
+
+[node name="FlechaDown" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/HBoxPad/GridPad" unique_id=342839062]
+layout_mode = 2
+text = "▼"
+
+[node name="SpacerBR" type="Control" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/HBoxPad/GridPad" unique_id=1280536404]
+layout_mode = 2
+
+[node name="HBoxCheats" type="HBoxContainer" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox" unique_id=780429089]
+layout_mode = 2
+
+[node name="CheckEstaminaInfinita" type="CheckBox" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/HBoxCheats" unique_id=742600648]
+layout_mode = 2
+text = "Estamina Infinita"
+
+[node name="CheckGodMode" type="CheckBox" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/HBoxCheats" unique_id=1211610447]
+layout_mode = 2
+text = "Invencibilidad (God Mode)"
+
+[node name="BtnDesplegarFisicas" type="Button" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox" unique_id=1690529426]
+layout_mode = 2
+text = "▶ Ajustes de Velocidad y Físicas (Desplegar)"
+
+[node name="PanelDesplegableFisicas" type="PanelContainer" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox" unique_id=197376244]
+visible = false
+layout_mode = 2
+
+[node name="MarginFisicas" type="MarginContainer" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas" unique_id=1497865632]
+layout_mode = 2
+
+[node name="ContenidoFisicas" type="VBoxContainer" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas" unique_id=1264322281]
+layout_mode = 2
+
+[node name="HBoxOpciones" type="HBoxContainer" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas" unique_id=1334928671]
+layout_mode = 2
+
+[node name="CheckProporcional" type="CheckBox" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas/HBoxOpciones" unique_id=553264572]
+layout_mode = 2
+button_pressed = true
+text = "Modo Automático: Mantener relación proporcional con velocidad base"
+
+[node name="GridVelocidades" type="GridContainer" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas" unique_id=155219517]
+layout_mode = 2
+columns = 3
+
+[node name="LblSliderVel" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas/GridVelocidades" unique_id=184114788]
+layout_mode = 2
+text = "Caminar (speed):"
+
+[node name="SliderVelNormal" type="HSlider" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas/GridVelocidades" unique_id=1634506795]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 50.0
+max_value = 3000.0
+step = 10.0
+value = 800.0
+
+[node name="ValSliderVelNormal" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas/GridVelocidades" unique_id=1629463925]
+custom_minimum_size = Vector2(85, 0)
+layout_mode = 2
+text = "800 px/s"
+
+[node name="LblSliderSprint" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas/GridVelocidades" unique_id=766735717]
+layout_mode = 2
+text = "Sprint (sprint_speed):"
+
+[node name="SliderVelSprint" type="HSlider" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas/GridVelocidades" unique_id=786865897]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 50.0
+max_value = 3000.0
+step = 10.0
+value = 1000.0
+
+[node name="ValSliderVelSprint" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas/GridVelocidades" unique_id=448153190]
+custom_minimum_size = Vector2(85, 0)
+layout_mode = 2
+text = "1000 px/s"
+
+[node name="LblSliderAcel" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas/GridVelocidades" unique_id=1614251751]
+layout_mode = 2
+text = "Aceleración (accel):"
+
+[node name="SliderAcel" type="HSlider" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas/GridVelocidades" unique_id=1701688510]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 100.0
+max_value = 20000.0
+step = 50.0
+value = 5000.0
+
+[node name="ValSliderAcel" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas/GridVelocidades" unique_id=1048256105]
+custom_minimum_size = Vector2(85, 0)
+layout_mode = 2
+text = "5000 px/s²"
+
+[node name="LblSliderFric" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas/GridVelocidades" unique_id=39638024]
+layout_mode = 2
+text = "Fricción (friction):"
+
+[node name="SliderFric" type="HSlider" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas/GridVelocidades" unique_id=1864151953]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 100.0
+max_value = 20000.0
+step = 50.0
+value = 5000.0
+
+[node name="ValSliderFric" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas/GridVelocidades" unique_id=1282877009]
+custom_minimum_size = Vector2(85, 0)
+layout_mode = 2
+text = "5000 px/s²"
+
+[node name="LblSliderDiveVel" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas/GridVelocidades" unique_id=1461881017]
+layout_mode = 2
+text = "Plancha (dive_speed):"
+
+[node name="SliderDiveVel" type="HSlider" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas/GridVelocidades" unique_id=594872279]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 100.0
+max_value = 4000.0
+step = 50.0
+value = 1200.0
+
+[node name="ValSliderDiveVel" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas/GridVelocidades" unique_id=531529266]
+custom_minimum_size = Vector2(85, 0)
+layout_mode = 2
+text = "1200 px/s"
+
+[node name="HBoxAccionesFisicas" type="HBoxContainer" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas" unique_id=2062434727]
+layout_mode = 2
+
+[node name="BtnResetVelocidades" type="Button" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas/HBoxAccionesFisicas" unique_id=957765831]
+layout_mode = 2
+text = "Restablecer Velocidades por Defecto"
+
+[node name="Escenario" type="MarginContainer" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer" unique_id=1157345859]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="VBox" type="VBoxContainer" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario" unique_id=2127433003]
+layout_mode = 2
+
+[node name="LblEstadoEscenario" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario/VBox" unique_id=14551245]
+layout_mode = 2
+text = "Escenario: Modo Standalone"
+
+[node name="GridSectores" type="GridContainer" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario/VBox" unique_id=893073590]
+layout_mode = 2
+columns = 2
+
+[node name="ValNO" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario/VBox/GridSectores" unique_id=174729370]
+layout_mode = 2
+text = "Sector NO: Normal"
+
+[node name="ValNE" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario/VBox/GridSectores" unique_id=1757250638]
+layout_mode = 2
+text = "Sector NE: Normal"
+
+[node name="ValSO" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario/VBox/GridSectores" unique_id=1832789071]
+layout_mode = 2
+text = "Sector SO: Normal"
+
+[node name="ValSE" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario/VBox/GridSectores" unique_id=1851619028]
+layout_mode = 2
+text = "Sector SE: Normal"
+
+[node name="BtnForzarMutacion" type="Button" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario/VBox" unique_id=705091549]
+layout_mode = 2
+text = "Forzar Mutación de Sectores Lejanos"
+
+[node name="CheckGodView" type="CheckBox" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario/VBox" unique_id=726551144]
+layout_mode = 2
+text = "Cámara Global (God View - 2160x2160)"
+
+[node name="CheckCorredores" type="CheckBox" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario/VBox" unique_id=1479072709]
+layout_mode = 2
+text = "Mostrar Corredores de Seguridad (160 px)"
+
+[node name="CheckCuadrantes" type="CheckBox" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario/VBox" unique_id=1143339233]
+layout_mode = 2
+text = "Mostrar Cuadrantes y Ejes (X=0, Y=0)"
+
+[node name="Enemigo" type="MarginContainer" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer" unique_id=2076416922]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 2
+
+[node name="VBox" type="VBoxContainer" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Enemigo" unique_id=117159408]
+layout_mode = 2
+
+[node name="GridEnemigo" type="GridContainer" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Enemigo/VBox" unique_id=818560897]
+layout_mode = 2
+columns = 2
+
+[node name="LblEstadoIA" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Enemigo/VBox/GridEnemigo" unique_id=689284375]
+layout_mode = 2
+text = "Estado / Comportamiento:"
+
+[node name="ValEstadoIA" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Enemigo/VBox/GridEnemigo" unique_id=1161145054]
+layout_mode = 2
+text = "Persiguiendo"
+
+[node name="LblPosEnemigo" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Enemigo/VBox/GridEnemigo" unique_id=1510286314]
+layout_mode = 2
+text = "Posición del monstruo:"
+
+[node name="ValPosEnemigo" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Enemigo/VBox/GridEnemigo" unique_id=401080257]
+layout_mode = 2
+text = "(0.0, 0.0)"
+
+[node name="LblDistancia" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Enemigo/VBox/GridEnemigo" unique_id=727290925]
+layout_mode = 2
+text = "Distancia al jugador:"
+
+[node name="ValDistancia" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Enemigo/VBox/GridEnemigo" unique_id=1786491405]
+layout_mode = 2
+text = "0.0 px"
+
+[node name="LblVelEnemigo" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Enemigo/VBox/GridEnemigo" unique_id=668608021]
+layout_mode = 2
+text = "Velocidad del monstruo:"
+
+[node name="ValVelEnemigo" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Enemigo/VBox/GridEnemigo" unique_id=1977929301]
+layout_mode = 2
+text = "0.0 px/s"
+
+[node name="LblAtascamiento" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Enemigo/VBox/GridEnemigo" unique_id=1768145336]
+layout_mode = 2
+text = "Anti-Atascamiento:"
+
+[node name="ValAtascamiento" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Enemigo/VBox/GridEnemigo" unique_id=691828014]
+layout_mode = 2
+text = "Libre / Transitable"
+
+[node name="BtnReubicarEnemigo" type="Button" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Enemigo/VBox" unique_id=2001450848]
+layout_mode = 2
+text = "Reubicar Monstruo a Cuadrante Opuesto"
+
+[node name="CheckVisualDebug" type="CheckBox" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Enemigo/VBox" unique_id=418748269]
+layout_mode = 2
+text = "Línea de Visión / Vector IA (Raycast)"
+
+[node name="Sistema" type="MarginContainer" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer" unique_id=1889444902]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 3
+
+[node name="VBox" type="VBoxContainer" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema" unique_id=1481781608]
+layout_mode = 2
+
+[node name="GridSistema" type="GridContainer" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox" unique_id=1501182873]
+layout_mode = 2
+columns = 2
+
+[node name="LblFPS" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridSistema" unique_id=113218371]
+layout_mode = 2
+text = "Rendimiento (FPS):"
+
+[node name="ValFPS" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridSistema" unique_id=1394778364]
+layout_mode = 2
+text = "60 FPS"
+
+[node name="LblMemoria" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridSistema" unique_id=243894018]
+layout_mode = 2
+text = "Memoria estática:"
+
+[node name="ValMemoria" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridSistema" unique_id=1405368438]
+layout_mode = 2
+text = "0.0 MB"
+
+[node name="LblTimeScale" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridSistema" unique_id=986391560]
+layout_mode = 2
+text = "Escala de tiempo:"
+
+[node name="ValTimeScale" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridSistema" unique_id=1663104546]
+layout_mode = 2
+text = "1.0x"
+
+[node name="HBoxTimeScale" type="HBoxContainer" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox" unique_id=1722308957]
+layout_mode = 2
+
+[node name="Btn05x" type="Button" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/HBoxTimeScale" unique_id=525090339]
+layout_mode = 2
+text = "0.5x"
+
+[node name="Btn10x" type="Button" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/HBoxTimeScale" unique_id=700311864]
+layout_mode = 2
+text = "1.0x (Normal)"
+
+[node name="Btn20x" type="Button" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/HBoxTimeScale" unique_id=410614303]
+layout_mode = 2
+text = "2.0x (Rápido)"
+
+[node name="BtnReiniciarEscena" type="Button" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox" unique_id=1691475212]
+layout_mode = 2
+text = "Reiniciar Escena Actual"
+
+[connection signal="pressed" from="ControlRaiz/MiniHUD/Margin/VBox/BtnMiniExpandir" to="." method="_on_boton_mini_expandir_pressed"]
+[connection signal="toggled" from="ControlRaiz/PanelConsola/Margin/VBox/BarraSuperior/CheckPausar" to="." method="_on_check_pausar_toggled"]
+[connection signal="pressed" from="ControlRaiz/PanelConsola/Margin/VBox/BarraSuperior/BotonCerrar" to="." method="_on_boton_cerrar_pressed"]
+[connection signal="toggled" from="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/HBoxCheats/CheckEstaminaInfinita" to="." method="_on_check_estamina_infinita_toggled"]
+[connection signal="toggled" from="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/HBoxCheats/CheckGodMode" to="." method="_on_check_god_mode_toggled"]
+[connection signal="pressed" from="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/BtnDesplegarFisicas" to="." method="_on_btn_desplegar_fisicas_pressed"]
+[connection signal="toggled" from="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas/HBoxOpciones/CheckProporcional" to="." method="_on_check_proporcional_toggled"]
+[connection signal="value_changed" from="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas/GridVelocidades/SliderVelNormal" to="." method="_on_slider_vel_normal_value_changed"]
+[connection signal="value_changed" from="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas/GridVelocidades/SliderVelSprint" to="." method="_on_slider_vel_sprint_value_changed"]
+[connection signal="value_changed" from="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas/GridVelocidades/SliderAcel" to="." method="_on_slider_acel_value_changed"]
+[connection signal="value_changed" from="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas/GridVelocidades/SliderFric" to="." method="_on_slider_fric_value_changed"]
+[connection signal="value_changed" from="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas/GridVelocidades/SliderDiveVel" to="." method="_on_slider_dive_vel_value_changed"]
+[connection signal="pressed" from="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas/HBoxAccionesFisicas/BtnResetVelocidades" to="." method="_on_btn_reset_velocidades_pressed"]
+[connection signal="pressed" from="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario/VBox/BtnForzarMutacion" to="." method="_on_btn_forzar_mutacion_pressed"]
+[connection signal="toggled" from="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario/VBox/CheckGodView" to="." method="_on_check_god_view_toggled"]
+[connection signal="toggled" from="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario/VBox/CheckCorredores" to="." method="_on_check_corredores_toggled"]
+[connection signal="toggled" from="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario/VBox/CheckCuadrantes" to="." method="_on_check_cuadrantes_toggled"]
+[connection signal="pressed" from="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Enemigo/VBox/BtnReubicarEnemigo" to="." method="_on_btn_reubicar_enemigo_pressed"]
+[connection signal="toggled" from="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Enemigo/VBox/CheckVisualDebug" to="." method="_on_check_visual_debug_enemigo_toggled"]
+[connection signal="pressed" from="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/HBoxTimeScale/Btn05x" to="." method="_on_btn_timescale_05_pressed"]
+[connection signal="pressed" from="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/HBoxTimeScale/Btn10x" to="." method="_on_btn_timescale_10_pressed"]
+[connection signal="pressed" from="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/HBoxTimeScale/Btn20x" to="." method="_on_btn_timescale_20_pressed"]
+[connection signal="pressed" from="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/BtnReiniciarEscena" to="." method="_on_btn_reiniciar_escena_pressed"]

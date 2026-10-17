@@ -28,3 +28,6 @@ shape = SubResource("CircleShape2D_uhebs")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AreaCaptura" unique_id=235146397]
 shape = SubResource("CircleShape2D_743j8")
+
+[node name="RayCastVision" type="RayCast2D" parent="." unique_id=1806219836]
+target_position = Vector2(0, 0)

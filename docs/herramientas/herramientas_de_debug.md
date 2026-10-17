@@ -1,0 +1,165 @@
+# Sistema de Herramientas de Depuración y Diagnóstico (Debug)
+
+Este documento detalla la arquitectura, herramientas, controles y flujos de trabajo del ecosistema de depuración y calibración de **Vosque**. El objetivo es proporcionar al equipo de desarrollo una visibilidad total sobre la simulación física, la mutación procedural del mapa y el comportamiento de la IA sin interrumpir el flujo de juego.
+
+---
+
+## 1. Filosofía y Principios de Diseño
+
+1. **Inmediatez y Control Centralizado:** En lugar de memorizar múltiples teclas de función o abrir interfaces dispersas, todas las utilidades de diagnóstico convergen en un **Menú Unificado de Debug** accesible mediante una única tecla (<kbd>F3</kbd>).
+2. **Arquitectura No Invasiva y Desacoplada:** El sistema de debug escucha e inspecciona los nodos del juego (`personaje`, `escenario`, `enemigo`) mediante verificaciones seguras (`has_method()`, variables condicionales y referencias nulas). Si un nodo o componente aún no ha sido implementado o instanciado, la herramienta no provoca errores ni interrupciones (*graceful degradation*).
+3. **Simulación en Tiempo Real:** Por defecto, abrir la consola de debug no pausa el motor, permitiendo observar cómo reaccionan las físicas, los estados del jugador y las mutaciones del escenario mientras se interactúa con el mundo.
+4. **Seguridad en Entornos de Producción:** Las rutinas de dibujo y captura de eventos de debug están condicionadas para ignorarse o suprimirse automáticamente en compilaciones finales de exportación web (`OS.is_debug_build()`).
+
+---
+
+## 2. Mapa de Controles y Estados de Visualización
+
+El acceso al sistema de depuración se gestiona mediante un ciclo **Tri-Estado** controlado por la tecla <kbd>F3</kbd>:
+
+```
+┌────────────────┐      <F3>      ┌────────────────┐      <F3>      ┌─────────────────────┐
+│  1. OCULTO     │  ───────────>  │  2. MINI-HUD   │  ───────────>  │  3. MENÚ COMPLETO   │
+│ (Juego Limpio) │  <───────────  │   (Esquina)    │  <───────────  │ (Consola Pestañas)  │
+└────────────────┘      <F3>      └────────────────┘      <F3>      └─────────────────────┘
+```
+
+| Estado | Descripción | Casos de Uso |
+| :--- | :--- | :--- |
+| **1. Oculto** | La interfaz está desactivada (`visible = false`). No genera sobrecarga visual ni consume tiempo de dibujo. | Partida arcade estándar, capturas de pantalla, playtesting de inmersión. |
+| **2. Mini-HUD** | Widget compacto anclado en la esquina superior derecha. Muestra FPS, consumo de memoria, cuadrante actual del jugador, velocidad instantánea y estamina. | Pruebas de rendimiento, calibración de locomoción sin obstruir la vista central del juego. |
+| **3. Menú Completo** | Panel modular con pestañas interactivas, botones de acción rápida, selectores y controles de diagnóstico visual (`_draw`). | Pruebas de mutación espacial, forzado de estados de IA, análisis de colisiones y cheats de prueba. |
+
+> [!TIP]
+> Dentro del **Menú Completo**, existe un selector `[x] Pausar Simulación`. Si se activa, el árbol del juego se pausa (`get_tree().paused = true`), permitiendo inspeccionar valores estáticos exactos en un frame determinado.
+
+---
+
+## 3. Menú Unificado de Debug In-Game (`escenas/debug_menu.tscn`)
+
+La escena maestra del menú de depuración reside en `escenas/debug_menu.tscn` (controlada por `scripts/debug_menu.gd`) y está estructurada en un `CanvasLayer` con prioridad alta (`layer = 100`).
+
+```text
+DebugMenu (CanvasLayer, layer=100)
+├── MiniHUD (PanelContainer en esquina superior derecha)
+├── ConsolaPrincipal (PanelContainer modal semi-transparente)
+│   ├── Encabezado (Título, FPS, Botón Cerrar, Toggle Pausa)
+│   └── TabContainer
+│       ├── TabJugador (Telemetría, Pad Direccional, Cheats)
+│       ├── TabEscenario (Cuadrantes, Mutación, God View, Corredores 160px)
+│       ├── TabEnemigo (Telemetría IA, Anti-Atascamiento, Reubicación)
+│       └── TabSistema (TimeScale, Reinicio de Escena, Notas)
+└── DebugOverlay (Node2D con dibujo vectorial en espacio de mundo)
+```
+
+### 3.1. Pestaña: Jugador y Físicas
+Monitorea la máquina de estados del protagonista y sus variables cinemáticas:
+* **Lectura en tiempo real:**
+  - Velocidad actual escalar y desglosada en componentes vectoriales $(X, Y)$.
+  - Velocidad máxima configurada (`speed`), aceleración (`acceleration`) y fricción (`friction`).
+  - Estado cinemático reportado (`REPOSO`, `CAMINANDO`, `CORRIENDO`, `SALTANDO`, `PLANCHA`, `AGOTADO`).
+  - Estamina actual vs. máxima y porcentaje restante.
+* **Pad Direccional Visual:** Matriz de 8 direcciones que resalta en azul claro las entradas recibidas por el `InputServer`.
+* **Cheats y Asistencias de Prueba:**
+  - `Estamina Infinita`: Evita el vaciado de la barra para probar desplazamientos continuos a $1000\text{ px/s}$.
+  - `Invencibilidad (God Mode)`: Ignora la colisión letal con el monstruo.
+* **Panel Desplegable de Velocidades y Físicas (*Foldout Live Tweak*):**
+  - **Botón Desplegable:** Alterna la visualización del panel (`▶ Ajustes de Velocidad y Físicas (Desplegar)` / `▼ Ajustes de Velocidad y Físicas (Ocultar)`), manteniendo la consola compacta.
+  - **Modo Automático Proporcional:** Casilla `[x] Modo Automático: Mantener relación proporcional con velocidad base`. Al variar `speed` (caminar), escala automáticamente sprint, aceleración, fricción y plancha de forma matemática y equilibrada.
+  - **Modo Manual:** Al desmarcar la casilla, permite calibrar individualmente cada magnitud.
+  - **Sliders con Indicador en Tiempo Real:**
+    - Caminar (`speed`): 50 a 3000 px/s (paso 10).
+    - Sprint (`sprint_speed`): 50 a 3000 px/s (paso 10).
+    - Aceleración (`acceleration`): 100 a 20,000 px/s² (paso 50).
+    - Fricción (`friction`): 100 a 20,000 px/s² (paso 50).
+    - Plancha (`dive_speed`): 100 a 4000 px/s (paso 50).
+  - Botón **"Restablecer Velocidades por Defecto"** para restaurar los valores base del personaje en cualquier momento.
+
+### 3.2. Pestaña: Escenario y Mutación Espacial (Issue #3)
+Diseñada específicamente para controlar y verificar la cuadrícula simétrica $2 \times 2$ ($2160 \times 2160\text{ px}$):
+* **Telemetría de Cuadrantes:**
+  - Identificación del cuadrante activo del jugador: `NO`, `NE`, `SO` o `SE` según las coordenadas globales respecto al centro `(0, 0)`.
+  - Nombre de la sub-escena o variante instanciada en cada uno de los 4 sectores.
+* **Disparador Manual de Mutación:**
+  - Botón **"Forzar Mutación de Sectores Lejanos"**: Reemplaza instantáneamente las variantes de los 3 cuadrantes donde el jugador *no* se encuentra, permitiendo validar la lógica de carga procedural sin necesidad de recoger físicamente una nota.
+* **Cámara Cenital Global (God View):**
+  - Desancla la `Camera2D` del protagonista y aplica un zoom exterior para encuadrar la totalidad de la arena ($2160 \times 2160\text{ px}$), permitiendo observar la mutación de los 3 cuadrantes en vivo.
+* **Capas de Depuración Visual (`_draw`):**
+  - `Mostrar Ejes Divisores`: Dibuja los ejes $X = 0$ e $Y = 0$.
+  - `Mostrar Corredores de Seguridad`: Dibuja las franjas de $160\text{ px}$ ($80\text{ px}$ a cada lado del borde interior de cada cuadrante) en color verde translúcido. Si un obstáculo sólido penetra la franja, se resalta en rojo.
+  - `Mostrar Puntos de Nota`: Resalta todos los nodos `Marker2D` pertenecientes al grupo `"puntos_nota"`.
+
+### 3.3. Pestaña: Monstruo y Comportamiento de IA
+Herramientas para validar el seguimiento y el protocolo anti-atascamiento:
+* **Telemetría de Persecución:**
+  - Posición global $(X, Y)$ y cuadrante ocupado por la criatura.
+  - Distancia euclidiana respecto al protagonista en píxeles.
+  - Estado de visión: `Visión directa` (rayo verde) vs. `Obstruido` (rayo rojo al punto de impacto + línea discontinua).
+* **Diagnóstico Anti-Atascamiento:**
+  - Indicador de colisión sólida (`is_on_wall()`).
+* **Visualización Táctica (`[x] Rayo de Visión y Vectores de IA`):**
+  - **Estela de Trayectoria (*Breadcrumbs*):** Buffer de los últimos 2 segundos de desplazamiento con degradado alfa para inspeccionar cómo sortea esquinas.
+  - **Radio de Captura Letal:** Círculo rojo de $56.0\text{ px}$ correspondiente al `AreaCaptura`.
+  - **Radio de Colisión Sólida:** Círculo ámbar de $42.0\text{ px}$ correspondiente al `CollisionShape2D`.
+  - **Vector de Velocidad:** Flecha directriz proporcional a la magnitud y dirección de aceleración.
+  - **Escalado Adaptativo:** Los trazos y radios se adaptan automáticamente al zoom de la cámara (tanto en vista del jugador como en *God View*).
+* **Acciones Rápidas:**
+  - Botón **"Reubicar Monstruo"**: Teletransporta a la criatura al cuadrante opuesto (o distancia segura).
+
+### 3.4. Pestaña: Sistema, Notas y Entorno
+* **Control de Tiempo (`Engine.time_scale`):**
+  - Botones de preajuste: `0.2x` (cámara súper lenta para analizar saltos parabólicos sobre obstáculos bajos de Capa 2), `0.5x`, `1.0x` (velocidad normal) y `2.0x` (prueba de estrés).
+* **Gestión de Notas Coleccionables:**
+  - Contador de notas recogidas.
+  - Botón **"Simular Recogida de Nota"**: Incrementa el contador, dispara la señal de progresión de dificultad y desencadena la mutación del escenario.
+* **Acciones de Sesión:**
+  - Botón **"Reiniciar Escena"**: Llama a `get_tree().reload_current_scene()` de forma limpia.
+
+---
+
+## 4. Herramientas de Editor (Plugins de Godot)
+
+Además de las herramientas in-game, el proyecto cuenta con plugins contextuales para el editor de Godot en `addons/`:
+
+### 4.1. Toolbar de Personaje (`addons/personaje_tools`)
+* Se activa automáticamente en el menú superior del viewport 2D (`CONTAINER_CANVAS_EDITOR_MENU`) cuando se selecciona un nodo `CharacterBody2D` que contenga las propiedades cinemáticas de *Vosque*.
+* Permite ajustar de forma visual mediante *SpinBoxes* la velocidad máxima, aceleración y fricción con persistencia directa en la escena.
+
+### 4.2. Linter y Guías de Nivel de Escenario (`addons/escenario_tools` - Planificado)
+Diseñado para la creación de variantes de sector en `escenas/sectores/variantes/`:
+* **Dibujo de Guías de Corredores:** Traza automáticamente en el editor el marco de $1080 \times 1080\text{ px}$ y las zonas de exclusión de $80\text{ px}$ interiores.
+* **Validador Estático de Variante:**
+  - Confirma que ningún `StaticBody2D` esté colocado en los corredores de borde.
+  - Comprueba que los obstáculos usen las capas correctas: Capa 1 para obstáculos altos y Capa 2 para obstáculos bajos.
+  - Verifica que existan entre 2 y 4 nodos `Marker2D` en el grupo `"puntos_nota"`.
+
+### 4.3. Servidor de Automatización (`addons/godot_ai`)
+* Servidor MCP integrado que permite consultar la jerarquía de nodos, inspeccionar propiedades, capturar pantallas del editor y validar sintaxis de GDScript en caliente.
+
+### 4.4. Monitores Personalizados del Depurador de Godot (`Performance`)
+* Se integran automáticamente al arrancar el juego en modo desarrollo (`OS.is_debug_build()`) bajo la categoría `Vosque/`.
+* Visibles en el panel inferior del editor de Godot: **Depurador > Monitores**:
+  - `Vosque/Estamina Jugador`: Monitoreo en tiempo real del gasto y recuperación de estamina ($0.0 - 100.0$).
+  - `Vosque/Velocidad Jugador`: Magnitud escalar instantánea de la velocidad del personaje en $\text{px/s}$.
+  - `Vosque/Velocidad Enemigo`: Velocidad instantánea de persecución de la criatura.
+  - `Vosque/Distancia Monstruo`: Distancia euclidiana en píxeles entre el jugador y el monstruo.
+  - `Vosque/Estado Jugador`: Identificador numérico del estado cinemático (`REPOSO: 0`, `CAMINANDO: 1`, `SPRINT: 2`, `FATIGA: 3`, `SALTO: 4`, `PLANCHA: 5`, `RECUPERACIÓN: 6`).
+
+---
+
+## 5. Protocolo de Pruebas y Validación para la Issue #3
+
+Para verificar que la infraestructura del escenario y la mutación espacial funcionan según las especificaciones técnicas:
+
+1. **Iniciar la escena de prueba** (`escenas/maain.tscn`).
+2. **Abrir la consola de depuración** presionando <kbd>F3</kbd> dos veces (hasta acceder al Menú Completo).
+3. **Seleccionar la pestaña "Escenario":**
+   - Activar la casilla `[x] Mostrar Corredores de Seguridad (160 px)` y verificar visualmente que las fronteras $X=0, Y=0$ permanezcan despejadas.
+   - Activar `[x] Vista Global (God View)` para visualizar los cuatro cuadrantes simultáneamente.
+   - Presionar reiteradamente el botón **"Forzar Mutación de Sectores Lejanos"**:
+     - Confirmar que el cuadrante donde se encuentra el jugador **nunca** es reemplazado.
+     - Confirmar que los otros 3 cuadrantes cambian aleatoriamente de sub-escena sin generar tirones ni errores de referencia en el registro de salida.
+4. **Validación del Protocolo Anti-Atascamiento:**
+   - Cambiar a la pestaña "Enemigo".
+   - Presionar "Forzar Mutación" mientras el monstruo está en uno de los 3 cuadrantes que cambian.
+   - Verificar que si el nuevo diseño genera una colisión sobre el enemigo, el sistema lo reubique de inmediato al `Marker2D` seguro más cercano.

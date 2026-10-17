@@ -117,7 +117,11 @@ func _descartar(ruta: String) -> void:
 ## Enciende o apaga las cámaras de un subárbol.
 func _fijar_camaras(raiz: Node, encendidas: bool) -> void:
 	if raiz is Camera2D:
-		(raiz as Camera2D).enabled = encendidas
+		var cam := raiz as Camera2D
+		if cam.is_in_group("camaras_debug") or cam.name == "CamaraDios":
+			cam.enabled = false
+		else:
+			cam.enabled = encendidas
 	for hijo in raiz.get_children():
 		_fijar_camaras(hijo, encendidas)
 
