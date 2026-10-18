@@ -1,3 +1,4 @@
+@tool
 class_name Personaje
 extends CharacterBody2D
 
@@ -66,6 +67,9 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if Engine.is_editor_hint():
+		return
+
 	var direction: Vector2 = Input.get_vector(
 		"personaje-izquierda", "personaje-derecha", "personaje-arriba", "personaje-abajo"
 	)

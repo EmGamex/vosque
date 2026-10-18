@@ -1,0 +1,81 @@
+[gd_scene format=3 uid="uid://clntbhmsji5os"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ufu1d"]
+radius = 38.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ub71v"]
+radius = 38.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_da3bj"]
+radius = 42.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_j36ps"]
+radius = 38.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_xcbvp"]
+radius = 40.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_tp5rt"]
+size = Vector2(140, 40)
+
+[node name="VarianteBosqueDenso" type="Node2D" unique_id=918089771]
+y_sort_enabled = true
+
+[node name="ObstaculosAltos" type="StaticBody2D" parent="." unique_id=1153490849]
+collision_mask = 0
+
+[node name="ArbolNoroeste" type="CollisionShape2D" parent="ObstaculosAltos" unique_id=1285619402]
+position = Vector2(-200, -220)
+shape = SubResource("CircleShape2D_ufu1d")
+
+[node name="Visual" type="Polygon2D" parent="ObstaculosAltos/ArbolNoroeste" unique_id=732731015]
+color = Color(0.10980392, 0.1764706, 0.11764706, 1)
+polygon = PackedVector2Array(-38, -14, -22, -36, 20, -38, 38, -14, 34, 24, 18, 38, -20, 36, -36, 18)
+
+[node name="ArbolNoreste" type="CollisionShape2D" parent="ObstaculosAltos" unique_id=1005455629]
+position = Vector2(220, -200)
+shape = SubResource("CircleShape2D_ub71v")
+
+[node name="Visual" type="Polygon2D" parent="ObstaculosAltos/ArbolNoreste" unique_id=854168533]
+color = Color(0.10980392, 0.1764706, 0.11764706, 1)
+polygon = PackedVector2Array(-38, -14, -22, -36, 20, -38, 38, -14, 34, 24, 18, 38, -20, 36, -36, 18)
+
+[node name="ArbolCentro" type="CollisionShape2D" parent="ObstaculosAltos" unique_id=938643754]
+position = Vector2(0, -60)
+shape = SubResource("CircleShape2D_da3bj")
+
+[node name="Visual" type="Polygon2D" parent="ObstaculosAltos/ArbolCentro" unique_id=637673144]
+color = Color(0.078431375, 0.13333334, 0.08627451, 1)
+polygon = PackedVector2Array(-42, -16, -24, -40, 22, -42, 42, -16, 38, 26, 20, 42, -22, 40, -40, 20)
+
+[node name="ArbolSur" type="CollisionShape2D" parent="ObstaculosAltos" unique_id=1870310171]
+position = Vector2(80, 240)
+shape = SubResource("CircleShape2D_j36ps")
+
+[node name="Visual" type="Polygon2D" parent="ObstaculosAltos/ArbolSur" unique_id=981676955]
+color = Color(0.10980392, 0.1764706, 0.11764706, 1)
+polygon = PackedVector2Array(-38, -14, -22, -36, 20, -38, 38, -14, 34, 24, 18, 38, -20, 36, -36, 18)
+
+[node name="RocaOeste" type="CollisionShape2D" parent="ObstaculosAltos" unique_id=1606453376]
+position = Vector2(-240, 100)
+shape = SubResource("CircleShape2D_xcbvp")
+
+[node name="Visual" type="Polygon2D" parent="ObstaculosAltos/RocaOeste" unique_id=1244336821]
+color = Color(0.22745098, 0.23921569, 0.27058825, 1)
+polygon = PackedVector2Array(-40, -14, -24, -38, 20, -40, 40, -14, 36, 26, 18, 40, -20, 38, -38, 18)
+
+[node name="ObstaculosBajos" type="StaticBody2D" parent="." unique_id=402286238]
+collision_layer = 2
+collision_mask = 0
+
+[node name="TroncoBajo" type="CollisionShape2D" parent="ObstaculosBajos" unique_id=705479891]
+position = Vector2(-60, 160)
+shape = SubResource("RectangleShape2D_tp5rt")
+
+[node name="PuntosDeNota" type="Node2D" parent="." unique_id=30739097]
+
+[node name="MarkerNota1" type="Marker2D" parent="PuntosDeNota" unique_id=656917788 groups=["puntos_nota"]]
+position = Vector2(-200, 0)
+
+[node name="MarkerNota2" type="Marker2D" parent="PuntosDeNota" unique_id=2077506036 groups=["puntos_nota"]]
+position = Vector2(200, 0)

@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://if7eayy3eh5f"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_tosgu"]
+radius = 40.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_jryw0"]
+radius = 40.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_aeg6w"]
+size = Vector2(160, 40)
+
+[node name="VarianteSenderoTroncos" type="Node2D" unique_id=1803589835]
+y_sort_enabled = true
+
+[node name="ObstaculosAltos" type="StaticBody2D" parent="." unique_id=2032199186]
+collision_mask = 0
+
+[node name="Arbol1" type="CollisionShape2D" parent="ObstaculosAltos" unique_id=1419607749]
+position = Vector2(-180, -180)
+shape = SubResource("CircleShape2D_tosgu")
+
+[node name="Arbol2" type="CollisionShape2D" parent="ObstaculosAltos" unique_id=205897667]
+position = Vector2(180, 180)
+shape = SubResource("CircleShape2D_jryw0")
+
+[node name="ObstaculosBajos" type="StaticBody2D" parent="." unique_id=866157927]
+collision_layer = 2
+collision_mask = 0
+
+[node name="TroncoSendero" type="CollisionShape2D" parent="ObstaculosBajos" unique_id=481202451]
+shape = SubResource("RectangleShape2D_aeg6w")
+
+[node name="PuntosDeNota" type="Node2D" parent="." unique_id=1721145953]
+
+[node name="MarkerNota1" type="Marker2D" parent="PuntosDeNota" unique_id=820379915 groups=["puntos_nota"]]
+position = Vector2(-180, 180)
+
+[node name="MarkerNota2" type="Marker2D" parent="PuntosDeNota" unique_id=1932528507 groups=["puntos_nota"]]
+position = Vector2(180, -180)

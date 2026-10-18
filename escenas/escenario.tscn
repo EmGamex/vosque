@@ -1,3 +1,80 @@
 [gd_scene format=3 uid="uid://bkuxmlnw8klod"]
 
+[ext_resource type="Script" uid="uid://blo3enjwv62k0" path="res://scripts/escenario.gd" id="1_1uc0k"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_rldi1"]
+size = Vector2(2160, 64)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mbe13"]
+size = Vector2(2160, 64)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3m15c"]
+size = Vector2(64, 2160)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_a55de"]
+size = Vector2(64, 2160)
+
 [node name="Escenario" type="Node2D" unique_id=1183581624]
+y_sort_enabled = true
+script = ExtResource("1_1uc0k")
+
+[node name="SueloContinuo" type="Polygon2D" parent="." unique_id=329049469]
+z_index = -10
+color = Color(0.078431375, 0.09411765, 0.14117648, 1)
+polygon = PackedVector2Array(-1080, -1080, 1080, -1080, 1080, 1080, -1080, 1080)
+
+[node name="VallaPerimetral" type="StaticBody2D" parent="." unique_id=973696799]
+collision_mask = 0
+
+[node name="ColisionNorte" type="CollisionShape2D" parent="VallaPerimetral" unique_id=801923181]
+position = Vector2(0, -1080)
+shape = SubResource("RectangleShape2D_rldi1")
+
+[node name="ColisionSur" type="CollisionShape2D" parent="VallaPerimetral" unique_id=1131119502]
+position = Vector2(0, 1080)
+shape = SubResource("RectangleShape2D_mbe13")
+
+[node name="ColisionOeste" type="CollisionShape2D" parent="VallaPerimetral" unique_id=2056460540]
+position = Vector2(-1080, 0)
+shape = SubResource("RectangleShape2D_3m15c")
+
+[node name="ColisionEste" type="CollisionShape2D" parent="VallaPerimetral" unique_id=796882259]
+position = Vector2(1080, 0)
+shape = SubResource("RectangleShape2D_a55de")
+
+[node name="VisualValla" type="Node2D" parent="VallaPerimetral" unique_id=696666353]
+
+[node name="VallaVisNorte" type="Polygon2D" parent="VallaPerimetral/VisualValla" unique_id=525535369]
+z_index = 10
+color = Color(0.2901961, 0.19607843, 0.1254902, 1)
+polygon = PackedVector2Array(-1080, -1112, 1080, -1112, 1080, -1048, -1080, -1048)
+
+[node name="VallaVisSur" type="Polygon2D" parent="VallaPerimetral/VisualValla" unique_id=328645786]
+z_index = 10
+color = Color(0.2901961, 0.19607843, 0.1254902, 1)
+polygon = PackedVector2Array(-1080, 1048, 1080, 1048, 1080, 1112, -1080, 1112)
+
+[node name="VallaVisOeste" type="Polygon2D" parent="VallaPerimetral/VisualValla" unique_id=1361612971]
+z_index = 10
+color = Color(0.2901961, 0.19607843, 0.1254902, 1)
+polygon = PackedVector2Array(-1112, -1080, -1048, -1080, -1048, 1080, -1112, 1080)
+
+[node name="VallaVisEste" type="Polygon2D" parent="VallaPerimetral/VisualValla" unique_id=664705563]
+z_index = 10
+color = Color(0.2901961, 0.19607843, 0.1254902, 1)
+polygon = PackedVector2Array(1048, -1080, 1112, -1080, 1112, 1080, 1048, 1080)
+
+[node name="Sectores" type="Node2D" parent="." unique_id=902135422]
+y_sort_enabled = true
+
+[node name="SectorNO" type="Marker2D" parent="Sectores" unique_id=1459968677]
+position = Vector2(-540, -540)
+
+[node name="SectorNE" type="Marker2D" parent="Sectores" unique_id=1274476006]
+position = Vector2(540, -540)
+
+[node name="SectorSO" type="Marker2D" parent="Sectores" unique_id=2129069290]
+position = Vector2(-540, 540)
+
+[node name="SectorSE" type="Marker2D" parent="Sectores" unique_id=1322479680]
+position = Vector2(540, 540)

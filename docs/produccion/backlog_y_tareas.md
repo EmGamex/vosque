@@ -40,20 +40,20 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 > 📄 **Especificación de referencia:** [`docs/gameplay/mapa_y_sectores.md`](../gameplay/mapa_y_sectores.md)  
 > 💻 **Archivos clave:** [`escenas/escenario.tscn`](../../escenas/escenario.tscn), `scripts/escenario.gd`
 
-- [ ] **Arena Base y Valla Perimetral:**
-  - [ ] Estructura fija de $2160 \times 2160\text{ px}$ en coordenadas $[-1080, 1080]$.
-  - [ ] `VallaPerimetral` en Capa 1 (`Mundo_Alto`) con 4 muros perimetrales fijos de $64\text{ px}$ de grosor.
-  - [ ] `Camera2D` configurada con límites nativos (`limit_left = -1080`, `limit_top = -1080`, etc.).
-- [ ] **Contenedores de Cuadrantes (Sectores NO, NE, SO, SE):**
-  - [ ] Nodos contenedores situados en los centros de cuadrante (`Vector2(±540, ±540)`).
-  - [ ] Corredores de seguridad de $160\text{ px}$ libres de obstáculos en las intersecciones $X=0, Y=0$.
-- [ ] **Sub-Escenas de Variantes de Sector:**
-  - [ ] Crear al menos 2 a 3 variantes prefabricadas por cuadrante con distribución variada de árboles, rocas y troncos.
-  - [ ] Nodos candidatos de aparición de notas (`Marker2D` en grupo `"puntos_nota"`).
-- [ ] **Algoritmo de Mutación Dinámica:**
-  - [ ] Detección del cuadrante activo del jugador al recoger una nota.
-  - [ ] Reemplazo aleatorio de las sub-escenas de los **3 cuadrantes lejanos**.
-  - [ ] Protocolo anti-atascamiento del monstruo con reubicación al punto transitable más próximo.
+- [x] **Arena Base y Valla Perimetral:**
+  - [x] Estructura fija de $2160 \times 2160\text{ px}$ en coordenadas $[-1080, 1080]$.
+  - [x] `VallaPerimetral` en Capa 1 (`Mundo_Alto`) con 4 muros perimetrales fijos de $64\text{ px}$ de grosor.
+  - [x] `Camera2D` configurada con límites nativos (`limit_left = -1080`, `limit_top = -1080`, etc.).
+- [x] **Contenedores de Cuadrantes (Sectores NO, NE, SO, SE):**
+  - [x] Nodos contenedores situados en los centros de cuadrante (`Vector2(±540, ±540)`).
+  - [x] Corredores de seguridad de $160\text{ px}$ libres de obstáculos en las intersecciones $X=0, Y=0$.
+- [x] **Sub-Escenas de Variantes de Sector:**
+  - [x] Crear al menos 2 a 3 variantes prefabricadas por cuadrante con distribución variada de árboles, rocas y troncos.
+  - [x] Nodos candidatos de aparición de notas (`Marker2D` en grupo `"puntos_nota"`).
+- [x] **Algoritmo de Mutación Dinámica:**
+  - [x] Detección del cuadrante activo del jugador al recoger una nota.
+  - [x] Reemplazo aleatorio de las sub-escenas de los **3 cuadrantes lejanos**.
+  - [x] Protocolo anti-atascamiento del monstruo con reubicación al punto transitable más próximo.
 
 ---
 

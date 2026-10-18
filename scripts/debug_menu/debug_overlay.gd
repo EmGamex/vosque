@@ -59,3 +59,16 @@ func _draw() -> void:
 		draw_string(ThemeDB.fallback_font, Vector2(480, -540), "SECTOR NE", HORIZONTAL_ALIGNMENT_CENTER, -1, tamano_fuente, Color(0.85, 0.92, 1.0, 0.75))
 		draw_string(ThemeDB.fallback_font, Vector2(-600, 540), "SECTOR SO", HORIZONTAL_ALIGNMENT_CENTER, -1, tamano_fuente, Color(0.85, 0.92, 1.0, 0.75))
 		draw_string(ThemeDB.fallback_font, Vector2(480, 540), "SECTOR SE", HORIZONTAL_ALIGNMENT_CENTER, -1, tamano_fuente, Color(0.85, 0.92, 1.0, 0.75))
+
+	# 3. Dibujar Puntos de Nota (Marker2D en grupo "puntos_nota")
+	if menu_debug.debug_dibujar_cuadrantes or menu_debug.debug_dibujar_corredores:
+		var radio_nota: float = maxf(5.0, 8.0 / factor_zoom)
+		var color_nota := Color(1.0, 0.85, 0.25, 0.9)
+		var color_nota_fill := Color(1.0, 0.85, 0.25, 0.25)
+		var nodos_nota = get_tree().get_nodes_in_group("puntos_nota")
+		for nodo in nodos_nota:
+			if nodo is Node2D and nodo.is_inside_tree():
+				var pos_m: Vector2 = (nodo as Node2D).global_position
+				draw_circle(pos_m, radio_nota, color_nota_fill)
+				draw_arc(pos_m, radio_nota, 0.0, TAU, 16, color_nota, maxf(1.5, 2.5 / factor_zoom))
+

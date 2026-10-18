@@ -1,13 +1,23 @@
 [gd_scene format=3 uid="uid://dl88w12yyd8ee"]
 
 [ext_resource type="PackedScene" uid="uid://b3dierpagcaih" path="res://escenas/personaje.tscn" id="1_p5vnh"]
+[ext_resource type="PackedScene" uid="uid://bkuxmlnw8klod" path="res://escenas/escenario.tscn" id="1_vhdvh"]
+[ext_resource type="PackedScene" uid="uid://m28wcu8ry61r" path="res://escenas/sectores/variantes/variante_claro_rocoso.tscn" id="2_avty2"]
 [ext_resource type="PackedScene" uid="uid://b1eu583e554ay" path="res://escenas/camara.tscn" id="2_avuvp"]
+[ext_resource type="PackedScene" uid="uid://clntbhmsji5os" path="res://escenas/sectores/variantes/variante_bosque_denso.tscn" id="3_ib8jo"]
 [ext_resource type="PackedScene" uid="uid://b74g6q4tcthym" path="res://escenas/debug_menu.tscn" id="4_kcfdb"]
+[ext_resource type="PackedScene" uid="uid://if7eayy3eh5f" path="res://escenas/sectores/variantes/variante_sendero_troncos.tscn" id="4_n1hb8"]
 [ext_resource type="PackedScene" uid="uid://cdg7eeqnykjnu" path="res://escenas/enemigo.tscn" id="5_vhdvh"]
 
 [node name="Maain" type="Node2D" unique_id=1472011216]
 
+[node name="Escenario" parent="." unique_id=1183581624 node_paths=PackedStringArray("objetivo_jugador", "objetivo_enemigo") instance=ExtResource("1_vhdvh")]
+objetivo_jugador = NodePath("../personaje")
+objetivo_enemigo = NodePath("../Enemigo")
+catalogo_variantes = Array[PackedScene]([ExtResource("2_avty2"), ExtResource("3_ib8jo"), ExtResource("4_n1hb8")])
+
 [node name="personaje" parent="." unique_id=1025630962 instance=ExtResource("1_p5vnh")]
+motion_mode = 1
 
 [node name="Camera2D" parent="personaje" unique_id=292125370 instance=ExtResource("2_avuvp")]
 
@@ -15,13 +25,12 @@
 position = Vector2(-650, -450)
 objetivo = NodePath("../personaje")
 
-[node name="DebugMenu" parent="." unique_id=85566436 node_paths=PackedStringArray("target_character", "target_enemigo", "target_camara", "target_camara_dios") instance=ExtResource("4_kcfdb")]
-process_mode = 3
-visible = false
+[node name="DebugMenu" parent="." unique_id=85566436 node_paths=PackedStringArray("target_character", "target_enemigo", "target_camara", "target_camara_dios", "target_escenario") instance=ExtResource("4_kcfdb")]
 target_character = NodePath("../personaje")
 target_enemigo = NodePath("../Enemigo")
 target_camara = NodePath("../personaje/Camera2D")
 target_camara_dios = NodePath("../CamaraDios")
+target_escenario = NodePath("../Escenario")
 
 [node name="CamaraDios" type="Camera2D" parent="." unique_id=854112470 groups=["camaras_debug"]]
 enabled = false
