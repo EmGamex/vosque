@@ -72,6 +72,10 @@ collision_mask = 0
 position = Vector2(-60, 160)
 shape = SubResource("RectangleShape2D_tp5rt")
 
+[node name="Visual" type="Polygon2D" parent="ObstaculosBajos/TroncoBajo" unique_id=1448664750]
+color = Color(0.3647059, 0.2509804, 0.21568628, 1)
+polygon = PackedVector2Array(-70, -20, 70, -20, 70, 20, -70, 20)
+
 [node name="PuntosDeNota" type="Node2D" parent="." unique_id=30739097]
 
 [node name="MarkerNota1" type="Marker2D" parent="PuntosDeNota" unique_id=656917788 groups=["puntos_nota"]]
