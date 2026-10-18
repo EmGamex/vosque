@@ -62,7 +62,7 @@ func test_limites_camara() -> void:
 	assert_eq(cam.limit_top, -1080, "limit_top debe ser -1080")
 	assert_eq(cam.limit_right, 1080, "limit_right debe ser 1080")
 	assert_eq(cam.limit_bottom, 1080, "limit_bottom debe ser 1080")
-	assert_true(cam.position_smoothing_enabled, "position_smoothing_enabled debe ser true")
+	assert_eq(cam.process_callback, Camera2D.CAMERA2D_PROCESS_PHYSICS, "process_callback debe ser PHYSICS (0) para evitar temblor")
 
 	cam.free()
 
