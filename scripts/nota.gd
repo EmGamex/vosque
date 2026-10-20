@@ -63,9 +63,12 @@ func recolectar() -> void:
 	if _particulas_recogida != null:
 		_particulas_recogida.emitting = true
 		var tiempo_vida: float = maxf(_particulas_recogida.lifetime, 0.4)
-		var arbol := get_tree()
-		if arbol != null:
-			arbol.create_timer(tiempo_vida).timeout.connect(queue_free)
+		if is_inside_tree():
+			var arbol := get_tree()
+			if arbol != null:
+				arbol.create_timer(tiempo_vida).timeout.connect(queue_free)
+			else:
+				queue_free()
 		else:
 			queue_free()
 	else:

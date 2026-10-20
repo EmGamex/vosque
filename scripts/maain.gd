@@ -52,13 +52,14 @@ func hay_nota_activa() -> bool:
 		if not nota_activa.is_queued_for_deletion() and not nota_activa._recolectada:
 			return true
 
-	var tree := get_tree()
-	if tree != null:
-		var notas_arbol: Array[Node] = tree.get_nodes_in_group("notas")
-		for nodo in notas_arbol:
-			if nodo is Nota and is_instance_valid(nodo):
-				if not nodo.is_queued_for_deletion() and not nodo._recolectada:
-					return true
+	if is_inside_tree():
+		var tree := get_tree()
+		if tree != null:
+			var notas_arbol: Array[Node] = tree.get_nodes_in_group("notas")
+			for nodo in notas_arbol:
+				if nodo is Nota and is_instance_valid(nodo):
+					if not nodo.is_queued_for_deletion() and not nodo._recolectada:
+						return true
 	return false
 
 
@@ -131,11 +132,12 @@ func _on_nota_recolectada(pos_nota: Vector2) -> void:
 	nota_recogida.emit(pos_nota, notas_recolectadas)
 
 	if escenario != null and is_instance_valid(escenario):
-		escenario.mutar_con_neblina()
+		# Disparar mutación en frame diferido para evitar alterar estado durante flushing_queries
+		escenario.call_deferred("mutar_con_neblina")
 
 
 func _on_sectores_mutados(_cuadrante_jugador: String, _variantes: Dictionary) -> void:
-	generar_nota()
+	call_deferred("generar_nota")
 
 
 static func filtrar_candidatos_espaciales(
