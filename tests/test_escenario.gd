@@ -296,3 +296,27 @@ func test_tileset_scenes_collection_y_tilemap_layer() -> void:
 	layer.y_sort_enabled = true
 	assert_eq(layer.tile_set, tileset, "TileMapLayer debe tener asignado tileset_obstaculos")
 	layer.free()
+
+
+func test_marcadores_sectores_mutados() -> void:
+	var escena_escenario: PackedScene = load("res://escenas/escenario.tscn")
+	var esc: Escenario = escena_escenario.instantiate() as Escenario
+
+	var root := Node2D.new()
+	root.add_child(esc)
+	esc._ready()
+
+	# Obtener marcadores excluyendo cuadrante NO
+	var marcadores_mutados: Array[Marker2D] = esc.obtener_marcadores_nota_sectores_mutados("NO")
+	assert_true(marcadores_mutados.size() >= 6, "Debe haber al menos 6 marcadores en los 3 cuadrantes restantes")
+
+	for m in marcadores_mutados:
+		var cuad = esc.obtener_cuadrante_jugador(m.global_position)
+		assert_ne(cuad, "NO", "Ningún marcador retornado debe pertenecer al cuadrante excluido (NO)")
+		assert_true(m.is_in_group("puntos_nota"), "Todos los marcadores deben estar en el grupo puntos_nota")
+
+	# Obtener todos los marcadores
+	var todos: Array[Marker2D] = esc.obtener_todos_marcadores_nota()
+	assert_true(todos.size() >= 8, "Debe haber al menos 8 marcadores en los 4 cuadrantes")
+
+	root.free()

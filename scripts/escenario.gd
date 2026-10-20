@@ -33,6 +33,7 @@ var _instancias_sectores: Dictionary = {
 }
 
 var _mutacion_en_progreso: bool = false
+var ultimo_marcador_desatasco: Vector2 = Vector2.INF
 
 @onready var _efecto_niebla: EfectoNieblaMutacion = get_node_or_null("EfectoNieblaMutacion") as EfectoNieblaMutacion
 @onready var _nodo_no: Node2D = get_node_or_null("Sectores/SectorNO") as Node2D
@@ -210,7 +211,10 @@ func validar_y_reubicar_enemigo() -> void:
 			var pos_anterior: Vector2 = objetivo_enemigo.global_position
 			objetivo_enemigo.global_position = punto_seguro
 			objetivo_enemigo.velocity = Vector2.ZERO
+			ultimo_marcador_desatasco = punto_seguro
 			enemigo_reubicado.emit(pos_anterior, punto_seguro, sector_enemigo)
+	else:
+		ultimo_marcador_desatasco = Vector2.INF
 
 
 func _verificar_solapamiento_solido(enemigo: CharacterBody2D) -> bool:
@@ -247,7 +251,18 @@ func _obtener_punto_seguro_en_sector(sector: String, pos_referencia: Vector2) ->
 
 	for m in marcadores:
 		if m.is_in_group("puntos_nota"):
-			candidatos_puntos.append((m as Marker2D).global_position)
+			var p: Vector2 = (m as Marker2D).global_position
+			# Filtro de seguridad: descartar marcadores a < 600 px del jugador si es posible
+			if objetivo_jugador != null and is_instance_valid(objetivo_jugador):
+				if p.distance_to(objetivo_jugador.global_position) < 600.0:
+					continue
+			candidatos_puntos.append(p)
+
+	if candidatos_puntos.is_empty():
+		# Fallback sin filtro de distancia al jugador si todos estaban a < 600 px
+		for m in marcadores:
+			if m.is_in_group("puntos_nota"):
+				candidatos_puntos.append((m as Marker2D).global_position)
 
 	if candidatos_puntos.is_empty():
 		# Fallback al centro del sector si no hay marcadores
@@ -265,3 +280,31 @@ func _obtener_punto_seguro_en_sector(sector: String, pos_referencia: Vector2) ->
 			punto_optimo = p
 
 	return punto_optimo
+
+
+func obtener_marcadores_nota_sectores_mutados(cuadrante_jugador: String = "") -> Array[Marker2D]:
+	if cuadrante_jugador.is_empty():
+		var pos_jug: Vector2 = objetivo_jugador.global_position if (objetivo_jugador != null and is_instance_valid(objetivo_jugador)) else Vector2.ZERO
+		cuadrante_jugador = obtener_cuadrante_jugador(pos_jug)
+
+	var resultado: Array[Marker2D] = []
+	for sector in SECTORES:
+		if sector == cuadrante_jugador:
+			continue
+		var instancia: Node2D = _instancias_sectores.get(sector)
+		if instancia != null and is_instance_valid(instancia):
+			for child in instancia.find_children("", "Marker2D", true, false):
+				if child.is_in_group("puntos_nota") and child is Marker2D:
+					resultado.append(child as Marker2D)
+	return resultado
+
+
+func obtener_todos_marcadores_nota() -> Array[Marker2D]:
+	var resultado: Array[Marker2D] = []
+	for sector in SECTORES:
+		var instancia: Node2D = _instancias_sectores.get(sector)
+		if instancia != null and is_instance_valid(instancia):
+			for child in instancia.find_children("", "Marker2D", true, false):
+				if child.is_in_group("puntos_nota") and child is Marker2D:
+					resultado.append(child as Marker2D)
+	return resultado

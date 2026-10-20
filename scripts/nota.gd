@@ -28,6 +28,12 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	if Engine.is_editor_hint():
+		if _visual_papel != null:
+			_visual_papel.position.y = 0.0
+		if _luz_baliza != null:
+			_luz_baliza.energy = ENERGIA_BASE
+		return
 	if _recolectada:
 		return
 	_tiempo += delta
