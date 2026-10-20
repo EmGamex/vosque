@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://cr1kke8d4wxbn"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ngdes"]
+size = Vector2(140, 40)
+
+[node name="TroncoBajo" type="StaticBody2D" unique_id=1833457101]
+collision_layer = 2
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1923729717]
+shape = SubResource("RectangleShape2D_ngdes")
+
+[node name="Visual" type="Polygon2D" parent="CollisionShape2D" unique_id=1134834650]
+color = Color(0.3647059, 0.2509804, 0.21568628, 1)
+polygon = PackedVector2Array(-70, -20, 70, -20, 70, 20, -70, 20)

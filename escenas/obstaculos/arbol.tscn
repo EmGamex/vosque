@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://b6bfgvahe6fuf"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_wrfkb"]
+radius = 38.0
+
+[node name="Arbol" type="StaticBody2D" unique_id=410882166]
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1439645171]
+shape = SubResource("CircleShape2D_wrfkb")
+
+[node name="Visual" type="Polygon2D" parent="CollisionShape2D" unique_id=491988624]
+color = Color(0.10980392, 0.1764706, 0.11764706, 1)
+polygon = PackedVector2Array(-38, -14, -22, -36, 20, -38, 38, -14, 34, 24, 18, 38, -20, 36, -36, 18)

@@ -24,7 +24,7 @@ func test_cuadrantes_calculo() -> void:
 	assert_eq(context.calcular_cuadrante(Vector2(500.0, -500.0)), "NE", "(500, -500) debe ser sector NE")
 	assert_eq(context.calcular_cuadrante(Vector2(-500.0, 500.0)), "SO", "(-500, 500) debe ser sector SO")
 	assert_eq(context.calcular_cuadrante(Vector2(500.0, 500.0)), "SE", "(500, 500) debe ser sector SE")
-	assert_eq(context.obtener_centro_cuadrante("NO"), "(-540, -540)", "Centro de NO debe ser (-540, -540)")
+	assert_eq(context.obtener_centro_cuadrante("NO"), "(-1080, -1080)", "Centro de NO debe ser (-1080, -1080)")
 
 
 func test_fisicas_escalado_proporcional() -> void:
@@ -87,3 +87,15 @@ func test_debug_menu_instanciacion() -> void:
 	assert_true(instancia.telemetry != null, "Sub-controlador telemetry debe inicializarse")
 	assert_true(instancia.monitors != null, "Sub-controlador monitors debe inicializarse")
 	instancia.free()
+
+
+func test_camara_dios_zoom_y_escenario() -> void:
+	assert_eq(DebugScenarioController.ZOOM_GOD_VIEW, Vector2(0.225, 0.225), "ZOOM_GOD_VIEW debe ser 0.225 para arena 4320x4320")
+	var escena_main: PackedScene = load("res://escenas/maain.tscn")
+	assert_true(escena_main != null, "maain.tscn debe cargar")
+	var inst: Node2D = escena_main.instantiate() as Node2D
+	assert_true(inst != null, "maain debe instanciarse")
+	var cam_dios: Camera2D = inst.get_node_or_null("CamaraDios") as Camera2D
+	assert_true(cam_dios != null, "Debe existir CamaraDios en maain.tscn")
+	assert_eq(cam_dios.zoom, Vector2(0.225, 0.225), "CamaraDios debe tener zoom (0.225, 0.225)")
+	inst.free()

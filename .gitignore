@@ -5,3 +5,7 @@
 # Addons
 addons/*
 !addons/personaje_tools/
+
+# Temporary and export archives
+*.zip
+vosque-proyecto/

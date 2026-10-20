@@ -3,6 +3,8 @@ extends RefCounted
 
 ## Controlador de cámara cenital (God View), mutaciones de escenario y capas vectoriales de dibujo.
 
+const ZOOM_GOD_VIEW := Vector2(0.225, 0.225)
+
 var god_view_activo: bool = false
 var debug_dibujar_cuadrantes: bool = false
 var debug_dibujar_corredores: bool = false
@@ -31,7 +33,7 @@ func inicializar_camaras(context: DebugContext) -> void:
 			if context.target_camara != null:
 				context.target_camara.enabled = false
 		elif context.target_camara != null:
-			context.target_camara.zoom = Vector2(0.45, 0.45)
+			context.target_camara.zoom = ZOOM_GOD_VIEW
 			context.target_camara.position_smoothing_enabled = false
 			context.target_camara.global_position = Vector2.ZERO
 	else:
@@ -67,7 +69,7 @@ func set_god_view(activo: bool, context: DebugContext, cfg: Node) -> void:
 		return
 
 	if activo:
-		context.target_camara.zoom = Vector2(0.45, 0.45)
+		context.target_camara.zoom = ZOOM_GOD_VIEW
 		context.target_camara.position_smoothing_enabled = false
 		context.target_camara.global_position = Vector2.ZERO
 	else:
@@ -91,7 +93,9 @@ func set_dibujar_cuadrantes(activo: bool, cfg: Node) -> void:
 
 
 func forzar_mutacion(escenario: Node2D) -> void:
-	if escenario != null and escenario.has_method("mutar_sectores_lejanos"):
+	if escenario != null and escenario.has_method("mutar_con_neblina"):
+		escenario.call("mutar_con_neblina")
+	elif escenario != null and escenario.has_method("mutar_sectores_lejanos"):
 		escenario.call("mutar_sectores_lejanos")
 	elif escenario != null and escenario.has_method("forzar_mutacion"):
 		escenario.call("forzar_mutacion")

@@ -6,32 +6,32 @@ Este documento detalla la topología, el sistema de composición modular, la del
 
 ## 1. Topología y Coordenadas del Mundo
 
-El mundo de juego de *Vosque* es una arena cerrada continua de **$2160 \times 2160\text{ px}$** organizada en una cuadrícula $2 \times 2$ simétrica respecto al origen global `(0, 0)`.
+El mundo de juego de *Vosque* es una arena cerrada continua de **$4320 \times 4320\text{ px}$** organizada en una cuadrícula $2 \times 2$ simétrica respecto al origen global `(0, 0)`.
 
 ```
-                  -1080 Y (Límite Norte)
+                  -2160 Y (Límite Norte)
             ┌───────────────────┬───────────────────┐
             │                   │                   │
             │     Sector NO     │     Sector NE     │
-            │  Pivote: (-540,-540)  Pivote: (540,-540) │
+            │ Pivote:(-1080,-1080) Pivote:(1080,-1080)│
             │                   │                   │
- -1080 X ───┼───────────────────┼───────────────────┼─── +1080 X
+ -2160 X ───┼───────────────────┼───────────────────┼─── +2160 X
  (Límite    │                   │                   │   (Límite
   Oeste)    │     Sector SO     │     Sector SE     │    Este)
-            │  Pivote: (-540,540)   Pivote: (540,540)  │
+            │ Pivote:(-1080,1080)  Pivote:(1080,1080) │
             │                   │                   │
             └───────────────────┴───────────────────┘
-                  +1080 Y (Límite Sur)
+                  +2160 Y (Límite Sur)
 ```
 
 ### Tabla de Cuadrantes
 
 | Cuadrante | Rango Coordenadas $X$ | Rango Coordenadas $Y$ | Coordenada Local Pivote | Dimensiones |
 | :--- | :--- | :--- | :--- | :--- |
-| **Sector NO** (Noroeste) | $[-1080, 0]$ | $[-1080, 0]$ | `Vector2(-540, -540)` | $1080 \times 1080\text{ px}$ |
-| **Sector NE** (Noreste) | $[0, 1080]$ | $[-1080, 0]$ | `Vector2(540, -540)` | $1080 \times 1080\text{ px}$ |
-| **Sector SO** (Suroeste) | $[-1080, 0]$ | $[0, 1080]$ | `Vector2(-540, 540)` | $1080 \times 1080\text{ px}$ |
-| **Sector SE** (Sureste) | $[0, 1080]$ | $[0, 1080]$ | `Vector2(540, 540)` | $1080 \times 1080\text{ px}$ |
+| **Sector NO** (Noroeste) | $[-2160, 0]$ | $[-2160, 0]$ | `Vector2(-1080, -1080)` | $2160 \times 2160\text{ px}$ |
+| **Sector NE** (Noreste) | $[0, 2160]$ | $[-2160, 0]$ | `Vector2(1080, -1080)` | $2160 \times 2160\text{ px}$ |
+| **Sector SO** (Suroeste) | $[-2160, 0]$ | $[0, 2160]$ | `Vector2(-1080, 1080)` | $2160 \times 2160\text{ px}$ |
+| **Sector SE** (Sureste) | $[0, 2160]$ | $[0, 2160]$ | `Vector2(1080, 1080)` | $2160 \times 2160\text{ px}$ |
 
 ---
 
@@ -44,19 +44,19 @@ En la escena raíz del escenario (`escenas/escenario.tscn`), se implementa una b
 * **Nodo:** `VallaPerimetral (StaticBody2D)`
 * **Capa de Colisión:** Capa 1 (`Mundo_Alto` / Bloqueo Total).
 * **Geometría de Muros:** 4 nodos `CollisionShape2D` (forma `RectangleShape2D` de $64\text{ px}$ de grosor):
-  - **Muro Norte:** Posición `(0, -1080)`, tamaño `Vector2(2160, 64)`.
-  - **Muro Sur:** Posición `(0, 1080)`, tamaño `Vector2(2160, 64)`.
-  - **Muro Oeste:** Posición `(-1080, 0)`, tamaño `Vector2(64, 2160)`.
-  - **Muro Este:** Posición `(1080, 0)`, tamaño `Vector2(64, 2160)`.
+  - **Muro Norte:** Posición `(0, -2160)`, tamaño `Vector2(4320, 64)`.
+  - **Muro Sur:** Posición `(0, 2160)`, tamaño `Vector2(4320, 64)`.
+  - **Muro Oeste:** Posición `(-2160, 0)`, tamaño `Vector2(64, 4320)`.
+  - **Muro Este:** Posición `(2160, 0)`, tamaño `Vector2(64, 4320)`.
 * **Propósito:** Esta valla es fija e inmutable; nunca se altera al mutar los sectores interiores, garantizando que ni el jugador ni el monstruo puedan escapar de la arena.
 
 ### 2.2. Límites Visuales (Encuadre de Cámara en Godot 4)
 Para una resolución base de viewport $1:1$ ($1080 \times 1080\text{ px}$), el nodo `Camera2D` utiliza los límites perimetrales nativos del motor:
 ```gdscript
-limit_left = -1080
-limit_top = -1080
-limit_right = 1080
-limit_bottom = 1080
+limit_left = -2160
+limit_top = -2160
+limit_right = 2160
+limit_bottom = 2160
 ```
 * **Comportamiento dinámico:**
   - En el interior del bosque, la cámara sigue con suavidad al personaje centrándolo en pantalla.
@@ -113,7 +113,9 @@ Cada variante de sector es una escena compacta de $1080 \times 1080\text{ px}$ c
 
 ```text
 VarianteSector (Node2D)
-├── ObstaculosAltos (StaticBody2D - Capa 1: Mundo_Alto)
+├── CapaObstaculos (TileMapLayer con tileset_obstaculos.tres [Scenes Collection])
+│   └── Instancias pintadas con brocha: Arbol (Capa 1), Roca (Capa 1), TroncoBajo (Capa 2)
+├── ObstaculosAltos (StaticBody2D - Capa 1: Mundo_Alto) [Colocación manual o complementaria]
 │   ├── Arboles (CollisionShape2D circulares en las bases)
 │   └── RocasGrandes
 ├── ObstaculosBajos (StaticBody2D - Capa 2: Obstaculos_Bajos)
@@ -123,6 +125,10 @@ VarianteSector (Node2D)
     ├── MarkerNota2 (Marker2D, grupo: "puntos_nota")
     └── MarkerNota3 (Marker2D, grupo: "puntos_nota")
 ```
+
+#### Flujo de Pintado Rápido con `TileMapLayer` y `TileSetScenesCollectionSource`:
+* En `recursos/tilesets/tileset_obstaculos.tres` se configuran las escenas modulares de obstáculos (`escenas/obstaculos/arbol.tscn`, `roca.tscn`, `tronco_bajo.tscn`) mediante un `TileSetScenesCollectionSource`.
+* Al añadir un nodo `TileMapLayer` a cualquier variante con este `TileSet`, es posible pintar obstáculos directamente con el ratón en el editor 2D como si fueran celdas, instanciando automáticamente los nodos de colisión en sus respectivas capas físicas (Capa 1 para árboles/rocas y Capa 2 para troncos bajos) con soporte nativo de `y_sort_enabled`.
 
 ---
 

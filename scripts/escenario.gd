@@ -18,6 +18,11 @@ const RUTAS_VARIANTES_DEFECTO: Array[String] = [
 @export var objetivo_enemigo: CharacterBody2D
 @export var catalogo_variantes: Array[PackedScene] = []
 
+@export_group("Efecto Niebla de Mutación")
+@export_range(0.2, 5.0, 0.1, "suffix:s") var niebla_duracion_cierre: float = 1.3
+@export_range(0.0, 3.0, 0.1, "suffix:s") var niebla_pausa_oscuridad: float = 0.4
+@export_range(0.2, 5.0, 0.1, "suffix:s") var niebla_duracion_apertura: float = 1.3
+
 var variantes_activas: Dictionary = {
 	"NO": "",
 	"NE": "",
@@ -32,7 +37,7 @@ var _instancias_sectores: Dictionary = {
 	"SE": null
 }
 
-@onready var _contenedor_sectores: Node2D = get_node_or_null("Sectores") as Node2D
+@onready var _efecto_niebla: EfectoNieblaMutacion = get_node_or_null("EfectoNieblaMutacion") as EfectoNieblaMutacion
 @onready var _nodo_no: Node2D = get_node_or_null("Sectores/SectorNO") as Node2D
 @onready var _nodo_ne: Node2D = get_node_or_null("Sectores/SectorNE") as Node2D
 @onready var _nodo_so: Node2D = get_node_or_null("Sectores/SectorSO") as Node2D
@@ -54,6 +59,11 @@ func _resolver_referencias_objetivos() -> void:
 
 	if objetivo_enemigo == null and get_parent() != null:
 		objetivo_enemigo = get_parent().find_child("Enemigo", true, false) as CharacterBody2D
+
+	if _efecto_niebla == null:
+		_efecto_niebla = get_node_or_null("EfectoNieblaMutacion") as EfectoNieblaMutacion
+	if _efecto_niebla != null and _efecto_niebla.objetivo_jugador == null:
+		_efecto_niebla.objetivo_jugador = objetivo_jugador
 
 
 func _inicializar_catalogo() -> void:
@@ -124,7 +134,40 @@ func calcular_cuadrante(pos_global: Vector2) -> String:
 
 
 func forzar_mutacion() -> void:
-	mutar_sectores_lejanos()
+	mutar_con_neblina()
+
+
+func mutar_con_neblina(
+	duracion_cierre: float = -1.0,
+	duracion_apertura: float = -1.0,
+	pausa_oscuridad: float = -1.0
+) -> void:
+	if _efecto_niebla == null:
+		_efecto_niebla = get_node_or_null("EfectoNieblaMutacion") as EfectoNieblaMutacion
+
+	var t_cierre: float = duracion_cierre
+	if t_cierre < 0.0:
+		t_cierre = _efecto_niebla.duracion_cierre if _efecto_niebla != null else niebla_duracion_cierre
+
+	var t_apertura: float = duracion_apertura
+	if t_apertura < 0.0:
+		t_apertura = _efecto_niebla.duracion_apertura if _efecto_niebla != null else niebla_duracion_apertura
+
+	var t_pausa: float = pausa_oscuridad
+	if t_pausa < 0.0:
+		t_pausa = _efecto_niebla.pausa_oscuridad if _efecto_niebla != null else niebla_pausa_oscuridad
+
+	if _efecto_niebla != null:
+		_efecto_niebla.cubrir(t_cierre)
+		await _efecto_niebla.ceguera_alcanzada
+		mutar_sectores_lejanos()
+		if t_pausa > 0.0:
+			var tree = get_tree()
+			if tree != null:
+				await tree.create_timer(t_pausa).timeout
+		_efecto_niebla.despejar(t_apertura)
+	else:
+		mutar_sectores_lejanos()
 
 
 func mutar_sectores_lejanos() -> void:

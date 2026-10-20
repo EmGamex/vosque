@@ -69,8 +69,8 @@ func calcular_cuadrante(pos: Vector2) -> String:
 
 func obtener_centro_cuadrante(cuad: String) -> String:
 	match cuad:
-		"NO": return "(-540, -540)"
-		"NE": return "(540, -540)"
-		"SO": return "(-540, 540)"
-		"SE": return "(540, 540)"
+		"NO": return "(-1080, -1080)"
+		"NE": return "(1080, -1080)"
+		"SO": return "(-1080, 1080)"
+		"SE": return "(1080, 1080)"
 		_: return "(0, 0)"
