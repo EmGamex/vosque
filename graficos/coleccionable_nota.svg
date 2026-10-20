@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+  <!-- Sombra y borde quemado exterior -->
+  <polygon points="12,6 48,4 56,16 54,52 46,60 16,58 8,46 10,18" fill="#382414" filter="url(#shadow)"/>
+  <!-- Papel envejecido base -->
+  <polygon points="13,7 47,5 55,16 53,51 45,59 17,57 9,45 11,19" fill="#d9c398"/>
+  <!-- Textura interior / bordes manchados -->
+  <polygon points="16,10 44,8 51,18 49,48 42,55 19,53 13,42 14,21" fill="#ede0c4"/>
+  <!-- Manchas y dobleces sutiles -->
+  <path d="M 14,25 Q 24,27 34,22 T 50,26" stroke="#c4ad82" stroke-width="1.5" fill="none" opacity="0.6"/>
+  <path d="M 15,38 Q 28,35 38,40 T 48,37" stroke="#c4ad82" stroke-width="1.5" fill="none" opacity="0.6"/>
+  <polygon points="46,6 55,16 45,17" fill="#bfa577" opacity="0.8"/>
+  <!-- Runa / Símbolo arcano en tinta oscura desgastada -->
+  <circle cx="32" cy="32" r="10" stroke="#1c140d" stroke-width="2.5" fill="none" opacity="0.9"/>
+  <line x1="32" y1="18" x2="32" y2="46" stroke="#1c140d" stroke-width="2.5" stroke-linecap="round" opacity="0.9"/>
+  <line x1="22" y1="28" x2="42" y2="36" stroke="#1c140d" stroke-width="2" stroke-linecap="round" opacity="0.9"/>
+  <line x1="22" y1="36" x2="42" y2="28" stroke="#1c140d" stroke-width="2" stroke-linecap="round" opacity="0.9"/>
+  <circle cx="32" cy="32" r="3" fill="#63171b" opacity="0.85"/>
+</svg>

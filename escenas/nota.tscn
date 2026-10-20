@@ -1,0 +1,38 @@
+[gd_scene format=3 uid="uid://bkew8wnh4vhlu"]
+
+[ext_resource type="Script" uid="uid://cx8bnnbmuynox" path="res://scripts/nota.gd" id="1_3p1gy"]
+[ext_resource type="Texture2D" uid="uid://cfsys4vyiwpya" path="res://graficos/coleccionable_nota.svg" id="2_q2k08"]
+[ext_resource type="Texture2D" uid="uid://ckap2m8bjlqp5" path="res://escenas/luz_baliza_textura.tres" id="3_50qer"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_qalj3"]
+radius = 32.0
+
+[node name="Nota" type="Area2D" unique_id=1235575928]
+collision_layer = 16
+collision_mask = 4
+script = ExtResource("1_3p1gy")
+
+[node name="VisualPapel" type="Sprite2D" parent="." unique_id=1936358198]
+texture = ExtResource("2_q2k08")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=603299985]
+shape = SubResource("CircleShape2D_qalj3")
+
+[node name="LuzBaliza" type="PointLight2D" parent="." unique_id=1216381019]
+color = Color(1, 0.95, 0.8, 1)
+energy = 0.8
+texture = ExtResource("3_50qer")
+texture_scale = 1.5625
+
+[node name="ParticulasRecogida" type="CPUParticles2D" parent="." unique_id=1641251033]
+emitting = false
+lifetime = 0.4
+one_shot = true
+explosiveness = 1.0
+spread = 180.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 40.0
+initial_velocity_max = 90.0
+color = Color(1, 0.9, 0.6, 1)
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
