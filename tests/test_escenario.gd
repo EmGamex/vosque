@@ -167,18 +167,53 @@ func test_efecto_niebla_mutacion() -> void:
 	assert_false(efecto_niebla.visible, "Al estar desactivado debe permanecer invisible")
 	assert_false(efecto_niebla.is_processing(), "Al estar desactivado debe tener process inactivo")
 
-	# Probar emisión inmediata de señales al estar desactivado (anti-deadlock)
+	# Probar emisión diferida de señales al estar desactivado (anti-deadlock)
 	var senales := {"ceguera": false, "disipada": false}
 	efecto_niebla.ceguera_alcanzada.connect(func(): senales["ceguera"] = true, CONNECT_ONE_SHOT)
 	efecto_niebla.niebla_disipada.connect(func(): senales["disipada"] = true, CONNECT_ONE_SHOT)
 
 	efecto_niebla.cubrir(0.1)
-	assert_true(senales["ceguera"], "cubrir() en modo desactivado debe emitir ceguera_alcanzada de inmediato")
-
 	efecto_niebla.despejar(0.1)
-	assert_true(senales["disipada"], "despejar() en modo desactivado debe emitir niebla_disipada de inmediato")
+	# Esperar al siguiente tick para procesar call_deferred
+	await (Engine.get_main_loop() as SceneTree).process_frame
+	assert_true(senales["ceguera"], "cubrir() en modo desactivado debe emitir ceguera_alcanzada")
+	assert_true(senales["disipada"], "despejar() en modo desactivado debe emitir niebla_disipada")
 
 	esc.free()
+
+
+func test_mutacion_con_niebla_desactivada_y_reactivada() -> void:
+	var escena_escenario: PackedScene = load("res://escenas/escenario.tscn")
+	var esc: Escenario = escena_escenario.instantiate() as Escenario
+	var dummy_jugador := MockPersonajeParaEscenario.new()
+	dummy_jugador.global_position = Vector2(-500, -500) # Sector NO
+	esc.objetivo_jugador = dummy_jugador
+
+	var root := Node2D.new()
+	root.add_child(dummy_jugador)
+	root.add_child(esc)
+	esc._ready()
+
+	var efecto_niebla: EfectoNieblaMutacion = esc.get_node_or_null("EfectoNieblaMutacion") as EfectoNieblaMutacion
+	assert_true(efecto_niebla != null, "Debe existir EfectoNieblaMutacion")
+
+	# 1. Desactivar niebla y forzar mutación: debe mutar al instante y no dejar _mutacion_en_progreso trabado
+	efecto_niebla.desactivado = true
+	var variantes_antes: Dictionary = esc.variantes_activas.duplicate()
+
+	await esc.mutar_con_neblina(0.01, 0.01, 0.0)
+	assert_false(esc._mutacion_en_progreso, "Con niebla desactivada _mutacion_en_progreso debe quedar en false tras completar")
+	assert_eq(esc.variantes_activas.get("NO"), variantes_antes.get("NO"), "El sector del jugador NO muta")
+
+	# 2. Reactivar niebla: debe poder mutar nuevamente con niebla sin quedar en deadlock
+	efecto_niebla.desactivado = false
+	assert_false(efecto_niebla.desactivado, "La niebla debe quedar reactivada")
+
+	esc.mutar_con_neblina(0.01, 0.01, 0.0)
+	await (Engine.get_main_loop() as SceneTree).create_timer(0.1).timeout
+	assert_false(esc._mutacion_en_progreso, "_mutacion_en_progreso debe volver a false tras mutar con niebla activa")
+
+	root.free()
 
 
 func test_protocolo_anti_atascamiento_enemigo() -> void:
