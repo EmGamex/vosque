@@ -23,13 +23,13 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
   - [x] Estado de fatiga (bloqueo de sprint hasta recuperar $\ge 30\%$ de estamina).
 - [x] **Mecánica de Salto Libre (Despegue en Suelo):**
   - [x] Activación con `Espacio` en suelo consumiendo $-20\text{ pts}$ de estamina.
-  - [x] Arco parabólico en contenedor `Visual` local (duración $\approx 0.45\text{ s}$).
+  - [x] Arco parabólico en contenedor `Visual` local con fórmula $4u(1-u) \times 56\text{ px}$ (duración $0.45\text{ s}$).
   - [x] Desactivación temporal de colisión con Capa 2 (`Obstaculos_Bajos`).
-  - [x] Escala reducida de la sombra proyectada en el suelo durante el vuelo.
+  - [x] Escala reducida de la sombra proyectada en el suelo durante el vuelo (`Vector2(0.6, 0.6)`).
 - [x] **Mecánica de Salto de Plancha (*Dive* en el Aire):**
   - [x] Segunda pulsación de `Espacio` en el aire consumiendo $-30\text{ pts}$ de estamina.
-  - [x] Impulso horizontal aerodinámico a $\approx 1200\text{ px/s}$.
-  - [x] Impacto contra el suelo y ventana de inmovilidad/recuperación de $0.6\text{ s}$ (vulnerabilidad total ante el monstruo).
+  - [x] Impulso horizontal aerodinámico a $1200\text{ px/s}$.
+  - [x] Impacto contra el suelo y ventana de inmovilidad/recuperación de $0.6\text{ s}$ con arrastre (`dive_slide_friction = 2200 px/s²`).
 - [ ] **Animaciones de Salto y Recuperación en Motor:**
   - [ ] Integrar poses estáticas y recuperación (`jugador_salto_aire`, `jugador_plancha_aire`, `jugador_suelo_recuperacion`) en `_actualizar_animacion()` de [`scripts/personaje.gd`](../../scripts/personaje.gd).
 - [ ] **Linterna Frontal Desacoplada:**
@@ -40,7 +40,7 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 
 ## 2. Módulo: Escenario y Topología 2x2
 > 📄 **Especificación de referencia:** [`docs/gameplay/mapa_y_sectores.md`](../gameplay/mapa_y_sectores.md)  
-> 💻 **Archivos clave:** [`escenas/escenario.tscn`](../../escenas/escenario.tscn), `scripts/escenario.gd`
+> 💻 **Archivos clave:** [`escenas/escenario.tscn`](../../escenas/escenario.tscn), [`scripts/escenario.gd`](../../scripts/escenario.gd)
 
 - [x] **Arena Base y Valla Perimetral:**
   - [x] Estructura fija de $4320 \times 4320\text{ px}$ en coordenadas $[-2160, 2160]$.
@@ -54,9 +54,9 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
   - [x] Nodos candidatos de aparición de notas (`Marker2D` en grupo `"puntos_nota"`).
 - [x] **Algoritmo de Mutación Dinámica y Niebla:**
   - [x] Detección del cuadrante activo del jugador al recoger una nota o forzar mutación.
-  - [x] Transición de niebla radial (`EfectoNieblaMutacion`) con cero consumo en reposo y blindaje asíncrono.
+  - [x] Transición de niebla radial (`EfectoNieblaMutacion`) vía `ejecutar_transicion()` con cero consumo en reposo y blindaje asíncrono.
   - [x] Reemplazo atómico de las sub-escenas de los **3 cuadrantes lejanos** durante la fase de ceguera.
-  - [x] Protocolo anti-atascamiento del monstruo con reubicación al punto transitable más próximo.
+  - [x] Protocolo anti-atascamiento del monstruo con reubicación al punto transitable más próximo y reserva de marcador.
 
 ---
 
@@ -64,35 +64,63 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 > 📄 **Especificación de referencia:** [`docs/gameplay/mecanicas_y_entidades.md`](../gameplay/mecanicas_y_entidades.md), [`docs/gameplay/dificultad_y_balance.md`](../gameplay/dificultad_y_balance.md)  
 > 💻 **Archivos clave:** [`scripts/enemigo.gd`](../../scripts/enemigo.gd), [`escenas/enemigo.tscn`](../../escenas/enemigo.tscn)
 
-- [x] **Persecución Básica Vectorial:** Movimiento directo hacia el jugador con `move_and_slide()` y deslizamiento en colisiones.
+- [x] **Persecución Básica Vectorial:** Movimiento hacia el jugador con `move_and_slide()` y aceleración controlada (`3500 px/s²`).
 - [x] **Rotación Continua 360°:** El nodo visual orienta sus garras y cabeza siguiendo el vector instantáneo de velocidad (`velocity.angle()`).
-- [ ] **Escalado de Fases y Dificultad:**
-  - [ ] Fase 1 (*Patrulla Lenta*): Velocidad base al $60\% - 75\%$ de la marcha del jugador (notas 1 a 3).
-  - [ ] Fase 2 (*Persecución Media*): Velocidad igualada al $95\% - 100\%$ (notas 4 a 7).
-  - [ ] Fase 3 (*Cacería Frenética*): Velocidad superior al $105\% - 115\%$ (notas 8+).
-  - [ ] Fórmula acumulativa: $\text{Velocidad}(n) = \text{Velocidad Base} \times (1 + \text{Tasa})^n$.
+- [x] **Geometría de Detección:** Colisión física sólida ($42\text{ px}$) y `AreaCaptura` letal ($56\text{ px}$) con `RayCastVision`.
+- [ ] **Escalado Cuantitativo de Dificultad:**
+  - [ ] Implementar la función de velocidad acotada: $\text{Velocidad}(n) = \min(920.0, \; 500.0 + 42.0 \times n)$.
+  - [ ] Tope absoluto de $920\text{ px/s}$ para garantizar la maniobrabilidad del jugador durante el sprint ($1000\text{ px/s}$).
+- [ ] **Desatasco Tangencial (*Steering*):** Vector de desvío lateral cuando la línea de visión se bloquea contra obstáculos sólidos.
 - [ ] **Ojos Reflectantes y Material Emisivo:** Ojos visibles en penumbra antes que la silueta completa penetre en el haz de luz.
-- [ ] **Estela de Sombras:** Emisión de `CPUParticles2D` oscuras al entrar en fase frenética.
 
 ---
 
-## 4. Módulo: Coleccionables Arcade (Notas)
-> 📄 **Especificación de referencia:** [`docs/gameplay/mecanicas_y_entidades.md`](../gameplay/mecanicas_y_entidades.md)  
+## 4. Módulo: Coleccionables Arcade (Notas) y Spawner
+> 📄 **Especificación de referencia:** [`docs/gameplay/sistema_de_notas_y_spawner.md`](../gameplay/sistema_de_notas_y_spawner.md)  
 > 💻 **Archivos clave:** `escenas/nota.tscn`, `scripts/nota.gd`
 
 - [ ] **Entidad Nota (`Area2D`):**
-  - [ ] Solo 1 nota activa en escena en todo momento.
-  - [ ] Halo luminoso propio (`PointLight2D`) actuando como baliza en penumbra.
-  - [ ] Flotación senoidal procedural suave.
+  - [ ] Solo 1 nota activa en escena en todo momento en Capa 5 (`Interactuables`).
+  - [ ] Halo luminoso propio (`PointLight2D` ámbar de $200\text{ px}$) con pulso armónico como baliza orientativa.
+  - [ ] Flotación senoidal procedural en `VisualPapel`.
 - [ ] **Recolección Fluida Estilo Arcade:**
   - [ ] Detección por contacto sin bloquear el control ni desplegar textos obstructivos.
   - [ ] Disparo de sonido de rasgado seco y brote de 8 micropartículas doradas/blancas.
-  - [ ] Notificación al HUD para salto de escala del contador numérico.
-  - [ ] Notificación al gestor de escenario para disparar la mutación de los 3 sectores lejanos y spawnear la siguiente nota a $R_{\min} \ge 600\text{ px}$.
+  - [ ] Desactivación diferida de colisión y emisión de señal `recolectada`.
+- [ ] **Algoritmo del Spawner Espacial:**
+  - [ ] Filtrado de candidatos en los 3 cuadrantes recién mutados.
+  - [ ] Restricción de distancias mínimas: $\ge 600\text{ px}$ al jugador y $\ge 800\text{ px}$ al monstruo.
+  - [ ] Exclusión mutua respecto al marcador utilizado para desatascar al enemigo.
 
 ---
 
-## 5. Módulo: Interfaz, HUD y Menús
+## 5. Módulo: Arquitectura de Partida y Director (Game Director)
+> 📄 **Especificación de referencia:** [`docs/gameplay/arquitectura_de_partida_y_director.md`](../gameplay/arquitectura_de_partida_y_director.md)  
+> 💻 **Archivos clave:** `scripts/maain.gd`, `escenas/maain.tscn`
+
+- [ ] **Orquestador Principal de Partida (`maain.gd`):**
+  - [ ] Instanciación y colocación de jugador, monstruo y primera nota.
+  - [ ] Bus centralizado de señales: recolección $\to$ puntuación $\to$ aceleración $\to$ mutación $\to$ nuevo spawn.
+  - [ ] Manejo de condición de derrota y salto a Game Over.
+- [ ] **Persistencia de High Score:**
+  - [ ] Guardado en archivo local `user://highscore.save` (IndexedDB en navegador).
+  - [ ] Fallback web directo a `JavaScriptBridge` con `localStorage`.
+
+---
+
+## 6. Módulo: Cámara y Game Feel
+> 📄 **Especificación de referencia:** [`docs/gameplay/camara_y_game_feel.md`](../gameplay/camara_y_game_feel.md)  
+> 💻 **Archivos clave:** [`escenas/camara.tscn`](../../escenas/camara.tscn), `scripts/camara.gd`
+
+- [x] **Configuración Básica de Cámara:** Viewport $1:1$ con centrado y límites perimetrales fijos $[-2160, 2160]$.
+- [ ] **Sistema de Sacudida por Trauma (*Camera Shake*):**
+  - [ ] Desplazamiento por trauma cuadrático: $\text{Trauma}^2 \times \text{AmplitudMáxima}$.
+  - [ ] Tasa de decaimiento lineal a $-1.4\text{ pts/s}$.
+  - [ ] Disparadores: impacto de plancha ($+0.35$), proximidad del monstruo en luz ($+0.12/\text{s}$), jumpscare ($+1.0$).
+
+---
+
+## 7. Módulo: Interfaz, HUD y Menús
 > 📄 **Especificación de referencia:** [`docs/interfaz_y_audio/controles_y_hud.md`](../interfaz_y_audio/controles_y_hud.md)  
 > 💻 **Archivos clave:** [`scripts/gestor_escenas.gd`](../../scripts/gestor_escenas.gd), [`scripts/menu_inicio.gd`](../../scripts/menu_inicio.gd), [`scripts/game_over.gd`](../../scripts/game_over.gd)
 
@@ -109,7 +137,7 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 
 ---
 
-## 6. Módulo: Pipeline Artístico (~30 Assets)
+## 8. Módulo: Pipeline Artístico (~30 Assets)
 > 📄 **Especificación de referencia:** [`docs/arte/guia_estilo_y_assets.md`](../arte/guia_estilo_y_assets.md)
 
 - [ ] **Protagonista (15 Cuadros):**
@@ -140,27 +168,30 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 
 ---
 
-## 7. Módulo: Audio y Feedback Sensorial
+## 9. Módulo: Audio y Feedback Sensorial
 > 📄 **Especificación de referencia:** [`docs/interfaz_y_audio/audio_y_feedback.md`](../interfaz_y_audio/audio_y_feedback.md)
 
+- [ ] **Configuración de Buses de Audio (`default_bus_layout.tres`):**
+  - [ ] Crear estructura de buses: `Master`, `Ambiente`, `Efectos`, `Criatura`.
+  - [ ] Efecto `AudioEffectLowPassFilter` dinámico activado durante el estado `FATIGA`.
 - [ ] **Efectos de Jugador:** Pasos sobre hojarasca seca con cadencia según velocidad, sonido de despegue de salto y golpe seco al caer en plancha con jadeo.
-- [ ] **Efectos de Criatura:** Sonido sordo gutural o estática que incrementa en proximidad.
+- [ ] **Efectos de Criatura:** Radar sonoro mediante `AudioStreamPlayer2D` con atenuación logarítmica ($1400\text{ px}$) y zumbido de estática.
 - [ ] **Efectos de Entorno y Notas:** Viento frío continuo de fondo, rasgado seco de nota recogida y golpe orquestal repentino de jumpscare.
 
 ---
 
-## 8. Módulo: Exportación Web y Persistencia
+## 10. Módulo: Exportación Web y Persistencia
 > 📄 **Especificación de referencia:** [`docs/produccion/checklist_exportacion_web.md`](checklist_exportacion_web.md)
 
-- [ ] **Configuración de Preset Web:**
-  - [ ] Renderer `gl_compatibility` y `threads = false`.
-  - [ ] Captura de foco de canvas y anulación de scroll de página en Espacio/Flechas.
+- [x] **Configuración de Preset Web:**
+  - [x] Renderer `gl_compatibility` y `threads = false`.
+  - [x] Captura de foco de canvas y anulación de scroll de página en Espacio/Flechas.
 - [ ] **Persistencia de High Score:** Guardado de récord histórico mediante `user://` (IndexedDB en navegador) con fallback a `localStorage`.
 - [ ] **Validación en Plataformas:** Pruebas de empaquetado `.zip` y ejecución en itch.io y Newgrounds.
 
 ---
 
-## 9. Módulo: Herramientas de Depuración y Diagnóstico
+## 11. Módulo: Herramientas de Depuración y Diagnóstico
 > 📄 **Especificación de referencia:** [`docs/herramientas/herramientas_de_debug.md`](../herramientas/herramientas_de_debug.md)  
 > 💻 **Archivos clave:** `escenas/debug_menu.tscn`, `scripts/debug_menu/`, `addons/personaje_tools/`
 
@@ -174,4 +205,3 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
   - [x] Pestaña Sistema: escala de tiempo (`Engine.time_scale`) y reinicio rápido de escena.
 - [ ] Pestaña Sistema (Notas): integrar contador y simulador de notas al implementar la entidad `escenas/nota.tscn`.
 - [ ] **Linter de Escenario (`addons/escenario_tools`):** Guías visuales de exclusión ($80\text{ px}$) y validación estática de colisiones en variantes.
-
