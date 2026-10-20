@@ -26,7 +26,7 @@ Un juego arcade de supervivencia y terror de vista cenital inspirado en la atmó
 ### 1.2. Pilares de Diseño
 1. **Inmediatez Arcade:** Sesiones de 60 a 120 segundos; controles instantáneos, reintentos rápidos y enfoque en superar la puntuación máxima (*High Score*).
 2. **Tensión y Atmósfera de Terror:** Sensación constante de vulnerabilidad, oscuridad opresiva, pasos inquietantes en el bosque y una amenaza implacable que acecha al jugador.
-3. **Producción Eficiente Asistida:** Alcance acotado a un mapa de 4 sectores mutables (cuadrícula 2x2), pipeline híbrido 3D-Vectorial (Blender + Inkscape) para gráficos rápidos y consistentes, y lógica directa asistida por IA/MCP en Godot.
+3. **Producción Eficiente Asistida:** Alcance acotado a un mapa de 4 sectores mutables (cuadrícula 2x2), pipeline híbrido 3D-Vectorial (Blender + Inkscape) para gráficos consistentes, y arquitectura modular asistida por IA/MCP en Godot.
 
 ---
 
@@ -35,18 +35,21 @@ Un juego arcade de supervivencia y terror de vista cenital inspirado en la atmó
 Para facilitar la lectura y desarrollo, la documentación está dividida en las siguientes áreas técnicas:
 
 ### [Gameplay y Mecánicas](gameplay/mecanicas_y_entidades.md)
-- [Personaje y Habilidades](gameplay/personaje_y_habilidades.md): Atributos físicos, sprint con barra de estamina, linterna híbrida y máquina de estados del jugador.
-- [Mapa y Sectores](gameplay/mapa_y_sectores.md): Topología 2x2, composición modular, límites físicos/visuales, corredores de conectividad y matriz de capas de colisión.
-- [Mecánicas y Entidades](gameplay/mecanicas_y_entidades.md): Core loop, jugador, IA del monstruo, notas, bosque mutable de 4 sectores y cámara interactiva.
-- [Dificultad y Balance](gameplay/dificultad_y_balance.md): Progresión por notas, fórmulas de velocidad y reubicación en sectores mutados.
+- [Personaje y Habilidades](gameplay/personaje_y_habilidades.md): Atributos físicos, sprint con estamina, salto libre, plancha (*Dive*), linterna frontal y máquina de estados FSM.
+- [Mapa y Sectores](gameplay/mapa_y_sectores.md): Topología 2x2, composición modular, límites físicos/visuales, corredores seguros ($160\text{ px}$) y matriz de colisiones.
+- [Mecánicas y Entidades](gameplay/mecanicas_y_entidades.md): Core loop, jugador, IA y radios del monstruo, y bosque mutable.
+- [Dificultad y Balance](gameplay/dificultad_y_balance.md): Progresión por notas, tabla cuantitativa de velocidades ($500 \to 920\text{ px/s}$) y reglas de mutación.
+- [Sistema de Notas y Spawner](gameplay/sistema_de_notas_y_spawner.md): Jerarquía de `Area2D`, baliza luminosa, recolección atómica y algoritmo con filtros de distancia mínima.
+- [Arquitectura de Partida y Director](gameplay/arquitectura_de_partida_y_director.md): Game Director (`maain.gd`), ciclo de señales, Game Over y persistencia de récords en Web.
+- [Cámara y Game Feel](gameplay/camara_y_game_feel.md): Cámara $1:1$, sistema de sacudidas (*Shake*) por trauma acumulativo y post-procesamiento.
 
 ### [Arte y Pipeline Visual](arte/pipeline_hibrido.md)
 - [Pipeline Híbrido](arte/pipeline_hibrido.md): Flujo paso a paso (Blender ➔ Inkscape ➔ Godot).
-- [Guía de Estilo y Assets](arte/guia_estilo_y_assets.md): Estética visual y checklist de sprites necesarios.
+- [Guía de Estilo y Assets](arte/guia_estilo_y_assets.md): Estética visual y checklist de ~30 sprites necesarios.
 
 ### [Interfaz y Audio](interfaz_y_audio/controles_y_hud.md)
-- [Controles y HUD](interfaz_y_audio/controles_y_hud.md): Entradas de teclado, HUD in-game, menú de pausa, pantalla de Game Over e integración con el gestor de escenas.
-- [Audio y Feedback](interfaz_y_audio/audio_y_feedback.md): Efectos de sonido, detección de proximidad y tensión auditiva.
+- [Controles y HUD](interfaz_y_audio/controles_y_hud.md): Entradas de teclado, HUD in-game, menú de pausa superpuesto en CanvasLayer 50, Game Over e integración de pantallas.
+- [Audio y Feedback](interfaz_y_audio/audio_y_feedback.md): Paisaje sonoro, layout de buses de audio, radar de proximidad y efectos sensoriales.
 
 ### [Producción](produccion/roadmap_y_hitos.md)
 - [Roadmap e Hitos](produccion/roadmap_y_hitos.md): Calendario de 4 semanas hacia Halloween, flujo de hitos y estado actual.
@@ -55,4 +58,3 @@ Para facilitar la lectura y desarrollo, la documentación está dividida en las 
 
 ### [Herramientas y Diagnóstico](herramientas/herramientas_de_debug.md)
 - [Herramientas de Debug](herramientas/herramientas_de_debug.md): Menú unificado in-game (F3 tri-estado), telemetría de jugador/monstruo, diagnóstico de mutación para Issue #3, plugins de editor y MCP.
-

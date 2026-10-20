@@ -54,8 +54,6 @@ flowchart TD
 
 ## 2. Definición de Límites
 
-El juego asegura que la acción permanezca dentro de la arena y sin artefactos visuales mediante un doble sistema independiente:
-
 ### 2.1. Límites Físicos (Colisión Infranqueable)
 En la escena raíz del escenario (`escenas/escenario.tscn`), se implementa una barrera estática permanente:
 * **Nodo:** `VallaPerimetral (StaticBody2D)`
@@ -75,31 +73,32 @@ limit_top = -2160
 limit_right = 2160
 limit_bottom = 2160
 ```
-* **Comportamiento dinámico:**
-  - En el interior del bosque, la cámara sigue con suavidad al personaje centrándolo en pantalla.
-  - Al aproximarse a los extremos exteriores, la cámara amortigua su desplazamiento y se ancla al borde del bosque, permitiendo que el personaje camine hasta la valla sin dejar al descubierto el fondo gris exterior.
+* La cámara sigue con suavidad al personaje centrándolo en pantalla (`position_smoothing_enabled = true`).
+* Al aproximarse a los extremos exteriores, la cámara amortigua su desplazamiento y se ancla al borde del bosque sin mostrar el exterior vacío.
 
-### 2.3. Iluminación Ambiental y Penumbra Contrastada (Legibilidad Arcade)
-Para compatibilizar la atmósfera de terror con desplazamientos a alta velocidad ($800 - 1000\text{ px/s}$) y maniobras evasivas de salto (*Dive*):
-* **Luz Ambiental Base (`CanvasModulate`):** Se aplica un tono azul petróleo / noche americana desaturado (`Color(0.08, 0.10, 0.15, 1.0)`).
-* **Ausencia de Oscuridad Ciega:** El bosque nunca es negro absoluto. La silueta de los troncos, rocas y valla siempre es perceptible a media distancia para anticipar desvíos y saltos.
-* **Linterna como Contraste Alto:** El cono de luz frontal del jugador actúa como haz revelador de alto brillo que ilumina detalles, texturas y el cuerpo del monstruo.
-* **Ojos Reflectantes del Monstruo:** El enemigo cuenta con dos puntos o sprites emisivos (ojos brillantes de brillo retro-reflectante) visibles antes que su silueta completa para alertar su aproximación.
-* **Auto-Iluminación de la Nota:** La nota activa proyecta un halo propio de $\approx 200\text{ px}$, funcionando como una baliza luminosa lejana.
+### 2.3. Iluminación Ambiental y Penumbra Contrastada
+* **Luz Ambiental Base (`CanvasModulate`):** Tono azul petróleo desaturado (`Color(0.08, 0.10, 0.15, 1.0)`).
+* **Ausencia de Oscuridad Ciega:** La silueta de los troncos, rocas y valla siempre es perceptible a media distancia.
+* **Linterna Frontal:** Haz revelador de alto brillo que ilumina texturas y el cuerpo del monstruo.
+* **Ojos Reflectantes:** El enemigo cuenta con dos puntos emisivos visibles en penumbra antes que su cuerpo penetre en el haz.
+* **Halo de la Nota:** La nota proyecta una luz propia de radio $\approx 200\text{ px}$ que funciona como baliza orientativa.
 
 ---
 
 ## 3. Matriz de Capas de Físicas (`Collision Layers`)
 
-Para coordinar la mecánica de locomoción en tierra con el **Salto Libre y Salto de Plancha (*Dive*)**, los objetos del escenario se clasifican en:
+La siguiente matriz detalla cómo interactúa cada entidad del juego con el entorno en tierra y durante maniobras aéreas:
 
-| Capa (Layer) | Nombre de Capa | Elementos del Escenario | Máscara del Jugador en Suelo | Máscara del Jugador en Salto/Plancha |
-| :---: | :--- | :--- | :---: | :---: |
-| **1** | `Mundo_Alto` | Valla perimetral, árboles densos y rocas gigantes impenetrables. | **Activa** (Colisiona) | **Activa** (Colisiona) |
-| **2** | `Obstaculos_Bajos` | Troncos caídos, tocones y piedras pequeñas superables. | **Activa** (Colisiona) | **Inactiva** (Pasa por encima) |
-| **3** | `Jugador` | Protagonista (`CharacterBody2D`). | — | — |
-| **4** | `Monstruo` | Criatura perseguidora (`CharacterBody2D`). | **Activa** (Game Over) | **Activa** (Game Over) |
-| **5** | `Interactuables` | Notas coleccionables (`Area2D`). | **Activa** (Recolección) | **Activa** (Recolección) |
+| Capa | Nombre de Capa | Elementos | Máscara Jugador (Suelo) | Máscara Jugador (Salto/Plancha) | Máscara Monstruo |
+| :---: | :--- | :--- | :---: | :---: | :---: |
+| **1** | `Mundo_Alto` | Valla exterior, árboles grandes, rocas densas | **Activa** (Bloquea) | **Activa** (Bloquea) | **Activa** (Bloquea) |
+| **2** | `Obstaculos_Bajos` | Troncos caídos, tocones, piedras pequeñas | **Activa** (Bloquea) | **Inactiva** (Supera por arriba) | **Activa** (Bloquea / Rodea) |
+| **3** | `Jugador` | Protagonista (`CharacterBody2D`) | — | — | **Activa** (`AreaCaptura`) |
+| **4** | `Monstruo` | Criatura perseguidora (`CharacterBody2D`) | **Activa** (Muerte) | **Activa** (Muerte) | — |
+| **5** | `Interactuables` | Notas coleccionables (`Area2D`) | **Activa** (Recogida) | **Activa** (Recogida) | **Inactiva** |
+
+> [!TIP]
+> **Valor Táctico del Salto:** Dado que la máscara del Monstruo mantiene activas tanto la Capa 1 como la Capa 2, **la criatura está obligada a rodear los troncos bajos**, mientras que el jugador puede saltarlos en línea recta para ganar distancia crucial.
 
 ---
 
@@ -124,52 +123,37 @@ Escenario (Node2D) [scripts/escenario.gd]
 │   ├── SectorSO (Marker2D en [-1080,  1080]) ──> Instancia de Variante activa
 │   └── SectorSE (Marker2D en [ 1080,  1080]) ──> Instancia de Variante activa
 └── EfectoNieblaMutacion (CanvasLayer, layer 15) [scripts/efecto_niebla_mutacion.gd]
-    └── ColorRect (ColorRect en pantalla completa con mat_niebla_mutacion.tres)
+    └── ColorRect (ColorRect con mat_niebla_mutacion.tres)
 ```
 
 ### 4.2. Estructura de Sub-Escena de Variante (`escenas/sectores/variantes/`)
 
-Cada variante de sector cubre un cuadrante de $2160 \times 2160\text{ px}$ con origen `(0, 0)` en su centro relativo (rango de colocación de colisiones $[-960, 960]\text{ px}$ para respetar los corredores limpios de $160\text{ px}$):
+Cada variante cubre un cuadrante de $2160 \times 2160\text{ px}$ con origen `(0, 0)` en su centro relativo:
 
 ```text
 VarianteSector (Node2D, y_sort_enabled = true)
-├── CapaObstaculos (TileMapLayer con tileset_obstaculos.tres [Scenes Collection])
-│   └── Instancias pintadas con brocha: Arbol (Capa 1), Roca (Capa 1), TroncoBajo (Capa 2)
-├── ObstaculosAltos (StaticBody2D - Capa 1: Mundo_Alto) [Colocación manual o complementaria]
-│   ├── Arboles (CollisionShape2D circulares en las bases)
+├── CapaObstaculos (TileMapLayer opcional para pintado rápido)
+├── ObstaculosAltos (StaticBody2D - Capa 1: Mundo_Alto)
+│   ├── Arboles (CollisionShape2D circulares en bases)
 │   └── RocasGrandes
 ├── ObstaculosBajos (StaticBody2D - Capa 2: Obstaculos_Bajos)
-│   └── TroncosCaidos (CollisionShape2D rectangulares orientados)
+│   └── TroncosCaidos (CollisionShape2D rectangulares)
 └── PuntosDeNota (Node2D)
     ├── MarkerNota1 (Marker2D, grupo: "puntos_nota")
     ├── MarkerNota2 (Marker2D, grupo: "puntos_nota")
     └── MarkerNota3 (Marker2D, grupo: "puntos_nota")
 ```
 
-#### Flujo de Pintado Rápido con `TileMapLayer` y `TileSetScenesCollectionSource`:
-* En `recursos/tilesets/tileset_obstaculos.tres` se configuran las escenas modulares de obstáculos (`escenas/obstaculos/arbol.tscn`, `roca.tscn`, `tronco_bajo.tscn`) mediante un `TileSetScenesCollectionSource`.
-* Al añadir un nodo `TileMapLayer` a cualquier variante con este `TileSet`, es posible pintar obstáculos directamente con el ratón en el editor 2D como si fueran celdas, instanciando automáticamente los nodos de colisión en sus respectivas capas físicas (Capa 1 para árboles/rocas y Capa 2 para troncos bajos) con soporte nativo de `y_sort_enabled`.
-
 ---
 
-## 5. Reglas de Diseño de Niveles (*Level Design Guidelines*)
+## 5. Corredores de Conectividad Intersectorial
 
-Para garantizar una experiencia justa, fluida y sin bloqueos accidentales durante las mutaciones:
-
-### 5.1. Corredores de Conectividad Intersectorial
-* Alrededor de los ejes divisores $X = 0$ e $Y = 0$, debe mantenerse una **franja despejada de seguridad de al menos $160\text{ px}$ de ancho** ($80\text{ px}$ a cada lado del borde interior de cada cuadrante).
-* **Regla estricta:** Ninguna variante puede posicionar obstáculos sólidos en estos bordes de conexión. Esto asegura que, sin importar qué variante se instancie en un sector vecino, el jugador o el monstruo siempre puedan cruzar la frontera sin toparse con un muro imprevisto.
-
-### 5.2. Proporción de Espacio y Maniobrabilidad
-* **Área Transitable:** $\ge 70\%$ de la superficie del cuadrante.
-* **Área Ocupada por Obstáculos:** $\le 30\%$.
-* Los árboles densos deben agruparse en pequeños clústeres que dejen pasillos libres de al menos $140\text{ px}$ (suficiente para que el jugador a $800\text{ px/s}$ y el monstruo a $500\text{ - }900\text{ px/s}$ naveguen sin fricción excesiva).
+* Alrededor de los ejes divisores $X = 0$ e $Y = 0$, se mantiene una **franja despejada obligatoria de al menos $160\text{ px}$ de ancho** ($80\text{ px}$ a cada lado del borde interior de cada cuadrante).
+* **Regla estricta:** Ninguna variante puede posicionar obstáculos sólidos en estos bordes de conexión. Esto asegura que el cruce intersectorial sea fluido sin importar la combinación aleatoria de cuadrantes instanciada.
 
 ---
 
 ## 6. Algoritmo de Mutación Espacial Dinámica
-
-Para ocultar el reemplazo procedural de los árboles y rocas evitando el popping visual en pantalla, la mutación se ejecuta bajo una cortina de niebla oscura radial centrada dinámicamente en el jugador (`EfectoNieblaMutacion`).
 
 ```mermaid
 sequenceDiagram
@@ -182,30 +166,28 @@ sequenceDiagram
     participant Monstruo as "Monstruo (enemigo.gd)"
 
     Jugador->>Nota: Entra en contacto (body_entered)
-    Nota->>Gestor: emit_signal('nota_recolectada', pos_nota)
+    Nota->>Gestor: nota_recolectada(pos_nota)
     Nota->>Nota: queue_free()
     
-    Gestor->>Niebla: transicionar_mutacion(Callable)
+    Gestor->>Niebla: mutar_con_neblina() -> ejecutar_transicion()
     activate Niebla
     Niebla->>Niebla: Cierre de iris radial (duracion_cierre: 1.3s)
     Niebla-->>Gestor: ceguera_alcanzada
     
-    Gestor->>Gestor: Identificar cuadrante del jugador (CuadranteActivo)
-    Note over Gestor: CuadranteActivo = (sign(pos.x), sign(pos.y))
-    
+    Gestor->>Gestor: Identificar cuadrante del jugador en instante exacto
     Gestor->>Sectores: Mutar los 3 cuadrantes no activos
     loop Para cada uno de los 3 cuadrantes lejanos
         Sectores->>Sectores: queue_free() variante anterior
         Sectores->>Sectores: instanciar nueva variante aleatoria
     end
     
-    Gestor->>Monstruo: Validar posición segura (anti-atascamiento)
+    Gestor->>Monstruo: Validar posición segura (test_move)
     alt Si el monstruo quedó dentro de un obstáculo nuevo
-        Gestor->>Monstruo: Desplazar al Marker2D transitable más cercano
+        Gestor->>Monstruo: Reubicar a Marker2D transitable más cercano
     end
     
-    Gestor->>Gestor: Seleccionar Marker2D aleatorio en los 3 sectores mutados
-    Gestor->>Nota: Spawnear nueva nota en posición seleccionada
+    Gestor->>Gestor: Seleccionar Marker2D excluyendo la posición del monstruo
+    Gestor->>Nota: Instanciar nueva nota en posición válida (>600px de jugador)
 
     Niebla->>Niebla: Pausa en oscuridad total (pausa_oscuridad: 0.4s)
     Niebla->>Niebla: Apertura de iris radial (duracion_apertura: 1.3s)
@@ -213,16 +195,7 @@ sequenceDiagram
     deactivate Niebla
 ```
 
-### 6.1. Detección del Cuadrante del Jugador
-En GDScript:
-```gdscript
-func obtener_cuadrante_jugador(pos_global: Vector2) -> String:
-	var x_str: String = "E" if pos_global.x >= 0.0 else "O"
-	var y_str: String = "S" if pos_global.y >= 0.0 else "N"
-	return y_str + x_str # Retorna "NO", "NE", "SO" o "SE"
-```
-
-### 6.2. Ciclo de Vida y Optimización de la Niebla de Mutación
-* **Cero Consumo en Reposo (Zero Overhead):** La niebla permanece oculta (`visible = false`) y con el procesamiento detenido (`set_process(false)`) mientras el jugador explora con normalidad. No se evalúan shaders ni transformaciones de pantalla fuera del evento de mutación.
-* **Seguimiento Dinámico:** Durante la transición, el centro del círculo sigue en espacio UV al jugador mediante `get_global_transform_with_canvas().origin / vp_size`, corrigiendo la relación de aspecto del viewport.
-* **Seguridad Asíncrona (Anti-Deadlock):** Si la niebla es desactivada mediante herramientas de depuración a mitad de una animación, interrumpe el tween inmediatamente y emite las señales pendientes (`ceguera_alcanzada`, `niebla_disipada`), impidiendo que el gestor de escenario quede bloqueado en una corrutina.
+### 6.1. Exclusión Mutua en Desatasco y Spawn
+Para garantizar que la nueva nota nunca aparezca en las garras del enemigo:
+1. Si el monstruo necesita ser reubicado por `validar_y_reubicar_enemigo()`, se registra el marcador seleccionado como reservado.
+2. Al sortear el spawn de la nueva nota entre los `"puntos_nota"`, se descarta cualquier marcador que se encuentre a una distancia menor a $800\text{ px}$ de la posición del monstruo o a menos de $600\text{ px}$ de la posición del jugador.
