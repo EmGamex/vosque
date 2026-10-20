@@ -32,6 +32,8 @@ var _instancias_sectores: Dictionary = {
 	"SE": null
 }
 
+var _mutacion_en_progreso: bool = false
+
 @onready var _efecto_niebla: EfectoNieblaMutacion = get_node_or_null("EfectoNieblaMutacion") as EfectoNieblaMutacion
 @onready var _nodo_no: Node2D = get_node_or_null("Sectores/SectorNO") as Node2D
 @onready var _nodo_ne: Node2D = get_node_or_null("Sectores/SectorNE") as Node2D
@@ -137,6 +139,10 @@ func mutar_con_neblina(
 	duracion_apertura: float = -1.0,
 	pausa_oscuridad: float = -1.0
 ) -> void:
+	if _mutacion_en_progreso:
+		return
+	_mutacion_en_progreso = true
+
 	if _efecto_niebla == null:
 		_efecto_niebla = get_node_or_null("EfectoNieblaMutacion") as EfectoNieblaMutacion
 
@@ -153,8 +159,11 @@ func mutar_con_neblina(
 			if tree != null:
 				await tree.create_timer(t_pausa).timeout
 		_efecto_niebla.despejar(t_apertura)
+		await _efecto_niebla.niebla_disipada
 	else:
 		mutar_sectores_lejanos()
+
+	_mutacion_en_progreso = false
 
 
 func mutar_sectores_lejanos() -> void:

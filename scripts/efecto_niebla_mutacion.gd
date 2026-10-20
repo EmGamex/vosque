@@ -11,9 +11,13 @@ signal niebla_disipada
 ## Desactiva por completo la niebla visual y permite que las mutaciones ocurran instantáneamente.
 @export var desactivado: bool = false:
 	set(val):
+		if desactivado == val:
+			return
 		desactivado = val
 		visible = not desactivado
-		if not desactivado and _material_shader != null:
+		if desactivado and _tween != null and _tween.is_valid():
+			_tween.kill()
+		if not desactivado and not _animando and _material_shader != null:
 			_material_shader.set_shader_parameter("radio_interno", radio_despejado)
 
 @export_group("Objetivo de Enfoque")
@@ -60,6 +64,7 @@ signal niebla_disipada
 
 var _material_shader: ShaderMaterial
 var _tween: Tween
+var _animando: bool = false
 
 
 func _ready() -> void:
@@ -153,12 +158,14 @@ func cubrir(duracion: float = -1.0) -> void:
 		ceguera_alcanzada.emit()
 		return
 
+	_animando = true
 	var t: float = duracion if duracion >= 0.0 else duracion_cierre
 	if _tween != null and _tween.is_valid():
 		_tween.kill()
 
 	_actualizar_parametros_shader()
 	if _material_shader == null:
+		_animando = false
 		ceguera_alcanzada.emit()
 		return
 
@@ -171,11 +178,16 @@ func cubrir(duracion: float = -1.0) -> void:
 		radio_cerrado,
 		t
 	)
-	_tween.tween_callback(func(): ceguera_alcanzada.emit())
+	_tween.tween_callback(func():
+		if _material_shader != null:
+			_material_shader.set_shader_parameter("radio_interno", radio_cerrado)
+		ceguera_alcanzada.emit()
+	)
 
 
 func despejar(duracion: float = -1.0) -> void:
 	if desactivado:
+		_animando = false
 		niebla_disipada.emit()
 		return
 
@@ -185,6 +197,7 @@ func despejar(duracion: float = -1.0) -> void:
 
 	_actualizar_parametros_shader()
 	if _material_shader == null:
+		_animando = false
 		niebla_disipada.emit()
 		return
 
@@ -197,4 +210,9 @@ func despejar(duracion: float = -1.0) -> void:
 		radio_despejado,
 		t
 	)
-	_tween.tween_callback(func(): niebla_disipada.emit())
+	_tween.tween_callback(func():
+		_animando = false
+		if _material_shader != null:
+			_material_shader.set_shader_parameter("radio_interno", radio_despejado)
+		niebla_disipada.emit()
+	)

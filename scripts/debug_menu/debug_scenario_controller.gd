@@ -107,7 +107,8 @@ func aplicar_estado_niebla(context: DebugContext) -> void:
 	if context == null:
 		return
 	if context.target_efecto_niebla != null and is_instance_valid(context.target_efecto_niebla):
-		context.target_efecto_niebla.desactivado = niebla_desactivada
+		if context.target_efecto_niebla.desactivado != niebla_desactivada:
+			context.target_efecto_niebla.desactivado = niebla_desactivada
 
 
 func forzar_mutacion(escenario: Node2D) -> void:
