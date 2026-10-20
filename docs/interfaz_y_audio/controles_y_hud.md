@@ -44,6 +44,32 @@ Este documento especifica los esquemas de entrada para teclado en PC y las panta
 
 ---
 
+## 3. Tutorial Flotante sobre la Cabeza del Personaje (Onboarding In-Game)
+
+Para garantizar un onboarding inmediato que no rompa la inmersión cenital ni requiera pausas artificiales, al iniciar cada partida aparece un indicador flotante diegético centrado en la cabeza del personaje (`Vector2(0, -90)`):
+
+### 3.1. Estructura Visual
+* **Contenedor:** Pastilla flotante con fondo negro translúcido (`Color(0.08, 0.10, 0.15, 0.85)`), esquinas redondeadas y borde sutil.
+* **Badges de Teclas:** Representaciones visuales de teclas estilizadas con contraste alto.
+
+### 3.2. Secuencia de 3 Pasos
+1. **Paso 1: Locomoción en 4 Direcciones:**
+   - Mensaje: `"Mueve con [W] [A] [S] [D]"` (o flechas).
+   - Comportamiento: A medida que el jugador presiona cada dirección, el badge de esa tecla se ilumina en ámbar/verde (`#4ade80`).
+   - Criterio de avance: Haber presionado las 4 direcciones (o alcanzar desplazamiento sostenido).
+2. **Paso 2: Superación de Obstáculos Bajos (Salto):**
+   - Mensaje: `"Presiona [Espacio] para saltar"`.
+   - Criterio de avance: Detectar `personaje-salto` y la transición al estado `SALTO`.
+3. **Paso 3: Aceleración con Estamina (Sprint):**
+   - Mensaje: `"Mantén presionado [Shift] para correr"`.
+   - Criterio de avance: Sostener la acción `sprint` y transicionar a `SPRINT`.
+   - Cierre: Al activarse el sprint, la pastilla reproduce un pulso de confirmación y se desvanece suavemente con un `Tween` de alfa en $0.4\text{ s}$ antes de liberarse.
+
+### 3.3. Protocolo de Desvanecimiento Forzado
+* Si el jugador se dirige directamente a la primera nota y la recolecta antes de completar los 3 pasos, el tutorial se desvanece instantáneamente para no entorpecer la cacería de la criatura.
+
+---
+
 ## 3. Menú Principal (Key Art y Portada Dinámica)
 
 El Menú Principal (`escenas/menu_inicio.tscn`) es la pieza visual prioritaria del proyecto, funcionando simultáneamente como portada oficial (*Key Art* para plataformas como itch.io y Newgrounds) y pantalla de bienvenida interactiva.

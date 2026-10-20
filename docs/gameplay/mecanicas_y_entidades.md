@@ -8,20 +8,19 @@ Este documento detalla el bucle principal de juego (*Core Gameplay Loop*), las e
 
 ```mermaid
 flowchart TD
-    A([Inicio de Partida en Bosque]) --> B[Explorar los 4 sectores en la oscuridad con linterna]
+    A([Inicio de Partida en Bosque]) --> B[Explorar en la oscuridad con linterna]
     B --> C{¿Encontró Nota?}
     C -- Sí --> D[+1 Puntuación & Sonido Inquietante]
-    D --> E[Mostrar Flash de Nota 1s]
-    E --> F[Aumentar Velocidad del Monstruo]
-    F --> G[Cerrar Niebla de Transición & Mutar los 3 Sectores Lejanos]
-    G --> H[Spawnear Nueva Nota en Sector Mutado & Abrir Niebla]
-    H --> B
-    C -- No --> I{¿Contacto con Monstruo?}
-    I -- No --> B
-    I -- Sí --> J([Game Over / Jumpscare])
-    J --> K[Guardar High Score en LocalStorage]
-    K --> L[Botón Reintentar Inmediato]
-    L --> A
+    D --> E[Aumentar Velocidad del Monstruo]
+    E --> F[Cerrar Niebla Radial & Mutar los 3 Sectores Lejanos]
+    F --> G[Spawnear Nueva Nota en Sector Mutado & Abrir Niebla]
+    G --> B
+    C -- No --> H{¿Contacto con Monstruo?}
+    H -- No --> B
+    H -- Sí --> I([Game Over / Jumpscare])
+    I --> J[Guardar High Score en Persistencia]
+    J --> K[Reintentar Inmediato]
+    K --> A
 ```
 
 ---
@@ -29,70 +28,53 @@ flowchart TD
 ## 2. Especificación de Entidades
 
 ### 2.1. Jugador (`CharacterBody2D`)
-> 📄 **Especificación completa:** Consulta **[Personaje y Habilidades](personaje_y_habilidades.md)** para el desglose detallado de atributos físicos, máquina de estados y arquitectura de nodos.
+> 📄 **Especificación completa:** Consulta [Personaje y Habilidades](personaje_y_habilidades.md) para el desglose detallado de atributos físicos, máquina de estados y arquitectura de nodos.
 
-* **Movimiento:** 8 direcciones con aceleración y fricción altas (`5000 px/s²`) para un control preciso, responsivo y sin deslizamiento residual (`stop_threshold`).
-* **Habilidad de Sprint:** Carrera temporal (`1000 px/s`) regulada por una **barra de estamina** recargable.
-* **Iluminación (Linterna Decorativa):** Nodo `PointLight2D` siempre activo con halo de proximidad y orientación híbrida (apunta al cursor del ratón o se alinea con la dirección de movimiento si se juega solo con teclado).
-* **Colisión:** `CollisionShape2D` compacto en los pies para evitar atascarse en esquinas y troncos.
+* **Movimiento:** 8 direcciones con aceleración y fricción altas (`5000 px/s²`) para control instantáneo y responsivo (`stop_threshold = 15 px/s`).
+* **Habilidad de Sprint:** Carrera a `1000 px/s` regulada por estamina ($100\text{ pts}$ con consumo de $-25\text{ pts/s}$).
+* **Salto Libre y Salto de Plancha (*Dive*):** Permite sortear obstáculos bajos (Capa 2) con una parábola en eje Z simulado ($0.45\text{ s}$ de vuelo) o plancha hacia adelante ($1200\text{ px/s}$) con inmovilidad de recuperación de $0.6\text{ s}$.
+* **Iluminación:** `PointLight2D` frontal libremente orientable en $360^\circ$ más un halo de proximidad tenue en los pies.
 
-### 2.2. El Monstruo (`CharacterBody2D` o `Area2D`)
-* **IA de Persecución:** Movimiento vectorial directo hacia las coordenadas del jugador:
-  ```gdscript
-  var direccion = global_position.direction_to(jugador.global_position)
-  velocity = direccion * velocidad_actual
-  move_and_slide()
-  ```
-* **Comportamiento ante obstáculos:** Si choca contra un árbol, se desliza alrededor de él utilizando la física y colisiones nativas de Godot (`move_and_slide()`).
-* **Representación Visual y Rotación $360^\circ$ Continua:**
-  - El monstruo utiliza un spritesheet ultra-compacto de solo 2 a 3 cuadros (`monstruo_persecucion`) orientado de base hacia la derecha ($+X$).
-  - Su nodo visual rota matemáticamente en tiempo real (`_visual.rotation = velocity.angle()`), garantizando que sus garras y cabeza apunten siempre en el vector exacto de persecución sin tener que dibujar direcciones extra.
-  - **Ojos Auto-iluminados:** Ojos retro-reflectantes amarillo/rojo brillante con material sin sombreado (`unshaded`) o un pequeño `PointLight2D`, haciéndolos visibles como dos puntos amenazantes antes de que su silueta completa penetre en el haz de la linterna.
-* **Feedback de proximidad:** Sonido ambiental gutural/estática o temblor leve de cámara cuando está dentro del radio de luz del jugador. En la fase de *Cacería Frenética*, emite una estela sutil de humo negro con `CPUParticles2D`.
+---
 
-#### Diagrama de Estados del Monstruo
-```mermaid
-stateDiagram-v2
-    [*] --> PatrullaLenta: Spawn / Primeras 3 Notas
-    PatrullaLenta --> PersecucionMedia: Recoge 4 Notas
-    PersecucionMedia --> CaceriaFrenetica: Recoge 8+ Notas
-    
-    state CaceriaFrenetica {
-        [*] --> SiguiendoJugador
-        SiguiendoJugador --> DeslizamientoObstaculo: Colisión con Árbol
-        DeslizamientoObstaculo --> SiguiendoJugador: Línea Libre
-    }
-    
-    CaceriaFrenetica --> Atrapado: Colisión con Jugador
-    PersecucionMedia --> Atrapado: Colisión con Jugador
-    PatrullaLenta --> Atrapado: Colisión con Jugador
-    Atrapado --> [*]
-```
+### 2.2. El Monstruo (`CharacterBody2D`)
+> 💻 **Script en motor:** [`scripts/enemigo.gd`](../../scripts/enemigo.gd)  
+> 📄 **Fórmulas de balance:** [Dificultad y Balance](dificultad_y_balance.md)
+
+* **Físicas e Inercia:**
+  - `speed`: Inicia en $500.0\text{ px/s}$ y escala con las notas hasta un tope máximo de $920.0\text{ px/s}$.
+  - `acceleration`: $3500.0\text{ px/s}^2$ constantes (giro con inercia controlada, permitiendo al jugador sacarle ventaja en curvas cerradas).
+  - `motion_mode`: `MOTION_MODE_FLOATING`.
+* **Geometría de Detección y Colisión:**
+  - **Colisión Física:** Radio circular de $42.0\text{ px}$ con `move_and_slide()` que choca contra Capa 1 (`Mundo_Alto`) y Capa 2 (`Obstaculos_Bajos`).
+  - **Área de Captura Letal (`Area2D`):** Radio de detección de $56.0\text{ px}$. Si el cuerpo del jugador penetra este círculo y no tiene `god_mode`, dispara instantáneamente el Game Over.
+* **Línea de Visión (`RayCastVision`):**
+  - Nodo `RayCast2D` interno en Capa 1 que apunta dinámicamente hacia las coordenadas globales del jugador.
+  - Variable booleana `tiene_linea_vision`: si el rayo choca con un árbol, se marca como obstruido.
+* **Desatasco Tangencial (*Steering* Liviano):**
+  - Si el monstruo no tiene línea de visión y su velocidad real cae por debajo del $30\%$ de su velocidad máxima debido a un choque perpendicular con un árbol, añade un vector tangencial ($\pm 45^\circ$) hacia la arista libre para continuar la persecución sin congelarse.
+* **Representación Visual y Rotación Continua:**
+  - El nodo visual rota matemáticamente hacia el ángulo de movimiento:
+    ```gdscript
+    if velocity.length_squared() > 1.0:
+        _visual.rotation = velocity.angle()
+    ```
+  - **Ojos Reflectantes:** Par de puntos emisivos visibles en penumbra para alertar al jugador antes de que la silueta sea iluminada por la linterna.
+
+---
 
 ### 2.3. Sistema de Notas Coleccionables Arcade (`Area2D`)
-* Existe **solo una nota en pantalla a la vez** para forzar al jugador a explorar y recorrer los 4 sectores del mapa activamente.
-* **Jerarquía de la Escena (`escenas/nota.tscn`):**
-  ```text
-  Nota (Area2D) [Capa 5: Interactuables]
-  ├── Sprite2D (Hoja de papel viejo / reliquia de 64x64 px con flotación senoidal)
-  ├── CollisionShape2D (Círculo de radio 32 px)
-  ├── LuzPropia (PointLight2D - Halo tenue blanco/amarillento de ~200 px con pulso suave)
-  └── CPUParticles2D (Micro-partículas doradas/blancas emitidas al ser recogida)
-  ```
-* **Visibilidad en Penumbra:**
-  - La nota emite su propio resplandor pulsante (`PointLight2D`), actuando como una **baliza visual a media distancia** para que el jugador pueda orientarse hacia ella en la penumbra sin necesidad de barrer a ciegas con la linterna.
-* **Proceso de Recolección Arcade Fluida (Estilo Moneda):**
-  1. **Contacto:** Detección instantánea al entrar en contacto con el jugador (`body_entered`).
-  2. **Feedback Sonoro Inmediato:** Reproduce un rasgado seco de papel o sonido de reliquia antigua sin detener la acción.
-  3. **Partículas y HUD:** Estallido breve de 8 partículas en el mapa y rebote elástico en el contador del HUD (`+1`). No se despliegan pantallas de bloqueo ni textos que obstaculicen la visión.
-  4. **Escalado del Monstruo:** Aumenta la velocidad del enemigo según la fórmula exponencial (ver [Dificultad y Balance](dificultad_y_balance.md)).
-  5. **Mutación Espacial Bajo Niebla:** Dispara la transición de niebla radial (`EfectoNieblaMutacion`); al alcanzar la ceguera visual, se reemplazan las sub-escenas de los **3 sectores lejanos** (donde no está el jugador) y se reubica al monstruo si quedara atrapado en un obstáculo.
-  6. **Nueva Nota y Reapertura:** Se instancia una nueva nota en un `Marker2D` candidato de cualquiera de los 3 sectores recién mutados a una distancia $R_{\min} \ge 600\text{ px}$ y la niebla se disipa revelando el nuevo entorno sin popping visual.
+> 📄 **Especificación técnica completa:** [Sistema de Notas y Spawner](sistema_de_notas_y_spawner.md)
 
-### 2.4. El Bosque: Cuadrícula 2x2 de Sectores Mutables
-> 📄 **Especificación completa:** Consulta **[Mapa y Sectores](mapa_y_sectores.md)** para la topología matemática, arquitectura de sub-escenas de variantes, límites físicos/visuales, corredores de conectividad y matriz de capas de colisión.
+* Solo **1 nota activa a la vez** en todo el mapa.
+* Emite un resplandor pulsante (`PointLight2D`) que actúa como faro orientativo en la oscuridad.
+* **Recolección Instantánea:** Al tocarla, emite la señal, reproduce el rasgado sonoro, suelta partículas doradas y se libera con `queue_free()`, disparando el incremento de velocidad del monstruo y la mutación bajo niebla.
 
-* **Topología:** Arena cerrada continua de $4320 \times 4320\text{ px}$ dividida en 4 cuadrantes ($2160 \times 2160\text{ px}$ cada uno: `Sector NO`, `Sector NE`, `Sector SO`, `Sector SE`).
-* **Mecánica de Mutación por Página:** Al recolectar una nota, el cuadrante del jugador permanece intacto mientras los otros **3 cuadrantes lejanos** reemplazan su sub-escena por otra variante aleatoria de árboles y obstáculos prefabricados bajo la niebla de transición.
-* **Corredores Libres:** Franja de seguridad de $160\text{ px}$ en las intersecciones centrales ($X=0, Y=0$) para evitar bloqueos entre cuadrantes al mutar.
-* **Límites Perimetrales:** `VallaPerimetral` fija (`StaticBody2D` en Capa 1: `Mundo_Alto`) en $[-2160, 2160]$ tanto en $X$ como en $Y$.
+---
+
+### 2.4. El Bosque Mutable (Arena 2x2)
+> 📄 **Especificación completa:** [Mapa y Sectores](mapa_y_sectores.md)
+
+* Cuadrícula simétrica de $4320 \times 4320\text{ px}$ dividida en 4 cuadrantes.
+* Al recoger una nota, se mutan las variantes de los **3 sectores lejanos** bajo el iris radial de `EfectoNieblaMutacion`.
+* Corredores de seguridad de $160\text{ px}$ en $X=0, Y=0$ para garantizar transitabilidad permanente.
