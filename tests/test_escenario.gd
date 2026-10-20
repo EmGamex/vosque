@@ -158,6 +158,26 @@ func test_efecto_niebla_mutacion() -> void:
 	assert_true(efecto_niebla.difuminado_borde > 0.0, "difuminado_borde debe ser mayor a 0")
 	assert_true("objetivo_jugador" in efecto_niebla, "efecto_niebla debe soportar objetivo_jugador")
 
+	efecto_niebla._ready()
+	assert_false(efecto_niebla.visible, "Efecto de niebla debe iniciar invisible en reposo tras _ready (0% overhead)")
+	assert_false(efecto_niebla.is_processing(), "Efecto de niebla debe tener process desactivado en reposo")
+
+	# Probar comportamiento cuando se desactiva
+	efecto_niebla.desactivado = true
+	assert_false(efecto_niebla.visible, "Al estar desactivado debe permanecer invisible")
+	assert_false(efecto_niebla.is_processing(), "Al estar desactivado debe tener process inactivo")
+
+	# Probar emisión inmediata de señales al estar desactivado (anti-deadlock)
+	var senales := {"ceguera": false, "disipada": false}
+	efecto_niebla.ceguera_alcanzada.connect(func(): senales["ceguera"] = true, CONNECT_ONE_SHOT)
+	efecto_niebla.niebla_disipada.connect(func(): senales["disipada"] = true, CONNECT_ONE_SHOT)
+
+	efecto_niebla.cubrir(0.1)
+	assert_true(senales["ceguera"], "cubrir() en modo desactivado debe emitir ceguera_alcanzada de inmediato")
+
+	efecto_niebla.despejar(0.1)
+	assert_true(senales["disipada"], "despejar() en modo desactivado debe emitir niebla_disipada de inmediato")
+
 	esc.free()
 
 

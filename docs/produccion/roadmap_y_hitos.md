@@ -76,13 +76,14 @@ flowchart TD
 ### Semana 3 (18/10/2026 – 24/10/2026): Integración en Motor, Mutación 2x2 y Web — **[EN CURSO / PRÓXIMO HITO]**
 * **Objetivo:** Trasladar las mecánicas documentadas al código GDScript de Godot 4, habilitar la mutación continua de cuadrantes y validar la primera compilación funcional en navegador.
 * **Entregables Clave:**
-  - [ ] Implementar la máquina de estados de Salto Libre, Plancha (*Dive*) y simulación de elevación en eje Z en [`personaje.gd`](../../scripts/personaje.gd).
-  - [ ] Implementar el sistema de Estamina, fatiga y vincularlo con el `ProgressBar` nativo del HUD.
-  - [ ] Crear la estructura modular de [`escenas/escenario.tscn`](../../escenas/escenario.tscn) con valla perimetral fija y las sub-escenas de variantes con corredores de paso seguros.
-  - [ ] Programar la lógica de mutación de los 3 sectores lejanos y reposicionamiento anti-atascamiento del monstruo.
+  - [x] Implementar la máquina de estados de Salto Libre, Plancha (*Dive*) y simulación de elevación en eje Z en [`personaje.gd`](../../scripts/personaje.gd).
+  - [x] Implementar el sistema de Estamina, fatiga y vincularlo con el `ProgressBar` nativo del HUD.
+  - [x] Crear la estructura modular de [`escenas/escenario.tscn`](../../escenas/escenario.tscn) con valla perimetral fija y las sub-escenas de variantes con corredores de paso seguros.
+  - [x] Programar la lógica de mutación de los 3 sectores lejanos, niebla de transición (`EfectoNieblaMutacion`) y reposicionamiento anti-atascamiento del monstruo.
   - [ ] Crear la entidad coleccionable [`escenas/nota.tscn`](../../escenas/nota.tscn) con halo tenue (`PointLight2D`), recolección arcade instantánea y escalado de velocidad del enemigo.
+  - [x] Implementar suite de telemetría y menú unificado de diagnóstico in-game en [`escenas/debug_menu.tscn`](../../escenas/debug_menu.tscn).
   - [ ] Integrar el nodo de menú de pausa en [`gestor_escenas.gd`](../../scripts/gestor_escenas.gd) pausando solo el subárbol de la partida activa.
-  - [ ] Configurar el preset de exportación Web (HTML5) con renderer Compatibility y generar la primera build de prueba para navegador.
+  - [x] Configurar el preset de exportación Web (HTML5) con renderer Compatibility y generar la primera build de prueba para navegador.
 
 ---
 

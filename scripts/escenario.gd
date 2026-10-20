@@ -145,21 +145,16 @@ func mutar_con_neblina(
 
 	if _efecto_niebla == null:
 		_efecto_niebla = get_node_or_null("EfectoNieblaMutacion") as EfectoNieblaMutacion
+	if _efecto_niebla != null and _efecto_niebla.objetivo_jugador == null:
+		_efecto_niebla.objetivo_jugador = objetivo_jugador
 
 	if _efecto_niebla != null:
-		var t_cierre: float = duracion_cierre if duracion_cierre >= 0.0 else _efecto_niebla.duracion_cierre
-		var t_apertura: float = duracion_apertura if duracion_apertura >= 0.0 else _efecto_niebla.duracion_apertura
-		var t_pausa: float = pausa_oscuridad if pausa_oscuridad >= 0.0 else _efecto_niebla.pausa_oscuridad
-
-		_efecto_niebla.cubrir(t_cierre)
-		await _efecto_niebla.ceguera_alcanzada
-		mutar_sectores_lejanos()
-		if t_pausa > 0.0:
-			var tree = get_tree()
-			if tree != null:
-				await tree.create_timer(t_pausa).timeout
-		_efecto_niebla.despejar(t_apertura)
-		await _efecto_niebla.niebla_disipada
+		await _efecto_niebla.ejecutar_transicion(
+			Callable(self, "mutar_sectores_lejanos"),
+			duracion_cierre,
+			duracion_apertura,
+			pausa_oscuridad
+		)
 	else:
 		mutar_sectores_lejanos()
 

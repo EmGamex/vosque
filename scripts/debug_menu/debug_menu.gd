@@ -174,6 +174,7 @@ func _ready() -> void:
 
 	_buscar_nodos_objetivo()
 	scenario.inicializar_camaras(context)
+	scenario.aplicar_estado_niebla(context)
 	monitors.registrar(context)
 
 
@@ -245,7 +246,6 @@ func _buscar_nodos_objetivo() -> void:
 	var escena_actual: Node = get_tree().current_scene
 	context.buscar_nodos(escena_actual, scenario.god_view_activo)
 	physics.inicializar_valores(context.target_character, get_node_or_null("/root/DebugConfig"), _obtener_ui_fisicas())
-	scenario.aplicar_estado_niebla(context)
 
 
 func _actualizar_telemetria() -> void:

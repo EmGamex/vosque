@@ -13,8 +13,8 @@ flowchart TD
     C -- Sí --> D[+1 Puntuación & Sonido Inquietante]
     D --> E[Mostrar Flash de Nota 1s]
     E --> F[Aumentar Velocidad del Monstruo]
-    F --> G[Mutar Layout de los 3 Sectores Lejanos]
-    G --> H[Spawnear Nueva Nota en Sector Mutado]
+    F --> G[Cerrar Niebla de Transición & Mutar los 3 Sectores Lejanos]
+    G --> H[Spawnear Nueva Nota en Sector Mutado & Abrir Niebla]
     H --> B
     C -- No --> I{¿Contacto con Monstruo?}
     I -- No --> B
@@ -86,13 +86,13 @@ stateDiagram-v2
   2. **Feedback Sonoro Inmediato:** Reproduce un rasgado seco de papel o sonido de reliquia antigua sin detener la acción.
   3. **Partículas y HUD:** Estallido breve de 8 partículas en el mapa y rebote elástico en el contador del HUD (`+1`). No se despliegan pantallas de bloqueo ni textos que obstaculicen la visión.
   4. **Escalado del Monstruo:** Aumenta la velocidad del enemigo según la fórmula exponencial (ver [Dificultad y Balance](dificultad_y_balance.md)).
-  5. **Mutación Espacial:** Dispara la mutación de los **3 sectores lejanos** (donde no está el jugador).
-  6. **Nueva Nota:** Se instancia una nueva nota en un `Marker2D` candidato de cualquiera de los 3 sectores recién mutados a una distancia $R_{\min} \ge 600\text{ px}$.
+  5. **Mutación Espacial Bajo Niebla:** Dispara la transición de niebla radial (`EfectoNieblaMutacion`); al alcanzar la ceguera visual, se reemplazan las sub-escenas de los **3 sectores lejanos** (donde no está el jugador) y se reubica al monstruo si quedara atrapado en un obstáculo.
+  6. **Nueva Nota y Reapertura:** Se instancia una nueva nota en un `Marker2D` candidato de cualquiera de los 3 sectores recién mutados a una distancia $R_{\min} \ge 600\text{ px}$ y la niebla se disipa revelando el nuevo entorno sin popping visual.
 
 ### 2.4. El Bosque: Cuadrícula 2x2 de Sectores Mutables
 > 📄 **Especificación completa:** Consulta **[Mapa y Sectores](mapa_y_sectores.md)** para la topología matemática, arquitectura de sub-escenas de variantes, límites físicos/visuales, corredores de conectividad y matriz de capas de colisión.
 
-* **Topología:** Arena cerrada continua de $2160 \times 2160\text{ px}$ dividida en 4 cuadrantes ($1080 \times 1080\text{ px}$ cada uno: `Sector NO`, `Sector NE`, `Sector SO`, `Sector SE`).
-* **Mecánica de Mutación por Página:** Al recolectar una nota, el cuadrante del jugador permanece intacto mientras los otros **3 cuadrantes lejanos** reemplazan su sub-escena por otra variante aleatoria de árboles y obstáculos prefabricados.
+* **Topología:** Arena cerrada continua de $4320 \times 4320\text{ px}$ dividida en 4 cuadrantes ($2160 \times 2160\text{ px}$ cada uno: `Sector NO`, `Sector NE`, `Sector SO`, `Sector SE`).
+* **Mecánica de Mutación por Página:** Al recolectar una nota, el cuadrante del jugador permanece intacto mientras los otros **3 cuadrantes lejanos** reemplazan su sub-escena por otra variante aleatoria de árboles y obstáculos prefabricados bajo la niebla de transición.
 * **Corredores Libres:** Franja de seguridad de $160\text{ px}$ en las intersecciones centrales ($X=0, Y=0$) para evitar bloqueos entre cuadrantes al mutar.
-* **Límites Perimetrales:** `VallaPerimetral` fija (`StaticBody2D` en Capa 1: `Mundo_Alto`) en $[-1080, 1080]$ tanto en $X$ como en $Y$.
+* **Límites Perimetrales:** `VallaPerimetral` fija (`StaticBody2D` en Capa 1: `Mundo_Alto`) en $[-2160, 2160]$ tanto en $X$ como en $Y$.

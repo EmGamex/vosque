@@ -88,14 +88,16 @@ Monitorea la máquina de estados del protagonista y sus variables cinemáticas:
   - Botón **"Restablecer Velocidades por Defecto"** para restaurar los valores base del personaje en cualquier momento.
 
 ### 3.2. Pestaña: Escenario y Mutación Espacial (Issue #3)
-Diseñada específicamente para controlar y verificar la cuadrícula simétrica $2 \times 2$ ($2160 \times 2160\text{ px}$):
+Diseñada específicamente para controlar y verificar la cuadrícula simétrica $2 \times 2$ ($4320 \times 4320\text{ px}$ en total, con cuadrantes de $2160 \times 2160\text{ px}$):
 * **Telemetría de Cuadrantes:**
   - Identificación del cuadrante activo del jugador: `NO`, `NE`, `SO` o `SE` según las coordenadas globales respecto al centro `(0, 0)`.
   - Nombre de la sub-escena o variante instanciada en cada uno de los 4 sectores.
 * **Disparador Manual de Mutación:**
   - Botón **"Forzar Mutación de Sectores Lejanos"**: Reemplaza instantáneamente las variantes de los 3 cuadrantes donde el jugador *no* se encuentra, permitiendo validar la lógica de carga procedural sin necesidad de recoger físicamente una nota.
+* **Control de Niebla de Transición:**
+  - Casilla `[x] Desactivar Niebla`: Anula la cortina visual radial para poder observar en tiempo real la instanciación de las variantes sin oscurecimiento artificial. Incorpora protección anti-bloqueo (*failsafe*), emitiendo de inmediato las señales de sincronización para que ninguna corrutina quede colgada.
 * **Cámara Cenital Global (God View):**
-  - Desancla la `Camera2D` del protagonista y aplica un zoom exterior para encuadrar la totalidad de la arena ($2160 \times 2160\text{ px}$), permitiendo observar la mutación de los 3 cuadrantes en vivo.
+  - Desancla la `Camera2D` del protagonista y aplica un zoom exterior (`Vector2(0.225, 0.225)`) para encuadrar la totalidad de la arena ($4320 \times 4320\text{ px}$), permitiendo observar la mutación de los 3 cuadrantes en vivo.
 * **Capas de Depuración Visual (`_draw`):**
   - `Mostrar Ejes Divisores`: Dibuja los ejes $X = 0$ e $Y = 0$.
   - `Mostrar Corredores de Seguridad`: Dibuja las franjas de $160\text{ px}$ ($80\text{ px}$ a cada lado del borde interior de cada cuadrante) en color verde translúcido. Si un obstáculo sólido penetra la franja, se resalta en rojo.

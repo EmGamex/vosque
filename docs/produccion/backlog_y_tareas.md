@@ -50,9 +50,10 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 - [x] **Sub-Escenas de Variantes de Sector:**
   - [x] Crear al menos 2 a 3 variantes prefabricadas por cuadrante con distribución variada de árboles, rocas y troncos.
   - [x] Nodos candidatos de aparición de notas (`Marker2D` en grupo `"puntos_nota"`).
-- [x] **Algoritmo de Mutación Dinámica:**
-  - [x] Detección del cuadrante activo del jugador al recoger una nota.
-  - [x] Reemplazo aleatorio de las sub-escenas de los **3 cuadrantes lejanos**.
+- [x] **Algoritmo de Mutación Dinámica y Niebla:**
+  - [x] Detección del cuadrante activo del jugador al recoger una nota o forzar mutación.
+  - [x] Transición de niebla radial (`EfectoNieblaMutacion`) con cero consumo en reposo y blindaje asíncrono.
+  - [x] Reemplazo atómico de las sub-escenas de los **3 cuadrantes lejanos** durante la fase de ceguera.
   - [x] Protocolo anti-atascamiento del monstruo con reubicación al punto transitable más próximo.
 
 ---
@@ -162,12 +163,12 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 > 💻 **Archivos clave:** `escenas/debug_menu.tscn`, `scripts/debug_menu/`, `addons/personaje_tools/`
 
 - [x] **Toolbar de Personaje en Editor:** Plugin contextual `addons/personaje_tools` para ajuste de velocidad, aceleración y fricción.
-- [ ] **Menú Unificado de Debug In-Game (`escenas/debug_menu.tscn`):**
-  - [ ] Ciclo tri-estado con <kbd>F3</kbd>: Oculto ➔ Mini-HUD ➔ Menú Completo.
-  - [ ] Mini-HUD con FPS, memoria, cuadrante y velocidad en esquina superior.
-  - [ ] Pestaña Jugador: telemetría física, pad 8-dir y cheats de prueba (estamina infinita, god mode).
-  - [ ] Pestaña Escenario (Issue #3): cuadrante activo, forzado manual de mutación, vista global (God View) y toggles visuales de corredores ($160\text{ px}$).
-  - [ ] Pestaña Monstruo: estado de persecución, anti-atascamiento, cálculo de velocidad y botón de reubicación segura.
-  - [ ] Pestaña Sistema: escala de tiempo (`Engine.time_scale`), reinicio rápido de escena y simulador de notas.
+- [x] **Menú Unificado de Debug In-Game (`escenas/debug_menu.tscn`):**
+  - [x] Ciclo tri-estado con <kbd>F3</kbd>: Oculto ➔ Mini-HUD ➔ Menú Completo.
+  - [x] Mini-HUD con FPS, memoria, cuadrante y velocidad en esquina superior.
+  - [x] Pestaña Jugador: telemetría física, pad 8-dir y cheats de prueba (estamina infinita, god mode).
+  - [x] Pestaña Escenario (Issue #3): cuadrante activo, forzado manual de mutación, toggle de niebla, vista global (God View) y toggles visuales de corredores ($160\text{ px}$).
+  - [x] Pestaña Monstruo: estado de persecución, anti-atascamiento, cálculo de velocidad y botón de reubicación segura.
+  - [x] Pestaña Sistema: escala de tiempo (`Engine.time_scale`), reinicio rápido de escena y simulador de notas.
 - [ ] **Linter de Escenario (`addons/escenario_tools`):** Guías visuales de exclusión ($80\text{ px}$) y validación estática de colisiones en variantes.
 
