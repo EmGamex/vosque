@@ -41,23 +41,26 @@ flowchart LR
   - Display Device: `sRGB`.
   - View Transform: **Standard** (evitar *AgX* o *Filmic*, ya que desaturan y alteran los valores requeridos como plantilla de calcado).
 * **Salida de Render:** Renders en formato PNG transparente de alta resolución que actuarán como capas plantilla en Inkscape.
+* **Ubicación de Archivos Fuente:** Todos los archivos `.blend` y renders intermedios se guardan en la carpeta `assets_raw/blender/` (aislada de la importación de Godot mediante un archivo `.gdignore`).
 
 ---
 
 ## 2. Fase 2: Inkscape (Estilo Visual y Acabado Gráfico)
 
 * **Función:** Darle el toque ilustrado, estética de novela gráfica oscura y entintado manual final.
+* **Ubicación de Proyectos Vectoriales:** Los archivos maestros `.svg` multicapa se almacenan en `assets_raw/inkscape/`.
 * **Estructura Estándar de Capas en SVG:**
   1. `Capa 1: Guía 3D` ➔ Render de Blender con opacidad fija al $40\%$ para trazar sobre él.
   2. `Capa 2: Entintado (Lineart)` ➔ Trazado vectorial con trazos negros marcados y expresivos.
   3. `Capa 3: Color y Cel-Shading` ➔ Tonos desaturados y sombras duras de alto contraste.
-* **Exportación de Sprites y Assets:**
-  - Formato: PNG optimizado (RGBA) con canal alfa.
-  - Personajes (Jugador y Criatura): $128 \times 128$ px.
-  - Obstáculos de Entorno (Árboles): $256 \times 256$ px; Rocas y Valla: $128 \times 128$ px; Tronco caído: $192 \times 64$ px.
-  - Coleccionable Arcade (Nota): $64 \times 64$ px (Icono HUD: $32 \times 32$ px).
-  - Menú Principal (Capas de Portada / Key Art): $1080 \times 1080$ px en capas PNG transparentes.
-  - Jumpscare Game Over: $512 \times 512$ px.
+* **Exportación de Sprites y Assets (Destino: `res://graficos/`):**
+  - Formato: PNG optimizado (RGBA) con canal alfa y nomenclatura en `snake_case`.
+  - Personaje: `res://graficos/personaje/` ($128 \times 128$ px).
+  - Criatura: `res://graficos/criatura/` ($128 \times 128$ px).
+  - Entorno: `res://graficos/entorno/` (Árboles $256 \times 256$ px, Rocas/Valla $128 \times 128$ px, Tronco $192 \times 64$ px).
+  - Coleccionable Arcade (Nota): `res://graficos/notas/` ($64 \times 64$ px, Icono HUD $32 \times 32$ px).
+  - Menú Principal: `res://graficos/interfaz/` ($1080 \times 1080$ px en capas).
+  - Jumpscare Game Over: `res://graficos/jumpscare/` ($512 \times 512$ px).
 
 ---
 

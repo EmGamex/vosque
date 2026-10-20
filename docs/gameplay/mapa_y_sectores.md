@@ -196,6 +196,11 @@ sequenceDiagram
 ```
 
 ### 6.1. Exclusión Mutua en Desatasco y Spawn
-Para garantizar que la nueva nota nunca aparezca en las garras del enemigo:
-1. Si el monstruo necesita ser reubicado por `validar_y_reubicar_enemigo()`, se registra el marcador seleccionado como reservado.
+Para garantizar que la nueva nota nunca aparezca en las garras del enemigo y que la reubicación de la criatura sea justa:
+1. Si el monstruo necesita ser reubicado por `validar_y_reubicar_enemigo()`, se evalúan los marcadores transitables libres en su sector. Se descartan aquellos que estén a menos de $600\text{ px}$ del jugador para evitar teletransportes letales injustos, y se registra el marcador seleccionado como reservado.
 2. Al sortear el spawn de la nueva nota entre los `"puntos_nota"`, se descarta cualquier marcador que se encuentre a una distancia menor a $800\text{ px}$ de la posición del monstruo o a menos de $600\text{ px}$ de la posición del jugador.
+
+### 6.2. Caso Borde: Transición de Cuadrante en Frontera durante el Cierre de Niebla
+Dado que transcurren $1.3\text{ s}$ de cierre de niebla radial tras tocar una nota:
+* El cuadrante activo del jugador **se evalúa en el instante exacto de oscuridad total** (`ceguera_alcanzada`), y no en el momento inicial del toque de la nota. De este modo, si el jugador cruza $X=0$ o $Y=0$ durante el cierre de la niebla, el sector donde efectivamente se encuentre será el preservado.
+* Los corredores seguros de $160\text{ px}$ ($80\text{ px}$ a cada lado del eje) garantizan que aunque un cuadrante vecino mute, ningún obstáculo sólido aparezca dentro de la franja transitable inmediata donde camina el jugador.

@@ -8,8 +8,9 @@ Este documento detalla la arquitectura, herramientas, controles y flujos de trab
 
 1. **Inmediatez y Control Centralizado:** En lugar de memorizar múltiples teclas de función o abrir interfaces dispersas, todas las utilidades de diagnóstico convergen en un **Menú Unificado de Debug** accesible mediante una única tecla (<kbd>F3</kbd>).
 2. **Arquitectura No Invasiva y Desacoplada:** El sistema de debug escucha e inspecciona los nodos del juego (`personaje`, `escenario`, `enemigo`) mediante verificaciones seguras (`has_method()`, variables condicionales y referencias nulas). Si un nodo o componente aún no ha sido implementado o instanciado, la herramienta no provoca errores ni interrupciones (*graceful degradation*).
-3. **Simulación en Tiempo Real:** Por defecto, abrir la consola de debug no pausa el motor, permitiendo observar cómo reaccionan las físicas, los estados del jugador y las mutaciones del escenario mientras se interactúa con el mundo.
-4. **Seguridad en Entornos de Producción:** Las rutinas de dibujo y captura de eventos de debug están condicionadas para ignorarse o suprimirse automáticamente en compilaciones finales de exportación web (`OS.is_debug_build()`).
+3. **Persistencia Trans-Sesión (`DebugConfig` Autoload):** Los ajustes de depuración (toggles visuales, cheats, velocidades calibradas y time_scale) se conservan a través de `/root/DebugConfig` (`scripts/debug_config.gd`), impidiendo que se reinicien al recargar la escena, reiniciar la partida o disparar Game Over.
+4. **Simulación en Tiempo Real y Diagnóstico Nativo:** Por defecto, abrir la consola de debug no pausa el motor, permitiendo observar cómo reaccionan las físicas, los estados del jugador y las mutaciones del escenario mientras se interactúa con el mundo. Asimismo, se expone telemetría directa al depurador nativo de Godot 4 (`Performance` custom monitors y visor de árbol remoto).
+5. **Seguridad en Entornos de Producción:** Las rutinas de dibujo y captura de eventos de debug están condicionadas para ignorarse o suprimirse automáticamente en compilaciones finales de exportación web (`OS.is_debug_build()`).
 
 ---
 
@@ -94,14 +95,19 @@ Diseñada específicamente para controlar y verificar la cuadrícula simétrica 
   - Nombre de la sub-escena o variante instanciada en cada uno de los 4 sectores.
 * **Disparador Manual de Mutación:**
   - Botón **"Forzar Mutación de Sectores Lejanos"**: Reemplaza instantáneamente las variantes de los 3 cuadrantes donde el jugador *no* se encuentra, permitiendo validar la lógica de carga procedural sin necesidad de recoger físicamente una nota.
-* **Control de Niebla de Transición:**
+* **Control de Niebla de Transición e Iluminación:**
   - Casilla `[x] Desactivar Niebla`: Anula la cortina visual radial para poder observar en tiempo real la instanciación de las variantes sin oscurecimiento artificial. Incorpora protección anti-bloqueo (*failsafe*), emitiendo de inmediato las señales de sincronización para que ninguna corrutina quede colgada.
+  - Casilla `[x] Modo Fullbright (Sin Oscuridad)`: Desactiva temporalmente el nodo `CanvasModulate` o aplica `Viewport.DEBUG_DRAW_UNSHADED` para inspeccionar la totalidad del mapa iluminado al 100% durante el diseño y prueba de sectores en God View.
 * **Cámara Cenital Global (God View):**
   - Desancla la `Camera2D` del protagonista y aplica un zoom exterior (`Vector2(0.225, 0.225)`) para encuadrar la totalidad de la arena ($4320 \times 4320\text{ px}$), permitiendo observar la mutación de los 3 cuadrantes en vivo.
-* **Capas de Depuración Visual (`_draw`):**
-  - `Mostrar Ejes Divisores`: Dibuja los ejes $X = 0$ e $Y = 0$.
+* **Capas de Depuración Visual (`_draw` en `DebugOverlay`):**
+  - `Mostrar Ejes Divisores`: Dibuja los ejes $X = 0$ e $Y = 0$ y los límites perimetrales.
   - `Mostrar Corredores de Seguridad`: Dibuja las franjas de $160\text{ px}$ ($80\text{ px}$ a cada lado del borde interior de cada cuadrante) en color verde translúcido. Si un obstáculo sólido penetra la franja, se resalta en rojo.
-  - `Mostrar Puntos de Nota`: Resalta todos los nodos `Marker2D` pertenecientes al grupo `"puntos_nota"`.
+  - `Mostrar Puntos de Nota y Filtros de Spawner`: Diagnóstico espacial de los nodos `Marker2D` del grupo `"puntos_nota"`:
+    - **Verde**: Marcadores candidatos válidos para el próximo spawn (cumplen pertenecer a un cuadrante mutado, $\ge 600\text{ px}$ al jugador y $\ge 800\text{ px}$ al monstruo).
+    - **Rojo**: Marcadores descartados (sector del jugador o dentro de radios de exclusión).
+    - **Ámbar / Cian**: Marcador reservado para el desatasco de la criatura.
+    - **Dorado Pulsante**: Ubicación de la nota activa en la escena.
 
 ### 3.3. Pestaña: Monstruo y Comportamiento de IA
 Herramientas para validar el seguimiento y el protocolo anti-atascamiento:
@@ -111,6 +117,9 @@ Herramientas para validar el seguimiento y el protocolo anti-atascamiento:
   - Estado de visión: `Visión directa` (rayo verde) vs. `Obstruido` (rayo rojo al punto de impacto + línea discontinua).
 * **Diagnóstico Anti-Atascamiento:**
   - Indicador de colisión sólida (`is_on_wall()`).
+* **Control de Comportamiento y Fases de Dificultad:**
+  - Casilla `[x] Congelar IA / Inactivo`: Desactiva la persecución del monstruo (`velocity = Vector2.ZERO`, `AreaCaptura.monitoring = false`) para permitir pruebas libres de movimiento y saltos sin acoso.
+  - Selector de Fase / Escalón de Amenaza (Nota 0 a 10+): Permite calibrar en caliente la velocidad del monstruo saltando directamente a cualquier escalón de `VELOCIDADES_MONSTRUO` ($0 \to 500 \to 580 \dots 920\text{ px/s}$) para verificar la jugabilidad en fases tardías sin requerir recolección manual.
 * **Visualización Táctica (`[x] Rayo de Visión y Vectores de IA`):**
   - **Estela de Trayectoria (*Breadcrumbs*):** Buffer de los últimos 2 segundos de desplazamiento con degradado alfa para inspeccionar cómo sortea esquinas.
   - **Radio de Captura Letal:** Círculo rojo de $56.0\text{ px}$ correspondiente al `AreaCaptura`.
@@ -120,14 +129,22 @@ Herramientas para validar el seguimiento y el protocolo anti-atascamiento:
 * **Acciones Rápidas:**
   - Botón **"Reubicar Monstruo"**: Teletransporta a la criatura al cuadrante opuesto (o distancia segura).
 
-### 3.4. Pestaña: Sistema, Notas y Entorno
+### 3.4. Pestaña: Sistema, Notas, Game Feel y Persistencia
 * **Control de Tiempo (`Engine.time_scale`):**
   - Botones de preajuste: `0.2x` (cámara súper lenta para analizar saltos parabólicos sobre obstáculos bajos de Capa 2), `0.5x`, `1.0x` (velocidad normal) y `2.0x` (prueba de estrés).
-* **Gestión de Notas Coleccionables (Planificado / En Integración):**
-  - Contador de notas recogidas.
-  - Botón **"Simular Recogida de Nota"**: Incrementa el contador, dispara la señal de progresión de dificultad y desencadena la mutación del escenario (se conectará al implementarse el ciclo de la entidad `Nota`).
-* **Acciones de Sesión:**
-  - Botón **"Reiniciar Escena"**: Llama a `get_tree().reload_current_scene()` de forma limpia.
+* **Gestión de Notas Coleccionables y Spawner:**
+  - Contador numérico de notas recogidas sincronizado con el HUD.
+  - Botón **"Simular Recogida de Nota"**: Incrementa el contador, dispara la señal de progresión de dificultad y desencadena la mutación del escenario.
+  - Botón **"Teletransportar a Nota Activa"**: Mueve al jugador a la posición del coleccionable activo para probar instantáneamente la recolección, SFX y feedback visual.
+* **Calibrador de Trauma de Cámara (Game Feel):**
+  - Inyectores manuales de estrés para evaluar sacudidas y decaimiento cuadrático:
+    - Botón `+0.20 Trauma` (Vibración leve).
+    - Botón `+0.35 Trauma` (Impacto de plancha / *Dive*).
+    - Botón `+1.00 Trauma` (Sacudida máxima de Jumpscare / Muerte).
+* **Gestión de Persistencia (High Score):**
+  - Botón **"Resetear High Score Guardado"**: Borra el récord histórico almacenado en `user://highscore.save` y en `localStorage` (Web) para realizar pruebas limpias de primera partida.
+* **Acciones de Sesión y Reinicio Rápido:**
+  - Botón **"Reiniciar Partida"**: Si la raíz del proyecto es `GestorEscenas`, invoca de forma segura `GestorEscenas.iniciar_partida()` para recrear la pantalla de juego limpia directamente sin expulsar al usuario al menú de inicio. En escenas aisladas, ejecuta `get_tree().reload_current_scene()`.
 
 ---
 
@@ -151,13 +168,36 @@ Diseñado para la creación de variantes de sector en `escenas/sectores/variante
 * Servidor MCP integrado que permite consultar la jerarquía de nodos, inspeccionar propiedades, capturar pantallas del editor y validar sintaxis de GDScript en caliente.
 
 ### 4.4. Monitores Personalizados del Depurador de Godot (`Performance`)
-* Se integran automáticamente al arrancar el juego en modo desarrollo (`OS.is_debug_build()`) bajo la categoría `Vosque/`.
+* Se integran automáticamente al arrancar el juego en modo desarrollo (`OS.is_debug_build()`) bajo la categoría `Vosque/` a través de [`scripts/debug_menu/debug_custom_monitors.gd`](../../scripts/debug_menu/debug_custom_monitors.gd).
 * Visibles en el panel inferior del editor de Godot: **Depurador > Monitores**:
   - `Vosque/Estamina Jugador`: Monitoreo en tiempo real del gasto y recuperación de estamina ($0.0 - 100.0$).
   - `Vosque/Velocidad Jugador`: Magnitud escalar instantánea de la velocidad del personaje en $\text{px/s}$.
   - `Vosque/Velocidad Enemigo`: Velocidad instantánea de persecución de la criatura.
   - `Vosque/Distancia Monstruo`: Distancia euclidiana en píxeles entre el jugador y el monstruo.
   - `Vosque/Estado Jugador`: Identificador numérico del estado cinemático (`REPOSO: 0`, `CAMINANDO: 1`, `SPRINT: 2`, `FATIGA: 3`, `SALTO: 4`, `PLANCHA: 5`, `RECUPERACIÓN: 6`).
+  - `Vosque/Notas Recogidas`: Conteo histórico de páginas recogidas para correlacionar con los picos de velocidad de la IA.
+  - `Vosque/Trauma Camara`: Nivel de estrés cuadrático de la `Camera2D` ($0.0 - 1.0$) y su decaimiento lineal.
+  - `Vosque/Nodos Huerfanos`: Seguimiento de `Performance.OBJECT_ORPHAN_NODE_COUNT` para garantizar que la destrucción e instanciación de cuadrantes no provoque fugas de memoria (*memory leaks*).
+
+### 4.5. Modos de Renderizado y Colisiones en Caliente (`Viewport` & `SceneTree`)
+* Acceso directo desde la pestaña Sistema o atajos internos para auditar el rendimiento y físicas sin reiniciar el proyecto:
+  - **Formas de Colisión Visibles en Caliente:** Alterna dinámicamente las formas físicas del motor para comprobar la desactivación de la Capa 2 (`Obstaculos_Bajos`) durante el vuelo del salto libre.
+  - **Overdraw & Unshaded (`Viewport.debug_draw`):**
+    - `DEBUG_DRAW_UNSHADED`: Ignora la iluminación 2D (`CanvasModulate` y `PointLight2D`) para revisar geometría pura.
+    - `DEBUG_DRAW_OVERDRAW`: Muestra el solapamiento de capas transparentes para auditar el impacto de la niebla y partículas en navegadores web.
+
+### 4.6. Bitácora de Decisiones Estructurada en Consola (`print_rich` BBCode)
+Para diagnosticar eventos que ocurren en milisegundos bajo la niebla sin saturar la consola:
+* Registro coloreado de mutación:
+  ```text
+  [MUTACIÓN] Cuadrante Jugador: NO | Variantes instanciadas: NE(bosque_denso), SO(claro_rocoso), SE(sendero_troncos)
+  [ANTI-ATASCO] Monstruo solapado en SO -> Reubicado a Marker2D seguro (distancia a jugador: 950 px)
+  [SPAWNER] Candidatos: 9 | Descartados: 5 (<600px jug / <800px mon) | Nota activa instanciada en SE/MarkerNota1
+  ```
+
+### 4.7. Nomenclatura Limpia en el Árbol Remoto (`Depurador > Escena > Remoto`)
+* Al mutar variantes en [`escenario.gd`](../../scripts/escenario.gd), el nodo recién instanciado se nombra semánticamente (`nueva_instancia.name = "Activa_" + nombre_variante`).
+* **Beneficio:** Al inspeccionar el árbol en vivo en la pestaña **Remoto** de Godot, se visualiza de inmediato qué variante compone cada cuadrante (ej. `SectorNO/Activa_variante_claro_rocoso`) evitando identificadores anónimos de motor (`@Node2D@2`).
 
 ---
 

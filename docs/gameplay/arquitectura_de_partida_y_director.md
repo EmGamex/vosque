@@ -68,6 +68,8 @@ sequenceDiagram
 
 ### 3.1. Condición de Derrota (Game Over)
 * **Disparador:** La señal `_on_body_entered` o `_comprobar_captura_continua` del `AreaCaptura` del enemigo hace contacto con el jugador.
+* **Manejo de Casos Borde y Cancelación de Corrutinas:**
+  - Si el contacto mortal ocurre simultáneamente con la recolección de una nota o durante el ciclo asíncrono de mutación/niebla (`mutar_con_neblina()`), el Game Director interrumpe o descarta inmediatamente el ciclo de mutación y generación de notas, evitando referencias nulas o invocaciones diferidas en escenas destruidas.
 * **Efectos:**
   1. La velocidad del jugador y del enemigo se anula a `Vector2.ZERO`.
   2. Se reproduce el sonido de impacto/jumpscare.

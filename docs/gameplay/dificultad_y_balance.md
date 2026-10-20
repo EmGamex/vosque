@@ -26,9 +26,38 @@ El juego utiliza un escalado continuo de peligro por nota recolectada dentro de 
 
 ## 2. Modelo Matemático y Límites
 
-La función de velocidad implementa un incremento progresivo amortiguado a partir del despertar en la Nota 1:
+Para garantizar coherencia absoluta entre el código y el diseño, el escalado de velocidad del monstruo puede implementarse mediante la tabla de valores discretos precalibrados (recomendado para control exacto del ritmo de juego) o mediante la fórmula unificada de interpolación por tramos:
 
-$$\text{Velocidad}(n) = \begin{cases} 0.0 & \text{si } n = 0 \text{ (Fase Tutorial / Inactivo)} \\ \min\left(920.0, \; 500.0 + 42.0 \times (n - 1)\right) & \text{si } n \ge 1 \end{cases}$$
+### 2.1. Tabla de Valores Discretos (Arreglo de Calibración)
+```gdscript
+const VELOCIDADES_MONSTRUO: Array[float] = [
+    0.0,   # Nota 0 (Inactivo / Tutorial)
+    500.0, # Nota 1 (Despertar)
+    580.0, # Nota 2
+    620.0, # Nota 3
+    680.0, # Nota 4
+    730.0, # Nota 5
+    770.0, # Nota 6
+    800.0, # Nota 7 (Punto de inflexión: empareja caminata normal)
+    840.0, # Nota 8
+    880.0, # Nota 9
+    920.0  # Nota 10+ (Tope máximo estricto)
+]
+
+func obtener_velocidad_monstruo(notas: int) -> float:
+    if notas <= 0:
+        return 0.0
+    if notas >= VELOCIDADES_MONSTRUO.size():
+        return 920.0
+    return VELOCIDADES_MONSTRUO[notas]
+```
+
+### 2.2. Fórmula Continua Equivalente
+Si se prefiere una función matemática cerrada sin arreglos:
+
+$$\text{Velocidad}(n) = \begin{cases} 0.0 & \text{si } n = 0 \text{ (Fase Tutorial / Inactivo)} \\ \min\left(920.0, \; 500.0 + \Delta V(n)\right) & \text{si } n \ge 1 \end{cases}$$
+
+Donde los incrementos progresivos aseguran que en $n=7$ alcance exactamente $800\text{ px/s}$ y en $n \ge 10$ se fije en el tope de $920\text{ px/s}$.
 
 * **Despertar en Nota 1 ($500\text{ px/s}$):** Permite al jugador completar el tutorial y explorar sin frustración durante la primera búsqueda.
 * **Tope de Seguridad ($920\text{ px/s}$):** Garantiza que el juego nunca se vuelva imposible matemáticamente. Puesto que el Sprint alcanza $1000\text{ px/s}$, el jugador siempre tiene un margen de escape si administra correctamente su barra de estamina y esquiva entre árboles y troncos bajos.
@@ -40,7 +69,7 @@ $$\text{Velocidad}(n) = \begin{cases} 0.0 & \text{si } n = 0 \text{ (Fase Tutori
 
 Al recolectar una nota, el escenario entra en el ciclo de mutación espacial bajo niebla:
 1. **Comportamiento del Monstruo en Niebla:** Durante los $0.4\text{ s}$ de oscuridad total (`pausa_oscuridad`), el monstruo continúa activo, pero su velocidad se modula temporalmente al $50\%$ para evitar muertes a ciegas injustas mientras el círculo de visión del jugador está cerrado.
-2. **Reubicación de Seguridad:** Si tras la mutación el monstruo queda solapado con un árbol o roca de la variante recién cargada, se traslada de inmediato al `Marker2D` libre más cercano.
+2. **Reubicación de Seguridad y Distancia Mínima:** Si tras la mutación el monstruo queda solapado con un obstáculo de la variante recién cargada (verificado tanto con `test_move()` como asegurando que su radio de colisión de $42\text{ px}$ quede libre), se traslada al `Marker2D` libre más cercano que respete una distancia de seguridad mínima con respecto al jugador ($\ge 600\text{ px}$), evitando teletransportes letales o injustos directamente sobre el usuario.
 3. **Criterio de Spawn de la Nueva Nota:**
    - La nueva nota se genera en uno de los puntos candidatos de los **3 sectores lejanos mutados**.
    - Se excluye estrictamente el cuadrante donde se encuentra el jugador.

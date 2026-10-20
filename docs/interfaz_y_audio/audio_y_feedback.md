@@ -10,7 +10,14 @@ En *Vosque*, el audio es un pilar central de supervivencia. Dado que el rango de
 
 ---
 
-## 2. Layout de Buses de Audio (`default_bus_layout.tres`)
+## 2. Layout de Buses y Organización de Archivos (`res://audio/`)
+
+Todos los archivos de audio del proyecto se estructuran en carpetas temáticas bajo `res://audio/`:
+* `res://audio/ambiente/`: Loops continuos de viento, susurros y ramas secas (`.ogg`).
+* `res://audio/criatura/`: SFX del monstruo, zumbido de estática, pisadas pesadas y grito de jumpscare (`.wav` y `.ogg`).
+* `res://audio/jugador/`: Pasos en hojarasca, despegue de salto, impacto/arrastre de plancha y jadeos (`.wav`).
+* `res://audio/interfaz/`: Rasgado seco de notas y clics/hovers de menú (`.wav`).
+* `res://audio/default_bus_layout.tres`: Configuración de los 4 buses de audio.
 
 ```mermaid
 flowchart TD

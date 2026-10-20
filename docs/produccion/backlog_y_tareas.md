@@ -71,7 +71,7 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
   - [ ] Propiedad `activo = false` al iniciar la sesión (velocidad $0\text{ px/s}$, `AreaCaptura.monitoring = false`).
   - [ ] Método `activar_persecucion()` disparado por el Game Director al recoger la primera página a $500\text{ px/s}$.
 - [ ] **Escalado Cuantitativo de Dificultad:**
-  - [ ] Implementar la función de velocidad acotada: $\text{Velocidad}(n) = \min(920.0, \; 500.0 + 42.0 \times n)$.
+  - [ ] Implementar la progresión mediante arreglo discreto `VELOCIDADES_MONSTRUO` ($0 \to 500 \to 580 \dots 920\text{ px/s}$).
   - [ ] Tope absoluto de $920\text{ px/s}$ para garantizar la maniobrabilidad del jugador durante el sprint ($1000\text{ px/s}$).
 - [ ] **Desatasco Tangencial (*Steering*):** Vector de desvío lateral cuando la línea de visión se bloquea contra obstáculos sólidos.
 - [ ] **Ojos Reflectantes y Material Emisivo:** Ojos visibles en penumbra antes que la silueta completa penetre en el haz de luz.
@@ -144,10 +144,13 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 
 ---
 
-## 8. Módulo: Pipeline Artístico (~30 Assets)
-> 📄 **Especificación de referencia:** [`docs/arte/guia_estilo_y_assets.md`](../arte/guia_estilo_y_assets.md)
+## 8. Módulo: Pipeline Artístico (~30 Assets) y Organización
+> 📄 **Especificación de referencia:** [`docs/arte/guia_estilo_y_assets.md`](../arte/guia_estilo_y_assets.md), [`docs/produccion/estructura_del_proyecto.md`](estructura_del_proyecto.md)
 
-- [ ] **Protagonista (15 Cuadros):**
+- [ ] **Estructura de Directorios de Arte y Fuentes Crudas:**
+  - [ ] Crear directorio `assets_raw/` con archivo `.gdignore` para alojar archivos editables de Blender (`.blend`) e Inkscape (`.svg`).
+  - [ ] Estructurar destinos en `res://graficos/`: `personaje/`, `criatura/`, `entorno/`, `notas/`, `interfaz/`, `jumpscare/` y `bocetos/`.
+- [ ] **Protagonista (15 Cuadros en `res://graficos/personaje/`):**
   - [ ] Caminar frente (4 cuadros, $128 \times 128$ px).
   - [ ] Caminar perfil (4 cuadros, $128 \times 128$ px, simetría `flip_h`).
   - [ ] Caminar espalda (4 cuadros, $128 \times 128$ px).
@@ -176,9 +179,11 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 ---
 
 ## 9. Módulo: Audio y Feedback Sensorial
-> 📄 **Especificación de referencia:** [`docs/interfaz_y_audio/audio_y_feedback.md`](../interfaz_y_audio/audio_y_feedback.md)
+> 📄 **Especificación de referencia:** [`docs/interfaz_y_audio/audio_y_feedback.md`](../interfaz_y_audio/audio_y_feedback.md), [`docs/produccion/estructura_del_proyecto.md`](estructura_del_proyecto.md)
 
-- [ ] **Configuración de Buses de Audio (`default_bus_layout.tres`):**
+- [ ] **Estructura de Directorios de Audio:**
+  - [ ] Crear carpetas temáticas bajo `res://audio/`: `ambiente/`, `criatura/`, `jugador/` e `interfaz/`.
+- [ ] **Configuración de Buses de Audio (`res://audio/default_bus_layout.tres`):**
   - [ ] Crear estructura de buses: `Master`, `Ambiente`, `Efectos`, `Criatura`.
   - [ ] Efecto `AudioEffectLowPassFilter` dinámico activado durante el estado `FATIGA`.
 - [ ] **Efectos de Jugador:** Pasos sobre hojarasca seca con cadencia según velocidad, sonido de despegue de salto y golpe seco al caer en plancha con jadeo.
@@ -202,6 +207,7 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 > 📄 **Especificación de referencia:** [`docs/herramientas/herramientas_de_debug.md`](../herramientas/herramientas_de_debug.md)  
 > 💻 **Archivos clave:** `escenas/debug_menu.tscn`, `scripts/debug_menu/`, `addons/personaje_tools/`
 
+- [x] **Singleton de Persistencia de Debug (`scripts/debug_config.gd`):** Autoload global `/root/DebugConfig` que preserva estado tri-estado, cheats, overlays, God View, niebla y sliders modificados tras reinicio de escena o muerte.
 - [x] **Toolbar de Personaje en Editor:** Plugin contextual `addons/personaje_tools` para ajuste de velocidad, aceleración y fricción.
 - [x] **Menú Unificado de Debug In-Game (`escenas/debug_menu.tscn`):**
   - [x] Ciclo tri-estado con <kbd>F3</kbd>: Oculto ➔ Mini-HUD ➔ Menú Completo.
@@ -210,5 +216,10 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
   - [x] Pestaña Escenario (Issue #3): cuadrante activo, forzado manual de mutación, toggle de niebla, vista global (God View) y toggles visuales de corredores ($160\text{ px}$).
   - [x] Pestaña Monstruo: estado de persecución, anti-atascamiento, cálculo de velocidad y botón de reubicación segura.
   - [x] Pestaña Sistema: escala de tiempo (`Engine.time_scale`) y reinicio rápido de escena.
-- [ ] Pestaña Sistema (Notas): integrar contador y simulador de notas al implementar la entidad `escenas/nota.tscn`.
+- [x] **Monitores Personalizados Base en Depurador de Godot:** Registro automático en `Performance` de estamina, velocidad de jugador y enemigo, distancia y estado cinemático (`scripts/debug_menu/debug_custom_monitors.gd`).
+- [ ] **Ampliación de Herramientas para Semanas 3 y 4:**
+  - [ ] Pestaña Escenario: Modo Fullbright (`[x] Sin Oscuridad`) y visualizador avanzado de filtros de spawner en `DebugOverlay` (verde = válido, rojo = excluido, dorado = activa).
+  - [ ] Pestaña Monstruo: Casilla de congelación de IA y selector de fase de dificultad escalonada (Nota 0 a 10+).
+  - [ ] Pestaña Sistema: Simulador de notas, teletransporte a nota activa, inyector de trauma de cámara (`+0.20`, `+0.35`, `+1.00`), borrado de *High Score* guardado y reinicio directo vía `GestorEscenas.iniciar_partida()`.
+  - [ ] Depurador de Godot: Monitores de notas recogidas, trauma y nodos huérfanos, soporte de `Viewport.debug_draw`, bitácora estructurada con `print_rich` y nombrado semántico de variantes en el Árbol Remoto.
 - [ ] **Linter de Escenario (`addons/escenario_tools`):** Guías visuales de exclusión ($80\text{ px}$) y validación estática de colisiones en variantes.

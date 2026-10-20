@@ -52,9 +52,10 @@ Para facilitar la lectura y desarrollo, la documentación está dividida en las 
 - [Audio y Feedback](interfaz_y_audio/audio_y_feedback.md): Paisaje sonoro, layout de buses de audio, radar de proximidad y efectos sensoriales.
 
 ### [Producción](produccion/roadmap_y_hitos.md)
+- [Estructura del Proyecto y Archivos](produccion/estructura_del_proyecto.md): Árbol oficial `res://`, convenciones de nomenclatura (`snake_case`), aislamiento de fuentes `.blend`/`.svg` (`.gdignore`) y gestión de carpetas de producción.
 - [Roadmap e Hitos](produccion/roadmap_y_hitos.md): Calendario de 4 semanas hacia Halloween, flujo de hitos y estado actual.
 - [Backlog y Tareas](produccion/backlog_y_tareas.md): Desglose modular de tareas técnicas, de arte y de diseño con estados y criterios de aceptación.
 - [Checklist de Exportación Web](produccion/checklist_exportacion_web.md): Parámetros para HTML5, resolución 1:1, IndexedDB, itch.io y Newgrounds en Godot 4.
 
 ### [Herramientas y Diagnóstico](herramientas/herramientas_de_debug.md)
-- [Herramientas de Debug](herramientas/herramientas_de_debug.md): Menú unificado in-game (F3 tri-estado), telemetría de jugador/monstruo, diagnóstico de mutación para Issue #3, plugins de editor y MCP.
+- [Herramientas de Debug](herramientas/herramientas_de_debug.md): Menú unificado in-game (F3 tri-estado), telemetría de jugador/monstruo, diagnóstico de mutación para Issue #3, integración con monitores de Godot (`Performance`), Árbol Remoto, persistencia con `DebugConfig`, plugins de editor y MCP.

@@ -101,9 +101,12 @@ El proyecto cuenta con un plugin de editor dedicado (`character_bar.gd`) que per
 * **Estructura de Iluminación (`PointLight2D`):**
   1. **Halo de Proximidad (`LuzCuerpo`):** Luz radial tenue alrededor del cuerpo del personaje para asegurar que siempre vea sus pies y los obstáculos inmediatos.
   2. **Haz Direccional (`LinternaFrontal`):** Cono de luz frontal que proyecta visión a media distancia hacia donde apunta.
-* **Desacople Orientacional:**
+* **Desacople y Conmutación Inteligente de Orientación:**
   - El sprite del personaje orienta sus animaciones según el vector de entrada de movimiento (`velocity`).
-  - La linterna apunta libremente en $360^\circ$ al cursor del ratón (`get_global_mouse_position()`), o se alinea automáticamente con `velocity.angle()` si se juega exclusivamente con teclado.
+  - **Detección Dinámica de Entrada (Ratón vs. Teclado):** Para evitar que en Web la linterna quede anclada a la última posición estática del cursor tras hacer clic en la pantalla de inicio:
+    - Se registra el tiempo del último evento `InputEventMouseMotion` con desplazamiento significativo ($> 4\text{ px}$).
+    - **Modo Ratón Activo:** Si hubo movimiento de ratón reciente ($< 1.5\text{ s}$), el haz apunta a `get_global_mouse_position()`.
+    - **Modo Teclado Puro:** Si no hay movimiento de ratón reciente o el jugador se desplaza solo con teclado, la linterna interpola suavemente su rotación (`slerp` o `rotate_toward`) hacia el ángulo de la velocidad de marcha (`velocity.angle()`) o la última dirección registrada.
 
 ---
 
