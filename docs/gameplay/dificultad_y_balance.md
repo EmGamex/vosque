@@ -10,8 +10,8 @@ El juego utiliza un escalado continuo de peligro por nota recolectada dentro de 
 
 | Nota Recogida | Fase de Comportamiento | Velocidad Monstruo | Relación vs Jugador ($800\text{ px/s}$) | Dinámica de Juego |
 | :---: | :--- | :---: | :---: | :--- |
-| **0 (Inicio)** | *Acecho Silente* | $500\text{ px/s}$ | $62.5\%$ | Fase inicial de aclimatación; el jugador explora la oscuridad y ubica la primera baliza luminosa. |
-| **Nota 1** | *Patrulla Lenta* | $540\text{ px/s}$ | $67.5\%$ | El jugador puede dejar atrás al enemigo caminando en línea recta. |
+| **0 (Inicio)** | *Inactivo / Acecho Silente* | $0\text{ px/s}$ | $0\%$ | Fase inicial de aclimatación y tutorial sobre la cabeza del personaje. El monstruo no persigue ni ataca. El jugador explora la oscuridad y ubica la primera baliza luminosa. |
+| **Nota 1** | *Despertar y Patrulla Inicial* | $500\text{ px/s}$ | $62.5\%$ | **Despertar de la Criatura:** La criatura se activa e inicia la persecución tras recoger la primera página. El jugador puede dejar atrás al enemigo caminando en línea recta. |
 | **Nota 2** | *Patrulla Lenta* | $580\text{ px/s}$ | $72.5\%$ | El sonido de pasos y crujidos del monstruo se vuelve más persistente. |
 | **Nota 3** | *Patrulla Lenta* | $620\text{ px/s}$ | $77.5\%$ | Comienza a cerrarse la brecha de distancia si el jugador se detiene a inspeccionar callejones sin salida. |
 | **Nota 4** | *Persecución Media* | $680\text{ px/s}$ | $85.0\%$ | Los errores de navegación entre árboles comienzan a costar distancia valiosa. |
@@ -26,10 +26,11 @@ El juego utiliza un escalado continuo de peligro por nota recolectada dentro de 
 
 ## 2. Modelo Matemático y Límites
 
-La función de velocidad implementa un incremento progresivo amortiguado con límite superior:
+La función de velocidad implementa un incremento progresivo amortiguado a partir del despertar en la Nota 1:
 
-$$\text{Velocidad}(n) = \min\left(920.0, \; 500.0 + 42.0 \times n\right)$$
+$$\text{Velocidad}(n) = \begin{cases} 0.0 & \text{si } n = 0 \text{ (Fase Tutorial / Inactivo)} \\ \min\left(920.0, \; 500.0 + 42.0 \times (n - 1)\right) & \text{si } n \ge 1 \end{cases}$$
 
+* **Despertar en Nota 1 ($500\text{ px/s}$):** Permite al jugador completar el tutorial y explorar sin frustración durante la primera búsqueda.
 * **Tope de Seguridad ($920\text{ px/s}$):** Garantiza que el juego nunca se vuelva imposible matemáticamente. Puesto que el Sprint alcanza $1000\text{ px/s}$, el jugador siempre tiene un margen de escape si administra correctamente su barra de estamina y esquiva entre árboles y troncos bajos.
 * **Aceleración Física:** El monstruo conserva una aceleración constante de $3500\text{ px/s}^2$ en todo momento, otorgándole un giro ligeramente más abierto en curvas que el del jugador ($5000\text{ px/s}^2$), incentivando los desvíos bruscos en pasillos de árboles.
 

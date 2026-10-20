@@ -26,6 +26,7 @@ Maain (Node2D) [scripts/maain.gd]
 sequenceDiagram
     autonumber
     actor Jugador
+    participant Tutorial as "TutorialCabeza (Node2D)"
     participant Nota as "Nota (Area2D)"
     participant Director as "Director (maain.gd)"
     participant HUD as "HUD (CanvasLayer)"
@@ -33,13 +34,19 @@ sequenceDiagram
     participant Escenario as "Escenario (Node2D)"
     participant Gestor as "GestorDeEscenas"
 
-    Jugador->>Nota: Colisión body_entered
+    Note over Jugador,Monstruo: Inicio de Partida: Monstruo Inactivo (0 px/s, sin colisión letal)
+    Jugador->>Tutorial: Inputs WASD -> Salto -> Sprint
+    Tutorial->>Tutorial: Fade-out suave al completar
+
+    Jugador->>Nota: Colisión body_entered (Nota 1 - Despertar)
     Nota->>Director: emit_signal('recolectada', pos)
     
-    par Actualizar HUD y Puntuación
+    par Actualizar HUD y Despertar
         Director->>Director: notas_recogidas += 1
         Director->>HUD: actualizar_contador(notas_recogidas)
-    and Escalar Dificultad
+        Director->>Tutorial: cerrar_inmediato()
+        Director->>Monstruo: activar_persecucion(velocidad_inicial=500)
+    and Escalar Dificultad (Notas 2+)
         Director->>Monstruo: actualizar_velocidad(notas_recogidas)
     and Mutación de Entorno
         Director->>Escenario: mutar_con_neblina()

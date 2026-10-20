@@ -67,6 +67,9 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 - [x] **Persecución Básica Vectorial:** Movimiento hacia el jugador con `move_and_slide()` y aceleración controlada (`3500 px/s²`).
 - [x] **Rotación Continua 360°:** El nodo visual orienta sus garras y cabeza siguiendo el vector instantáneo de velocidad (`velocity.angle()`).
 - [x] **Geometría de Detección:** Colisión física sólida ($42\text{ px}$) y `AreaCaptura` letal ($56\text{ px}$) con `RayCastVision`.
+- [ ] **Activación Diferida (Inactivo en Nota 0 -> Despertar en Nota 1):**
+  - [ ] Propiedad `activo = false` al iniciar la sesión (velocidad $0\text{ px/s}$, `AreaCaptura.monitoring = false`).
+  - [ ] Método `activar_persecucion()` disparado por el Game Director al recoger la primera página a $500\text{ px/s}$.
 - [ ] **Escalado Cuantitativo de Dificultad:**
   - [ ] Implementar la función de velocidad acotada: $\text{Velocidad}(n) = \min(920.0, \; 500.0 + 42.0 \times n)$.
   - [ ] Tope absoluto de $920\text{ px/s}$ para garantizar la maniobrabilidad del jugador durante el sprint ($1000\text{ px/s}$).
@@ -126,6 +129,10 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 
 - [x] **Gestor de Escenas y Fundidos:** Transiciones con velo negro entre Inicio, Partida y Game Over.
 - [x] **Flujo Básico de Menús:** Navegación funcional entre pantallas.
+- [ ] **Tutorial Flotante sobre la Cabeza (`TutorialCabeza`):**
+  - [ ] Componente visual flotante a $Y \approx -90\text{ px}$ con fondo traslúcido y badges de teclas.
+  - [ ] Secuencia de 3 pasos: WASD (ilumina teclas al pulsar) $\to$ Salto (Espacio) $\to$ Sprint (Shift).
+  - [ ] Cierre automático con `Tween` al completar o al recoger la Nota 1.
 - [ ] **Barra de Estamina en HUD:** `ProgressBar` nativo con `StyleBoxFlat` delgado ($200 \times 12$ px), color ámbar normal y titileo carmesí en fatiga.
 - [ ] **Contador de Notas en HUD:** Icono de nota y texto numérico con `Tween` elástico de recogida ($1.3 \to 1.0$).
 - [ ] **Menú de Pausa Superpuesto (`CanvasLayer`, layer=50):**
