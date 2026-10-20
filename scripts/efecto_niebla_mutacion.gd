@@ -193,7 +193,7 @@ func _abortar_y_limpiar() -> void:
 func cubrir(duracion: float = -1.0) -> void:
 	if desactivado:
 		_estado_fase = "CEGUERA"
-		ceguera_alcanzada.emit()
+		ceguera_alcanzada.emit.call_deferred()
 		return
 
 	_animando = true
@@ -245,7 +245,7 @@ func despejar(duracion: float = -1.0) -> void:
 		_estado_fase = "DESPEJADO"
 		visible = false
 		set_process(false)
-		niebla_disipada.emit()
+		niebla_disipada.emit.call_deferred()
 		return
 
 	var t: float = duracion if duracion >= 0.0 else duracion_apertura
@@ -301,6 +301,22 @@ func ejecutar_transicion(
 	t_apertura: float = -1.0,
 	t_pausa: float = -1.0
 ) -> void:
+	if desactivado:
+		# Bypass instantáneo para modo de depuración: muta de inmediato sin tweens ni espera de corrutinas
+		_animando = false
+		_estado_fase = "DESPEJADO"
+		visible = false
+		set_process(false)
+		if _material_shader != null:
+			_material_shader.set_shader_parameter("radio_interno", radio_despejado)
+
+		if accion_en_ceguera.is_valid():
+			accion_en_ceguera.call()
+
+		ceguera_alcanzada.emit.call_deferred()
+		niebla_disipada.emit.call_deferred()
+		return
+
 	var dur_cierre: float = t_cierre if t_cierre >= 0.0 else duracion_cierre
 	var dur_apertura: float = t_apertura if t_apertura >= 0.0 else duracion_apertura
 	var dur_pausa: float = t_pausa if t_pausa >= 0.0 else pausa_oscuridad
