@@ -155,7 +155,7 @@ Personaje (CharacterBody2D) [scripts/personaje.gd, y_sort_enabled=true]
 ```
 
 * **Gestión de Pivote y Profundidad:** El nodo raíz `Personaje` y el mapa tienen `y_sort_enabled = true`. El pivote (`offset`) del `AnimatedSprite2D` se ubica exactamente en la base de los pies para ordenar correctamente el renderizado delante o detrás de los árboles.
-* **Simulación de Elevación:** Durante el salto o plancha, solo se desplaza el contenedor `Visual` en el eje local $-Y$, permitiendo que la `Sombra` permanezca fija en el suelo mientras reduce su escala suavemente (`scale = Vector2(0.6, 0.6)`).
+* **Simulación de Elevación:** Durante el salto o plancha, solo se desplaza el contenedor `Visual` en el eje local $-Y$, permitiendo que la `Sombra` (nodo hermano directo bajo la raíz, nunca hijo de `Visual`) permanezca fija en el suelo mientras reduce su escala suavemente (`scale = Vector2(0.6, 0.6)`).
 
 ### 5.2. Mapa de Entradas (`InputMap` en `project.godot`)
 
@@ -166,7 +166,7 @@ Personaje (CharacterBody2D) [scripts/personaje.gd, y_sort_enabled=true]
 | `personaje-izquierda` | `A` / `Flecha Izquierda` | Implementado | Movimiento horizontal a la izquierda ($-X$) |
 | `personaje-derecha` | `D` / `Flecha Derecha` | Implementado | Movimiento horizontal a la derecha ($+X$) |
 | `personaje-salto` | `Espacio` | Implementado | Salto Libre (en suelo) / Salto de Plancha (*Dive*, en el aire) |
-| `personaje-sprint` | `Shift` (o `Espacio` sostenido) | Configurado (`Shift` recomendado) | Carrera continua consumiendo la barra de estamina |
+| `sprint` / `personaje-sprint` | `Shift` (o `Espacio` sostenido) | Configurado (`Shift` recomendado) | Carrera continua consumiendo la barra de estamina (en `project.godot` registrado como `sprint`) |
 | *Movimiento de Ratón* | `InputEventMouseMotion` | Opcional / Híbrido | Orientación libre del haz de la linterna |
 
 ### 5.3. Integración con Sistemas de Depuración y Editor

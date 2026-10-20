@@ -1,6 +1,6 @@
 # Roadmap e Hitos de Producción
 
-Este documento detalla el cronograma de desarrollo acotado a 4 semanas para alcanzar el objetivo de lanzamiento en Halloween (31 de Octubre de 2026), reflejando el progreso técnico real del proyecto a fecha de **17 de Octubre de 2026**.
+Este documento detalla el cronograma de desarrollo acotado a 4 semanas para alcanzar el objetivo de lanzamiento en Halloween (31 de Octubre de 2026), reflejando el progreso técnico real del proyecto a fecha de **19 de Octubre de 2026**.
 
 ---
 
@@ -66,7 +66,7 @@ flowchart TD
 * **Entregables:**
   - [x] Especificación técnica de **Salto Libre** (arco Z simulado en $0.45\text{ s}$ superando obstáculos bajos) y **Salto de Plancha (*Dive*)** con vulnerabilidad de $0.6\text{ s}$ en suelo en [`personaje_y_habilidades.md`](../gameplay/personaje_y_habilidades.md).
   - [x] Especificación de **Sprint y Barra de Estamina** nativa con retardo de recarga de $0.8\text{ s}$ y umbral de seguridad de fatiga ($30\%$).
-  - [x] Diseño topológico de la **Arena 2x2 ($2160 \times 2160$ px)**, sub-escenas de variantes, franjas seguras de $160\text{ px}$ en intersecciones y algoritmo de mutación de los 3 sectores lejanos en [`mapa_y_sectores.md`](../gameplay/mapa_y_sectores.md).
+  - [x] Diseño topológico de la **Arena 2x2 ($4320 \times 4320$ px con cuadrantes de $2160 \times 2160$ px)**, sub-escenas de variantes, franjas seguras de $160\text{ px}$ en intersecciones y algoritmo de mutación de los 3 sectores lejanos en [`mapa_y_sectores.md`](../gameplay/mapa_y_sectores.md).
   - [x] Matriz de capas de física (Capa 1: `Mundo_Alto`, Capa 2: `Obstaculos_Bajos`, Capa 3: `Jugador`, Capa 4: `Monstruo`, Capa 5: `Interactuables`).
   - [x] Catálogo consolidado de arte de ~30 piezas (15 cuadros jugador, 2-3 criatura, 3 menú, 6 entorno, 2 notas, 1 jumpscare) en [`guia_estilo_y_assets.md`](../arte/guia_estilo_y_assets.md).
   - [x] Diseño de arquitectura del **Menú de Pausa** como `CanvasLayer` en `layer=50` en [`controles_y_hud.md`](../interfaz_y_audio/controles_y_hud.md).
@@ -77,13 +77,14 @@ flowchart TD
 * **Objetivo:** Trasladar las mecánicas documentadas al código GDScript de Godot 4, habilitar la mutación continua de cuadrantes y validar la primera compilación funcional en navegador.
 * **Entregables Clave:**
   - [x] Implementar la máquina de estados de Salto Libre, Plancha (*Dive*) y simulación de elevación en eje Z en [`personaje.gd`](../../scripts/personaje.gd).
-  - [x] Implementar el sistema de Estamina, fatiga y vincularlo con el `ProgressBar` nativo del HUD.
+  - [x] Implementar la lógica de Estamina y fatiga en [`personaje.gd`](../../scripts/personaje.gd).
+  - [ ] Diseñar el HUD in-game y vincular el `ProgressBar` nativo con la señal `estamina_cambiada`.
   - [x] Crear la estructura modular de [`escenas/escenario.tscn`](../../escenas/escenario.tscn) con valla perimetral fija y las sub-escenas de variantes con corredores de paso seguros.
   - [x] Programar la lógica de mutación de los 3 sectores lejanos, niebla de transición (`EfectoNieblaMutacion`) y reposicionamiento anti-atascamiento del monstruo.
   - [ ] Crear la entidad coleccionable [`escenas/nota.tscn`](../../escenas/nota.tscn) con halo tenue (`PointLight2D`), recolección arcade instantánea y escalado de velocidad del enemigo.
   - [x] Implementar suite de telemetría y menú unificado de diagnóstico in-game en [`escenas/debug_menu.tscn`](../../escenas/debug_menu.tscn).
   - [ ] Integrar el nodo de menú de pausa en [`gestor_escenas.gd`](../../scripts/gestor_escenas.gd) pausando solo el subárbol de la partida activa.
-  - [x] Configurar el preset de exportación Web (HTML5) con renderer Compatibility y generar la primera build de prueba para navegador.
+  - [x] Configurar preset de exportación Web en [`export_presets.cfg`](../../export_presets.cfg) y preparar build `index.html` para navegador.
 
 ---
 

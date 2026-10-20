@@ -123,9 +123,9 @@ Herramientas para validar el seguimiento y el protocolo anti-atascamiento:
 ### 3.4. Pestaña: Sistema, Notas y Entorno
 * **Control de Tiempo (`Engine.time_scale`):**
   - Botones de preajuste: `0.2x` (cámara súper lenta para analizar saltos parabólicos sobre obstáculos bajos de Capa 2), `0.5x`, `1.0x` (velocidad normal) y `2.0x` (prueba de estrés).
-* **Gestión de Notas Coleccionables:**
+* **Gestión de Notas Coleccionables (Planificado / En Integración):**
   - Contador de notas recogidas.
-  - Botón **"Simular Recogida de Nota"**: Incrementa el contador, dispara la señal de progresión de dificultad y desencadena la mutación del escenario.
+  - Botón **"Simular Recogida de Nota"**: Incrementa el contador, dispara la señal de progresión de dificultad y desencadena la mutación del escenario (se conectará al implementarse el ciclo de la entidad `Nota`).
 * **Acciones de Sesión:**
   - Botón **"Reiniciar Escena"**: Llama a `get_tree().reload_current_scene()` de forma limpia.
 
@@ -141,7 +141,7 @@ Además de las herramientas in-game, el proyecto cuenta con plugins contextuales
 
 ### 4.2. Linter y Guías de Nivel de Escenario (`addons/escenario_tools` - Planificado)
 Diseñado para la creación de variantes de sector en `escenas/sectores/variantes/`:
-* **Dibujo de Guías de Corredores:** Traza automáticamente en el editor el marco de $1080 \times 1080\text{ px}$ y las zonas de exclusión de $80\text{ px}$ interiores.
+* **Dibujo de Guías de Corredores:** Traza automáticamente en el editor el marco de variante de $2160 \times 2160\text{ px}$ y las zonas de exclusión de $80\text{ px}$ interiores.
 * **Validador Estático de Variante:**
   - Confirma que ningún `StaticBody2D` esté colocado en los corredores de borde.
   - Comprueba que los obstáculos usen las capas correctas: Capa 1 para obstáculos altos y Capa 2 para obstáculos bajos.
