@@ -1,3 +1,4 @@
+@tool
 class_name Personaje
 extends CharacterBody2D
 
@@ -54,6 +55,7 @@ var _ultima_direccion: Vector2 = Vector2.DOWN
 var _direccion_plancha: Vector2 = Vector2.DOWN
 
 @onready var _visual: Node2D = get_node_or_null("Visual") as Node2D
+@onready var _sprite: AnimatedSprite2D = get_node_or_null("Visual/Sprite2D") as AnimatedSprite2D
 @onready var _sombra: Node2D = get_node_or_null("Sombra") as Node2D
 
 
@@ -66,6 +68,9 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if Engine.is_editor_hint():
+		return
+
 	var direction: Vector2 = Input.get_vector(
 		"personaje-izquierda", "personaje-derecha", "personaje-arriba", "personaje-abajo"
 	)
@@ -155,6 +160,8 @@ func _physics_process(delta: float) -> void:
 
 	if not estamina_consumida_en_frame:
 		_procesar_regeneracion_estamina(delta)
+
+	_actualizar_animacion(direction, is_moving)
 
 	move_and_slide()
 
@@ -268,6 +275,63 @@ func _actualizar_procedural_suelo(direction: Vector2, _delta: float) -> void:
 		_visual.rotation = deg_to_rad(5.0 * signf(direction.x))
 	else:
 		_visual.rotation = 0.0
+
+
+func _actualizar_animacion(direction: Vector2, is_moving: bool) -> void:
+	if _sprite == null:
+		return
+
+	var dir: Vector2 = direction if is_moving else _ultima_direccion
+
+	if dir.x < -0.05:
+		_sprite.flip_h = true
+	elif dir.x > 0.05:
+		_sprite.flip_h = false
+
+	var abs_x: float = absf(dir.x)
+	var abs_y: float = absf(dir.y)
+
+	if not is_moving and estado_actual == Estado.REPOSO:
+		if abs_x > abs_y:
+			_reproducir_animacion_con_fallback(&"idle-lado", [&"idle", &"lado", &"idle-arriba"])
+		elif dir.y > 0.0:
+			_reproducir_animacion_con_fallback(&"idle-abajo", [&"idle", &"idle-arriba", &"arriba"])
+		else:
+			_reproducir_animacion_con_fallback(&"idle-arriba", [&"idle", &"arriba"])
+		return
+
+	if abs_x > 0.3 and abs_y > 0.3:
+		if dir.y > 0.0:
+			_reproducir_animacion_con_fallback(&"diagonal-abajo", [&"diagonal-arriba", &"diagonal", &"lado"])
+		else:
+			_reproducir_animacion_con_fallback(&"diagonal-arriba", [&"diagonal", &"lado"])
+	elif abs_y > abs_x:
+		if dir.y > 0.0:
+			_reproducir_animacion_con_fallback(&"abajo", [&"idle-abajo", &"diagonal-abajo", &"lado"])
+		else:
+			_reproducir_animacion_con_fallback(&"arriba", [&"idle-arriba", &"idle"])
+	else:
+		_reproducir_animacion_con_fallback(&"lado", [&"idle-lado", &"diagonal-arriba"])
+
+
+func _reproducir_animacion_con_fallback(anim_principal: StringName, fallbacks: Array[StringName]) -> void:
+	if _sprite == null or _sprite.sprite_frames == null:
+		return
+
+	var candidatas: Array[StringName] = [anim_principal]
+	candidatas.append_array(fallbacks)
+
+	for anim in candidatas:
+		if _sprite.sprite_frames.has_animation(anim):
+			# Solo reproducir si tiene al menos un frame configurado
+			if _sprite.sprite_frames.get_frame_count(anim) > 0:
+				if _sprite.animation != anim or not _sprite.is_playing():
+					_sprite.play(anim)
+				return
+
+
+func _reproducir_animacion(anim_name: StringName) -> void:
+	_reproducir_animacion_con_fallback(anim_name, [])
 
 
 func _restaurar_mascara_colision_suelo() -> void:

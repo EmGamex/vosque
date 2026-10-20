@@ -1,3 +1,9 @@
 [gd_scene format=3 uid="uid://b1eu583e554ay"]
 
 [node name="Camera2D" type="Camera2D" unique_id=292125370]
+process_callback = 0
+limit_left = -2160
+limit_top = -2160
+limit_right = 2160
+limit_bottom = 2160
+position_smoothing_speed = 8.0

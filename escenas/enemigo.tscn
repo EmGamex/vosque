@@ -9,6 +9,8 @@ radius = 42.0
 radius = 56.0
 
 [node name="Enemigo" type="CharacterBody2D" unique_id=1591042193]
+collision_layer = 8
+collision_mask = 7
 script = ExtResource("1_sms58")
 
 [node name="BocetoVisual" type="Node2D" parent="." unique_id=372931188]
@@ -25,6 +27,8 @@ polygon = PackedVector2Array(30, 0, 0, 20, -20, 0, 0, -20)
 shape = SubResource("CircleShape2D_uhebs")
 
 [node name="AreaCaptura" type="Area2D" parent="." unique_id=634841124]
+collision_layer = 0
+collision_mask = 4
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AreaCaptura" unique_id=235146397]
 shape = SubResource("CircleShape2D_743j8")

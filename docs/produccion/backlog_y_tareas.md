@@ -17,19 +17,21 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 
 - [x] **Locomoción 8 Direcciones:** Movimiento con vector normalizado, aceleración (`5000 px/s²`), fricción y freno seco (`stop_threshold = 15.0 px/s`).
 - [x] **Telemetría F3 y Calibración:** Panel de depuración in-game y plugin de editor contextual [`addons/personaje_tools`](../../addons/personaje_tools).
-- [ ] **Mecánica de Sprint y Estamina:**
-  - [ ] Consumo de estamina a $-25\text{ pts/s}$ al sostener `Shift` pasando de $800\text{ px/s}$ a $1000\text{ px/s}$.
-  - [ ] Retardo de recarga de $0.8\text{ s}$ y regeneración continua a $+20\text{ pts/s}$.
-  - [ ] Estado de fatiga (bloqueo de sprint hasta recuperar $\ge 30\%$ de estamina).
-- [ ] **Mecánica de Salto Libre (Despegue en Suelo):**
-  - [ ] Activación con `Espacio` en suelo consumiendo $-20\text{ pts}$ de estamina.
-  - [ ] Arco parabólico en contenedor `Visual` local (duración $\approx 0.45\text{ s}$).
-  - [ ] Desactivación temporal de colisión con Capa 2 (`Obstaculos_Bajos`).
-  - [ ] Escala reducida de la sombra proyectada en el suelo durante el vuelo.
-- [ ] **Mecánica de Salto de Plancha (*Dive* en el Aire):**
-  - [ ] Segunda pulsación de `Espacio` en el aire consumiendo $-30\text{ pts}$ de estamina.
-  - [ ] Impulso horizontal aerodinámico a $\approx 1200\text{ px/s}$.
-  - [ ] Impacto contra el suelo y ventana de inmovilidad/recuperación de $0.6\text{ s}$ (vulnerabilidad total ante el monstruo).
+- [x] **Mecánica de Sprint y Estamina:**
+  - [x] Consumo de estamina a $-25\text{ pts/s}$ al sostener `Shift` pasando de $800\text{ px/s}$ a $1000\text{ px/s}$.
+  - [x] Retardo de recarga de $0.8\text{ s}$ y regeneración continua a $+20\text{ pts/s}$.
+  - [x] Estado de fatiga (bloqueo de sprint hasta recuperar $\ge 30\%$ de estamina).
+- [x] **Mecánica de Salto Libre (Despegue en Suelo):**
+  - [x] Activación con `Espacio` en suelo consumiendo $-20\text{ pts}$ de estamina.
+  - [x] Arco parabólico en contenedor `Visual` local (duración $\approx 0.45\text{ s}$).
+  - [x] Desactivación temporal de colisión con Capa 2 (`Obstaculos_Bajos`).
+  - [x] Escala reducida de la sombra proyectada en el suelo durante el vuelo.
+- [x] **Mecánica de Salto de Plancha (*Dive* en el Aire):**
+  - [x] Segunda pulsación de `Espacio` en el aire consumiendo $-30\text{ pts}$ de estamina.
+  - [x] Impulso horizontal aerodinámico a $\approx 1200\text{ px/s}$.
+  - [x] Impacto contra el suelo y ventana de inmovilidad/recuperación de $0.6\text{ s}$ (vulnerabilidad total ante el monstruo).
+- [ ] **Animaciones de Salto y Recuperación en Motor:**
+  - [ ] Integrar poses estáticas y recuperación (`jugador_salto_aire`, `jugador_plancha_aire`, `jugador_suelo_recuperacion`) en `_actualizar_animacion()` de [`scripts/personaje.gd`](../../scripts/personaje.gd).
 - [ ] **Linterna Frontal Desacoplada:**
   - [ ] Halo radial permanente centrado en el personaje.
   - [ ] Haz cónico orientable libremente en $360^\circ$ hacia el ratón o alineado automáticamente con la dirección de marcha.
@@ -40,20 +42,21 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 > 📄 **Especificación de referencia:** [`docs/gameplay/mapa_y_sectores.md`](../gameplay/mapa_y_sectores.md)  
 > 💻 **Archivos clave:** [`escenas/escenario.tscn`](../../escenas/escenario.tscn), `scripts/escenario.gd`
 
-- [ ] **Arena Base y Valla Perimetral:**
-  - [ ] Estructura fija de $2160 \times 2160\text{ px}$ en coordenadas $[-1080, 1080]$.
-  - [ ] `VallaPerimetral` en Capa 1 (`Mundo_Alto`) con 4 muros perimetrales fijos de $64\text{ px}$ de grosor.
-  - [ ] `Camera2D` configurada con límites nativos (`limit_left = -1080`, `limit_top = -1080`, etc.).
-- [ ] **Contenedores de Cuadrantes (Sectores NO, NE, SO, SE):**
-  - [ ] Nodos contenedores situados en los centros de cuadrante (`Vector2(±540, ±540)`).
-  - [ ] Corredores de seguridad de $160\text{ px}$ libres de obstáculos en las intersecciones $X=0, Y=0$.
-- [ ] **Sub-Escenas de Variantes de Sector:**
-  - [ ] Crear al menos 2 a 3 variantes prefabricadas por cuadrante con distribución variada de árboles, rocas y troncos.
-  - [ ] Nodos candidatos de aparición de notas (`Marker2D` en grupo `"puntos_nota"`).
-- [ ] **Algoritmo de Mutación Dinámica:**
-  - [ ] Detección del cuadrante activo del jugador al recoger una nota.
-  - [ ] Reemplazo aleatorio de las sub-escenas de los **3 cuadrantes lejanos**.
-  - [ ] Protocolo anti-atascamiento del monstruo con reubicación al punto transitable más próximo.
+- [x] **Arena Base y Valla Perimetral:**
+  - [x] Estructura fija de $4320 \times 4320\text{ px}$ en coordenadas $[-2160, 2160]$.
+  - [x] `VallaPerimetral` en Capa 1 (`Mundo_Alto`) con 4 muros perimetrales fijos de $64\text{ px}$ de grosor.
+  - [x] `Camera2D` configurada con límites nativos (`limit_left = -2160`, `limit_top = -2160`, etc.).
+- [x] **Contenedores de Cuadrantes (Sectores NO, NE, SO, SE):**
+  - [x] Nodos contenedores situados en los centros de cuadrante (`Vector2(±1080, ±1080)`).
+  - [x] Corredores de seguridad de $160\text{ px}$ libres de obstáculos en las intersecciones $X=0, Y=0$.
+- [x] **Sub-Escenas de Variantes de Sector:**
+  - [x] Crear al menos 2 a 3 variantes prefabricadas por cuadrante con distribución variada de árboles, rocas y troncos.
+  - [x] Nodos candidatos de aparición de notas (`Marker2D` en grupo `"puntos_nota"`).
+- [x] **Algoritmo de Mutación Dinámica y Niebla:**
+  - [x] Detección del cuadrante activo del jugador al recoger una nota o forzar mutación.
+  - [x] Transición de niebla radial (`EfectoNieblaMutacion`) con cero consumo en reposo y blindaje asíncrono.
+  - [x] Reemplazo atómico de las sub-escenas de los **3 cuadrantes lejanos** durante la fase de ceguera.
+  - [x] Protocolo anti-atascamiento del monstruo con reubicación al punto transitable más próximo.
 
 ---
 
@@ -162,12 +165,13 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 > 💻 **Archivos clave:** `escenas/debug_menu.tscn`, `scripts/debug_menu/`, `addons/personaje_tools/`
 
 - [x] **Toolbar de Personaje en Editor:** Plugin contextual `addons/personaje_tools` para ajuste de velocidad, aceleración y fricción.
-- [ ] **Menú Unificado de Debug In-Game (`escenas/debug_menu.tscn`):**
-  - [ ] Ciclo tri-estado con <kbd>F3</kbd>: Oculto ➔ Mini-HUD ➔ Menú Completo.
-  - [ ] Mini-HUD con FPS, memoria, cuadrante y velocidad en esquina superior.
-  - [ ] Pestaña Jugador: telemetría física, pad 8-dir y cheats de prueba (estamina infinita, god mode).
-  - [ ] Pestaña Escenario (Issue #3): cuadrante activo, forzado manual de mutación, vista global (God View) y toggles visuales de corredores ($160\text{ px}$).
-  - [ ] Pestaña Monstruo: estado de persecución, anti-atascamiento, cálculo de velocidad y botón de reubicación segura.
-  - [ ] Pestaña Sistema: escala de tiempo (`Engine.time_scale`), reinicio rápido de escena y simulador de notas.
+- [x] **Menú Unificado de Debug In-Game (`escenas/debug_menu.tscn`):**
+  - [x] Ciclo tri-estado con <kbd>F3</kbd>: Oculto ➔ Mini-HUD ➔ Menú Completo.
+  - [x] Mini-HUD con FPS, memoria, cuadrante y velocidad en esquina superior.
+  - [x] Pestaña Jugador: telemetría física, pad 8-dir y cheats de prueba (estamina infinita, god mode).
+  - [x] Pestaña Escenario (Issue #3): cuadrante activo, forzado manual de mutación, toggle de niebla, vista global (God View) y toggles visuales de corredores ($160\text{ px}$).
+  - [x] Pestaña Monstruo: estado de persecución, anti-atascamiento, cálculo de velocidad y botón de reubicación segura.
+  - [x] Pestaña Sistema: escala de tiempo (`Engine.time_scale`) y reinicio rápido de escena.
+- [ ] Pestaña Sistema (Notas): integrar contador y simulador de notas al implementar la entidad `escenas/nota.tscn`.
 - [ ] **Linter de Escenario (`addons/escenario_tools`):** Guías visuales de exclusión ($80\text{ px}$) y validación estática de colisiones en variantes.
 

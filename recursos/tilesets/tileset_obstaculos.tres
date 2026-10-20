@@ -1,0 +1,14 @@
+[gd_resource type="TileSet" format=3 uid="uid://dx6qk1mgn5btq"]
+
+[ext_resource type="PackedScene" uid="uid://b6bfgvahe6fuf" path="res://escenas/obstaculos/arbol.tscn" id="1_w8dqa"]
+[ext_resource type="PackedScene" uid="uid://ubufxvikk2hl" path="res://escenas/obstaculos/roca.tscn" id="2_l7fx6"]
+[ext_resource type="PackedScene" uid="uid://cr1kke8d4wxbn" path="res://escenas/obstaculos/tronco_bajo.tscn" id="3_ojp71"]
+
+[sub_resource type="TileSetScenesCollectionSource" id="TileSetScenesCollectionSource_vi5ux"]
+scenes/1/scene = ExtResource("1_w8dqa")
+scenes/2/scene = ExtResource("2_l7fx6")
+scenes/3/scene = ExtResource("3_ojp71")
+
+[resource]
+tile_size = Vector2i(64, 64)
+sources/0 = SubResource("TileSetScenesCollectionSource_vi5ux")

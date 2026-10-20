@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://ubufxvikk2hl"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ysaam"]
+radius = 42.0
+
+[node name="Roca" type="StaticBody2D" unique_id=1957903107]
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=276347601]
+shape = SubResource("CircleShape2D_ysaam")
+
+[node name="Visual" type="Polygon2D" parent="CollisionShape2D" unique_id=165855913]
+color = Color(0.22745098, 0.23921569, 0.27058825, 1)
+polygon = PackedVector2Array(-42, -14, -24, -40, 20, -42, 42, -14, 38, 26, 18, 42, -20, 40, -40, 18)

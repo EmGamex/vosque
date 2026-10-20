@@ -1,0 +1,83 @@
+[gd_scene format=3 uid="uid://if7eayy3eh5f"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_tosgu"]
+radius = 40.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_jryw0"]
+radius = 40.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_aeg6w"]
+size = Vector2(160, 40)
+
+[node name="VarianteSenderoTroncos" type="Node2D" unique_id=1803589835]
+y_sort_enabled = true
+
+[node name="ObstaculosAltos" type="StaticBody2D" parent="." unique_id=2032199186]
+collision_mask = 0
+
+[node name="Arbol1" type="CollisionShape2D" parent="ObstaculosAltos" unique_id=1419607749]
+position = Vector2(-450, -450)
+shape = SubResource("CircleShape2D_tosgu")
+
+[node name="Visual" type="Polygon2D" parent="ObstaculosAltos/Arbol1" unique_id=338695873]
+color = Color(0.10980392, 0.1764706, 0.11764706, 1)
+polygon = PackedVector2Array(-40, -14, -24, -38, 22, -40, 40, -14, 36, 26, 18, 40, -22, 38, -38, 18)
+
+[node name="Arbol2" type="CollisionShape2D" parent="ObstaculosAltos" unique_id=205897667]
+position = Vector2(450, 450)
+shape = SubResource("CircleShape2D_jryw0")
+
+[node name="Visual" type="Polygon2D" parent="ObstaculosAltos/Arbol2" unique_id=1466339430]
+color = Color(0.10980392, 0.1764706, 0.11764706, 1)
+polygon = PackedVector2Array(-40, -14, -24, -38, 22, -40, 40, -14, 36, 26, 18, 40, -22, 38, -38, 18)
+
+[node name="ArbolFlancoNorte" type="CollisionShape2D" parent="ObstaculosAltos" unique_id=1304510951]
+position = Vector2(150, -550)
+shape = SubResource("CircleShape2D_tosgu")
+
+[node name="Visual" type="Polygon2D" parent="ObstaculosAltos/ArbolFlancoNorte" unique_id=1112056279]
+color = Color(0.10980392, 0.1764706, 0.11764706, 1)
+polygon = PackedVector2Array(-40, -14, -24, -38, 22, -40, 40, -14, 36, 26, 18, 40, -22, 38, -38, 18)
+
+[node name="ArbolFlancoSur" type="CollisionShape2D" parent="ObstaculosAltos" unique_id=1166688499]
+position = Vector2(-150, 550)
+shape = SubResource("CircleShape2D_jryw0")
+
+[node name="Visual" type="Polygon2D" parent="ObstaculosAltos/ArbolFlancoSur" unique_id=230221901]
+color = Color(0.10980392, 0.1764706, 0.11764706, 1)
+polygon = PackedVector2Array(-40, -14, -24, -38, 22, -40, 40, -14, 36, 26, 18, 40, -22, 38, -38, 18)
+
+[node name="ObstaculosBajos" type="StaticBody2D" parent="." unique_id=866157927]
+collision_layer = 2
+collision_mask = 0
+
+[node name="TroncoSendero" type="CollisionShape2D" parent="ObstaculosBajos" unique_id=481202451]
+shape = SubResource("RectangleShape2D_aeg6w")
+
+[node name="Visual" type="Polygon2D" parent="ObstaculosBajos/TroncoSendero" unique_id=539396843]
+color = Color(0.3647059, 0.2509804, 0.21568628, 1)
+polygon = PackedVector2Array(-80, -20, 80, -20, 80, 20, -80, 20)
+
+[node name="TroncoEntradaOeste" type="CollisionShape2D" parent="ObstaculosBajos" unique_id=1037434504]
+position = Vector2(-350, 200)
+shape = SubResource("RectangleShape2D_aeg6w")
+
+[node name="Visual" type="Polygon2D" parent="ObstaculosBajos/TroncoEntradaOeste" unique_id=476132232]
+color = Color(0.3647059, 0.2509804, 0.21568628, 1)
+polygon = PackedVector2Array(-80, -20, 80, -20, 80, 20, -80, 20)
+
+[node name="TroncoSalidaEste" type="CollisionShape2D" parent="ObstaculosBajos" unique_id=1601934012]
+position = Vector2(350, -200)
+shape = SubResource("RectangleShape2D_aeg6w")
+
+[node name="Visual" type="Polygon2D" parent="ObstaculosBajos/TroncoSalidaEste" unique_id=1937849872]
+color = Color(0.3647059, 0.2509804, 0.21568628, 1)
+polygon = PackedVector2Array(-80, -20, 80, -20, 80, 20, -80, 20)
+
+[node name="PuntosDeNota" type="Node2D" parent="." unique_id=1721145953]
+
+[node name="MarkerNota1" type="Marker2D" parent="PuntosDeNota" unique_id=820379915 groups=["puntos_nota"]]
+position = Vector2(-550, 550)
+
+[node name="MarkerNota2" type="Marker2D" parent="PuntosDeNota" unique_id=1932528507 groups=["puntos_nota"]]
+position = Vector2(550, -550)

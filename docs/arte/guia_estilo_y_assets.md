@@ -78,7 +78,7 @@ Las notas coleccionables funcionan como **fichas/monedas arcade de recolección 
 
 ### 2.5. Entorno y Bosque (Catálogo Modular de 5 Piezas)
 
-Para poblar la arena completa de $2160 \times 2160\text{ px}$ con variabilidad visual y mínimo esfuerzo de dibujo, se utilizan **5 sprites modulares** combinados con transformaciones en motor:
+Para poblar la arena completa de $4320 \times 4320\text{ px}$ (4 cuadrantes de $2160 \times 2160\text{ px}$) con variabilidad visual y mínimo esfuerzo de dibujo, se utilizan **5 sprites modulares** combinados con transformaciones en motor:
 
 | ID de Asset | Tipo de Obstáculo | Capa de Colisión | Resolución | Técnicas de Reutilización en Godot 4 |
 | :--- | :--- | :---: | :---: | :--- |
@@ -87,7 +87,7 @@ Para poblar la arena completa de $2160 \times 2160\text{ px}$ con variabilidad v
 | `arbol_seco` | Árbol retorcido muerto | Capa 1 (`Mundo_Alto`) | $256 \times 256$ px | Ofrece siluetas góticas y desoladas; se rota e invierte para romper patrones repetitivos. |
 | `roca_asimetrica` | Peñasco de piedra musgosa | Capa 1 (`Mundo_Alto`) | $128 \times 128$ px | Diseñada deliberadamente asimétrica: al rotarse en $0^\circ, 90^\circ, 180^\circ$ y $270^\circ$, aparenta ser 4 rocas totalmente distintas. |
 | `tronco_caido` | Tronco tumbado horizontal | Capa 2 (`Obstaculos_Bajos`) | $192 \times 64$ px | Obstáculo bajo para superar con el salto *Dive*. Puede orientarse horizontal o verticalmente. |
-| `valla_alambre_tramo` | Tramo de valla de estacas | Capa 1 (`Mundo_Alto`) | $128 \times 64$ px | Módulo repetido a lo largo del perímetro exterior de $2160\text{ px}$. |
+| `valla_alambre_tramo` | Tramo de valla de estacas | Capa 1 (`Mundo_Alto`) | $128 \times 64$ px | Módulo repetido a lo largo del perímetro exterior de $4320\text{ px}$ por lado. |
 
 ### 2.6. Pantallas de Impacto e Iluminación
 

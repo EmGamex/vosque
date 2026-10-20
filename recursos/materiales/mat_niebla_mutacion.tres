@@ -1,0 +1,10 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://yychgk670rlv"]
+
+[ext_resource type="Shader" uid="uid://b2bb57sxnovr0" path="res://shaders/niebla_mutacion.gdshader" id="1_mj1wh"]
+
+[resource]
+shader = ExtResource("1_mj1wh")
+shader_parameter/color_niebla = Color(0.04, 0.05, 0.08, 1)
+shader_parameter/radio_interno = 1.3
+shader_parameter/suavizado = 0.45
+shader_parameter/centro = Vector2(0.5, 0.5)

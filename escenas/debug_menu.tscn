@@ -361,7 +361,7 @@ text = "Forzar Mutación de Sectores Lejanos"
 
 [node name="CheckGodView" type="CheckBox" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario/VBox" unique_id=726551144]
 layout_mode = 2
-text = "Cámara Global (God View - 2160x2160)"
+text = "Cámara Global (God View - 4320x4320)"
 
 [node name="CheckCorredores" type="CheckBox" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario/VBox" unique_id=1479072709]
 layout_mode = 2
@@ -370,6 +370,10 @@ text = "Mostrar Corredores de Seguridad (160 px)"
 [node name="CheckCuadrantes" type="CheckBox" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario/VBox" unique_id=1143339233]
 layout_mode = 2
 text = "Mostrar Cuadrantes y Ejes (X=0, Y=0)"
+
+[node name="CheckDesactivarNiebla" type="CheckBox" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario/VBox" unique_id=680834615]
+layout_mode = 2
+text = "Desactivar Niebla de Mutación"
 
 [node name="Enemigo" type="MarginContainer" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer" unique_id=2076416922]
 visible = false
@@ -503,6 +507,7 @@ text = "Reiniciar Escena Actual"
 [connection signal="toggled" from="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario/VBox/CheckGodView" to="." method="_on_check_god_view_toggled"]
 [connection signal="toggled" from="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario/VBox/CheckCorredores" to="." method="_on_check_corredores_toggled"]
 [connection signal="toggled" from="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario/VBox/CheckCuadrantes" to="." method="_on_check_cuadrantes_toggled"]
+[connection signal="toggled" from="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario/VBox/CheckDesactivarNiebla" to="." method="_on_check_desactivar_niebla_toggled"]
 [connection signal="pressed" from="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Enemigo/VBox/BtnReubicarEnemigo" to="." method="_on_btn_reubicar_enemigo_pressed"]
 [connection signal="toggled" from="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Enemigo/VBox/CheckVisualDebug" to="." method="_on_check_visual_debug_enemigo_toggled"]
 [connection signal="pressed" from="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/HBoxTimeScale/Btn05x" to="." method="_on_btn_timescale_05_pressed"]

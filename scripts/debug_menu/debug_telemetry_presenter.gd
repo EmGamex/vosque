@@ -72,10 +72,10 @@ func actualizar_tab_escenario(labels: Dictionary, escenario: Node2D, cuadrante_j
 			if lbl_se != null: lbl_se.text = str(vars.get("SE", "Default"))
 	else:
 		if lbl_estado != null: lbl_estado.text = "Escenario: No instanciado (Modo Standalone)"
-		if lbl_no != null: lbl_no.text = "Sector NO [-1080..0, -1080..0]"
-		if lbl_ne != null: lbl_ne.text = "Sector NE [0..1080, -1080..0]"
-		if lbl_so != null: lbl_so.text = "Sector SO [-1080..0, 0..1080]"
-		if lbl_se != null: lbl_se.text = "Sector SE [0..1080, 0..1080]"
+		if lbl_no != null: lbl_no.text = "Sector NO [-2160..0, -2160..0]"
+		if lbl_ne != null: lbl_ne.text = "Sector NE [0..2160, -2160..0]"
+		if lbl_so != null: lbl_so.text = "Sector SO [-2160..0, 0..2160]"
+		if lbl_se != null: lbl_se.text = "Sector SE [0..2160, 0..2160]"
 
 
 func actualizar_tab_enemigo(labels: Dictionary, enemigo: CharacterBody2D, pos_jugador: Vector2, context: DebugContext, debug_dibujar_vectores_ia: bool) -> void:
