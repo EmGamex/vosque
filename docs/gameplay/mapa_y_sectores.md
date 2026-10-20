@@ -24,6 +24,23 @@ El mundo de juego de *Vosque* es una arena cerrada continua de **$4320 \times 43
                   +2160 Y (Límite Sur)
 ```
 
+```mermaid
+flowchart TD
+    subgraph Arena["Arena Vosque (4320 x 4320 px)"]
+        direction TB
+        subgraph ZonaNorte["Zona Norte (Y: -2160 a 0)"]
+            direction LR
+            SectorNO["Sector NO<br/>X: [-2160, 0] | Y: [-2160, 0]<br/>Pivote: (-1080, -1080)"]
+            SectorNE["Sector NE<br/>X: [0, 2160] | Y: [-2160, 0]<br/>Pivote: (1080, -1080)"]
+        end
+        subgraph ZonaSur["Zona Sur (Y: 0 a +2160)"]
+            direction LR
+            SectorSO["Sector SO<br/>X: [-2160, 0] | Y: [0, 2160]<br/>Pivote: (-1080, 1080)"]
+            SectorSE["Sector SE<br/>X: [0, 2160] | Y: [0, 2160]<br/>Pivote: (1080, 1080)"]
+        end
+    end
+```
+
 ### Tabla de Cuadrantes
 
 | Cuadrante | Rango Coordenadas $X$ | Rango Coordenadas $Y$ | Coordenada Local Pivote | Dimensiones |
@@ -128,13 +145,6 @@ VarianteSector (Node2D, y_sort_enabled = true)
     ├── MarkerNota2 (Marker2D, grupo: "puntos_nota")
     └── MarkerNota3 (Marker2D, grupo: "puntos_nota")
 ```
-├── ObstaculosBajos (StaticBody2D - Capa 2: Obstaculos_Bajos)
-│   └── TroncosCaidos (CollisionShape2D rectangulares orientados)
-└── PuntosDeNota (Node2D)
-    ├── MarkerNota1 (Marker2D, grupo: "puntos_nota")
-    ├── MarkerNota2 (Marker2D, grupo: "puntos_nota")
-    └── MarkerNota3 (Marker2D, grupo: "puntos_nota")
-```
 
 #### Flujo de Pintado Rápido con `TileMapLayer` y `TileSetScenesCollectionSource`:
 * En `recursos/tilesets/tileset_obstaculos.tres` se configuran las escenas modulares de obstáculos (`escenas/obstaculos/arbol.tscn`, `roca.tscn`, `tronco_bajo.tscn`) mediante un `TileSetScenesCollectionSource`.
@@ -165,14 +175,14 @@ Para ocultar el reemplazo procedural de los árboles y rocas evitando el popping
 sequenceDiagram
     autonumber
     actor Jugador
-    participant Nota as Nota (Area2D)
-    participant Gestor as GestorEscenario (escenario.gd)
-    participant Niebla as EfectoNieblaMutacion (CanvasLayer)
-    participant Sectores as Contenedores de Cuadrante
-    participant Monstruo as Monstruo (enemigo.gd)
+    participant Nota as "Nota (Area2D)"
+    participant Gestor as "GestorEscenario (escenario.gd)"
+    participant Niebla as "EfectoNieblaMutacion (CanvasLayer)"
+    participant Sectores as "Contenedores de Cuadrante"
+    participant Monstruo as "Monstruo (enemigo.gd)"
 
     Jugador->>Nota: Entra en contacto (body_entered)
-    Nota->>Gestor: emit_signal("nota_recolectada", pos_nota)
+    Nota->>Gestor: emit_signal('nota_recolectada', pos_nota)
     Nota->>Nota: queue_free()
     
     Gestor->>Niebla: transicionar_mutacion(Callable)
@@ -183,7 +193,7 @@ sequenceDiagram
     Gestor->>Gestor: Identificar cuadrante del jugador (CuadranteActivo)
     Note over Gestor: CuadranteActivo = (sign(pos.x), sign(pos.y))
     
-    Gestor->>Sectores: Mutar los 3 cuadrantes != CuadranteActivo
+    Gestor->>Sectores: Mutar los 3 cuadrantes no activos
     loop Para cada uno de los 3 cuadrantes lejanos
         Sectores->>Sectores: queue_free() variante anterior
         Sectores->>Sectores: instanciar nueva variante aleatoria
