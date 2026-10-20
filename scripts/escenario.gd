@@ -18,11 +18,6 @@ const RUTAS_VARIANTES_DEFECTO: Array[String] = [
 @export var objetivo_enemigo: CharacterBody2D
 @export var catalogo_variantes: Array[PackedScene] = []
 
-@export_group("Efecto Niebla de Mutación")
-@export_range(0.2, 5.0, 0.1, "suffix:s") var niebla_duracion_cierre: float = 1.3
-@export_range(0.0, 3.0, 0.1, "suffix:s") var niebla_pausa_oscuridad: float = 0.4
-@export_range(0.2, 5.0, 0.1, "suffix:s") var niebla_duracion_apertura: float = 1.3
-
 var variantes_activas: Dictionary = {
 	"NO": "",
 	"NE": "",
@@ -145,19 +140,11 @@ func mutar_con_neblina(
 	if _efecto_niebla == null:
 		_efecto_niebla = get_node_or_null("EfectoNieblaMutacion") as EfectoNieblaMutacion
 
-	var t_cierre: float = duracion_cierre
-	if t_cierre < 0.0:
-		t_cierre = _efecto_niebla.duracion_cierre if _efecto_niebla != null else niebla_duracion_cierre
-
-	var t_apertura: float = duracion_apertura
-	if t_apertura < 0.0:
-		t_apertura = _efecto_niebla.duracion_apertura if _efecto_niebla != null else niebla_duracion_apertura
-
-	var t_pausa: float = pausa_oscuridad
-	if t_pausa < 0.0:
-		t_pausa = _efecto_niebla.pausa_oscuridad if _efecto_niebla != null else niebla_pausa_oscuridad
-
 	if _efecto_niebla != null:
+		var t_cierre: float = duracion_cierre if duracion_cierre >= 0.0 else _efecto_niebla.duracion_cierre
+		var t_apertura: float = duracion_apertura if duracion_apertura >= 0.0 else _efecto_niebla.duracion_apertura
+		var t_pausa: float = pausa_oscuridad if pausa_oscuridad >= 0.0 else _efecto_niebla.pausa_oscuridad
+
 		_efecto_niebla.cubrir(t_cierre)
 		await _efecto_niebla.ceguera_alcanzada
 		mutar_sectores_lejanos()
