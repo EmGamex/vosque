@@ -8,14 +8,16 @@ const ZOOM_GOD_VIEW := Vector2(0.225, 0.225)
 var god_view_activo: bool = false
 var debug_dibujar_cuadrantes: bool = false
 var debug_dibujar_corredores: bool = false
+var niebla_desactivada: bool = false
 
 
-func restaurar_desde_config(cfg: Node, check_god_view: CheckBox, check_corr: CheckBox, check_cuad: CheckBox) -> void:
+func restaurar_desde_config(cfg: Node, check_god_view: CheckBox, check_corr: CheckBox, check_cuad: CheckBox, check_niebla: CheckBox = null) -> void:
 	if cfg == null:
 		return
 	god_view_activo = cfg.god_view_activo
 	debug_dibujar_cuadrantes = cfg.debug_dibujar_cuadrantes
 	debug_dibujar_corredores = cfg.debug_dibujar_corredores
+	niebla_desactivada = cfg.get("niebla_desactivada") if "niebla_desactivada" in cfg else false
 
 	if check_god_view != null:
 		check_god_view.set_pressed_no_signal(god_view_activo)
@@ -23,6 +25,8 @@ func restaurar_desde_config(cfg: Node, check_god_view: CheckBox, check_corr: Che
 		check_corr.set_pressed_no_signal(debug_dibujar_corredores)
 	if check_cuad != null:
 		check_cuad.set_pressed_no_signal(debug_dibujar_cuadrantes)
+	if check_niebla != null:
+		check_niebla.set_pressed_no_signal(niebla_desactivada)
 
 
 func inicializar_camaras(context: DebugContext) -> void:
@@ -90,6 +94,20 @@ func set_dibujar_cuadrantes(activo: bool, cfg: Node) -> void:
 	debug_dibujar_cuadrantes = activo
 	if cfg != null:
 		cfg.debug_dibujar_cuadrantes = activo
+
+
+func set_desactivar_niebla(desactivar: bool, context: DebugContext, cfg: Node) -> void:
+	niebla_desactivada = desactivar
+	if cfg != null and "niebla_desactivada" in cfg:
+		cfg.niebla_desactivada = desactivar
+	aplicar_estado_niebla(context)
+
+
+func aplicar_estado_niebla(context: DebugContext) -> void:
+	if context == null:
+		return
+	if context.target_efecto_niebla != null and is_instance_valid(context.target_efecto_niebla):
+		context.target_efecto_niebla.desactivado = niebla_desactivada
 
 
 func forzar_mutacion(escenario: Node2D) -> void:

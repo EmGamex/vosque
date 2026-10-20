@@ -94,6 +94,7 @@ var god_view_activo: bool:
 @onready var check_god_view: CheckBox = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario/VBox/CheckGodView
 @onready var check_corredores: CheckBox = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario/VBox/CheckCorredores
 @onready var check_cuadrantes: CheckBox = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario/VBox/CheckCuadrantes
+@onready var check_desactivar_niebla: CheckBox = get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario/VBox/CheckDesactivarNiebla") as CheckBox
 @onready var check_visual_debug: CheckBox = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Enemigo/VBox/CheckVisualDebug
 
 # Labels - Pestaña Jugador
@@ -183,7 +184,7 @@ func _restaurar_estado_desde_config() -> void:
 
 	modo_actual = cfg.modo_actual as ModoVisual
 	cheats.restaurar_desde_config(cfg, check_estamina_infinita, check_god_mode)
-	scenario.restaurar_desde_config(cfg, check_god_view, check_corredores, check_cuadrantes)
+	scenario.restaurar_desde_config(cfg, check_god_view, check_corredores, check_cuadrantes, check_desactivar_niebla)
 	enemy_ctrl.restaurar_desde_config(cfg, check_visual_debug)
 	physics.set_proporcional(cfg.escalado_proporcional_activo, cfg)
 	if check_proporcional != null:
@@ -244,6 +245,7 @@ func _buscar_nodos_objetivo() -> void:
 	var escena_actual: Node = get_tree().current_scene
 	context.buscar_nodos(escena_actual, scenario.god_view_activo)
 	physics.inicializar_valores(context.target_character, get_node_or_null("/root/DebugConfig"), _obtener_ui_fisicas())
+	scenario.aplicar_estado_niebla(context)
 
 
 func _actualizar_telemetria() -> void:
@@ -413,6 +415,9 @@ func _on_check_corredores_toggled(toggled_on: bool) -> void:
 func _on_check_cuadrantes_toggled(toggled_on: bool) -> void:
 	scenario.set_dibujar_cuadrantes(toggled_on, get_node_or_null("/root/DebugConfig"))
 	_actualizar_visibilidad()
+
+func _on_check_desactivar_niebla_toggled(toggled_on: bool) -> void:
+	scenario.set_desactivar_niebla(toggled_on, context, get_node_or_null("/root/DebugConfig"))
 
 func _on_check_visual_debug_enemigo_toggled(toggled_on: bool) -> void:
 	enemy_ctrl.set_visual_debug(toggled_on, context.target_enemigo, get_node_or_null("/root/DebugConfig"))

@@ -7,6 +7,15 @@ extends CanvasLayer
 signal ceguera_alcanzada
 signal niebla_disipada
 
+@export_group("Depuración y Anulación")
+## Desactiva por completo la niebla visual y permite que las mutaciones ocurran instantáneamente.
+@export var desactivado: bool = false:
+	set(val):
+		desactivado = val
+		visible = not desactivado
+		if not desactivado and _material_shader != null:
+			_material_shader.set_shader_parameter("radio_interno", radio_despejado)
+
 @export_group("Objetivo de Enfoque")
 ## Nodo al que la niebla sigue dinámicamente en pantalla (incluso cuando la cámara se detiene por límites).
 @export var objetivo_jugador: Node2D
@@ -55,6 +64,7 @@ var _tween: Tween
 
 func _ready() -> void:
 	layer = 15
+	visible = not desactivado
 	if color_rect == null:
 		color_rect = get_node_or_null("ColorRect") as ColorRect
 
@@ -139,6 +149,10 @@ func _actualizar_parametros_shader() -> void:
 
 
 func cubrir(duracion: float = -1.0) -> void:
+	if desactivado:
+		ceguera_alcanzada.emit()
+		return
+
 	var t: float = duracion if duracion >= 0.0 else duracion_cierre
 	if _tween != null and _tween.is_valid():
 		_tween.kill()
@@ -161,6 +175,10 @@ func cubrir(duracion: float = -1.0) -> void:
 
 
 func despejar(duracion: float = -1.0) -> void:
+	if desactivado:
+		niebla_disipada.emit()
+		return
+
 	var t: float = duracion if duracion >= 0.0 else duracion_apertura
 	if _tween != null and _tween.is_valid():
 		_tween.kill()

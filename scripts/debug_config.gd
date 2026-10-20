@@ -18,6 +18,9 @@ var debug_dibujar_vectores_ia: bool = false
 # Cámara Cenital (God View)
 var god_view_activo: bool = false
 
+# Efectos visuales de escenario
+var niebla_desactivada: bool = false
+
 # Ajustes de físicas y velocidades modificados por sliders (null si no han sido modificados)
 var fisicas_personalizadas: bool = false
 var vel_normal: float = 800.0

@@ -99,3 +99,27 @@ func test_camara_dios_zoom_y_escenario() -> void:
 	assert_true(cam_dios != null, "Debe existir CamaraDios en maain.tscn")
 	assert_eq(cam_dios.zoom, Vector2(0.225, 0.225), "CamaraDios debe tener zoom (0.225, 0.225)")
 	inst.free()
+
+
+func test_desactivar_niebla_en_debug() -> void:
+	var escena_debug: PackedScene = load("res://escenas/debug_menu.tscn")
+	assert_true(escena_debug != null, "debug_menu.tscn debe cargar")
+	var menu: DebugMenu = escena_debug.instantiate() as DebugMenu
+	assert_true(menu != null, "DebugMenu debe instanciarse")
+
+	var check_niebla = menu.get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario/VBox/CheckDesactivarNiebla") as CheckBox
+	assert_true(check_niebla != null, "Debe existir CheckDesactivarNiebla en la pestaña Escenario")
+
+	# Probar activación y desactivación de la niebla en el scenario controller
+	var cfg = load("res://scripts/debug_config.gd").new()
+	cfg.niebla_desactivada = false
+	menu.scenario.set_desactivar_niebla(true, menu.context, cfg)
+	assert_true(menu.scenario.niebla_desactivada, "La niebla debe quedar marcada como desactivada")
+	assert_true(cfg.niebla_desactivada, "Debe persistirse en cfg")
+
+	menu.scenario.set_desactivar_niebla(false, menu.context, cfg)
+	assert_false(menu.scenario.niebla_desactivada, "La niebla debe quedar habilitada de nuevo")
+	assert_false(cfg.niebla_desactivada, "Debe persistirse falso en cfg")
+
+	cfg.free()
+	menu.free()
