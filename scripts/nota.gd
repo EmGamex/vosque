@@ -28,6 +28,12 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	if Engine.is_editor_hint():
+		if _visual_papel != null:
+			_visual_papel.position.y = 0.0
+		if _luz_baliza != null:
+			_luz_baliza.energy = ENERGIA_BASE
+		return
 	if _recolectada:
 		return
 	_tiempo += delta
@@ -57,9 +63,12 @@ func recolectar() -> void:
 	if _particulas_recogida != null:
 		_particulas_recogida.emitting = true
 		var tiempo_vida: float = maxf(_particulas_recogida.lifetime, 0.4)
-		var arbol := get_tree()
-		if arbol != null:
-			arbol.create_timer(tiempo_vida).timeout.connect(queue_free)
+		if is_inside_tree():
+			var arbol := get_tree()
+			if arbol != null:
+				arbol.create_timer(tiempo_vida).timeout.connect(queue_free)
+			else:
+				queue_free()
 		else:
 			queue_free()
 	else:

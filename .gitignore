@@ -9,3 +9,7 @@ addons/*
 # Temporary and export archives
 *.zip
 vosque-proyecto/
+ejecutables/
+ejecutable/
+vosque-v2/
+

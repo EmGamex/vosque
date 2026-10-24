@@ -8,3 +8,5 @@ gradient = SubResource("Gradient_kcog2")
 width = 256
 height = 256
 fill = 1
+fill_from = Vector2(0.4982639, 0.4982639)
+fill_to = Vector2(0.8003472, 0.23090278)
