@@ -98,9 +98,9 @@ El proyecto cuenta con un plugin de editor dedicado (`character_bar.gd`) que per
 
 ### 3.4. Linterna Atmosférica y Desacople de Orientación
 * **Comportamiento:** La linterna es un elemento **decorativo y atmosférico siempre activo**. No requiere recarga de baterías ni posee interruptor de apagado manual.
-* **Estructura de Iluminación (`PointLight2D`):**
-  1. **Halo de Proximidad (`LuzCuerpo`):** Luz radial tenue alrededor del cuerpo del personaje para asegurar que siempre vea sus pies y los obstáculos inmediatos.
-  2. **Haz Direccional (`LinternaFrontal`):** Cono de luz frontal que proyecta visión a media distancia hacia donde apunta.
+* **Estructura de Iluminación Optimizada para Web:**
+  1. **Halo de Proximidad (`LuzCuerpo`):** Para economizar pases de renderizado en WebGL 2.0 (`gl_compatibility`), se implementa como un `Sprite2D` radial translúcido con material `CanvasItemMaterial(blend_mode = BLEND_MODE_ADD)`, proporcionando iluminación suave en los pies sin generar un pase de luz real en GPU.
+  2. **Haz Direccional (`LinternaFrontal`):** Un nodo `PointLight2D` frontal (sin sombras dinámicas `shadow_enabled = false`) que proyecta visión a media distancia hacia donde apunta.
 * **Desacople y Conmutación Inteligente de Orientación:**
   - El sprite del personaje orienta sus animaciones según el vector de entrada de movimiento (`velocity`).
   - **Detección Dinámica de Entrada (Ratón vs. Teclado):** Para evitar que en Web la linterna quede anclada a la última posición estática del cursor tras hacer clic en la pantalla de inicio:

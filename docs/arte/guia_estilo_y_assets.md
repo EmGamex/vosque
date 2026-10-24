@@ -89,13 +89,19 @@ Para poblar la arena completa de $4320 \times 4320\text{ px}$ (4 cuadrantes de $
 | `tronco_caido` | Tronco tumbado horizontal | Capa 2 (`Obstaculos_Bajos`) | $192 \times 64$ px | Obstáculo bajo para superar con el salto *Dive*. Puede orientarse horizontal o verticalmente. |
 | `valla_alambre_tramo` | Tramo de valla de estacas | Capa 1 (`Mundo_Alto`) | $128 \times 64$ px | Módulo repetido a lo largo del perímetro exterior de $4320\text{ px}$ por lado. |
 
-### 2.6. Pantallas de Impacto e Iluminación
+### 2.6. Pantallas de Impacto e Iluminación (Presupuesto WebGL 2.0)
+
+En el renderizador `gl_compatibility`, cada `PointLight2D` activo genera un pase adicional de renderizado sobre cada elemento en pantalla que intersecte su área. Para evitar la sobrecarga de fragmentos en Web:
+
+* **Linterna Frontal:** Un único nodo `PointLight2D` cónico con textura `luz_linterna_cono` y **`shadow_enabled = false`** (sin sombras proyectadas dinámicas de 360°, las cuales son extremadamente costosas en WebGL).
+* **Halos Secundarios:** En lugar de múltiples nodos `PointLight2D`, el halo corporal del protagonista (`luz_halo_corporal`) y el halo de la nota se implementan mediante `Sprite2D` con material aditivo (`CanvasItemMaterial` en `BLEND_MODE_ADD`). Esto ofrece el mismo efecto visual de iluminación sobre la penumbra de `CanvasModulate` sin pases extras de luz en GPU.
+* **Ojos Reflectantes:** Los ojos de la criatura usan `LIGHT_MODE_UNSHADED` en su material, brillando con total nitidez en la oscuridad con coste computacional despreciable.
 
 | ID de Asset | Descripción | Resolución | Comportamiento / Integración |
 | :--- | :--- | :---: | :--- |
 | `game_over_jumpscare` | Ilustración de alto impacto del rostro o garra de la bestia en tinta negra y rojo sangre | $512 \times 512$ px | Aparece instantáneamente en la pantalla de Game Over con sacudida brusca de pantalla (*camera shake*), estática y destello rojo estroboscópico. |
-| `luz_linterna_cono` | Gradiente radial de cono angular para la linterna frontal | $512 \times 512$ px | Asignado al `PointLight2D` frontal del protagonista. |
-| `luz_halo_corporal` | Gradiente radial circular suave de penumbra | $256 \times 256$ px | Luz ambiental cercana alrededor del cuerpo del protagonista. |
+| `luz_linterna_cono` | Gradiente radial de cono angular para la linterna frontal | $512 \times 512$ px | Asignado al `PointLight2D` frontal del protagonista (sin sombras dinámicas). |
+| `luz_halo_corporal` | Gradiente radial circular suave de penumbra | $256 \times 256$ px | Sprite aditivo (`BLEND_MODE_ADD`) centrado en el protagonista. |
 
 ---
 

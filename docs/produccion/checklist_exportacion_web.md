@@ -18,12 +18,24 @@ Para garantizar la estética claustrofóbica y una lectura espacial simétrica i
 
 ---
 
-## 2. Parámetros del Motor (Godot 4)
+## 2. Parámetros del Motor (Godot 4) y Presupuesto de Rendimiento
 
 * **Renderizador Gráfico:** `gl_compatibility` (basado en WebGL 2.0). Ofrece la mayor tasa de cuadros y compatibilidad universal en navegadores de escritorio (Chrome, Firefox, Edge, Safari) sin requerir WebGPU.
 * **Hilos de Ejecución (Threads Deshabilitados):**
   - **Parámetro del Preset:** `Export > Web > Thread Support = Disabled`.
   - **Justificación Crítica:** La activación de hilos múltiples en navegadores exige el aislamiento de origen cruzado mediante cabeceras HTTP `Cross-Origin-Opener-Policy (COOP)` y `Cross-Origin-Embedder-Policy (COEP)`. En plataformas como Newgrounds e itch.io, los juegos se ejecutan dentro de `<iframe>` con dominios de contenido segregados donde estas cabeceras causan bloqueos de carga. Deshabilitar hilos garantiza que el juego cargue instantáneamente y sin restricciones.
+* **Exclusión de Herramientas de Desarrollo (`exclude_filter`):**
+  - En `export_presets.cfg` dentro del preset `Web`, se debe definir:
+    ```ini
+    exclude_filter="addons/godot_ai/*, addons/personaje_tools/*, tests/*, docs/*"
+    ```
+  - **Efecto:** Mantiene el paquete `.pck` por debajo de ~15 MB, reduce la huella de memoria en el navegador y evita que clientes o servidores de integración MCP intenten ejecutarse en producción.
+* **Desactivación de Módulos Innecesarios:**
+  - En `project.godot`, evitar motores de física 3D adicionales como Jolt Physics (`3d/physics_engine`), ya que el proyecto es estrictamente 2D.
+* **Control de Fill-Rate en Pantallas HiDPI (Retina / 4K):**
+  - Mantener `window/stretch/aspect = "keep"` y verificar `display/window/dpi/allow_hidpi = false` (o controlado) para evitar que resoluciones 4K multipliquen por 4 el número de fragmentos procesados por los shaders y las luces 2D en GPUs integradas.
+* **Pre-calentamiento (*Shader & Particle Warm-up*):**
+  - Al compilar en WebGL 2.0, los shaders y partículas de `CPUParticles2D` (como las chispas de la nota o el shader de transición de iris) pueden provocar un micro-congelamiento (*stutter*) en su primer uso. Pre-calentar o pre-instanciar estos recursos en un frame oculto durante la pantalla de inicio asegura una experiencia fluida.
 * **Exportación PWA:** Desactivada para Web estándar (a menos que se desee soporte offline explícito).
 
 ---

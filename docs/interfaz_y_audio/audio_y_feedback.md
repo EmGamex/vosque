@@ -39,13 +39,27 @@ flowchart TD
 | Bus de Audio | Volumen Base | Efectos Asignados | Propósito |
 | :--- | :---: | :--- | :--- |
 | **Master** | $0.0\text{ dB}$ | `AudioEffectLowPassFilter` (bypass) | Mezcla final general; el filtro paso-bajo se activa en estado de fatiga o salud crítica. |
-| **Ambiente** | $-6.0\text{ dB}$ | `AudioEffectReverb` tenue | Viento sibilante continuo y crujidos lejanos de ramas secas. |
+| **Ambiente** | $-6.0\text{ dB}$ | Pre-procesado (Bypass en motor) | Viento sibilante continuo y crujidos lejanos con reverberación ya renderizada en el archivo `.ogg`. |
 | **Efectos** | $-2.0\text{ dB}$ | Ninguno | Pasos en hojarasca, jadeos de recuperación, salto y rasgado de papel. |
-| **Criatura** | $+1.0\text{ dB}$ | Distorsión / Pitch Shift | Sonidos guturales, zumbido de estática y garras rozando la madera. |
+| **Criatura** | $+1.0\text{ dB}$ | Pre-procesado (Bypass en motor) | Sonidos guturales y estática con distorsión ya horneada en el archivo. |
 
 ---
 
-## 3. Catálogo de Efectos de Sonido (SFX)
+## 3. Optimización para WebAudio y Navegadores (`threads = false`)
+
+En compilaciones HTML5 sin soporte de hilos, el motor de mezcla de audio se ejecuta en el mismo hilo de CPU que las físicas y el renderizado:
+
+1. **Efectos Pre-procesados (*Baked DSP*):**
+   - Efectos pesados en tiempo real como `AudioEffectReverb` o distorsiones continuas pueden generar crepitaciones (*audio crackling*) si el framerate fluctúa. Por ello, **la reverberación del bosque y la distorsión del monstruo deben venir pre-procesadas directamente en las pistas de audio** (.ogg/.wav), reservando únicamente el `AudioEffectLowPassFilter` dinámico en el bus `Master` para la mecánica de fatiga.
+2. **Límites de Polifonía (`max_polyphony`):**
+   - En todos los nodos `AudioStreamPlayer2D` (como los pasos del protagonista o el rasgado de la nota), fijar `max_polyphony = 2` o `3` para evitar que llamadas rápidas acumulen instancias virtuales en WebAudio.
+3. **Formatos de Archivo:**
+   - Ambientes y pistas continuas: formato `.ogg` con compresión de calidad media (Q4 a Q6) para minimizar el tamaño en megabytes sin pérdida perceptible.
+   - Efectos cortos y críticos de latencia (saltos, clics, impactos): archivos `.wav` de 16-bit mono.
+
+---
+
+## 4. Catálogo de Efectos de Sonido (SFX)
 
 ### 3.1. Jugador
 * **Pasos en Hojarasca:** Sonido seco y crujiente reproducido mediante `AudioStreamPlayer2D` con modulación de pitch aleatoria ($\pm 0.08$) para evitar monotonía. Su cadencia acelera automáticamente al entrar en `SPRINT`.

@@ -41,6 +41,9 @@ flowchart TD
 > 💻 **Script en motor:** [`scripts/enemigo.gd`](../../scripts/enemigo.gd)  
 > 📄 **Fórmulas de balance:** [Dificultad y Balance](dificultad_y_balance.md)
 
+* **Ciclo de Vida y Aparición (Nota 0 vs Nota 1):**
+  - **Fase Tutorial (Nota 0):** El monstruo literalmente no aparece en el mapa para el jugador. Para evitar caídas de cuadros (*frame jank*) por instanciación o carga de shaders en WebGL/WASM, el nodo preexiste en la escena pero se mantiene en **Hibernación Total**: `visible = false`, `process_mode = Node.PROCESS_MODE_DISABLED` y coordenadas de reposo fuera del mapa (`Vector2(-99999, -99999)`).
+  - **Despertar en Nota 1:** Al recoger la primera página, el Game Director reposiciona la entidad en un sector seguro y distante, restaura `visible = true`, `process_mode = Node.PROCESS_MODE_INHERIT` y activa la persecución a $500\text{ px/s}$.
 * **Físicas e Inercia:**
   - `speed`: Inicia en $500.0\text{ px/s}$ y escala con las notas hasta un tope máximo de $920.0\text{ px/s}$.
   - `acceleration`: $3500.0\text{ px/s}^2$ constantes (giro con inercia controlada, permitiendo al jugador sacarle ventaja en curvas cerradas).

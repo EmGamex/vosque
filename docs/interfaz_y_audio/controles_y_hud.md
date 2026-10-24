@@ -68,6 +68,12 @@ Para garantizar un onboarding inmediato que no rompa la inmersión cenital ni re
 ### 3.3. Protocolo de Desvanecimiento Forzado
 * Si el jugador se dirige directamente a la primera nota y la recolecta antes de completar los 3 pasos, el tutorial se desvanece instantáneamente para no entorpecer la cacería de la criatura.
 
+### 3.4. Ausencia Total del Monstruo durante el Tutorial (Zona Segura Inicial)
+* **El monstruo literalmente no aparece en el mapa:** Durante toda la fase de tutorial (Nota 0), el monstruo no está presente físicamente ni visible en el escenario.
+* **Objetivo de diseño:** Ofrecer un entorno seguro y libre de estrés para que el jugador aprenda la locomoción básica, el salto de obstáculos y la aceleración con sprint, explorando la penumbra a su propio ritmo hasta localizar la primera nota.
+* **Arquitectura de Motor (Hibernación Total):** Para garantizar cero tirones de framerate (*jank*) en la exportación Web (WASM/WebGL) por instanciación o compilación de shaders al recolectar la nota, el nodo de la criatura preexiste en el árbol pero en **hibernación completa**: `visible = false`, `process_mode = Node.PROCESS_MODE_DISABLED` y coordenadas de espera fuera del escenario (`Vector2(-99999, -99999)`).
+* **El Despertar (Nota 1):** En el instante en que se recoge la primera página, el Game Director reposiciona a la criatura en un sector distante y seguro fuera de pantalla, restaura `visible = true`, `process_mode = Node.PROCESS_MODE_INHERIT` y activa la persecución a $500\text{ px/s}$.
+
 ---
 
 ## 3. Menú Principal (Key Art y Portada Dinámica)

@@ -204,3 +204,16 @@ Para garantizar que la nueva nota nunca aparezca en las garras del enemigo y que
 Dado que transcurren $1.3\text{ s}$ de cierre de niebla radial tras tocar una nota:
 * El cuadrante activo del jugador **se evalúa en el instante exacto de oscuridad total** (`ceguera_alcanzada`), y no en el momento inicial del toque de la nota. De este modo, si el jugador cruza $X=0$ o $Y=0$ durante el cierre de la niebla, el sector donde efectivamente se encuentre será el preservado.
 * Los corredores seguros de $160\text{ px}$ ($80\text{ px}$ a cada lado del eje) garantizan que aunque un cuadrante vecino mute, ningún obstáculo sólido aparezca dentro de la franja transitable inmediata donde camina el jugador.
+
+---
+
+## 7. Optimización de Mutación para WebAssembly Mono-Hilo (`threads = false`)
+
+Al compilar a la Web con hilos desactivados, cualquier trabajo excesivo en el árbol de escenas o en el servidor de físicas 2D compite directamente con el bucle de renderizado y el audio:
+
+1. **Evitar Búsquedas Recursivas con `find_children`:**
+   - En lugar de invocar `find_children("", "Marker2D", true, false)` sobre toda la jerarquía de variantes en cada mutación, el sistema debe aprovechar los grupos indexados nativos en C++ de Godot (`get_tree().get_nodes_in_group("puntos_nota")`) o mantener un arreglo cacheado de marcadores en el script raíz de cada variante. Esto reduce el coste de búsqueda a $O(1)$/$O(k)$ marcadores sin recorrer árboles y rocas.
+2. **Consolidación de Colisionadores Estáticos:**
+   - Cada nodo `StaticBody2D` añade un cuerpo rígido independiente al servidor de física (`PhysicsServer2D`). Para un rendimiento óptimo en WebGL, cada variante debe consolidar sus obstáculos en **pocos `StaticBody2D` maestros** (uno para Capa 1 y otro para Capa 2 con múltiples formas `CollisionShape2D` asociadas) o utilizar `TileMapLayer`.
+3. **Estrategia de *Sector Pooling* (Alternativa a `instantiate()` / `queue_free()`):**
+   - Si en el futuro las variantes aumentan su densidad de objetos y provocan micro-tirones durante `mutar_sectores_lejanos`, el gestor `Escenario` debe pre-instanciar el catálogo de variantes al cargar la partida y alternar su estado activo (`visible`, `process_mode` y `collision_layer`/`collision_mask`) en lugar de instanciar y destruir nodos en caliente durante la ventana de ceguera.

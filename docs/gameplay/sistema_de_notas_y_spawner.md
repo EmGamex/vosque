@@ -18,14 +18,14 @@ En los juegos clásicos de recolección de notas, el jugador suele detenerse a l
 Nota (Area2D) [scripts/nota.gd, Capa 5: Interactuables]
 ├── VisualPapel (Sprite2D)          # Textura de papel antiguo arrugado (64x64 px)
 ├── CollisionShape2D                # Círculo de colisión física (radio: 32 px)
-├── LuzBaliza (PointLight2D)        # Resplandor radial ámbar tenue (~200 px)
+├── LuzBaliza (Sprite2D o PointLight2D) # Resplandor radial ámbar (~200 px)
 └── ParticulasRecogida (CPUParticles2D) # Emisión puntual de micro-chispas al recolectarse
 ```
 
-### 2.1. Parámetros del Nodo `PointLight2D`
+### 2.1. Iluminación y Rendimiento en WebGL 2.0
+* **Variante Optimizada Web (Recomendada):** Implementar `LuzBaliza` como un `Sprite2D` con gradiente radial y `CanvasItemMaterial(blend_mode = BLEND_MODE_ADD)`, modulando `modulate.a` senoidalmente ($\pm 0.15$ a $1.5\text{ Hz}$). Esto emula a la perfección el pulso de baliza sin añadir un pase de iluminación multipase en `gl_compatibility`.
+* **Variante con `PointLight2D`:** Si se utiliza `PointLight2D`, asegurar `shadow_enabled = false` y energía moderada ($0.8$).
 * **Color:** Blanco cálido / pergamino (`Color(1.0, 0.95, 0.8, 1.0)`).
-* **Energía Base:** $0.8$ con una oscilación senoidal sutil ($\pm 0.15$) a $1.5\text{ Hz}$ para generar un pulso orgánico de baliza.
-* **Textura:** Gradiente radial suave sin aristas duras.
 
 ### 2.2. Animación Procedural de Flotación
 Para evitar requerir spritesheets adicionales, el nodo `VisualPapel` realiza una levitación suave en motor:

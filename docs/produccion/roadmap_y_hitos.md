@@ -85,8 +85,9 @@ flowchart TD
   - [ ] Diseñar el HUD in-game y vincular el `ProgressBar` nativo con la señal `estamina_cambiada`.
   - [x] Crear la estructura modular de [`escenas/escenario.tscn`](../../escenas/escenario.tscn) con valla perimetral fija y las sub-escenas de variantes con corredores de paso seguros.
   - [x] Programar la lógica de mutación de los 3 sectores lejanos, niebla de transición (`EfectoNieblaMutacion`) y reposicionamiento anti-atascamiento del monstruo.
-  - [ ] Crear la entidad coleccionable [`escenas/nota.tscn`](../../escenas/nota.tscn) con halo tenue (`PointLight2D`), recolección arcade instantánea y escalado de velocidad del enemigo según el modelo cuantitativo acotado ($500 \to 920\text{ px/s}$).
-  - [ ] Implementar el orquestador Game Director en [`scripts/maain.gd`](../../scripts/maain.gd) conectando las señales de recolección, mutación y fin de partida.
+  - [x] Crear la entidad coleccionable [`escenas/nota.tscn`](../../escenas/nota.tscn) con baliza luminosa y recolección arcade instantánea.
+  - [x] Implementar el orquestador Game Director en [`scripts/maain.gd`](../../scripts/maain.gd) conectando las señales de recolección, mutación y el algoritmo de Spawner con exclusión espacial.
+  - [ ] Implementar el escalado de velocidad del enemigo según el modelo cuantitativo acotado ($500 \to 920\text{ px/s}$) y condición de derrota.
   - [x] Implementar suite de telemetría y menú unificado de diagnóstico in-game en [`escenas/debug_menu.tscn`](../../escenas/debug_menu.tscn).
   - [ ] Integrar el nodo de menú de pausa en [`gestor_escenas.gd`](../../scripts/gestor_escenas.gd) pausando solo el subárbol de la partida activa.
   - [x] Configurar preset de exportación Web en [`export_presets.cfg`](../../export_presets.cfg) y preparar build `index.html` para navegador.

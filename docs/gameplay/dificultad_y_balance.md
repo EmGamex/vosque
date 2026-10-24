@@ -10,8 +10,8 @@ El juego utiliza un escalado continuo de peligro por nota recolectada dentro de 
 
 | Nota Recogida | Fase de Comportamiento | Velocidad Monstruo | Relación vs Jugador ($800\text{ px/s}$) | Dinámica de Juego |
 | :---: | :--- | :---: | :---: | :--- |
-| **0 (Inicio)** | *Inactivo / Acecho Silente* | $0\text{ px/s}$ | $0\%$ | Fase inicial de aclimatación y tutorial sobre la cabeza del personaje. El monstruo no persigue ni ataca. El jugador explora la oscuridad y ubica la primera baliza luminosa. |
-| **Nota 1** | *Despertar y Patrulla Inicial* | $500\text{ px/s}$ | $62.5\%$ | **Despertar de la Criatura:** La criatura se activa e inicia la persecución tras recoger la primera página. El jugador puede dejar atrás al enemigo caminando en línea recta. |
+| **0 (Inicio)** | *Hibernación / Fase Tutorial* | $0\text{ px/s}$ | $0\%$ | **El monstruo literalmente no aparece en el mapa.** Fase de aclimatación y tutorial sobre la cabeza del personaje. En motor reside en hibernación total (`process_mode = DISABLED`, invisible, fuera de mapa). El jugador explora con seguridad la penumbra hasta ubicar la primera baliza luminosa. |
+| **Nota 1** | *Materialización y Despertar* | $500\text{ px/s}$ | $62.5\%$ | **Despertar de la Criatura:** La criatura se reposiciona en un sector distante y seguro, se reactiva (`process_mode = INHERIT`) e inicia la persecución a $500\text{ px/s}$. El jugador puede dejar atrás al enemigo caminando en línea recta. |
 | **Nota 2** | *Patrulla Lenta* | $580\text{ px/s}$ | $72.5\%$ | El sonido de pasos y crujidos del monstruo se vuelve más persistente. |
 | **Nota 3** | *Patrulla Lenta* | $620\text{ px/s}$ | $77.5\%$ | Comienza a cerrarse la brecha de distancia si el jugador se detiene a inspeccionar callejones sin salida. |
 | **Nota 4** | *Persecución Media* | $680\text{ px/s}$ | $85.0\%$ | Los errores de navegación entre árboles comienzan a costar distancia valiosa. |
@@ -31,8 +31,8 @@ Para garantizar coherencia absoluta entre el código y el diseño, el escalado d
 ### 2.1. Tabla de Valores Discretos (Arreglo de Calibración)
 ```gdscript
 const VELOCIDADES_MONSTRUO: Array[float] = [
-    0.0,   # Nota 0 (Inactivo / Tutorial)
-    500.0, # Nota 1 (Despertar)
+    0.0,   # Nota 0 (Ausente del mapa / Tutorial)
+    500.0, # Nota 1 (Materialización y Despertar)
     580.0, # Nota 2
     620.0, # Nota 3
     680.0, # Nota 4

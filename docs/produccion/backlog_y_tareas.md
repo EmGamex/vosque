@@ -67,9 +67,9 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 - [x] **Persecución Básica Vectorial:** Movimiento hacia el jugador con `move_and_slide()` y aceleración controlada (`3500 px/s²`).
 - [x] **Rotación Continua 360°:** El nodo visual orienta sus garras y cabeza siguiendo el vector instantáneo de velocidad (`velocity.angle()`).
 - [x] **Geometría de Detección:** Colisión física sólida ($42\text{ px}$) y `AreaCaptura` letal ($56\text{ px}$) con `RayCastVision`.
-- [ ] **Activación Diferida (Inactivo en Nota 0 -> Despertar en Nota 1):**
-  - [ ] Propiedad `activo = false` al iniciar la sesión (velocidad $0\text{ px/s}$, `AreaCaptura.monitoring = false`).
-  - [ ] Método `activar_persecucion()` disparado por el Game Director al recoger la primera página a $500\text{ px/s}$.
+- [ ] **Hibernación Inicial y Despertar en Nota 1 (process_mode = DISABLED -> Reposicionar y Activar):**
+  - [ ] En Nota 0 (tutorial), el monstruo no aparece en el mapa para el jugador; en motor reside en hibernación total (`visible = false`, `process_mode = Node.PROCESS_MODE_DISABLED`, fuera de escena).
+  - [ ] Al recoger la Nota 1, el Game Director reposiciona al monstruo a una distancia segura fuera de pantalla, restaura `visible = true`, `process_mode = Node.PROCESS_MODE_INHERIT` y activa la persecución a $500\text{ px/s}$.
 - [ ] **Escalado Cuantitativo de Dificultad:**
   - [ ] Implementar la progresión mediante arreglo discreto `VELOCIDADES_MONSTRUO` ($0 \to 500 \to 580 \dots 920\text{ px/s}$).
   - [ ] Tope absoluto de $920\text{ px/s}$ para garantizar la maniobrabilidad del jugador durante el sprint ($1000\text{ px/s}$).
@@ -82,18 +82,19 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 > 📄 **Especificación de referencia:** [`docs/gameplay/sistema_de_notas_y_spawner.md`](../gameplay/sistema_de_notas_y_spawner.md)  
 > 💻 **Archivos clave:** `escenas/nota.tscn`, `scripts/nota.gd`
 
-- [ ] **Entidad Nota (`Area2D`):**
-  - [ ] Solo 1 nota activa en escena en todo momento en Capa 5 (`Interactuables`).
-  - [ ] Halo luminoso propio (`PointLight2D` ámbar de $200\text{ px}$) con pulso armónico como baliza orientativa.
-  - [ ] Flotación senoidal procedural en `VisualPapel`.
-- [ ] **Recolección Fluida Estilo Arcade:**
-  - [ ] Detección por contacto sin bloquear el control ni desplegar textos obstructivos.
-  - [ ] Disparo de sonido de rasgado seco y brote de 8 micropartículas doradas/blancas.
-  - [ ] Desactivación diferida de colisión y emisión de señal `recolectada`.
-- [ ] **Algoritmo del Spawner Espacial:**
-  - [ ] Filtrado de candidatos en los 3 cuadrantes recién mutados.
-  - [ ] Restricción de distancias mínimas: $\ge 600\text{ px}$ al jugador y $\ge 800\text{ px}$ al monstruo.
-  - [ ] Exclusión mutua respecto al marcador utilizado para desatascar al enemigo.
+- [x] **Entidad Nota (`Area2D`):**
+  - [x] Solo 1 nota activa en escena en todo momento en Capa 5 (`Interactuables`).
+  - [x] Resplandor luminoso orientativo con pulso armónico.
+  - [x] Flotación senoidal procedural en `VisualPapel`.
+- [x] **Recolección Fluida Estilo Arcade:**
+  - [x] Detección por contacto sin bloquear el control ni desplegar textos obstructivos.
+  - [x] Partículas de recogida (`CPUParticles2D`) y desactivación diferida de colisión.
+  - [x] Emisión de señal `recolectada` coordinada con el Director.
+- [x] **Algoritmo del Spawner Espacial (`maain.gd`):**
+  - [x] Filtrado de candidatos en los 3 cuadrantes recién mutados.
+  - [x] Restricción de distancias mínimas: $\ge 600\text{ px}$ al jugador y $\ge 800\text{ px}$ al monstruo.
+  - [x] Exclusión mutua respecto al marcador utilizado para desatascar al enemigo.
+  - [x] Fallback robusto al marcador más lejano si todos quedan filtrados.
 
 ---
 
@@ -101,9 +102,11 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 > 📄 **Especificación de referencia:** [`docs/gameplay/arquitectura_de_partida_y_director.md`](../gameplay/arquitectura_de_partida_y_director.md)  
 > 💻 **Archivos clave:** `scripts/maain.gd`, `escenas/maain.tscn`
 
-- [ ] **Orquestador Principal de Partida (`maain.gd`):**
-  - [ ] Instanciación y colocación de jugador, monstruo y primera nota.
-  - [ ] Bus centralizado de señales: recolección $\to$ puntuación $\to$ aceleración $\to$ mutación $\to$ nuevo spawn.
+- [x] **Orquestador Principal de Partida (`maain.gd`):**
+  - [x] Referenciación segura de jugador, monstruo y escenario.
+  - [x] Bus centralizado de señales: recolección $\to$ puntuación $\to$ mutación $\to$ nuevo spawn diferido.
+- [ ] **Progresión y Fin de Partida:**
+  - [ ] Escalado dinámico de velocidad del enemigo según notas recolectadas.
   - [ ] Manejo de condición de derrota y salto a Game Over.
 - [ ] **Persistencia de High Score:**
   - [ ] Guardado en archivo local `user://highscore.save` (IndexedDB en navegador).
