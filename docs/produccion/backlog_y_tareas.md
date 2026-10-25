@@ -39,7 +39,7 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 ---
 
 ## 2. Módulo: Escenario y Topología 2x2
-> 📄 **Especificación de referencia:** [`docs/gameplay/mapa_y_sectores.md`](../gameplay/mapa_y_sectores.md)  
+> 📄 **Especificación de referencia:** [`docs/gameplay/mapa_y_sectores.md`](../gameplay/mapa_y_sectores.md), [`docs/gameplay/sistema_de_mutacion_y_niebla.md`](../gameplay/sistema_de_mutacion_y_niebla.md)  
 > 💻 **Archivos clave:** [`escenas/escenario.tscn`](../../escenas/escenario.tscn), [`scripts/escenario.gd`](../../scripts/escenario.gd)
 
 - [x] **Arena Base y Valla Perimetral:**
@@ -61,7 +61,7 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 ---
 
 ## 3. Módulo: Criatura (Monstruo) e IA
-> 📄 **Especificación de referencia:** [`docs/gameplay/mecanicas_y_entidades.md`](../gameplay/mecanicas_y_entidades.md), [`docs/gameplay/dificultad_y_balance.md`](../gameplay/dificultad_y_balance.md)  
+> 📄 **Especificación de referencia:** [`docs/gameplay/monstruo_e_ia.md`](../gameplay/monstruo_e_ia.md), [`docs/gameplay/dificultad_y_balance.md`](../gameplay/dificultad_y_balance.md)  
 > 💻 **Archivos clave:** [`scripts/enemigo.gd`](../../scripts/enemigo.gd), [`escenas/enemigo.tscn`](../../escenas/enemigo.tscn)
 
 - [x] **Persecución Básica Vectorial:** Movimiento hacia el jugador con `move_and_slide()` y aceleración controlada (`3500 px/s²`).
@@ -127,7 +127,7 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 ---
 
 ## 7. Módulo: Interfaz, HUD y Menús
-> 📄 **Especificación de referencia:** [`docs/interfaz_y_audio/controles_y_hud.md`](../interfaz_y_audio/controles_y_hud.md)  
+> 📄 **Especificación de referencia:** [`docs/interfaz_y_audio/controles_y_hud.md`](../interfaz_y_audio/controles_y_hud.md), [`docs/interfaz_y_audio/pantallas_y_menus.md`](../interfaz_y_audio/pantallas_y_menus.md), [`docs/interfaz_y_audio/gestor_de_escenas.md`](../interfaz_y_audio/gestor_de_escenas.md)  
 > 💻 **Archivos clave:** [`scripts/gestor_escenas.gd`](../../scripts/gestor_escenas.gd), [`scripts/menu_inicio.gd`](../../scripts/menu_inicio.gd), [`scripts/game_over.gd`](../../scripts/game_over.gd)
 
 - [x] **Gestor de Escenas y Fundidos:** Transiciones con velo negro entre Inicio, Partida y Game Over con patrón desacoplado *Call Down, Signal Up*.

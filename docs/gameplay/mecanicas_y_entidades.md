@@ -1,6 +1,6 @@
-# Mecánicas y Entidades
+# Mecánicas Generales y Core Gameplay Loop
 
-Este documento detalla el bucle principal de juego (*Core Gameplay Loop*), las entidades principales y sus especificaciones técnicas de implementación en Godot 4.
+Este documento detalla el bucle principal de juego (*Core Gameplay Loop*), la interacción global entre las entidades del mundo y la arquitectura sistémica de **Vosque**.
 
 ---
 
@@ -8,7 +8,7 @@ Este documento detalla el bucle principal de juego (*Core Gameplay Loop*), las e
 
 ```mermaid
 flowchart TD
-    A([Inicio de Partida en Bosque]) --> B[Explorar en la oscuridad con linterna]
+    A([Inicio de Partida en Bosque]) --> B[Explorar en penumbra con linterna]
     B --> C{¿Encontró Nota?}
     C -- Sí --> D[+1 Puntuación & Sonido Inquietante]
     D --> E[Aumentar Velocidad del Monstruo]
@@ -25,59 +25,40 @@ flowchart TD
 
 ---
 
-## 2. Especificación de Entidades
+## 2. Mapa de Entidades y Documentación Especializada
 
-### 2.1. Jugador (`CharacterBody2D`)
-> 📄 **Especificación completa:** Consulta [Personaje y Habilidades](personaje_y_habilidades.md) para el desglose detallado de atributos físicos, máquina de estados y arquitectura de nodos.
+Cada entidad de *Vosque* cuenta con un documento de diseño técnico dedicado donde se profundiza en su física, lógica de estados y jerarquía en motor:
 
-* **Movimiento:** 8 direcciones con aceleración y fricción altas (`5000 px/s²`) para control instantáneo y responsivo (`stop_threshold = 15 px/s`).
-* **Habilidad de Sprint:** Carrera a `1000 px/s` regulada por estamina ($100\text{ pts}$ con consumo de $-25\text{ pts/s}$).
-* **Salto Libre y Salto de Plancha (*Dive*):** Permite sortear obstáculos bajos (Capa 2) con una parábola en eje Z simulado ($0.45\text{ s}$ de vuelo) o plancha hacia adelante ($1200\text{ px/s}$) con inmovilidad de recuperación de $0.6\text{ s}$.
-* **Iluminación:** `PointLight2D` frontal libremente orientable en $360^\circ$ más un halo de proximidad tenue en los pies.
-
----
-
-### 2.2. El Monstruo (`CharacterBody2D`)
-> 💻 **Script en motor:** [`scripts/enemigo.gd`](../../scripts/enemigo.gd)  
-> 📄 **Fórmulas de balance:** [Dificultad y Balance](dificultad_y_balance.md)
-
-* **Ciclo de Vida y Aparición (Nota 0 vs Nota 1):**
-  - **Fase Tutorial (Nota 0):** El monstruo literalmente no aparece en el mapa para el jugador. Para evitar caídas de cuadros (*frame jank*) por instanciación o carga de shaders en WebGL/WASM, el nodo preexiste en la escena pero se mantiene en **Hibernación Total**: `visible = false`, `process_mode = Node.PROCESS_MODE_DISABLED` y coordenadas de reposo fuera del mapa (`Vector2(-99999, -99999)`).
-  - **Despertar en Nota 1:** Al recoger la primera página, el Game Director reposiciona la entidad en un sector seguro y distante, restaura `visible = true`, `process_mode = Node.PROCESS_MODE_INHERIT` y activa la persecución a $500\text{ px/s}$.
-* **Físicas e Inercia:**
-  - `speed`: Inicia en $500.0\text{ px/s}$ y escala con las notas hasta un tope máximo de $920.0\text{ px/s}$.
-  - `acceleration`: $3500.0\text{ px/s}^2$ constantes (giro con inercia controlada, permitiendo al jugador sacarle ventaja en curvas cerradas).
-  - `motion_mode`: `MOTION_MODE_FLOATING`.
-* **Geometría de Detección y Colisión:**
-  - **Colisión Física:** Radio circular de $42.0\text{ px}$ con `move_and_slide()` que choca contra Capa 1 (`Mundo_Alto`) y Capa 2 (`Obstaculos_Bajos`).
-  - **Área de Captura Letal (`Area2D`):** Radio de detección de $56.0\text{ px}$. Si el cuerpo del jugador penetra este círculo y no tiene `god_mode`, dispara instantáneamente el Game Over.
-* **Línea de Visión (`RayCastVision`):**
-  - Nodo `RayCast2D` interno en Capa 1 que apunta dinámicamente hacia las coordenadas globales del jugador.
-  - Variable booleana `tiene_linea_vision`: si el rayo choca con un árbol, se marca como obstruido.
-* **Desatasco Tangencial (*Steering* Liviano):**
-  - Si el monstruo no tiene línea de visión y su velocidad real cae por debajo del $30\%$ de su velocidad máxima debido a un choque perpendicular con un árbol, añade un vector tangencial ($\pm 45^\circ$) hacia la arista libre para continuar la persecución sin congelarse.
-* **Representación Visual y Rotación Continua:**
-  - El nodo visual rota matemáticamente hacia el ángulo de movimiento:
-    ```gdscript
-    if velocity.length_squared() > 1.0:
-        _visual.rotation = velocity.angle()
-    ```
-  - **Ojos Reflectantes:** Par de puntos emisivos visibles en penumbra para alertar al jugador antes de que la silueta sea iluminada por la linterna.
+| Entidad | Clase Base | Documento Especializado | Responsabilidad Principal |
+| :--- | :--- | :--- | :--- |
+| **Jugador** | `CharacterBody2D` | [Personaje y Habilidades](personaje_y_habilidades.md) | Movimiento en 8 direcciones, sprint con estamina, salto libre parabólico sobre obstáculos bajos, salto de plancha (*Dive*) y orientación de linterna. |
+| **El Monstruo** | `CharacterBody2D` | [Monstruo e IA](monstruo_e_ia.md) | Amenaza perseguidora, hibernación en fase tutorial (Nota 0), despertar en Nota 1, desatasco tangencial (*steering*) y detección letal. |
+| **Arena 2x2** | `Node2D` | [Mapa y Sectores](mapa_y_sectores.md) | Topología $4320 \times 4320\text{ px}$, vallas perimetrales fijas, límites de cámara, corredores seguros de $160\text{ px}$ y catálogo modular de variantes. |
+| **Mutación Espacial** | `CanvasLayer` | [Sistema de Mutación y Niebla](sistema_de_mutacion_y_niebla.md) | Algoritmo procedural asíncrono, transición de iris de niebla, reemplazo atómico de 3 sectores y protocolo anti-atascamiento. |
+| **Coleccionable** | `Area2D` | [Sistema de Notas y Spawner](sistema_de_notas_y_spawner.md) | Baliza luminosa, recolección atómica arcade sin pausas y algoritmo de aparición con filtros de exclusión mutua. |
+| **Game Director** | `Node2D` | [Arquitectura de Partida y Director](arquitectura_de_partida_y_director.md) | Orquestación general de señales, flujo de inicio a fin de partida y persistencia del récord. |
 
 ---
 
-### 2.3. Sistema de Notas Coleccionables Arcade (`Area2D`)
-> 📄 **Especificación técnica completa:** [Sistema de Notas y Spawner](sistema_de_notas_y_spawner.md)
+## 3. Matriz de Interacciones y Capas de Colisión
 
-* Solo **1 nota activa a la vez** en todo el mapa.
-* Emite un resplandor pulsante (`PointLight2D`) que actúa como faro orientativo en la oscuridad.
-* **Recolección Instantánea:** Al tocarla, emite la señal, reproduce el rasgado sonoro, suelta partículas doradas y se libera con `queue_free()`, disparando el incremento de velocidad del monstruo y la mutación bajo niebla.
+La siguiente tabla resume cómo interactúan las entidades entre sí y con el entorno:
+
+| Entidad | Mundo Alto (Capa 1) | Obstáculos Bajos (Capa 2) | Jugador (Capa 3) | Monstruo (Capa 4) | Interactuables (Capa 5) |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Jugador (Suelo)** | Bloquea | Bloquea | — | Muerte (Captura) | Recoge Nota |
+| **Jugador (Salto/Dive)** | Bloquea | **Supera por arriba** (Inactiva) | — | Muerte (Captura) | Recoge Nota |
+| **Monstruo (IA)** | Bloquea | **Bloquea** (Rodea) | Mata (`AreaCaptura`) | — | Ignora |
+| **Nota Coleccionable** | Inerte | Inerte | Emite `recolectada` | Inerte | — |
+| **Valla Perimetral** | Bloquea todo | — | Bloquea | Bloquea | — |
+
+> [!TIP]
+> **Ventaja Asimétrica del Salto:** La disparidad entre la máscara de colisión del jugador en el aire (Capa 2 inactiva) y la del monstruo (Capa 2 siempre activa) es la mecánica central de evasión del juego: permite al jugador ganar distancia saltando en línea recta sobre troncos caídos mientras el monstruo se ve forzado a rodearlos.
 
 ---
 
-### 2.4. El Bosque Mutable (Arena 2x2)
-> 📄 **Especificación completa:** [Mapa y Sectores](mapa_y_sectores.md)
+## 4. Filosofía de Juego: Tensión Arcade Ininterrumpida
 
-* Cuadrícula simétrica de $4320 \times 4320\text{ px}$ dividida en 4 cuadrantes.
-* Al recoger una nota, se mutan las variantes de los **3 sectores lejanos** bajo el iris radial de `EfectoNieblaMutacion`.
-* Corredores de seguridad de $160\text{ px}$ en $X=0, Y=0$ para garantizar transitabilidad permanente.
+1. **Sesiones Breves y Frenéticas:** Diseñado para partidas de 60 a 120 segundos donde el error se paga con la muerte inmediata.
+2. **Cero Pantallas Bloqueantes en Partida:** Ni la recolección de notas ni la mutación espacial congelan el flujo de control del protagonista. La tensión de la persecución nunca se interrumpe.
+3. **Reinicio Instantáneo:** La transición de Game Over a nueva partida se ejecuta en menos de un segundo presionando <kbd>Espacio</kbd> o <kbd>Enter</kbd>.

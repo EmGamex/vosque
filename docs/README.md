@@ -35,21 +35,25 @@ Un juego arcade de supervivencia y terror de vista cenital inspirado en la atmó
 Para facilitar la lectura y desarrollo, la documentación está dividida en las siguientes áreas técnicas:
 
 ### [Gameplay y Mecánicas](gameplay/mecanicas_y_entidades.md)
+- [Mecánicas Generales y Core Loop](gameplay/mecanicas_y_entidades.md): Bucle principal, mapa sistémico de entidades y matriz de interacciones de colisión.
 - [Personaje y Habilidades](gameplay/personaje_y_habilidades.md): Atributos físicos, sprint con estamina, salto libre, plancha (*Dive*), linterna frontal y máquina de estados FSM.
-- [Mapa y Sectores](gameplay/mapa_y_sectores.md): Topología 2x2, composición modular, límites físicos/visuales, corredores seguros ($160\text{ px}$) y matriz de colisiones.
-- [Mecánicas y Entidades](gameplay/mecanicas_y_entidades.md): Core loop, jugador, IA y radios del monstruo, y bosque mutable.
+- [La Criatura (Monstruo) y su IA](gameplay/monstruo_e_ia.md): Ciclo de vida (hibernación en Nota 0 $\to$ despertar en Nota 1), cinemática, línea de visión, desatasco tangencial (*steering*) y detección letal.
+- [Mapa y Sectores](gameplay/mapa_y_sectores.md): Topología 2x2 ($4320 \times 4320\text{ px}$), límites físicos/visuales perimetrales, corredores seguros ($160\text{ px}$) y diseño de variantes.
+- [Sistema de Mutación y Niebla](gameplay/sistema_de_mutacion_y_niebla.md): Algoritmo dinámico de reemplazo de los 3 sectores lejanos, telón visual de niebla, exclusión mutua y optimizaciones WebGL.
+- [Sistema de Notas y Spawner](gameplay/sistema_de_notas_y_spawner.md): Jerarquía de `Area2D`, baliza luminosa, recolección atómica y algoritmo con filtros espaciales.
 - [Dificultad y Balance](gameplay/dificultad_y_balance.md): Progresión por notas, tabla cuantitativa de velocidades ($500 \to 920\text{ px/s}$) y reglas de mutación.
-- [Sistema de Notas y Spawner](gameplay/sistema_de_notas_y_spawner.md): Jerarquía de `Area2D`, baliza luminosa, recolección atómica y algoritmo con filtros de distancia mínima.
 - [Arquitectura de Partida y Director](gameplay/arquitectura_de_partida_y_director.md): Game Director (`maain.gd`), ciclo de señales, Game Over y persistencia de récords en Web.
 - [Cámara y Game Feel](gameplay/camara_y_game_feel.md): Cámara $1:1$, sistema de sacudidas (*Shake*) por trauma acumulativo y post-procesamiento.
+
+### [Interfaz y Audio](interfaz_y_audio/controles_y_hud.md)
+- [Controles y HUD In-Game](interfaz_y_audio/controles_y_hud.md): Entradas de teclado, HUD minimalista en partida, barra de estamina y tutorial flotante sobre la cabeza.
+- [Pantallas y Menús](interfaz_y_audio/pantallas_y_menus.md): Menú principal diegético con linterna en 1ª persona y parallax, menú de pausa (`CanvasLayer 50`) y pantalla de Game Over con jumpscare.
+- [Gestor de Escenas y Ciclo de Vida](interfaz_y_audio/gestor_de_escenas.md): Patrón *Call Down, Signal Up*, control de `process_mode` y guía para integrar nuevas pantallas (Opciones/Créditos).
+- [Audio y Feedback](interfaz_y_audio/audio_y_feedback.md): Paisaje sonoro, layout de buses de audio, radar de proximidad y efectos sensoriales.
 
 ### [Arte y Pipeline Visual](arte/pipeline_hibrido.md)
 - [Pipeline Híbrido](arte/pipeline_hibrido.md): Flujo paso a paso (Blender ➔ Inkscape ➔ Godot).
 - [Guía de Estilo y Assets](arte/guia_estilo_y_assets.md): Estética visual y checklist de ~30 sprites necesarios.
-
-### [Interfaz y Audio](interfaz_y_audio/controles_y_hud.md)
-- [Controles y HUD](interfaz_y_audio/controles_y_hud.md): Entradas de teclado, HUD in-game, menú principal diegético de linterna, menú de pausa superpuesto en CanvasLayer 50, Game Over y arquitectura de pantallas *Call Down, Signal Up*.
-- [Audio y Feedback](interfaz_y_audio/audio_y_feedback.md): Paisaje sonoro, layout de buses de audio, radar de proximidad y efectos sensoriales.
 
 ### [Producción](produccion/roadmap_y_hitos.md)
 - [Estructura del Proyecto y Archivos](produccion/estructura_del_proyecto.md): Árbol oficial `res://`, convenciones de nomenclatura (`snake_case`), aislamiento de fuentes `.blend`/`.svg` (`.gdignore`) y gestión de carpetas de producción.
@@ -58,4 +62,7 @@ Para facilitar la lectura y desarrollo, la documentación está dividida en las 
 - [Checklist de Exportación Web](produccion/checklist_exportacion_web.md): Parámetros para HTML5, resolución 1:1, IndexedDB, itch.io y Newgrounds en Godot 4.
 
 ### [Herramientas y Diagnóstico](herramientas/herramientas_de_debug.md)
-- [Herramientas de Debug](herramientas/herramientas_de_debug.md): Menú unificado in-game (F3 tri-estado), telemetría de jugador/monstruo, diagnóstico de mutación para Issue #3, integración con monitores de Godot (`Performance`), Árbol Remoto, persistencia con `DebugConfig`, plugins de editor y MCP.
+- [Herramientas de Debug](herramientas/herramientas_de_debug.md): Índice central del ecosistema de depuración.
+- [Menú de Depuración In-Game](herramientas/menu_debug_ingame.md): Menú unificado F3 tri-estado, controladores modularizados, overlay vectorial en mundo y persistencia trans-sesión.
+- [Plugins de Editor, MCP y Monitores](herramientas/plugins_editor_y_mcp.md): Toolbar de personaje (`addons/personaje_tools`), linter de variantes, MCP `godot_ai` y monitores nativos `Performance`.
+- [Protocolos de Prueba y Diagnóstico](herramientas/protocolos_de_prueba.md): Guías de prueba paso a paso para validación de mutación (Issue #3), desatasco de IA y checklist para navegador Web.
