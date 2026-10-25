@@ -1,0 +1,10 @@
+[gd_resource type="FontVariation" format=3 uid="uid://0htusin8b5jm"]
+
+[ext_resource type="FontFile" uid="uid://c8fddvlvqpoow" path="res://fuentes/Raleway-VariableFont_wght.ttf" id="1_t5m80"]
+
+[resource]
+base_font = ExtResource("1_t5m80")
+variation_opentype = {
+"2003265652": 800.0
+}
+variation_embolden = 0.35

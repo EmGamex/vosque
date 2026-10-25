@@ -8,7 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://dkxadsqp7f6tc" path="res://graficos/menu principal/manu seleccion inicio.png" id="5_q3oj6"]
 [ext_resource type="Texture2D" uid="uid://5f2ee4t8jlrk" path="res://graficos/menu principal/variacion izquierda inicio.png" id="6_pkm7p"]
 [ext_resource type="Texture2D" uid="uid://boojl74uuht0b" path="res://graficos/menu principal/variacion derecha inicio.png" id="7_gk5ks"]
-[ext_resource type="FontFile" uid="uid://c8fddvlvqpoow" path="res://fuentes/Raleway-VariableFont_wght.ttf" id="9_f3do1"]
+[ext_resource type="FontVariation" uid="uid://0htusin8b5jm" path="res://fuentes/raleway_bold.tres" id="9_f3do1"]
 [ext_resource type="Material" uid="uid://dfcf4xfct740f" path="res://shaders/material_motion_blur.tres" id="9_q78gw"]
 
 [sub_resource type="Animation" id="Animation_q78gw"]
