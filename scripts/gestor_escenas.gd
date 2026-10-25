@@ -6,6 +6,7 @@ extends Node
 ## Las pantallas están instanciadas bajo "Contenedor". Solo la activa está
 ## visible y procesando; el cambio se hace con un fundido a negro y la
 ## pantalla de juego se recrea desde cero cada vez que se entra en ella.
+## Se comunica con las pantallas hijas mediante señales (patrón Signal Up).
 
 
 const RUTA_MENU: String = "res://escenas/menu_inicio.tscn"
@@ -75,6 +76,33 @@ func _registrar_pantallas() -> void:
 	for hijo in _contenedor.get_children():
 		if not hijo.scene_file_path.is_empty():
 			_pantallas[hijo.scene_file_path] = hijo
+			_conectar_senales_pantalla(hijo)
+
+
+## Conecta las señales de las pantallas hijas hacia los métodos del orquestador.
+func _conectar_senales_pantalla(pantalla: Node) -> void:
+	if pantalla.has_signal("jugar_solicitado"):
+		var sig_jugar: Signal = pantalla.get("jugar_solicitado")
+		if not sig_jugar.is_connected(_on_jugar_solicitado):
+			sig_jugar.connect(_on_jugar_solicitado)
+
+	if pantalla.has_signal("reintentar_solicitado"):
+		var sig_reintentar: Signal = pantalla.get("reintentar_solicitado")
+		if not sig_reintentar.is_connected(_on_jugar_solicitado):
+			sig_reintentar.connect(_on_jugar_solicitado)
+
+	if pantalla.has_signal("menu_solicitado"):
+		var sig_menu: Signal = pantalla.get("menu_solicitado")
+		if not sig_menu.is_connected(_on_menu_solicitado):
+			sig_menu.connect(_on_menu_solicitado)
+
+
+func _on_jugar_solicitado() -> void:
+	iniciar_partida()
+
+
+func _on_menu_solicitado() -> void:
+	volver_al_menu()
 
 
 ## Deja activa la pantalla de la ruta dada y aparca el resto.
@@ -101,6 +129,7 @@ func _obtener(ruta: String) -> Node:
 		pantalla = (load(ruta) as PackedScene).instantiate()
 		_contenedor.add_child(pantalla)
 		_pantallas[ruta] = pantalla
+		_conectar_senales_pantalla(pantalla)
 	return pantalla
 
 

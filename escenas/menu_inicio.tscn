@@ -1,6 +1,16 @@
 [gd_scene format=3 uid="uid://d3e688a28kpuq"]
 
 [ext_resource type="Script" uid="uid://b6jiwn4xdtmcp" path="res://scripts/menu_inicio.gd" id="1_leqng"]
+[ext_resource type="Texture2D" uid="uid://bbhkpjs77itdn" path="res://graficos/menu principal/fondo degradado.jpg" id="2_pwyh3"]
+[ext_resource type="Texture2D" uid="uid://dhkyi68atr4si" path="res://graficos/menu principal/montaña 2.png" id="3_q3oj6"]
+[ext_resource type="Texture2D" uid="uid://jrdcfeqo0t03" path="res://graficos/menu principal/montaña 1.png" id="4_pkm7p"]
+[ext_resource type="Texture2D" uid="uid://dkxadsqp7f6tc" path="res://graficos/menu principal/manu seleccion inicio.png" id="5_q3oj6"]
+[ext_resource type="Texture2D" uid="uid://5f2ee4t8jlrk" path="res://graficos/menu principal/variacion izquierda inicio.png" id="6_pkm7p"]
+[ext_resource type="Texture2D" uid="uid://boojl74uuht0b" path="res://graficos/menu principal/variacion derecha inicio.png" id="7_gk5ks"]
+
+[sub_resource type="SystemFont" id="SystemFont_yf5fn"]
+font_names = PackedStringArray("Raleway")
+font_weight = 800
 
 [node name="MenuInicio" type="Control" unique_id=987334960]
 layout_mode = 3
@@ -11,34 +21,83 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_leqng")
 
-[node name="Fondo" type="ColorRect" parent="." unique_id=1010292177]
+[node name="Fondos" type="Node2D" parent="." unique_id=843092210]
+position = Vector2(540, 540)
+
+[node name="FondoDegradado" type="Sprite2D" parent="Fondos" unique_id=732065939]
+scale = Vector2(0.55, 0.55)
+texture = ExtResource("2_pwyh3")
+
+[node name="Montaña2" type="Sprite2D" parent="Fondos" unique_id=1529222064]
+position = Vector2(-52, 260)
+scale = Vector2(0.48, 0.48)
+texture = ExtResource("3_q3oj6")
+
+[node name="Montaña1" type="Sprite2D" parent="Fondos" unique_id=1507619010]
+position = Vector2(-4, 244)
+scale = Vector2(0.52, 0.52)
+texture = ExtResource("4_pkm7p")
+
+[node name="Arboles" type="Node2D" parent="." unique_id=348604735]
+position = Vector2(540, 540)
+
+[node name="ArbolOpciones" type="Sprite2D" parent="Arboles" unique_id=2090473113]
+modulate = Color(1, 1, 1, 0)
+scale = Vector2(0.7, 0.7)
+texture = ExtResource("6_pkm7p")
+
+[node name="ArbolJugar" type="Sprite2D" parent="Arboles" unique_id=1498587972]
+scale = Vector2(0.7, 0.7)
+texture = ExtResource("5_q3oj6")
+
+[node name="ArbolCreditos" type="Sprite2D" parent="Arboles" unique_id=76812000]
+modulate = Color(1, 1, 1, 0)
+scale = Vector2(0.7, 0.7)
+texture = ExtResource("7_gk5ks")
+
+[node name="Textos" type="Control" parent="." unique_id=1319947182]
+anchors_preset = 0
+offset_left = 540.0
+offset_top = 540.0
+offset_right = 1620.0
+offset_bottom = 1620.0
+
+[node name="TextoOpciones" type="Label" parent="Textos" unique_id=1266535697]
+self_modulate = Color(1, 1, 1, 0.16078432)
 layout_mode = 0
-anchor_right = 1.0
-anchor_bottom = 1.0
-color = Color(0.05, 0.06, 0.08, 1)
-
-[node name="Layout" type="CenterContainer" parent="." unique_id=406213008]
-layout_mode = 0
-anchor_right = 1.0
-anchor_bottom = 1.0
-
-[node name="Columna" type="VBoxContainer" parent="Layout" unique_id=496350804]
-layout_mode = 2
-theme_override_constants/separation = 28
-alignment = 1
-
-[node name="Titulo" type="Label" parent="Layout/Columna" unique_id=734086782]
-layout_mode = 2
-theme_override_font_sizes/font_size = 72
-text = "VOSQUE"
+offset_left = -475.0
+offset_top = -240.0
+offset_right = -274.0
+offset_bottom = -187.0
+rotation = 0.17741348
+pivot_offset = Vector2(100.5, 26.5)
+theme_override_fonts/font = SubResource("SystemFont_yf5fn")
+theme_override_font_sizes/font_size = 44
+text = "Opciones"
 horizontal_alignment = 1
 
-[node name="BotonJugar" type="Button" parent="Layout/Columna" unique_id=899550942]
-custom_minimum_size = Vector2(240, 52)
-layout_mode = 2
+[node name="TextoJugar" type="Label" parent="Textos" unique_id=202312371]
+layout_mode = 0
+offset_left = -101.5
+offset_top = -350.0
+offset_right = 101.5
+offset_bottom = -262.0
+pivot_offset = Vector2(101.5, 44)
+theme_override_fonts/font = SubResource("SystemFont_yf5fn")
+theme_override_font_sizes/font_size = 74
 text = "Jugar"
+horizontal_alignment = 1
 
-[node name="BotonSalir" type="Button" parent="Layout/Columna" unique_id=49091203]
-custom_minimum_size = Vector2(240, 52)
-layout_mode = 2
-text = "Salir"
+[node name="TextoCreditos" type="Label" parent="Textos" unique_id=1999952592]
+self_modulate = Color(1, 1, 1, 0.16078432)
+layout_mode = 0
+offset_left = 240.0
+offset_top = -198.99997
+offset_right = 421.0
+offset_bottom = -145.99997
+rotation = -0.2617994
+pivot_offset = Vector2(90.5, 26.5)
+theme_override_fonts/font = SubResource("SystemFont_yf5fn")
+theme_override_font_sizes/font_size = 44
+text = "Créditos"
+horizontal_alignment = 1
