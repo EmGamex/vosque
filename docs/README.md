@@ -48,7 +48,7 @@ Para facilitar la lectura y desarrollo, la documentación está dividida en las 
 - [Guía de Estilo y Assets](arte/guia_estilo_y_assets.md): Estética visual y checklist de ~30 sprites necesarios.
 
 ### [Interfaz y Audio](interfaz_y_audio/controles_y_hud.md)
-- [Controles y HUD](interfaz_y_audio/controles_y_hud.md): Entradas de teclado, HUD in-game, menú de pausa superpuesto en CanvasLayer 50, Game Over e integración de pantallas.
+- [Controles y HUD](interfaz_y_audio/controles_y_hud.md): Entradas de teclado, HUD in-game, menú principal diegético de linterna, menú de pausa superpuesto en CanvasLayer 50, Game Over y arquitectura de pantallas *Call Down, Signal Up*.
 - [Audio y Feedback](interfaz_y_audio/audio_y_feedback.md): Paisaje sonoro, layout de buses de audio, radar de proximidad y efectos sensoriales.
 
 ### [Producción](produccion/roadmap_y_hitos.md)

@@ -54,15 +54,18 @@ Aprovechando que la lógica en `scripts/enemigo.gd` ya calcula la rotación cont
 * **Escalado de Fases sin Dibujar Más Sprites:** En la fase de *Cacería Frenética* (8+ notas), no se crea otro spritesheet; se incrementa el `speed_scale` de la animación a $2.0$ y se activa una oscilación sinoidal de escala (`Tween` elástico) junto con la emisión de partículas de humo negro.
 * **Atmósfera de Sombras:** Menor detalle anatómico se traduce en mayor sensación de pánico y vulnerabilidad en la penumbra.
 
-### 2.3. Menú Principal y Portada (Key Art en Capas)
+### 2.3. Menú Principal y Portada (Capas de Paralaje e Iluminación Diegética)
 
-El Menú Principal recibe máxima prioridad visual como carta de presentación del juego y material promocional (*Key Art* para itch.io y Newgrounds). En lugar de una ilustración plana, se compone en **3 capas independientes** que generan un efecto de profundidad/paralaje interactivo en Godot con el movimiento del ratón:
+El Menú Principal recibe máxima prioridad visual como carta de presentación del juego y material promocional (*Key Art* para itch.io y Newgrounds). En lugar de una ilustración plana o un menú convencional, se compone en **6 capas en `res://graficos/menu principal/`** que generan un efecto de profundidad/paralaje cinematográfico e iluminación diegética por linterna en Godot:
 
 | Capa / Asset | Descripción / Elementos | Resolución | Formato | Comportamiento en Godot 4 |
 | :--- | :--- | :---: | :---: | :--- |
-| `menu_fondo_niebla` | Fondo nocturno con degradado azul petróleo (`#141824`), luna pálida velada y niebla lejana | $1080 \times 1080$ px | PNG opaco | Se mueve lentamente en eje X con efecto de paralaje inverso al ratón. |
-| `menu_sujeto_criatura` | Silueta imponente de árboles retorcidos en primer plano con la criatura acechando entre las sombras y ojos reflectantes | $1080 \times 1080$ px | PNG transparente | Canal alfa transparente. Reacciona a una luz tenue `PointLight2D` o shader de respiración. |
-| `menu_logotipo_vosque` | Logotipo tipográfico "VOSQUE" con trazo raspado/desgarrado estilo terror analógico | Vectorial / SVG | SVG / PNG | Centrado en tercio superior; parpadeo sutil estocástico y micro-vibración de pánico. |
+| `fondo degradado.jpg` | Fondo nocturno con degradado azul petróleo y cielo en el infinito | $1080 \times 1080$ px | JPG opaco | Parallax sutil ($8\%$) en `$Fondos/FondoDegradado`. |
+| `montaña 2.png` | Silueta lejana de cordillera montañosa nocturna | $1080 \times 1080$ px | PNG transparente | Parallax intermedio ($22\%$) en `$Fondos/Montaña2`. |
+| `montaña 1.png` | Silueta cercana de ladera con pinos y relieve rocoso | $1080 \times 1080$ px | PNG transparente | Parallax activo ($45\%$) tras los troncos en `$Fondos/Montaña1`. |
+| `manu seleccion inicio.png` | Árbol central iluminado por haz de linterna (Opción **Jugar**) | $1080 \times 1080$ px | PNG transparente | Tronco y copa central iluminada; crossfade de alfa en `ArbolJugar`. |
+| `variacion izquierda inicio.png` | Árbol izquierdo iluminado por haz de linterna (Opción **Opciones**) | $1080 \times 1080$ px | PNG transparente | Tronco y copa izquierda iluminada; crossfade de alfa en `ArbolOpciones`. |
+| `variacion derecha inicio.png` | Árbol derecho iluminado por haz de linterna (Opción **Créditos**) | $1080 \times 1080$ px | PNG transparente | Tronco y copa derecha iluminada; crossfade de alfa en `ArbolCreditos`. |
 
 ### 2.4. Coleccionable Arcade (Dinámica Estilo Monedas)
 
@@ -111,11 +114,11 @@ En el renderizador `gl_compatibility`, cada `PointLight2D` activo genera un pase
 | :--- | :--- | :---: |
 | **Protagonista** | Caminar (3 vistas $\times$ 4 cuadros) + Salto (1) + Plancha (1) + Recuperación (1) + Sombra (1) | **15 cuadros** |
 | **Criatura** | Silueta cenital en $+X$ (2 a 3 cuadros) | **2–3 cuadros** |
-| **Menú Principal** | Fondo niebla + Sujeto central silueta + Logotipo "VOSQUE" | **3 piezas** |
+| **Menú Principal** | 3 Capas de fondo (cielo, montaña lejana, montaña cercana) + 3 Variaciones de iluminación de árboles | **6 capas** |
 | **Entorno Modular** | Suelo tile + 2 Árboles + 1 Roca asimétrica + 1 Tronco caído + 1 Valla | **6 piezas** |
 | **Coleccionable y HUD** | 1 Nota coleccionable + 1 Icono HUD | **2 piezas** |
 | **Game Over** | 1 Ilustración jumpscare de impacto | **1 pieza** |
-| **TOTAL ABSOLUTO DE TODO EL JUEGO** | **Todas las animaciones, menús, mapas y entidades** | **~29 a 30 piezas/cuadros** |
+| **TOTAL ABSOLUTO DE TODO EL JUEGO** | **Todas las animaciones, menús, mapas y entidades** | **~32 a 33 piezas/cuadros** |
 
 > [!TIP]
 > **Eficiencia Máxima de Producción:** Con menos de 30 piezas gráficas en total, el juego completo dispone de gráficos propios de autor, coherencia estética tenebrosa y cero elementos "cutrillos", apoyándose en la iluminación 2D, shaders y físicas de Godot 4 para toda la riqueza visual.

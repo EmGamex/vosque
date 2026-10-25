@@ -36,12 +36,13 @@ c:/Proyectos/vosque/
 │   ├── maain.tscn              # Escena del mundo activo (Game Director)
 │   ├── nota.tscn               # Coleccionable arcade baliza
 │   └── personaje.tscn          # Protagonista
-├── graficos/                   # Texturas y sprites importados (.png)
+├── graficos/                   # Texturas y sprites importados (.png / .jpg)
 │   ├── bocetos/                # Graybox y bocetos provisionales de prototipado
 │   ├── criatura/               # Sprites finales de la criatura cenital y ojos
 │   ├── entorno/                # Tiles de suelo, árboles, rocas, troncos y valla
 │   ├── interfaz/               # Iconos HUD, badges de tutorial, logos y portada
 │   ├── jumpscare/              # Ilustración de impacto de Game Over (512x512)
+│   ├── menu principal/         # Capas de paralaje y variaciones de haz de luz de árboles
 │   ├── notas/                  # Sprite de hoja arrugada y halo
 │   └── personaje/              # Spritesheets y poses de caminar, salto, plancha y sombra
 ├── recursos/                   # Recursos serializados de Godot (.tres)
@@ -56,12 +57,17 @@ c:/Proyectos/vosque/
 │   ├── escenario.gd            # Mutación de sectores lejanos y reubicación segura
 │   ├── game_over.gd            # Lógica de fin de partida y récord
 │   ├── gestor_escenas.gd       # Máquina de estados de pantallas y transiciones
-│   ├── menu_inicio.gd          # Menú principal y paralaje con ratón
+│   ├── menu_inicio.gd          # Menú diegético de linterna 1ª persona, parallax relativo y señales
 │   ├── menu_pausa.gd           # Control de pausa en CanvasLayer 50
 │   ├── nota.gd                 # Recolección atómica de páginas
 │   └── personaje.gd            # FSM de locomoción, estamina, salto y plancha
 ├── shaders/                    # Archivos de sombreadores en tiempo real (.gdshader)
-├── tests/                      # Scripts y suites de pruebas automatizadas (.gd)
+├── tests/                      # Scripts y suites de pruebas automatizadas (McpTestSuite)
+│   ├── test_debug_menu.gd      # Pruebas de menú de depuración F3
+│   ├── test_escenario.gd       # Pruebas de escenario y mutación
+│   ├── test_menu_inicio.gd     # Pruebas de navegación cíclica, parallax relativo y señales de menú
+│   ├── test_nota.gd            # Pruebas de baliza luminosa y protocolo de nota
+│   └── test_spawner.gd         # Pruebas del algoritmo de spawner espacial
 ├── export_presets.cfg          # Configuración de exportación (WebGL Compatibility, threads=false)
 └── project.godot               # Archivo maestro de configuración del proyecto
 ```

@@ -130,8 +130,17 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 > 📄 **Especificación de referencia:** [`docs/interfaz_y_audio/controles_y_hud.md`](../interfaz_y_audio/controles_y_hud.md)  
 > 💻 **Archivos clave:** [`scripts/gestor_escenas.gd`](../../scripts/gestor_escenas.gd), [`scripts/menu_inicio.gd`](../../scripts/menu_inicio.gd), [`scripts/game_over.gd`](../../scripts/game_over.gd)
 
-- [x] **Gestor de Escenas y Fundidos:** Transiciones con velo negro entre Inicio, Partida y Game Over.
-- [x] **Flujo Básico de Menús:** Navegación funcional entre pantallas.
+- [x] **Gestor de Escenas y Fundidos:** Transiciones con velo negro entre Inicio, Partida y Game Over con patrón desacoplado *Call Down, Signal Up*.
+- [x] **Menú Principal Diegético (`MenuInicio`):**
+  - [x] Composición en primera persona con linterna enfocando 3 árboles (`Opciones`, `Jugar`, `Créditos`) con crossfade de haz de luz.
+  - [x] Parallax multicapa en 3 planos (`FondoDegradado`, `Montaña2`, `Montaña1`) respetando las posiciones iniciales diseñadas en el editor 2D.
+  - [x] Desacoplamiento de animación: *sway* continuo de pulso/respiración combinado con interpolación `Tween` sin conflicto de propiedades.
+  - [x] Navegación cíclica horizontal por teclado/mando con *Scale Punch* tipográfico y bloqueo de confirmación contra doble clic.
+  - [x] Arquitectura de señales hacia el orquestador (`jugar_solicitado`, `opciones_solicitado`, `creditos_solicitado`).
+  - [x] Suite de pruebas automatizadas [`tests/test_menu_inicio.gd`](../../tests/test_menu_inicio.gd).
+- [ ] **Sub-Pantallas del Menú Principal:**
+  - [ ] Pantalla de Opciones conectada a la señal `opciones_solicitado` de `MenuInicio`.
+  - [ ] Pantalla de Créditos conectada a la señal `creditos_solicitado` de `MenuInicio`.
 - [ ] **Tutorial Flotante sobre la Cabeza (`TutorialCabeza`):**
   - [ ] Componente visual flotante a $Y \approx -90\text{ px}$ con fondo traslúcido y badges de teclas.
   - [ ] Secuencia de 3 pasos: WASD (ilumina teclas al pulsar) $\to$ Salto (Espacio) $\to$ Sprint (Shift).
@@ -142,7 +151,6 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
   - [ ] Congelación de la simulación del nodo de partida (`process_mode = PROCESS_MODE_DISABLED`) sin apagar la cámara ni el gestor de escenas.
   - [ ] Botones estilizados: Continuar, Reiniciar y Menú Principal.
   - [ ] Apertura/cierre instantáneo con tecla `Escape` o `P`.
-- [ ] **Key Art del Menú Principal:** Capas de paralaje reactivas al ratón (fondo bruma, silueta con ojos reflectantes, logotipo "VOSQUE").
 - [ ] **Pantalla de Game Over:** Sacudida súbita de cámara, destello rojo, ilustración de jumpscare y comparativa de notas recogidas vs High Score.
 
 ---
@@ -164,10 +172,13 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 - [ ] **Criatura (2 a 3 Cuadros):**
   - [ ] Silueta cenital hacia $+X$ con garras (2 a 3 cuadros, $128 \times 128$ px).
   - [ ] Máscara de ojos brillantes (amarillo/rojo).
-- [ ] **Menú Principal (3 Piezas):**
-  - [ ] Fondo niebla nocturna ($1080 \times 1080$ px).
-  - [ ] Sujeto central con árboles y bestia ($1080 \times 1080$ px con alfa).
-  - [ ] Logotipo tipográfico "VOSQUE".
+- [x] **Menú Principal (6 Capas en `res://graficos/menu principal/`):**
+  - [x] `fondo degradado.jpg` ($8\%$ parallax).
+  - [x] `montaña 2.png` ($22\%$ parallax).
+  - [x] `montaña 1.png` ($45\%$ parallax).
+  - [x] `manu seleccion inicio.png` (haz de linterna sobre árbol `Jugar`).
+  - [x] `variacion izquierda inicio.png` (haz de linterna sobre árbol `Opciones`).
+  - [x] `variacion derecha inicio.png` (haz de linterna sobre árbol `Créditos`).
 - [ ] **Entorno Modular (6 Piezas):**
   - [ ] Suelo hojarasca tile ($256 \times 256$ px).
   - [ ] Árbol frondoso ($256 \times 256$ px).

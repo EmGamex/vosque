@@ -76,24 +76,38 @@ Para garantizar un onboarding inmediato que no rompa la inmersión cenital ni re
 
 ---
 
-## 3. Menú Principal (Key Art y Portada Dinámica)
+## 4. Menú Principal (Linterna Diegética en Primera Persona)
 
-El Menú Principal (`escenas/menu_inicio.tscn`) es la pieza visual prioritaria del proyecto, funcionando simultáneamente como portada oficial (*Key Art* para plataformas como itch.io y Newgrounds) y pantalla de bienvenida interactiva.
+El Menú Principal (`escenas/menu_inicio.tscn` / `scripts/menu_inicio.gd`) es la pieza visual prioritaria y carta de presentación de *Vosque*. En lugar de un menú convencional con botones grises o planos, presenta una **experiencia diegética e inmersiva en primera persona** ambientada en la noche del bosque.
 
-### 3.1. Arquitectura Visual en Capas de Profundidad (Paralaje 2D)
-En lugar de una imagen estática plana, el menú se compone de 3 planos en Godot:
-1. **Fondo (`TextureRect`):** Paisaje sombrío de copas de pinos lejanos envueltos en bruma fría azul petróleo (`#141824`).
-2. **Sujeto Central (`TextureRect` con canal alfa):** Silueta detallada a tinta negra de árboles en primer plano con la criatura oculta acechando, cuyos ojos brillan con material `unshaded`.
-3. **Capa Interactiva (UI / CanvasLayer):**
-   - **Logotipo "VOSQUE":** Tipografía vectorial raspada y angular, con una animación sutil de parpadeo estocástico y micro-temblor de pánico.
-   - **Niebla en Movimiento:** Emisor `CPUParticles2D` con partículas suaves semitransparentes cruzando horizontalmente la parte inferior de la pantalla.
-   - **Efecto de Ratón (Paralaje Dinámico):** Un script sencillo desplaza la capa de fondo y el sujeto ligeramente en dirección contraria a la posición del cursor del ratón ($\pm 15\text{ px}$ y $\pm 30\text{ px}$ respectivamente), generando un efecto 2.5D impresionante sin coste de renderizado.
+### 4.1. Concepto Visual e Iluminación de Árboles
+El jugador observa la oscuridad a través de una linterna sostenida en mano. La vista enfoca a tres árboles que representan las opciones del menú:
+1. **Árbol Izquierdo:** `Opciones` (inclinación $+1.2^\circ$, offset $+95\text{ px}$).
+2. **Árbol Central:** `Jugar` (inclinación $0.0^\circ$, offset $0\text{ px}$).
+3. **Árbol Derecho:** `Créditos` (inclinación $-1.2^\circ$, offset $-95\text{ px}$).
 
-### 3.2. Botones y Tipografía
-* Se descartan los botones grises por defecto del motor.
-* Botones estilizados mediante `Theme` y `StyleBoxFlat`:
-  - Estado Normal: Fondo transparente, texto blanco desgastado con contorno negro sutil.
-  - Estado *Hover* / *Focus*: Resalte en rojo óxido (`#8A2020`) con una pequeña línea indicadora vertical y sonido grave de tensión al pasar el cursor.
+Al navegar entre opciones, la linterna se desplaza y realiza un *crossfade* suave de transparencia (`modulate:a`) entre los sprites correspondientes (`ArbolOpciones`, `ArbolJugar`, `ArbolCreditos`), iluminando únicamente el tronco y follaje de la opción seleccionada mientras los demás permanecen en penumbra.
+
+### 4.2. Parallax Multicapa Relativo al Editor 2D
+El fondo se organiza en tres planos de profundidad bajo el nodo `$Fondos`:
+1. **Fondo Degradado (`FondoDegradado`):** Cielo nocturno casi estático en el infinito (factor de parallax $0.08$ en traslación y $0.06$ en rotación).
+2. **Montaña 2 (`Montaña2`):** Capa lejana con desplazamiento suave (factor $0.22$ en traslación y $0.18$ en rotación).
+3. **Montaña 1 (`Montaña1`):** Capa intermedia que se desliza visiblemente tras los troncos (factor $0.45$ en traslación y $0.35$ en rotación).
+
+> [!NOTE]
+> **Preservación del Diseño en Editor (`_capturar_posiciones_iniciales`):**
+> Para evitar fragilidad ante ajustes artísticos en Godot, el script captura en `_ready()` las coordenadas iniciales configuradas en la escena (`_pos_inicial_fondos`, `_pos_inicial_degradado`, `_pos_inicial_montana_2`, etc.). En `_process()`, el parallax se suma de manera relativa a esas posiciones base, garantizando que mover nodos con el ratón en el editor 2D se preserve intacto en ejecución sin tocar código.
+
+### 4.3. Oscilación Orgánica (*Sway*) y Desacoplamiento de Tween
+Para simular el pulso y la respiración natural de un explorador sosteniendo una linterna en la oscuridad:
+* `_process(delta)` calcula oscilaciones sinusoidales armónicas compuestas en $X$, $Y$ y rotación (*sway*).
+* La transición entre opciones se anima mediante un `Tween` interpolando las variables intermedias `_offset_base` y `_rotacion_base` (`TRANS_CUBIC`, `EASE_OUT`).
+* Ambas transformaciones se suman sin conflicto: `offset_total = _offset_base + sway`, evitando que el `Tween` y el bucle por fotograma sobrescriban la propiedad `position` mutuamente.
+
+### 4.4. Navegación por Teclado/Mando y Feedback Tipográfico
+* **Navegación horizontal:** Teclas `A`/`D`, `Flecha Izquierda`/`Flecha Derecha` o sticks analógicos recorren cíclicamente el arreglo `ORDEN_OPCIONES = [OPCIONES, JUGAR, CREDITOS]`.
+* **Confirmación:** `Espacio` o `Enter` confirman la opción. Al seleccionar `JUGAR`, el menú activa `_bloqueado = true` para evitar dobles pulsaciones durante el fundido y emite la señal `jugar_solicitado`.
+* **Scale Punch tipográfico:** El texto de la opción activa incrementa su escala a $1.08\times$ mediante `Tween` con curva `TRANS_BACK` y opacidad $1.0$, mientras que las opciones inactivas reducen su opacidad a $0.16$ y escala base $1.0$.
 
 ---
 
@@ -117,7 +131,7 @@ El menú de pausa permite interrumpir temporalmente la sesión de juego sin perd
 
 ---
 
-## 5. Pantalla de Game Over (Impacto y Jumpscare)
+## 6. Pantalla de Game Over (Impacto y Jumpscare)
 
 Aparece de forma inmediata tras el contacto mortal con el monstruo:
 1. **Arte de Impacto:** Ilustración de jumpscare de alto contraste (`game_over_jumpscare`, $512 \times 512$ px) enmarcada en el tercio superior/central.
@@ -132,9 +146,48 @@ Aparece de forma inmediata tras el contacto mortal con el monstruo:
 
 ---
 
-## 5. Arquitectura e Integración Técnica (`GestorDeEscenas` y `MenuPausa`)
+## 7. Arquitectura e Integración Técnica (`GestorDeEscenas` y Pantallas)
 
-### 5.1. Flujo de Estados de Pantallas y Pausa
+### 7.1. Patrón "Call Down, Signal Up"
+Para garantizar alta cohesión, modularidad y testabilidad en Godot 4:
+* **Call Down (Orquestador $\to$ Pantallas):** `GestorDeEscenas` gestiona la visibilidad (`visible`), el modo de proceso (`process_mode`), apaga cámaras (`_fijar_camaras`) e invoca el método `enfocar()` de forma diferida en la pantalla activa.
+* **Signal Up (Pantallas $\to$ Orquestador):** Las pantallas no dependen de rutas fijas (`/root/GestorEscenas`) y son completamente autónomas (pueden instanciarse y probarse solas con <kbd>F6</kbd> o en tests automatizados). Notifican sus eventos mediante señales:
+  - `MenuInicio`: emite `jugar_solicitado`, `opciones_solicitado` y `creditos_solicitado`.
+  - `GameOver`: emite `reintentar_solicitado` y `menu_solicitado`.
+  - `GestorDeEscenas`: conecta dinámicamente estas señales en `_conectar_senales_pantalla()` al registrar o instanciar cada pantalla.
+
+```mermaid
+flowchart TD
+    GE["GestorDeEscenas (Orquestador Raíz)"]
+    MI["MenuInicio (Control)"]
+    GO["GameOver (Control)"]
+    MP["MenuPausa (CanvasLayer 50)"]
+
+    GE -- "Call Down: enfocar() / visibilidad / process_mode" --> MI
+    GE -- "Call Down: enfocar() / visibilidad / process_mode" --> GO
+    GE -- "Call Down: pausar() / reanudar()" --> MP
+
+    MI -. "Signal Up: jugar_solicitado" .-> GE
+    MI -. "Signal Up: opciones_solicitado" .-> GE
+    MI -. "Signal Up: creditos_solicitado" .-> GE
+
+    GO -. "Signal Up: reintentar_solicitado" .-> GE
+    GO -. "Signal Up: menu_solicitado" .-> GE
+
+    MP -. "Signal Up: continuar / reiniciar / menu" .-> GE
+```
+
+### 7.2. Guía para Incorporar Nuevas Pantallas (Ej. Opciones y Créditos)
+Cuando se desarrollen las escenas dedicadas para `escenas/opciones.tscn` o `escenas/creditos.tscn`:
+1. Definir la escena con raíz `Control` y asignarle un script autónomo.
+2. Implementar `func enfocar() -> void:` para inicializar el foco de teclado/mando.
+3. Declarar señales de retorno (ej. `signal volver_al_menu_solicitado`).
+4. En `GestorDeEscenas`:
+   - Añadir la constante de ruta (ej. `const RUTA_OPCIONES: String = "res://escenas/opciones.tscn"`).
+   - En `_conectar_senales_pantalla()`, conectar `volver_al_menu_solicitado` con `volver_al_menu()`.
+   - Conectar la señal `opciones_solicitado` de `MenuInicio` a `ir_a(RUTA_OPCIONES)`.
+
+### 7.3. Flujo de Estados de Pantallas y Pausa
 ```mermaid
 stateDiagram-v2
     [*] --> MenuInicio: Inicio de Aplicación
@@ -154,7 +207,7 @@ stateDiagram-v2
     GameOver --> MenuInicio: Menú (Fundido)
 ```
 
-### 5.2. Jerarquía de Nodos en Godot 4
+### 7.4. Jerarquía de Nodos en Godot 4
 El menú de pausa **no** se instancia como una pantalla exclusiva dentro de `$Contenedor` (lo cual ocultaría la partida y apagaría la `Camera2D`), sino como una capa superpuesta dedicada en `GestorEscenas`:
 
 ```text
@@ -177,7 +230,7 @@ GestorEscenas (Node) [scripts/gestor_escenas.gd]
     └── Anim (AnimationPlayer - fundidos)
 ```
 
-### 5.3. Estrategia de Pausa y `process_mode`
+### 7.5. Estrategia de Pausa y `process_mode`
 Para evitar congelar el `GestorDeEscenas` o la animación de transición (`Transicion/Anim`), la pausa se gestiona a nivel de nodo de juego:
 * **Al Pausar:**
   ```gdscript
