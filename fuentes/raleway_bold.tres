@@ -5,6 +5,7 @@
 [resource]
 base_font = ExtResource("1_t5m80")
 variation_opentype = {
+2003265652: 700,
 "2003265652": 800.0
 }
 variation_embolden = 0.35

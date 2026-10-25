@@ -193,13 +193,21 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 ---
 
 ## 9. Módulo: Audio y Feedback Sensorial
-> 📄 **Especificación de referencia:** [`docs/interfaz_y_audio/audio_y_feedback.md`](../interfaz_y_audio/audio_y_feedback.md), [`docs/produccion/estructura_del_proyecto.md`](estructura_del_proyecto.md)
+> 📄 **Especificación de referencia:** [`docs/interfaz_y_audio/audio_y_feedback.md`](../interfaz_y_audio/audio_y_feedback.md), [`docs/interfaz_y_audio/sistema_de_musica.md`](../interfaz_y_audio/sistema_de_musica.md), [`docs/produccion/estructura_del_proyecto.md`](estructura_del_proyecto.md)
 
 - [ ] **Estructura de Directorios de Audio:**
   - [ ] Crear carpetas temáticas bajo `res://audio/`: `ambiente/`, `criatura/`, `jugador/` e `interfaz/`.
-- [ ] **Configuración de Buses de Audio (`res://audio/default_bus_layout.tres`):**
-  - [ ] Crear estructura de buses: `Master`, `Ambiente`, `Efectos`, `Criatura`.
-  - [ ] Efecto `AudioEffectLowPassFilter` dinámico activado durante el estado `FATIGA`.
+  - [x] Configuración de carpetas de pistas bajo `res://sonido/musica/` con metadatos interactivos de BPM y compases.
+- [ ] **Configuración de Buses de Audio (`default_bus_layout.tres`):**
+  - [x] Crear estructura de buses: `Master`, `sfx`, `musica`.
+  - [ ] Asignar `AudioEffectLowPassFilter` dinámico en `Master` durante estado `FATIGA`.
+  - [ ] Asignar `AudioEffectReverb` (inactivo por defecto) en bus `musica` para efecto post-derrota.
+- [ ] **Sistema de Música Interactiva (`scripts/gestor_musica.gd`):**
+  - [ ] Implementar Singleton Autoload `/root/GestorMusica` con reproductores A y B asignados al bus `musica`.
+  - [ ] Continuidad de `Night Crawling` entre Menú Principal y Tutorial sin reinicio.
+  - [ ] Crossfade de $2.0\text{ s}$ a `Haunted Boardwalk` al recolectar la Nota 1.
+  - [ ] Modulación dinámica de volumen (*audio ducking*) de $-8\text{ dB}$ a $-20\text{ dB}$ ante proximidad de la criatura ($< 800\text{ px}$).
+  - [ ] Corte a $0\text{ ms}$ en jumpscare y activación en Game Over de `pitch_scale = 0.65` con reverberación cavernosa.
 - [ ] **Efectos de Jugador:** Pasos sobre hojarasca seca con cadencia según velocidad, sonido de despegue de salto y golpe seco al caer en plancha con jadeo.
 - [ ] **Efectos de Criatura:** Radar sonoro mediante `AudioStreamPlayer2D` con atenuación logarítmica ($1400\text{ px}$) y zumbido de estática.
 - [ ] **Efectos de Entorno y Notas:** Viento frío continuo de fondo, rasgado seco de nota recogida y golpe orquestal repentino de jumpscare.

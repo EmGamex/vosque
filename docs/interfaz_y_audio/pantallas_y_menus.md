@@ -115,6 +115,7 @@ Aparece de forma inmediata tras el contacto mortal con el monstruo:
    - Sacudida súbita de pantalla (*Camera Shake*) durante $0.3\text{ s}$ (ver [Cámara y Game Feel](../gameplay/camara_y_game_feel.md)).
    - Flash rojo intenso instantáneo que se disuelve en oscuridad total.
    - Estática y ruido sutil analógico.
+   - **Tratamiento Sonoro Post-Jumpscare:** Silencio instantáneo en el impacto y entrada posterior de la música ralentizada (`pitch_scale = 0.65`) con reverberación cavernosa en el bus `musica` (ver [Sistema de Música Interactiva](sistema_de_musica.md#34-secuencia-de-muerte-y-efecto-game-over-nightmare-decay)).
 3. **Resultados de la Partida:**
    - Páginas recogidas en la sesión actual.
    - Récord histórico (*High Score* persistido en IndexedDB y `LocalStorage` Web).

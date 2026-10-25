@@ -1,6 +1,6 @@
 # Audio y Feedback Sensorial
 
-Este documento describe el paisaje sonoro, los efectos de audio (SFX), la arquitectura de buses en Godot 4 y los recursos de respuesta sensorial para generar terror y tensión en **Vosque**.
+Este documento describe el paisaje sonoro, los efectos de audio (SFX), el sistema de música interactiva, la arquitectura de buses en Godot 4 y los recursos de respuesta sensorial para generar terror y tensión en **Vosque**.
 
 ---
 
@@ -8,16 +8,20 @@ Este documento describe el paisaje sonoro, los efectos de audio (SFX), la arquit
 
 En *Vosque*, el audio es un pilar central de supervivencia. Dado que el rango de visión frontal es limitado y los 3 sectores lejanos mutan tras cada nota, **el paisaje sonoro actúa como un radar diegético**: el jugador debe aprender a escuchar la distancia, cadencia y posición del monstruo para no correr directamente hacia sus garras.
 
+Por esta razón, la **música nunca debe enmascarar ni opacar los SFX críticos de proximidad**. La música se comporta como un barómetro de tensión psicológica y se subordina dinámicamente (*audio ducking*) a la presencia de la criatura.
+
 ---
 
-## 2. Layout de Buses y Organización de Archivos (`res://audio/`)
+## 2. Layout de Buses y Organización de Archivos (`res://audio/` y `res://sonido/`)
 
-Todos los archivos de audio del proyecto se estructuran en carpetas temáticas bajo `res://audio/`:
-* `res://audio/ambiente/`: Loops continuos de viento, susurros y ramas secas (`.ogg`).
-* `res://audio/criatura/`: SFX del monstruo, zumbido de estática, pisadas pesadas y grito de jumpscare (`.wav` y `.ogg`).
-* `res://audio/jugador/`: Pasos en hojarasca, despegue de salto, impacto/arrastre de plancha y jadeos (`.wav`).
-* `res://audio/interfaz/`: Rasgado seco de notas y clics/hovers de menú (`.wav`).
-* `res://audio/default_bus_layout.tres`: Configuración de los 4 buses de audio.
+Los recursos sonoros se organizan en las siguientes rutas del proyecto:
+* `res://sonido/musica/`: Pistas musicales en formato `.ogg` con metadatos de sincronización e importación.
+* `res://sonido/sfx/` o `res://audio/`: Efectos de sonido agrupados por entidad:
+  * `ambiente/`: Loops continuos de viento, susurros y ramas secas (`.ogg`).
+  * `criatura/`: SFX del monstruo, zumbido de estática, pisadas pesadas y jumpscare (`.wav` y `.ogg`).
+  * `jugador/`: Pasos en hojarasca, despegue de salto, impacto/arrastre de plancha y jadeos (`.wav`).
+  * `interfaz/`: Rasgado seco de notas y clics/hovers de menú (`.wav`).
+* `res://audio/default_bus_layout.tres`: Configuración de los buses de audio en Godot.
 
 ```mermaid
 flowchart TD
@@ -25,27 +29,42 @@ flowchart TD
     Ambiente[Bus Ambiente / Viento] --> Master
     Efectos[Bus SFX / Jugador & Notas] --> Master
     Criatura[Bus Criatura / Hostil] --> Master
+    Musica[Bus Musica / OST] --> Master
 
-    subgraph Modulaciones ["Efectos y Modulaciones"]
-        FiltroFatiga["AudioEffectLowPassFilter<br/>(Se activa en estado FATIGA)"]
-        ReverbBosque["AudioEffectReverb<br/>(Ambiente general)"]
+    subgraph Modulaciones ["Efectos y Modulaciones en Tiempo Real"]
+        FiltroFatiga["AudioEffectLowPassFilter<br/>(Bus Master - Activo en fatiga)"]
+        ReverbGameOver["AudioEffectReverb<br/>(Bus Musica - Activo en Game Over)"]
+        DuckingCriatura["Ducking Proximidad<br/>(Baja Bus Musica de -8 dB a -20 dB)"]
     end
 
-    Criatura -.-> Master
     Master --- FiltroFatiga
-    Ambiente --- ReverbBosque
+    Musica --- ReverbGameOver
+    Criatura -.-> DuckingCriatura
 ```
 
 | Bus de Audio | Volumen Base | Efectos Asignados | Propósito |
 | :--- | :---: | :--- | :--- |
-| **Master** | $0.0\text{ dB}$ | `AudioEffectLowPassFilter` (bypass) | Mezcla final general; el filtro paso-bajo se activa en estado de fatiga o salud crítica. |
-| **Ambiente** | $-6.0\text{ dB}$ | Pre-procesado (Bypass en motor) | Viento sibilante continuo y crujidos lejanos con reverberación ya renderizada en el archivo `.ogg`. |
-| **Efectos** | $-2.0\text{ dB}$ | Ninguno | Pasos en hojarasca, jadeos de recuperación, salto y rasgado de papel. |
-| **Criatura** | $+1.0\text{ dB}$ | Pre-procesado (Bypass en motor) | Sonidos guturales y estática con distorsión ya horneada en el archivo. |
+| **Master** | $0.0\text{ dB}$ | `AudioEffectLowPassFilter` (bypass) | Mezcla general final; el filtro paso-bajo se activa en estado de fatiga o agonía. |
+| **Ambiente** | $-6.0\text{ dB}$ | Pre-procesado (Bypass en motor) | Viento sibilante continuo y crujidos con reverberación horneada en el `.ogg`. |
+| **Efectos** | $-2.0\text{ dB}$ | Ninguno | Pasos en hojarasca, jadeos de recuperación, salto y rasgado de notas. |
+| **Criatura** | $+1.0\text{ dB}$ | Pre-procesado (Bypass en motor) | Sonidos guturales y estática con máxima prioridad auditiva. |
+| **Musica** | $-8.0\text{ dB}$ | `AudioEffectReverb` (bypass) | Pistas musicales interactivas; aplica atenuación por proximidad y efecto pesadilla en derrota. |
 
 ---
 
-## 3. Optimización para WebAudio y Navegadores (`threads = false`)
+## 3. Sistema de Música Interactiva (`res://sonido/musica/`)
+
+> 📖 **Especificación completa:** Para consultar la máquina de estados detallada, diagramas de transición, arquitectura del Autoload `GestorMusica` y fórmulas matemáticas de atenuación, consulta [Sistema de Música Interactiva](sistema_de_musica.md).
+
+El diseño musical acompaña la evolución emocional del jugador desde la intriga inicial hasta la paranoia absoluta del bosque abierto:
+* **Menú Principal + Tutorial (`Night Crawling`):** Mantiene continuidad fluida entre el menú con linterna y el aprendizaje seguro en el Sector Central sin cortes de reproducción.
+* **Supervivencia Activa (`Haunted Boardwalk`):** Transición mediante crossfade de $2.0\text{ s}$ al recolectar la Nota 1.
+* **Audio Ducking:** Atenuación dinámica de $-8\text{ dB}$ a $-20\text{ dB}$ cuando la criatura se sitúa a menos de $800\text{ px}$.
+* **Game Over (Nightmare Decay):** Detención súbita en jumpscare seguida de ralentización (`pitch_scale = 0.65`) y activación de `AudioEffectReverb` cavernoso en la pantalla de derrota.
+
+---
+
+## 4. Optimización para WebAudio y Navegadores (`threads = false`)
 
 En compilaciones HTML5 sin soporte de hilos, el motor de mezcla de audio se ejecuta en el mismo hilo de CPU que las físicas y el renderizado:
 

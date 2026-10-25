@@ -50,6 +50,7 @@ Para facilitar la lectura y desarrollo, la documentación está dividida en las 
 - [Pantallas y Menús](interfaz_y_audio/pantallas_y_menus.md): Menú principal diegético con linterna en 1ª persona y parallax, menú de pausa (`CanvasLayer 50`) y pantalla de Game Over con jumpscare.
 - [Gestor de Escenas y Ciclo de Vida](interfaz_y_audio/gestor_de_escenas.md): Patrón *Call Down, Signal Up*, control de `process_mode` y guía para integrar nuevas pantallas (Opciones/Créditos).
 - [Audio y Feedback](interfaz_y_audio/audio_y_feedback.md): Paisaje sonoro, layout de buses de audio, radar de proximidad y efectos sensoriales.
+- [Sistema de Música Interactiva](interfaz_y_audio/sistema_de_musica.md): Arquitectura de música, roles de pistas (`Night Crawling` y `Haunted Boardwalk`), sincronización rítmica, ducking dinámico y efecto Game Over.
 
 ### [Arte y Pipeline Visual](arte/pipeline_hibrido.md)
 - [Pipeline Híbrido](arte/pipeline_hibrido.md): Flujo paso a paso (Blender ➔ Inkscape ➔ Godot).
