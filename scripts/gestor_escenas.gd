@@ -14,8 +14,7 @@ const RUTA_JUEGO: String = "res://escenas/maain.tscn"
 const RUTA_GAME_OVER: String = "res://escenas/game_over.tscn"
 
 @onready var _contenedor: Node = $Contenedor
-@onready var _velo: ColorRect = $Transicion/Velo
-@onready var _anim: AnimationPlayer = $Transicion/Anim
+@onready var _transicion: TransicionEscenas = $Transicion
 
 ## Ruta de escena -> instancia dentro del contenedor.
 var _pantallas: Dictionary = {}
@@ -156,7 +155,7 @@ func _fijar_camaras(raiz: Node, encendidas: bool) -> void:
 
 
 func _fundir(a_negro: bool) -> void:
-	_velo.mouse_filter = Control.MOUSE_FILTER_STOP
-	_anim.play("fundido_salida" if a_negro else "fundido_entrada")
-	await _anim.animation_finished
-	_velo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if a_negro:
+		await _transicion.cerrar()
+	else:
+		await _transicion.abrir()

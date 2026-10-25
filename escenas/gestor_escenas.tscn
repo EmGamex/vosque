@@ -2,61 +2,28 @@
 
 [ext_resource type="Script" uid="uid://dbhas6loawsia" path="res://scripts/gestor_escenas.gd" id="1_ve7em"]
 [ext_resource type="PackedScene" uid="uid://d3e688a28kpuq" path="res://escenas/menu_inicio.tscn" id="2_05fps"]
+[ext_resource type="PackedScene" uid="uid://q7eut14gtt1u" path="res://escenas/transicion.tscn" id="2_jbqwm"]
 [ext_resource type="PackedScene" uid="uid://dl88w12yyd8ee" path="res://escenas/maain.tscn" id="3_jbqwm"]
+[ext_resource type="Shader" uid="uid://dqxjjk2xmymf8" path="res://shaders/transicion_iris.gdshader" id="3_tepdp"]
 [ext_resource type="PackedScene" uid="uid://c7acatnude74i" path="res://escenas/game_over.tscn" id="4_tepdp"]
 
-[sub_resource type="Animation" id="Animation_srsjv"]
-length = 0.25
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Velo:modulate:a")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.25),
-"transitions": PackedFloat32Array(1, 1),
-"update": 0,
-"values": [1.0, 0.0]
-}
-
-[sub_resource type="Animation" id="Animation_ve7em"]
-length = 0.25
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Velo:modulate:a")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.25),
-"transitions": PackedFloat32Array(1, 1),
-"update": 0,
-"values": [0.0, 1.0]
-}
-
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_5bi3b"]
-_data = {
-&"fundido_entrada": SubResource("Animation_srsjv"),
-&"fundido_salida": SubResource("Animation_ve7em")
-}
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ap2e7"]
+resource_local_to_scene = true
+shader = ExtResource("3_tepdp")
+shader_parameter/center = Vector2(0.5, 0.5)
+shader_parameter/progress = 0.0
+shader_parameter/smoothness = 0.02
+shader_parameter/color = Color(0, 0, 0, 1)
+shader_parameter/aspect_ratio = 1.0
 
 [node name="GestorEscenas" type="Node" unique_id=1515374323]
 script = ExtResource("1_ve7em")
 
-[node name="Transicion" type="CanvasLayer" parent="." unique_id=968021334]
-layer = 100
+[node name="Transicion" parent="." unique_id=1215309266 instance=ExtResource("2_jbqwm")]
 
-[node name="Velo" type="ColorRect" parent="Transicion" unique_id=2029228719]
-modulate = Color(1, 1, 1, 0)
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-mouse_filter = 2
-color = Color(0, 0, 0, 1)
-
-[node name="Anim" type="AnimationPlayer" parent="Transicion" unique_id=764417678]
-libraries/ = SubResource("AnimationLibrary_5bi3b")
+[node name="Velo" parent="Transicion" index="0" unique_id=175064061]
+modulate = Color(1, 1, 1, 0.20000005)
+material = SubResource("ShaderMaterial_ap2e7")
 
 [node name="Contenedor" type="Node" parent="." unique_id=1002276879]
 
@@ -71,3 +38,5 @@ process_mode = 4
 visible = false
 grow_horizontal = 2
 grow_vertical = 2
+
+[editable path="Transicion"]
