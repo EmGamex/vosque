@@ -2,15 +2,249 @@
 
 [ext_resource type="Script" uid="uid://b6jiwn4xdtmcp" path="res://scripts/menu_inicio.gd" id="1_leqng"]
 [ext_resource type="Texture2D" uid="uid://bbhkpjs77itdn" path="res://graficos/menu principal/fondo degradado.jpg" id="2_pwyh3"]
+[ext_resource type="Texture2D" uid="uid://bee043igkwa1n" path="res://graficos/menu principal/fondo degradado alargado.jpg" id="3_2v816"]
 [ext_resource type="Texture2D" uid="uid://dhkyi68atr4si" path="res://graficos/menu principal/montaña 2.png" id="3_q3oj6"]
 [ext_resource type="Texture2D" uid="uid://jrdcfeqo0t03" path="res://graficos/menu principal/montaña 1.png" id="4_pkm7p"]
 [ext_resource type="Texture2D" uid="uid://dkxadsqp7f6tc" path="res://graficos/menu principal/manu seleccion inicio.png" id="5_q3oj6"]
 [ext_resource type="Texture2D" uid="uid://5f2ee4t8jlrk" path="res://graficos/menu principal/variacion izquierda inicio.png" id="6_pkm7p"]
 [ext_resource type="Texture2D" uid="uid://boojl74uuht0b" path="res://graficos/menu principal/variacion derecha inicio.png" id="7_gk5ks"]
+[ext_resource type="Material" uid="uid://dfcf4xfct740f" path="res://shaders/material_motion_blur.tres" id="9_q78gw"]
 
 [sub_resource type="SystemFont" id="SystemFont_yf5fn"]
 font_names = PackedStringArray("Raleway")
 font_weight = 800
+subpixel_positioning = 0
+
+[sub_resource type="Animation" id="Animation_q78gw"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CamaraMenu:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(540, -540)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Presentacion:modulate:a")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Presentacion/TextoComenzar:modulate:a")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Fondos/FondoPresentacion:modulate:a")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [1.0]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Textos:modulate:a")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("CamaraMenu/EfectoMotionBlur:material:shader_parameter/intensidad")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_f3do1"]
+length = 1.4333
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Presentacion:modulate:a")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.8),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [1.0, 0.0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Fondos/FondoPresentacion:modulate:a")
+tracks/1/interp = 2
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.4, 0.8666667),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [1.0, 0.0]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Textos:modulate:a")
+tracks/2/interp = 2
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.6333333, 1.4333),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+tracks/3/type = "bezier"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("CamaraMenu:position:y")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"handle_modes": PackedInt32Array(0, 0),
+"points": PackedFloat32Array(-540, -0.25, 0, 0.43333334, 0.5, 540, -0.86666673, -0.5, 0.25, 0),
+"times": PackedFloat32Array(0, 0.8666667)
+}
+tracks/4/type = "bezier"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("CamaraMenu:position:x")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"handle_modes": PackedInt32Array(0, 0),
+"points": PackedFloat32Array(540, -0.25, 0, 0.25, 0, 540, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0, 0.8666667)
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("CamaraMenu/EfectoMotionBlur:material:shader_parameter/intensidad")
+tracks/5/interp = 2
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 0.43333334, 0.8666667),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [0.0, 0.015, 0.0]
+}
+
+[sub_resource type="Animation" id="Animation_dotxh"]
+length = 2.0
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CamaraMenu:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(540, -540), Vector2(540, -540)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Presentacion:modulate:a")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [1.0, 1.0]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Presentacion/TextoComenzar:modulate:a")
+tracks/2/interp = 2
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 1, 2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [1.0, 0.2, 1.0]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Fondos/FondoPresentacion:modulate:a")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [1.0, 1.0]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Textos:modulate:a")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 0.0]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("CamaraMenu/EfectoMotionBlur:material:shader_parameter/intensidad")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 0.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_mpb5u"]
+_data = {
+&"RESET": SubResource("Animation_q78gw"),
+&"bajar_al_bosque": SubResource("Animation_f3do1"),
+&"esperando_inicio": SubResource("Animation_dotxh")
+}
 
 [node name="MenuInicio" type="Control" unique_id=987334960]
 layout_mode = 3
@@ -27,6 +261,11 @@ position = Vector2(540, 540)
 [node name="FondoDegradado" type="Sprite2D" parent="Fondos" unique_id=732065939]
 scale = Vector2(0.55, 0.55)
 texture = ExtResource("2_pwyh3")
+
+[node name="FondoPresentacion" type="Sprite2D" parent="Fondos" unique_id=1595735472]
+position = Vector2(0, -540)
+scale = Vector2(0.55, 0.55)
+texture = ExtResource("3_2v816")
 
 [node name="Montaña2" type="Sprite2D" parent="Fondos" unique_id=1529222064]
 position = Vector2(-52, 260)
@@ -56,6 +295,7 @@ scale = Vector2(0.7, 0.7)
 texture = ExtResource("7_gk5ks")
 
 [node name="Textos" type="Control" parent="." unique_id=1319947182]
+modulate = Color(1, 1, 1, 0)
 anchors_preset = 0
 offset_left = 540.0
 offset_top = 540.0
@@ -63,7 +303,7 @@ offset_right = 1620.0
 offset_bottom = 1620.0
 
 [node name="TextoOpciones" type="Label" parent="Textos" unique_id=1266535697]
-self_modulate = Color(1, 1, 1, 0.16078432)
+self_modulate = Color(1, 1, 1, 0.16)
 layout_mode = 0
 offset_left = -475.0
 offset_top = -240.0
@@ -82,6 +322,7 @@ offset_left = -101.5
 offset_top = -350.0
 offset_right = 101.5
 offset_bottom = -262.0
+scale = Vector2(1.08, 1.08)
 pivot_offset = Vector2(101.5, 44)
 theme_override_fonts/font = SubResource("SystemFont_yf5fn")
 theme_override_font_sizes/font_size = 74
@@ -89,7 +330,7 @@ text = "Jugar"
 horizontal_alignment = 1
 
 [node name="TextoCreditos" type="Label" parent="Textos" unique_id=1999952592]
-self_modulate = Color(1, 1, 1, 0.16078432)
+self_modulate = Color(1, 1, 1, 0.16)
 layout_mode = 0
 offset_left = 240.0
 offset_top = -198.99997
@@ -101,3 +342,45 @@ theme_override_fonts/font = SubResource("SystemFont_yf5fn")
 theme_override_font_sizes/font_size = 44
 text = "Créditos"
 horizontal_alignment = 1
+
+[node name="CamaraMenu" type="Camera2D" parent="." unique_id=1121498657]
+position = Vector2(540, -540)
+
+[node name="EfectoMotionBlur" type="ColorRect" parent="CamaraMenu" unique_id=1168738901]
+material = ExtResource("9_q78gw")
+offset_left = -540.0
+offset_top = -540.0
+offset_right = 540.0
+offset_bottom = 540.0
+mouse_filter = 2
+
+[node name="Presentacion" type="Control" parent="." unique_id=434228532]
+anchors_preset = 0
+offset_top = -1080.0
+offset_right = 1080.0
+mouse_filter = 2
+
+[node name="Logo" type="Label" parent="Presentacion" unique_id=1831017180]
+layout_mode = 0
+offset_left = 140.0
+offset_top = 360.0
+offset_right = 940.0
+offset_bottom = 510.0
+theme_override_font_sizes/font_size = 88
+text = "V O S Q U E"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TextoComenzar" type="Label" parent="Presentacion" unique_id=757412386]
+layout_mode = 0
+offset_left = 140.0
+offset_top = 560.0
+offset_right = 940.0
+offset_bottom = 620.0
+theme_override_font_sizes/font_size = 32
+text = "PRESIONA ENTER PARA COMENZAR"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AnimadorCinematica" type="AnimationPlayer" parent="." unique_id=513910754]
+libraries/ = SubResource("AnimationLibrary_mpb5u")

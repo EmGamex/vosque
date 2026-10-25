@@ -11,8 +11,6 @@ func suite_name() -> String:
 func _crear_instancia_menu() -> Control:
 	var escena: PackedScene = load("res://escenas/menu_inicio.tscn")
 	var menu: Control = escena.instantiate() as Control
-	var script_menu: Script = load("res://scripts/menu_inicio.gd")
-	menu.set_script(script_menu)
 	return menu
 
 
@@ -117,3 +115,61 @@ func test_parallax_respeta_posiciones_capturadas() -> void:
 	assert_true(montana.position != Vector2(-4.0, 244.0), "No debe haber sido forzado a la constante anterior")
 
 	menu.free()
+
+
+func test_nodos_y_estado_cinematica() -> void:
+	var menu: Control = _crear_instancia_menu()
+	menu.add_to_group("modo_test")
+	menu._ready()
+
+	# Comprobar presencia de los nuevos nodos cinemáticos
+	var camara: Camera2D = menu.get_node_or_null("CamaraMenu") as Camera2D
+	var animador: AnimationPlayer = menu.get_node_or_null("AnimadorCinematica") as AnimationPlayer
+	var presentacion: Control = menu.get_node_or_null("Presentacion") as Control
+	var fondo_pres: Sprite2D = menu.get_node_or_null("Fondos/FondoPresentacion") as Sprite2D
+
+	assert_true(camara != null, "Debe existir CamaraMenu")
+	assert_true(animador != null, "Debe existir AnimadorCinematica")
+	assert_true(presentacion != null, "Debe existir Presentacion")
+	assert_true(fondo_pres != null, "Debe existir FondoPresentacion")
+
+	assert_true(animador.has_animation("esperando_inicio"), "Debe tener animación esperando_inicio")
+	assert_true(animador.has_animation("bajar_al_bosque"), "Debe tener animación bajar_al_bosque")
+
+	# Estado inicial debe ser PRESENTACION
+	assert_eq(menu.get("_estado"), 0, "Debe iniciar en estado PRESENTACION (0)")
+
+	# Iniciar descenso
+	menu.iniciar_descenso()
+	assert_eq(menu.get("_estado"), 1, "iniciar_descenso debe pasar a CINEMATICA_BAJANDO (1)")
+	assert_eq(animador.speed_scale, 1.0, "Velocidad normal debe ser 1.0")
+
+	# Probar skip de cinemática
+	menu.skipear_cinematica()
+	assert_eq(animador.speed_scale, menu.get("multiplicador_velocidad_skip"), "skipear_cinematica debe acelerar el animador")
+
+	# Finalización de la animación
+	menu._on_animacion_terminada(&"bajar_al_bosque")
+	assert_eq(menu.get("_estado"), 2, "Al terminar la animación debe pasar a MENU_ACTIVO (2)")
+	assert_eq(animador.speed_scale, 1.0, "Velocidad debe restaurarse a 1.0")
+	assert_eq(camara.position, Vector2(540.0, 540.0), "Cámara debe encuadrar el bosque (540, 540)")
+
+	menu.free()
+
+
+func test_pistas_bezier_configuradas() -> void:
+	var menu: Control = _crear_instancia_menu()
+	var animador: AnimationPlayer = menu.get_node_or_null("AnimadorCinematica") as AnimationPlayer
+	assert_true(animador != null, "Debe existir AnimadorCinematica")
+	if animador != null and animador.has_animation("bajar_al_bosque"):
+		var anim: Animation = animador.get_animation("bajar_al_bosque")
+		var tiene_bezier_y: bool = false
+		for i in range(anim.get_track_count()):
+			if anim.track_get_path(i) == ^"CamaraMenu:position:y" and anim.track_get_type(i) == Animation.TYPE_BEZIER:
+				tiene_bezier_y = true
+				break
+		assert_true(tiene_bezier_y, "La pista CamaraMenu:position:y debe ser de tipo TYPE_BEZIER")
+	menu.free()
+
+
+

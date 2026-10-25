@@ -2,15 +2,18 @@
 class_name MenuInicio
 extends Control
 
-## Menú de inicio interactivo con efecto inmersivo de linterna en primera persona.
-## Desplaza la vista para encuadrar y dar énfasis cinematográfico al árbol seleccionado,
-## manteniendo pivotes unificados y margen amplio. Emite señales hacia el orquestador
-## superior ("Signal Up") y tolera ejecución aislada.
+## Menú de inicio interactivo con sistema de cinemática modular y linterna en primera persona.
+## Dispone de dos lienzos espaciales continuos en el espacio 2D:
+## - Zona superior (Cielo/Presentación): Logotipo y aviso "Presiona ENTER para comenzar".
+## - Zona inferior (Bosque/Menú): Tres árboles iluminados por linterna (Opciones, Jugar, Créditos).
+## La transición está orquestada por Camera2D y AnimationPlayer, permitiendo aceleración (skip)
+## instantánea sin conflictos con las oscilaciones orgánicas.
 
 signal jugar_solicitado
 signal opciones_solicitado
 signal creditos_solicitado
 
+enum EstadoMenu { PRESENTACION, CINEMATICA_BAJANDO, MENU_ACTIVO }
 enum Opcion { OPCIONES, JUGAR, CREDITOS }
 
 const ORDEN_OPCIONES: Array[Opcion] = [Opcion.OPCIONES, Opcion.JUGAR, Opcion.CREDITOS]
@@ -29,6 +32,19 @@ const FACTOR_ROTACION_DEGRADADO: float = 0.06
 const FACTOR_ROTACION_MONTANA_2: float = 0.18
 const FACTOR_ROTACION_MONTANA_1: float = 0.35
 
+@export_group("Cinemática de Inicio")
+## Determina si al arrancar o volver al menú se reproduce la pantalla de inicio en el cielo.
+@export var habilitar_presentacion: bool = true
+## Multiplicador de velocidad al pulsar tecla durante la bajada para saltarla casi al instante.
+@export var multiplicador_velocidad_skip: float = 10.0
+
+
+
+@onready var _camara: Camera2D = $CamaraMenu
+@onready var _animador: AnimationPlayer = $AnimadorCinematica
+@onready var _presentacion: Control = $Presentacion
+@onready var _fondo_presentacion: Sprite2D = $Fondos/FondoPresentacion
+
 @onready var _fondos: Node2D = $Fondos
 @onready var _fondo_degradado: Sprite2D = $Fondos/FondoDegradado
 @onready var _montana_2: Sprite2D = $Fondos/Montaña2
@@ -44,6 +60,7 @@ const FACTOR_ROTACION_MONTANA_1: float = 0.35
 @onready var _texto_jugar: Label = $Textos/TextoJugar
 @onready var _texto_creditos: Label = $Textos/TextoCreditos
 
+var _estado: EstadoMenu = EstadoMenu.PRESENTACION
 var _opcion_actual: Opcion = Opcion.JUGAR
 var _datos_opciones: Dictionary = {}
 
@@ -67,7 +84,16 @@ var _pos_inicial_textos: Vector2 = Vector2.ZERO
 func _ready() -> void:
 	_capturar_posiciones_iniciales()
 	_inicializar_datos_opciones()
+	_conectar_animador()
+	iniciar_presentacion()
 	_actualizar_seleccion(false)
+
+
+func _conectar_animador() -> void:
+	if _animador != null and not _animador.animation_finished.is_connected(_on_animacion_terminada):
+		_animador.animation_finished.connect(_on_animacion_terminada)
+
+
 
 
 func _capturar_posiciones_iniciales() -> void:
@@ -106,6 +132,72 @@ func _inicializar_datos_opciones() -> void:
 			"rotacion": deg_to_rad(-1.2),
 		},
 	}
+
+
+## Configura el estado inicial del menú. Si la cinemática está habilitada,
+## posiciona la cámara en el cielo e inicia el bucle de presentación.
+func iniciar_presentacion() -> void:
+	_opcion_actual = Opcion.JUGAR
+	_bloqueado = false
+
+	if not habilitar_presentacion or (Engine.is_editor_hint() and not is_in_group("modo_test")):
+		_estado = EstadoMenu.MENU_ACTIVO
+		if _camara != null:
+			_camara.position = Vector2(540.0, 540.0)
+		if _presentacion != null:
+			_presentacion.modulate.a = 0.0
+		if _fondo_presentacion != null:
+			_fondo_presentacion.modulate.a = 0.0
+		if _textos_nodo != null:
+			_textos_nodo.modulate.a = 1.0
+		return
+
+	_estado = EstadoMenu.PRESENTACION
+	if _camara != null:
+		_camara.position = Vector2(540.0, -540.0)
+	if _presentacion != null:
+		_presentacion.modulate.a = 1.0
+	if _fondo_presentacion != null:
+		_fondo_presentacion.modulate.a = 1.0
+	if _textos_nodo != null:
+		_textos_nodo.modulate.a = 0.0
+
+	if _animador != null and _animador.has_animation("esperando_inicio"):
+		_animador.speed_scale = 1.0
+		_animador.play("esperando_inicio")
+
+
+## Dispara el paneo descendente de cámara hacia el bosque con fundido de fondos.
+func iniciar_descenso() -> void:
+	if _estado != EstadoMenu.PRESENTACION:
+		return
+
+	_estado = EstadoMenu.CINEMATICA_BAJANDO
+	if _animador != null and _animador.has_animation("bajar_al_bosque"):
+		_animador.speed_scale = 1.0
+		_animador.play("bajar_al_bosque")
+	else:
+		# Fallback de seguridad si no existe la animación
+		_on_animacion_terminada(&"bajar_al_bosque")
+
+
+## Acelera la animación de descenso para aterrizar casi al instante.
+func skipear_cinematica() -> void:
+	if _estado == EstadoMenu.CINEMATICA_BAJANDO and _animador != null and _animador.is_playing():
+		_animador.speed_scale = multiplicador_velocidad_skip
+
+
+func _on_animacion_terminada(nombre: StringName) -> void:
+	if nombre == &"bajar_al_bosque":
+		_estado = EstadoMenu.MENU_ACTIVO
+		_bloqueado = false
+		if _animador != null:
+			_animador.speed_scale = 1.0
+		if _camara != null:
+			_camara.position = Vector2(540.0, 540.0)
+		if _textos_nodo != null:
+			_textos_nodo.modulate.a = 1.0
+		_actualizar_seleccion(false)
 
 
 func _process(delta: float) -> void:
@@ -150,24 +242,38 @@ func _process(delta: float) -> void:
 
 
 func _unhandled_input(evento: InputEvent) -> void:
-	if _bloqueado or Engine.is_editor_hint():
+	if Engine.is_editor_hint():
 		return
 
-	if evento.is_action_pressed("personaje-izquierda") or evento.is_action_pressed("ui_left"):
-		_navegar(-1)
-		get_viewport().set_input_as_handled()
-	elif evento.is_action_pressed("personaje-derecha") or evento.is_action_pressed("ui_right"):
-		_navegar(1)
-		get_viewport().set_input_as_handled()
-	elif evento.is_action_pressed("ui_accept") or evento.is_action_pressed("personaje-salto"):
-		_confirmar_opcion()
-		get_viewport().set_input_as_handled()
+	match _estado:
+		EstadoMenu.PRESENTACION:
+			if evento.is_action_pressed("ui_accept") or evento.is_action_pressed("personaje-salto"):
+				iniciar_descenso()
+				get_viewport().set_input_as_handled()
+
+		EstadoMenu.CINEMATICA_BAJANDO:
+			if evento.is_action_pressed("ui_accept") or evento.is_action_pressed("ui_cancel") or evento.is_action_pressed("personaje-salto"):
+				skipear_cinematica()
+				get_viewport().set_input_as_handled()
+
+		EstadoMenu.MENU_ACTIVO:
+			if _bloqueado:
+				return
+
+			if evento.is_action_pressed("personaje-izquierda") or evento.is_action_pressed("ui_left"):
+				_navegar(-1)
+				get_viewport().set_input_as_handled()
+			elif evento.is_action_pressed("personaje-derecha") or evento.is_action_pressed("ui_right"):
+				_navegar(1)
+				get_viewport().set_input_as_handled()
+			elif evento.is_action_pressed("ui_accept") or evento.is_action_pressed("personaje-salto"):
+				_confirmar_opcion()
+				get_viewport().set_input_as_handled()
 
 
-## Fija el foco inicial en la opción Jugar y desbloquea el menú.
+## Fija el foco inicial y restablece la presentación cinematográfica al volver al menú.
 func enfocar() -> void:
-	_opcion_actual = Opcion.JUGAR
-	_bloqueado = false
+	iniciar_presentacion()
 	_actualizar_seleccion(false)
 
 

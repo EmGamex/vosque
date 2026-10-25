@@ -1,0 +1,9 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://dfcf4xfct740f"]
+
+[ext_resource type="Shader" uid="uid://bq06vf7qm0i1r" path="res://shaders/motion_blur_vertical.gdshader" id="1_c2gyx"]
+
+[resource]
+shader = ExtResource("1_c2gyx")
+shader_parameter/intensidad = 0.0
+shader_parameter/direccion = Vector2(0, 1)
+shader_parameter/muestras = 8
