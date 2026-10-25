@@ -8,12 +8,8 @@
 [ext_resource type="Texture2D" uid="uid://dkxadsqp7f6tc" path="res://graficos/menu principal/manu seleccion inicio.png" id="5_q3oj6"]
 [ext_resource type="Texture2D" uid="uid://5f2ee4t8jlrk" path="res://graficos/menu principal/variacion izquierda inicio.png" id="6_pkm7p"]
 [ext_resource type="Texture2D" uid="uid://boojl74uuht0b" path="res://graficos/menu principal/variacion derecha inicio.png" id="7_gk5ks"]
+[ext_resource type="FontFile" uid="uid://c8fddvlvqpoow" path="res://fuentes/Raleway-VariableFont_wght.ttf" id="9_f3do1"]
 [ext_resource type="Material" uid="uid://dfcf4xfct740f" path="res://shaders/material_motion_blur.tres" id="9_q78gw"]
-
-[sub_resource type="SystemFont" id="SystemFont_yf5fn"]
-font_names = PackedStringArray("Raleway")
-font_weight = 800
-subpixel_positioning = 0
 
 [sub_resource type="Animation" id="Animation_q78gw"]
 length = 0.001
@@ -311,7 +307,7 @@ offset_right = -274.0
 offset_bottom = -187.0
 rotation = 0.17741348
 pivot_offset = Vector2(100.5, 26.5)
-theme_override_fonts/font = SubResource("SystemFont_yf5fn")
+theme_override_fonts/font = ExtResource("9_f3do1")
 theme_override_font_sizes/font_size = 44
 text = "Opciones"
 horizontal_alignment = 1
@@ -324,7 +320,7 @@ offset_right = 101.5
 offset_bottom = -262.0
 scale = Vector2(1.08, 1.08)
 pivot_offset = Vector2(101.5, 44)
-theme_override_fonts/font = SubResource("SystemFont_yf5fn")
+theme_override_fonts/font = ExtResource("9_f3do1")
 theme_override_font_sizes/font_size = 74
 text = "Jugar"
 horizontal_alignment = 1
@@ -338,7 +334,7 @@ offset_right = 421.0
 offset_bottom = -145.99997
 rotation = -0.2617994
 pivot_offset = Vector2(90.5, 26.5)
-theme_override_fonts/font = SubResource("SystemFont_yf5fn")
+theme_override_fonts/font = ExtResource("9_f3do1")
 theme_override_font_sizes/font_size = 44
 text = "Créditos"
 horizontal_alignment = 1
@@ -366,6 +362,7 @@ offset_left = 140.0
 offset_top = 360.0
 offset_right = 940.0
 offset_bottom = 510.0
+theme_override_fonts/font = ExtResource("9_f3do1")
 theme_override_font_sizes/font_size = 88
 text = "V O S Q U E"
 horizontal_alignment = 1
@@ -377,6 +374,7 @@ offset_left = 140.0
 offset_top = 560.0
 offset_right = 940.0
 offset_bottom = 620.0
+theme_override_fonts/font = ExtResource("9_f3do1")
 theme_override_font_sizes/font_size = 32
 text = "PRESIONA ENTER PARA COMENZAR"
 horizontal_alignment = 1
