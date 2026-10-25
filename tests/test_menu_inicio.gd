@@ -148,11 +148,30 @@ func test_nodos_y_estado_cinematica() -> void:
 	menu.skipear_cinematica()
 	assert_eq(animador.speed_scale, menu.get("multiplicador_velocidad_skip"), "skipear_cinematica debe acelerar el animador")
 
-	# Finalización de la animación
+	# Finalización de la animación de descenso
 	menu._on_animacion_terminada(&"bajar_al_bosque")
 	assert_eq(menu.get("_estado"), 2, "Al terminar la animación debe pasar a MENU_ACTIVO (2)")
 	assert_eq(animador.speed_scale, 1.0, "Velocidad debe restaurarse a 1.0")
 	assert_eq(camara.position, Vector2(540.0, 540.0), "Cámara debe encuadrar el bosque (540, 540)")
+
+	# Probar regreso a presentación (presionar Escape en MENU_ACTIVO)
+	menu.regresar_a_presentacion()
+	assert_eq(menu.get("_estado"), 3, "regresar_a_presentacion debe pasar a CINEMATICA_SUBIENDO (3)")
+	assert_true(menu.get("_bloqueado"), "El menú debe bloquearse durante la cinemática de subida")
+
+	# Probar skip de subida
+	menu.skipear_cinematica()
+	assert_eq(animador.speed_scale, menu.get("multiplicador_velocidad_skip"), "skipear debe acelerar la subida")
+
+	# Finalización de la animación de subida
+	menu._on_animacion_terminada(&"bajar_al_bosque")
+	assert_eq(menu.get("_estado"), 0, "Al terminar de subir debe volver a PRESENTACION (0)")
+	assert_false(menu.get("_bloqueado"), "El menú debe desbloquearse al llegar a PRESENTACION")
+	assert_eq(camara.position, Vector2(540.0, -540.0), "Cámara debe encuadrar el cielo (540, -540)")
+	assert_eq(presentacion.modulate.a, 1.0, "Presentación debe restaurar opacidad 1.0")
+	var textos: Control = menu.get_node_or_null("Textos") as Control
+	if textos != null:
+		assert_eq(textos.modulate.a, 0.0, "Textos de opciones deben estar en 0.0 al volver a inicio")
 
 	menu.free()
 
@@ -170,6 +189,54 @@ func test_pistas_bezier_configuradas() -> void:
 				break
 		assert_true(tiene_bezier_y, "La pista CamaraMenu:position:y debe ser de tipo TYPE_BEZIER")
 	menu.free()
+
+
+func test_particulas_cielo_y_configurabilidad() -> void:
+	var menu: Control = _crear_instancia_menu()
+	menu.add_to_group("modo_test")
+	menu._ready()
+
+	var p_estrellas: CPUParticles2D = menu.get_node_or_null("Fondos/ParticulasEstrellas") as CPUParticles2D
+	var p_nubes: CPUParticles2D = menu.get_node_or_null("Fondos/ParticulasNubes") as CPUParticles2D
+
+	assert_true(p_estrellas != null, "Debe existir el nodo Fondos/ParticulasEstrellas")
+	assert_true(p_nubes != null, "Debe existir el nodo Fondos/ParticulasNubes")
+
+	if p_estrellas != null and p_nubes != null:
+		assert_true(p_estrellas.preprocess > 0.0, "Las estrellas deben tener preprocess para cargar pobladas")
+		assert_true(p_nubes.preprocess > 0.0, "Las nubes deben tener preprocess para cargar pobladas")
+
+		# Comprobar configurabilidad reactiva de estrellas
+		menu.set("estrellas_cantidad", 28)
+		assert_eq(p_estrellas.amount, 28, "Cambiar estrellas_cantidad debe actualizar el amount del emisor")
+
+		menu.set("habilitar_estrellas", false)
+		assert_false(p_estrellas.emitting, "Deshabilitar estrellas debe apagar emitting")
+
+		menu.set("habilitar_estrellas", true)
+		assert_true(p_estrellas.emitting, "Rehabilitar estrellas debe encender emitting")
+
+		# Comprobar configurabilidad reactiva de nubes
+		var color_prueba: Color = Color(0.5, 0.6, 0.9, 0.25)
+		menu.set("nubes_color", color_prueba)
+		assert_eq(p_nubes.color, color_prueba, "Cambiar nubes_color debe actualizar color del emisor")
+
+		menu.set("nubes_cantidad", 14)
+		assert_eq(p_nubes.amount, 14, "Cambiar nubes_cantidad debe actualizar amount del emisor")
+
+		# Comprobar parallax en _process (traslación y rotación reactiva)
+		menu.set("_offset_base", Vector2(95.0, 0.0))
+		menu.set("_rotacion_base", deg_to_rad(1.2))
+		menu._process(0.1)
+
+		# Comprobar que el parallax desplaza y rota los emisores con la linterna
+		assert_true(p_nubes.position != Vector2.ZERO, "Las nubes deben tener posición asignada")
+		assert_true(p_estrellas.position != Vector2.ZERO, "Las estrellas deben tener posición asignada")
+		assert_true(abs(p_nubes.rotation) > 0.0001, "Las nubes deben rotar con el parallax")
+		assert_true(abs(p_estrellas.rotation) > 0.0001, "Las estrellas deben rotar con el parallax")
+
+	menu.free()
+
 
 
 

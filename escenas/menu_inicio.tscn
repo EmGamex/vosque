@@ -7,7 +7,11 @@
 [ext_resource type="Texture2D" uid="uid://jrdcfeqo0t03" path="res://graficos/menu principal/montaña 1.png" id="4_pkm7p"]
 [ext_resource type="Texture2D" uid="uid://dkxadsqp7f6tc" path="res://graficos/menu principal/manu seleccion inicio.png" id="5_q3oj6"]
 [ext_resource type="Texture2D" uid="uid://5f2ee4t8jlrk" path="res://graficos/menu principal/variacion izquierda inicio.png" id="6_pkm7p"]
+[ext_resource type="Texture2D" uid="uid://dcibwm26xuypc" path="res://recursos/particulas/textura_estrella.tres" id="6_vxcbv"]
 [ext_resource type="Texture2D" uid="uid://boojl74uuht0b" path="res://graficos/menu principal/variacion derecha inicio.png" id="7_gk5ks"]
+[ext_resource type="Gradient" uid="uid://c4uoxglw5r0mw" path="res://recursos/particulas/rampa_alpha_estrella.tres" id="7_xbcmh"]
+[ext_resource type="Texture2D" uid="uid://do0wowmmnacrn" path="res://recursos/particulas/textura_nube.tres" id="8_883rq"]
+[ext_resource type="Gradient" uid="uid://uwtfwqocj2p7" path="res://recursos/particulas/rampa_alpha_nube.tres" id="9_5s2e3"]
 [ext_resource type="FontVariation" uid="uid://0htusin8b5jm" path="res://fuentes/raleway_bold.tres" id="9_f3do1"]
 [ext_resource type="Material" uid="uid://dfcf4xfct740f" path="res://shaders/material_motion_blur.tres" id="9_q78gw"]
 
@@ -250,6 +254,23 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_leqng")
+habilitar_estrellas = null
+estrellas_cantidad = null
+estrellas_lifetime = null
+estrellas_escala_min = null
+estrellas_escala_max = null
+estrellas_color = null
+estrellas_factor_parallax = null
+estrellas_factor_rotacion = null
+habilitar_nubes = null
+nubes_cantidad = null
+nubes_velocidad_x = null
+nubes_lifetime = null
+nubes_escala_min = null
+nubes_escala_max = null
+nubes_color = null
+nubes_factor_parallax = null
+nubes_factor_rotacion = null
 
 [node name="Fondos" type="Node2D" parent="." unique_id=843092210]
 position = Vector2(540, 540)
@@ -272,6 +293,37 @@ texture = ExtResource("3_q3oj6")
 position = Vector2(-4, 244)
 scale = Vector2(0.52, 0.52)
 texture = ExtResource("4_pkm7p")
+
+[node name="ParticulasEstrellas" type="CPUParticles2D" parent="Fondos" unique_id=1695083557]
+position = Vector2(0, -500)
+amount = 70
+texture = ExtResource("6_vxcbv")
+lifetime = 4.5
+preprocess = 5.0
+lifetime_randomness = 0.65
+emission_shape = 3
+emission_rect_extents = Vector2(560, 560)
+gravity = Vector2(0, 0)
+scale_amount_min = 0.35
+scale_amount_max = 0.95
+color_ramp = ExtResource("7_xbcmh")
+
+[node name="ParticulasNubes" type="CPUParticles2D" parent="Fondos" unique_id=422632142]
+position = Vector2(0, -320)
+amount = 12
+texture = ExtResource("8_883rq")
+lifetime = 16.0
+preprocess = 16.0
+emission_shape = 3
+emission_rect_extents = Vector2(580, 400)
+spread = 6.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 12.0
+initial_velocity_max = 24.0
+scale_amount_min = 2.0
+scale_amount_max = 4.2
+color = Color(0.7529412, 0.8156863, 0.9490196, 0.16078432)
+color_ramp = ExtResource("9_5s2e3")
 
 [node name="Arboles" type="Node2D" parent="." unique_id=348604735]
 position = Vector2(540, 540)

@@ -13,7 +13,7 @@ signal jugar_solicitado
 signal opciones_solicitado
 signal creditos_solicitado
 
-enum EstadoMenu { PRESENTACION, CINEMATICA_BAJANDO, MENU_ACTIVO }
+enum EstadoMenu { PRESENTACION, CINEMATICA_BAJANDO, MENU_ACTIVO, CINEMATICA_SUBIENDO }
 enum Opcion { OPCIONES, JUGAR, CREDITOS }
 
 const ORDEN_OPCIONES: Array[Opcion] = [Opcion.OPCIONES, Opcion.JUGAR, Opcion.CREDITOS]
@@ -35,8 +35,103 @@ const FACTOR_ROTACION_MONTANA_1: float = 0.35
 @export_group("Cinemática de Inicio")
 ## Determina si al arrancar o volver al menú se reproduce la pantalla de inicio en el cielo.
 @export var habilitar_presentacion: bool = true
-## Multiplicador de velocidad al pulsar tecla durante la bajada para saltarla casi al instante.
-@export var multiplicador_velocidad_skip: float = 10.0
+## Multiplicador de velocidad al pulsar tecla durante la bajada o subida para acelerar la transición.
+@export_range(1.5, 10.0, 0.5) var multiplicador_velocidad_skip: float = 4.0
+
+# ==========================================
+# CONFIGURACIÓN DE PARTÍCULAS DEL CIELO
+# ==========================================
+@export_group("Partículas y Ambiente")
+
+@export_subgroup("Estrellas")
+## Activa o desactiva las partículas de estrellas titilantes.
+@export var habilitar_estrellas: bool = true:
+	set(v):
+		habilitar_estrellas = v
+		_aplicar_configuracion_estrellas()
+
+## Cantidad total de estrellas emitidas en la bóveda celeste.
+@export_range(5, 200, 1) var estrellas_cantidad: int = 55:
+	set(v):
+		estrellas_cantidad = v
+		_aplicar_configuracion_estrellas()
+
+## Duración en segundos del ciclo de vida y titileo de las estrellas.
+@export_range(0.5, 15.0, 0.1) var estrellas_lifetime: float = 4.5:
+	set(v):
+		estrellas_lifetime = v
+		_aplicar_configuracion_estrellas()
+
+## Escala mínima de las estrellas (estrellas más lejanas y tenues).
+@export_range(0.1, 2.0, 0.05) var estrellas_escala_min: float = 0.35:
+	set(v):
+		estrellas_escala_min = v
+		_aplicar_configuracion_estrellas()
+
+## Escala máxima de las estrellas (estrellas más cercanas y brillantes).
+@export_range(0.2, 3.0, 0.05) var estrellas_escala_max: float = 0.95:
+	set(v):
+		estrellas_escala_max = v
+		_aplicar_configuracion_estrellas()
+
+## Tinte y opacidad global de las estrellas.
+@export var estrellas_color: Color = Color.WHITE:
+	set(v):
+		estrellas_color = v
+		_aplicar_configuracion_estrellas()
+
+## Factor de desplazamiento de parallax para las estrellas en respuesta a la linterna.
+@export_range(0.0, 0.5, 0.01) var estrellas_factor_parallax: float = 0.08
+## Factor de rotación de parallax para las estrellas en respuesta a la inclinación de la linterna.
+@export_range(0.0, 0.5, 0.01) var estrellas_factor_rotacion: float = 0.06
+
+@export_subgroup("Nubes y Bruma")
+## Activa o desactiva las nubes y bancos de bruma flotantes.
+@export var habilitar_nubes: bool = true:
+	set(v):
+		habilitar_nubes = v
+		_aplicar_configuracion_nubes()
+
+## Cantidad de jirones y bancos de nubes simultáneos.
+@export_range(1, 30, 1) var nubes_cantidad: int = 10:
+	set(v):
+		nubes_cantidad = v
+		_aplicar_configuracion_nubes()
+
+## Velocidad de deriva horizontal de las nubes en píxeles por segundo.
+@export_range(0.0, 100.0, 1.0) var nubes_velocidad_x: float = 18.0:
+	set(v):
+		nubes_velocidad_x = v
+		_aplicar_configuracion_nubes()
+
+## Tiempo de vida en segundos que tarda cada nube en cruzar la pantalla.
+@export_range(3.0, 40.0, 0.5) var nubes_lifetime: float = 16.0:
+	set(v):
+		nubes_lifetime = v
+		_aplicar_configuracion_nubes()
+
+## Escala mínima de los jirones de niebla.
+@export_range(0.5, 6.0, 0.1) var nubes_escala_min: float = 2.0:
+	set(v):
+		nubes_escala_min = v
+		_aplicar_configuracion_nubes()
+
+## Escala máxima de los bancos de niebla.
+@export_range(1.0, 8.0, 0.1) var nubes_escala_max: float = 4.2:
+	set(v):
+		nubes_escala_max = v
+		_aplicar_configuracion_nubes()
+
+## Color y opacidad de las nubes nocturnas.
+@export var nubes_color: Color = Color(0.75, 0.82, 0.95, 0.16):
+	set(v):
+		nubes_color = v
+		_aplicar_configuracion_nubes()
+
+## Factor de desplazamiento de parallax para las nubes.
+@export_range(0.0, 0.5, 0.01) var nubes_factor_parallax: float = 0.16
+## Factor de rotación de parallax para las nubes.
+@export_range(0.0, 0.5, 0.01) var nubes_factor_rotacion: float = 0.12
 
 
 
@@ -55,6 +150,9 @@ const FACTOR_ROTACION_MONTANA_1: float = 0.35
 @onready var _arbol_opciones: Sprite2D = $Arboles/ArbolOpciones
 @onready var _arbol_jugar: Sprite2D = $Arboles/ArbolJugar
 @onready var _arbol_creditos: Sprite2D = $Arboles/ArbolCreditos
+
+@onready var _particulas_estrellas: CPUParticles2D = $Fondos/ParticulasEstrellas
+@onready var _particulas_nubes: CPUParticles2D = $Fondos/ParticulasNubes
 
 @onready var _texto_opciones: Label = $Textos/TextoOpciones
 @onready var _texto_jugar: Label = $Textos/TextoJugar
@@ -77,6 +175,8 @@ var _pos_inicial_fondos: Vector2 = Vector2.ZERO
 var _pos_inicial_degradado: Vector2 = Vector2.ZERO
 var _pos_inicial_montana_2: Vector2 = Vector2.ZERO
 var _pos_inicial_montana_1: Vector2 = Vector2.ZERO
+var _pos_inicial_estrellas: Vector2 = Vector2.ZERO
+var _pos_inicial_nubes: Vector2 = Vector2.ZERO
 var _pos_inicial_arboles: Vector2 = Vector2.ZERO
 var _pos_inicial_textos: Vector2 = Vector2.ZERO
 
@@ -85,6 +185,7 @@ func _ready() -> void:
 	_capturar_posiciones_iniciales()
 	_inicializar_datos_opciones()
 	_conectar_animador()
+	_aplicar_configuracion_completa_particulas()
 	iniciar_presentacion()
 	_actualizar_seleccion(false)
 
@@ -105,10 +206,59 @@ func _capturar_posiciones_iniciales() -> void:
 		_pos_inicial_montana_2 = _montana_2.position
 	if _montana_1 != null:
 		_pos_inicial_montana_1 = _montana_1.position
+	var p_estrellas: CPUParticles2D = _obtener_particulas_estrellas()
+	if p_estrellas != null:
+		_pos_inicial_estrellas = p_estrellas.position
+	var p_nubes: CPUParticles2D = _obtener_particulas_nubes()
+	if p_nubes != null:
+		_pos_inicial_nubes = p_nubes.position
 	if _arboles_nodo != null:
 		_pos_inicial_arboles = _arboles_nodo.position
 	if _textos_nodo != null:
 		_pos_inicial_textos = _textos_nodo.position
+
+
+func _obtener_particulas_estrellas() -> CPUParticles2D:
+	if _particulas_estrellas == null and has_node("Fondos/ParticulasEstrellas"):
+		_particulas_estrellas = get_node("Fondos/ParticulasEstrellas") as CPUParticles2D
+	return _particulas_estrellas
+
+
+func _obtener_particulas_nubes() -> CPUParticles2D:
+	if _particulas_nubes == null and has_node("Fondos/ParticulasNubes"):
+		_particulas_nubes = get_node("Fondos/ParticulasNubes") as CPUParticles2D
+	return _particulas_nubes
+
+
+func _aplicar_configuracion_estrellas() -> void:
+	var p: CPUParticles2D = _obtener_particulas_estrellas()
+	if p == null:
+		return
+	p.emitting = habilitar_estrellas
+	p.amount = estrellas_cantidad
+	p.lifetime = estrellas_lifetime
+	p.scale_amount_min = estrellas_escala_min
+	p.scale_amount_max = estrellas_escala_max
+	p.color = estrellas_color
+
+
+func _aplicar_configuracion_nubes() -> void:
+	var p: CPUParticles2D = _obtener_particulas_nubes()
+	if p == null:
+		return
+	p.emitting = habilitar_nubes
+	p.amount = nubes_cantidad
+	p.lifetime = nubes_lifetime
+	p.initial_velocity_min = nubes_velocidad_x * 0.8
+	p.initial_velocity_max = nubes_velocidad_x * 1.2
+	p.scale_amount_min = nubes_escala_min
+	p.scale_amount_max = nubes_escala_max
+	p.color = nubes_color
+
+
+func _aplicar_configuracion_completa_particulas() -> void:
+	_aplicar_configuracion_estrellas()
+	_aplicar_configuracion_nubes()
 
 
 func _inicializar_datos_opciones() -> void:
@@ -181,23 +331,58 @@ func iniciar_descenso() -> void:
 		_on_animacion_terminada(&"bajar_al_bosque")
 
 
-## Acelera la animación de descenso para aterrizar casi al instante.
+## Dispara el paneo ascendente de cámara de regreso al cielo y pantalla de inicio.
+func regresar_a_presentacion() -> void:
+	if _estado != EstadoMenu.MENU_ACTIVO or _bloqueado:
+		return
+
+	_bloqueado = true
+	_opcion_actual = Opcion.JUGAR
+	_actualizar_seleccion(true)
+	_estado = EstadoMenu.CINEMATICA_SUBIENDO
+
+	if _animador != null and _animador.has_animation("bajar_al_bosque"):
+		_animador.speed_scale = 1.0
+		_animador.play_backwards("bajar_al_bosque")
+	else:
+		_on_animacion_terminada(&"bajar_al_bosque")
+
+
+## Acelera la animación cinemática activa (bajada o subida) para completarla casi al instante.
 func skipear_cinematica() -> void:
-	if _estado == EstadoMenu.CINEMATICA_BAJANDO and _animador != null and _animador.is_playing():
+	if (_estado == EstadoMenu.CINEMATICA_BAJANDO or _estado == EstadoMenu.CINEMATICA_SUBIENDO) and _animador != null and _animador.is_playing():
 		_animador.speed_scale = multiplicador_velocidad_skip
 
 
 func _on_animacion_terminada(nombre: StringName) -> void:
 	if nombre == &"bajar_al_bosque":
-		_estado = EstadoMenu.MENU_ACTIVO
-		_bloqueado = false
-		if _animador != null:
-			_animador.speed_scale = 1.0
-		if _camara != null:
-			_camara.position = Vector2(540.0, 540.0)
-		if _textos_nodo != null:
-			_textos_nodo.modulate.a = 1.0
-		_actualizar_seleccion(false)
+		if _estado == EstadoMenu.CINEMATICA_SUBIENDO:
+			_estado = EstadoMenu.PRESENTACION
+			_bloqueado = false
+			if _animador != null:
+				_animador.speed_scale = 1.0
+			if _camara != null:
+				_camara.position = Vector2(540.0, -540.0)
+			if _presentacion != null:
+				_presentacion.modulate.a = 1.0
+			if _fondo_presentacion != null:
+				_fondo_presentacion.modulate.a = 1.0
+			if _textos_nodo != null:
+				_textos_nodo.modulate.a = 0.0
+			_opcion_actual = Opcion.JUGAR
+			_actualizar_seleccion(false)
+			if _animador != null and _animador.has_animation("esperando_inicio"):
+				_animador.play("esperando_inicio")
+		else:
+			_estado = EstadoMenu.MENU_ACTIVO
+			_bloqueado = false
+			if _animador != null:
+				_animador.speed_scale = 1.0
+			if _camara != null:
+				_camara.position = Vector2(540.0, 540.0)
+			if _textos_nodo != null:
+				_textos_nodo.modulate.a = 1.0
+			_actualizar_seleccion(false)
 
 
 func _process(delta: float) -> void:
@@ -240,6 +425,16 @@ func _process(delta: float) -> void:
 		_montana_1.position = _pos_inicial_montana_1 + (offset_total * FACTOR_PARALLAX_MONTANA_1)
 		_montana_1.rotation = rotacion_total * FACTOR_ROTACION_MONTANA_1
 
+	var p_estrellas: CPUParticles2D = _obtener_particulas_estrellas()
+	if p_estrellas != null:
+		p_estrellas.position = _pos_inicial_estrellas + (offset_total * estrellas_factor_parallax)
+		p_estrellas.rotation = rotacion_total * estrellas_factor_rotacion
+
+	var p_nubes: CPUParticles2D = _obtener_particulas_nubes()
+	if p_nubes != null:
+		p_nubes.position = _pos_inicial_nubes + (offset_total * nubes_factor_parallax)
+		p_nubes.rotation = rotacion_total * nubes_factor_rotacion
+
 
 func _unhandled_input(evento: InputEvent) -> void:
 	if Engine.is_editor_hint():
@@ -251,7 +446,7 @@ func _unhandled_input(evento: InputEvent) -> void:
 				iniciar_descenso()
 				get_viewport().set_input_as_handled()
 
-		EstadoMenu.CINEMATICA_BAJANDO:
+		EstadoMenu.CINEMATICA_BAJANDO, EstadoMenu.CINEMATICA_SUBIENDO:
 			if evento.is_action_pressed("ui_accept") or evento.is_action_pressed("ui_cancel") or evento.is_action_pressed("personaje-salto"):
 				skipear_cinematica()
 				get_viewport().set_input_as_handled()
@@ -260,7 +455,10 @@ func _unhandled_input(evento: InputEvent) -> void:
 			if _bloqueado:
 				return
 
-			if evento.is_action_pressed("personaje-izquierda") or evento.is_action_pressed("ui_left"):
+			if evento.is_action_pressed("ui_cancel"):
+				regresar_a_presentacion()
+				get_viewport().set_input_as_handled()
+			elif evento.is_action_pressed("personaje-izquierda") or evento.is_action_pressed("ui_left"):
 				_navegar(-1)
 				get_viewport().set_input_as_handled()
 			elif evento.is_action_pressed("personaje-derecha") or evento.is_action_pressed("ui_right"):

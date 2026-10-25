@@ -62,11 +62,28 @@ El menú principal implementa una experiencia cinematográfica previa dividida e
 1. **Estado `PRESENTACION`:** La `CamaraMenu` inicia en `(540, -540)` reproduciendo en loop la animación `"esperando_inicio"` (respiración suave de opacidad del texto de inicio).
 2. **Descenso (`iniciar_descenso()`):** Al pulsar <kbd>Enter</kbd> o <kbd>Espacio</kbd>, pasa a `CINEMATICA_BAJANDO` y ejecuta `"bajar_al_bosque"`, desplazando la `CamaraMenu` verticalmente hasta `(540, 540)` y realizando un crossfade suave de salida (`modulate:a -> 0.0`) de `FondoPresentacion` hacia `FondoDegradado`.
 3. **Efecto Motion Blur Vertical (`shaders/motion_blur_vertical.gdshader`):** Un `ColorRect` a pantalla completa anclado a la cámara (`CamaraMenu/EfectoMotionBlur`) aplica un desenfoque direccional vertical sobre `screen_texture`. Su intensidad se modula mediante una curva de campana en el `AnimationPlayer` (pico de `0.035` a mitad de la caída y `0.0` al inicio y freno), otorgando una sensación vertiginosa de velocidad cinematográfica.
-4. **Función Skip Dinámica (`skipear_cinematica()`):** Si el jugador pulsa cualquier botón de acción (<kbd>Enter</kbd>, <kbd>Espacio</kbd>, <kbd>Escape</kbd>) durante el descenso, el `AnimationPlayer` multiplica su velocidad (`speed_scale = multiplicador_velocidad_skip`, por defecto $10\times$), concluyendo la animación en menos de $0.15\text{ s}$ sin cortes abruptos.
-5. **Reinicio al volver:** Cada vez que el jugador regresa al menú principal (desde el juego o Game Over vía `GestorDeEscenas.volver_al_menu()`), el método `enfocar()` reinicia la vista en la parte superior, permitiendo siempre la aceleración instantánea con doble pulsación.
-6. **Ajustes en Inspector:**
+4. **Función Skip Dinámica (`skipear_cinematica()`):** Si el jugador pulsa cualquier botón de acción (<kbd>Enter</kbd>, <kbd>Espacio</kbd>, <kbd>Escape</kbd>) durante el descenso o ascenso, el `AnimationPlayer` multiplica su velocidad (`speed_scale = multiplicador_velocidad_skip`, por defecto $4.0\times$, ajustable entre $1.5\times$ y $10.0\times$), concluyendo la animación de forma ágil y fluida ($\approx 0.35\text{ s}$) sin saltos abruptos.
+5. **Retorno a la Pantalla de Inicio con Escape (`regresar_a_presentacion()`):** Estando en el menú de selección de árboles (`MENU_ACTIVO`), presionar <kbd>Escape</kbd> (`ui_cancel`) activa el estado `CINEMATICA_SUBIENDO` y reproduce la animación en reversa (`play_backwards("bajar_al_bosque")`). La cámara se eleva desde el bosque hacia el cielo con *motion blur*, oculta los textos de opciones, restaura los fondos de presentación y reanuda el bucle de espera (*"PRESIONA ENTER PARA COMENZAR"*).
+6. **Reinicio al volver:** Cada vez que el jugador regresa al menú principal (desde el juego o Game Over vía `GestorDeEscenas.volver_al_menu()`), el método `enfocar()` reinicia la vista en la parte superior, permitiendo siempre la aceleración instantánea con doble pulsación.
+7. **Ajustes en Inspector:**
    - `habilitar_presentacion` (`bool`): Permite omitir la cinemática e iniciar directamente en los árboles para pruebas rápidas de desarrollo.
    - `multiplicador_velocidad_skip` (`float`): Factor de aceleración al skipear.
+
+### 1.6. Partículas Atmosféricas del Cielo (Estrellas y Nubes)
+Para eliminar la monotonía visual del cielo nocturno tanto en espera como en el descenso, el menú incorpora dos sistemas de partículas procedurales (`CPUParticles2D`) ubicados bajo `$Fondos`:
+
+1. **Estrellas Titilantes (`ParticulasEstrellas`):**
+   - Textura radial suave `res://recursos/particulas/textura_estrella.tres` con rampa de opacidad `rampa_alpha_estrella.tres` para simular titileo orgánico.
+   - Distribución rectangular con `preprocess` activo (aparece completamente poblada desde el inicio sin retraso).
+2. **Nubes y Bruma Nocturna (`ParticulasNubes`):**
+   - Textura difusa semi-translúcida `res://recursos/particulas/textura_nube.tres` con rampa de entrada y salida gradual `rampa_alpha_nube.tres`.
+   - Deriva horizontal suave en eje $X$.
+3. **Parámetros Altamente Configurables (`@tool` en Inspector):**
+   - El script actualiza en vivo los emisores en el editor 2D y en tiempo de ejecución:
+     - **Subgrupo Estrellas:** `habilitar_estrellas`, `estrellas_cantidad`, `estrellas_lifetime`, `estrellas_escala_min/max`, `estrellas_color`, `estrellas_factor_parallax`.
+     - **Subgrupo Nubes y Bruma:** `habilitar_nubes`, `nubes_cantidad`, `nubes_velocidad_x`, `nubes_lifetime`, `nubes_escala_min/max`, `nubes_color`, `nubes_factor_parallax`.
+4. **Cinemática Natural:**
+   - Al descender la cámara a ras de suelo en el bosque, las estrellas y nubes se desplazan de forma coherente hacia arriba, saliendo del viewport de manera natural.
 
 ---
 
