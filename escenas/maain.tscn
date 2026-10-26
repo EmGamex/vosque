@@ -22,6 +22,7 @@ objetivo_enemigo = NodePath("../Enemigo")
 process_mode = 4
 visible = false
 position = Vector2(-99999, -99999)
+motion_mode = 1
 objetivo = NodePath("../personaje")
 
 [node name="DebugMenu" parent="." unique_id=85566436 node_paths=PackedStringArray("target_character", "target_enemigo", "target_camara", "target_camara_dios", "target_escenario") instance=ExtResource("4_kcfdb")]

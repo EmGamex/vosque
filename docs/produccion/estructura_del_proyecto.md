@@ -46,13 +46,20 @@ c:/Proyectos/vosque/
 │   ├── notas/                  # Sprite de hoja arrugada y halo
 │   └── personaje/              # Spritesheets y poses de caminar, salto, plancha y sombra
 ├── recursos/                   # Recursos serializados de Godot (.tres)
+│   ├── config_niebla_defecto.tres # Preset predeterminado de ConfiguracionNiebla
 │   ├── materiales/             # Shaders materials (mat_niebla_mutacion.tres, etc.)
 │   ├── temas/                  # Estilos visuales de UI y botones (StyleBoxFlat, fuentes)
 │   └── tilesets/               # Tileset de obstáculos y suelo (tileset_obstaculos.tres, etc.)
 ├── scripts/                    # Código fuente GDScript (.gd)
 │   ├── debug_menu/             # Controladores modulares del menú F3 (cheats, física, escenario, etc.)
+│   ├── efecto_niebla/          # Módulo desacoplado del efecto visual de niebla geométrica
+│   │   ├── efecto_niebla_mutacion.gd # Fachada CanvasLayer y orquestador público
+│   │   ├── niebla_material_controller.gd # Duplicación en memoria y asignación de uniforms
+│   │   ├── niebla_foco_controller.gd # Seguimiento del jugador y proyección UV
+│   │   └── niebla_transicion_controller.gd # FSM, tweens y acumulación de fase
+│   ├── configuracion_niebla.gd # Recurso tipado de configuración de niebla
 │   ├── debug_config.gd         # Singleton/Autoload de persistencia de ajustes de debug
-│   ├── efecto_niebla_mutacion.gd # Lógica de iris y ceguera de transición
+│   ├── efecto_niebla_mutacion.gd # Stub de compatibilidad histórica hacia scripts/efecto_niebla/
 │   ├── enemigo.gd              # IA de persecución, rotación y anti-atascamiento
 │   ├── escenario.gd            # Mutación de sectores lejanos y reubicación segura
 │   ├── game_over.gd            # Lógica de fin de partida y récord

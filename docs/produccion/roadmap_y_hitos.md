@@ -1,6 +1,6 @@
 # Roadmap e Hitos de Producción
 
-Este documento detalla el cronograma de desarrollo acotado a 4 semanas para alcanzar el objetivo de lanzamiento en Halloween (31 de Octubre de 2026), reflejando el progreso técnico real del proyecto a fecha de **19 de Octubre de 2026**.
+Este documento detalla el cronograma de desarrollo acotado a 4 semanas para alcanzar el objetivo de lanzamiento en Halloween (31 de Octubre de 2026), reflejando el progreso técnico real del proyecto a fecha de **25 de Octubre de 2026**.
 
 ---
 
@@ -8,29 +8,29 @@ Este documento detalla el cronograma de desarrollo acotado a 4 semanas para alca
 
 ```mermaid
 flowchart TD
-    subgraph S1 ["Semana 1 (04/10 - 10/10): Prototipo Graybox"]
+    subgraph S1 ["Semana 1 (04/10 - 10/10): Prototipo Graybox [100%]"]
         W1A["Movimiento 8-Dir + Telemetría F3"] --> W1B["Plugin de Editor personaje_tools"]
         W1B --> W1C["Gestor de Escenas, Menús y Transiciones"]
         W1C --> W1D["IA Base del Monstruo con Rotación Continua"]
     end
 
-    subgraph S2 ["Semana 2 (11/10 - 17/10): Mecánicas Evasivas y GDD Técnico"]
+    subgraph S2 ["Semana 2 (11/10 - 17/10): Mecánicas Evasivas y GDD Técnico [100%]"]
         W2A["GDD: Salto Libre y Salto de Plancha (Dive)"] --> W2B["GDD: Sistema de Estamina y Fatiga"]
         W2B --> W2C["GDD: Arena 2x2 y Sectores Mutables"]
         W2C --> W2D["GDD: Sistema de Notas, Director, Audio y Cámara"]
         W2D --> W2E["Catálogo Artístico de ~30 Assets"]
     end
 
-    subgraph S3 ["Semana 3 (18/10 - 24/10): Integración en Motor y Web"]
+    subgraph S3 ["Semana 3 (18/10 - 24/10): Integración en Motor y Web [COMPLETADA]"]
         W3A["Implementación de Salto, Plancha y Estamina"] --> W3B["Sectores Mutables 2x2 y Corredores Seguros"]
         W3B --> W3C["Spawner de Notas Baliza y Escalado Cuantitativo"]
-        W3C --> W3D["Director maain.gd, Pausa CanvasLayer 50 y Preset Web"]
+        W3C --> W3D["Director maain.gd, Condición Derrota y Preset Web"]
     end
 
-    subgraph S4 ["Semana 4 (25/10 - 31/10): Arte Final, Audio y Lanzamiento"]
-        W4A["Producción de Sprites Finales (Blender + Inkscape)"] --> W4B["Integración de SFX, Buses de Audio y Shake"]
-        W4B --> W4C["Persistencia de High Score en Web y Jumpscare"]
-        W4C --> W4D["Publicación Oficial en itch.io y Newgrounds"]
+    subgraph S4 ["Semana 4 (25/10 - 31/10): HUD, Arte Final, Audio y Lanzamiento [EN CURSO]"]
+        W4A["HUD In-Game, Linterna y Menú de Pausa"] --> W4B["Producción de Sprites Finales (Blender + Inkscape)"]
+        W4B --> W4C["Integración de SFX, Gestor de Música y Trauma Shake"]
+        W4C --> W4D["Persistencia High Score y Publicación (itch.io / Newgrounds)"]
     end
 
     S1 --> S2
@@ -41,9 +41,8 @@ flowchart TD
     classDef current fill:#5a451b,stroke:#e69f0c,color:#ffffff;
     classDef pending fill:#1f2430,stroke:#4f5b66,color:#c0c5ce;
 
-    class W1A,W1B,W1C,W1D,W2A,W2B,W2C,W2D,W2E done;
-    class W3A,W3B,W3C,W3D current;
-    class W4A,W4B,W4C,W4D pending;
+    class W1A,W1B,W1C,W1D,W2A,W2B,W2C,W2D,W2E,W3A,W3B,W3C,W3D done;
+    class W4A,W4B,W4C,W4D current;
 ```
 
 ---
@@ -77,31 +76,32 @@ flowchart TD
 
 ---
 
-### Semana 3 (18/10/2026 – 24/10/2026): Integración en Motor, Mutación 2x2 y Web — **[EN CURSO / PRÓXIMO HITO]**
+### Semana 3 (18/10/2026 – 24/10/2026): Integración en Motor, Mutación 2x2 y Web — **[100% COMPLETADA]**
 * **Objetivo:** Trasladar las mecánicas documentadas al código GDScript de Godot 4, habilitar la mutación continua de cuadrantes y validar la primera compilación funcional en navegador.
 * **Entregables Clave:**
   - [x] Implementar la máquina de estados de Salto Libre, Plancha (*Dive*) y simulación de elevación en eje Z en [`personaje.gd`](../../scripts/personaje.gd).
   - [x] Implementar la lógica de Estamina y fatiga en [`personaje.gd`](../../scripts/personaje.gd).
-  - [ ] Diseñar el HUD in-game y vincular el `ProgressBar` nativo con la señal `estamina_cambiada`.
   - [x] Crear la estructura modular de [`escenas/escenario.tscn`](../../escenas/escenario.tscn) con valla perimetral fija y las sub-escenas de variantes con corredores de paso seguros.
   - [x] Programar la lógica de mutación de los 3 sectores lejanos, niebla de transición (`EfectoNieblaMutacion`) y reposicionamiento anti-atascamiento del monstruo.
   - [x] Crear la entidad coleccionable [`escenas/nota.tscn`](../../escenas/nota.tscn) con baliza luminosa y recolección arcade instantánea.
   - [x] Implementar el orquestador Game Director en [`scripts/maain.gd`](../../scripts/maain.gd) conectando las señales de recolección, mutación y el algoritmo de Spawner con exclusión espacial.
-  - [ ] Implementar el escalado de velocidad del enemigo según el modelo cuantitativo acotado ($500 \to 920\text{ px/s}$) y condición de derrota.
+  - [x] Implementar el escalado de velocidad del enemigo según el modelo cuantitativo acotado ($500 \to 920\text{ px/s}$) y condición de derrota hacia Game Over en [`enemigo.gd`](../../scripts/enemigo.gd).
   - [x] Implementar suite de telemetría y menú unificado de diagnóstico in-game en [`escenas/debug_menu.tscn`](../../escenas/debug_menu.tscn).
-  - [ ] Integrar el nodo de menú de pausa en [`gestor_escenas.gd`](../../scripts/gestor_escenas.gd) pausando solo el subárbol de la partida activa.
-  - [x] Configurar preset de exportación Web en [`export_presets.cfg`](../../export_presets.cfg) y preparar build `index.html` para navegador.
+  - [x] Configurar preset de exportación Web en [`export_presets.cfg`](../../export_presets.cfg) y preparar flags de compatibilidad navegador.
 
 ---
 
-### Semana 4 (25/10/2026 – 31/10/2026): Arte Final, Audio, Pulido y Lanzamiento — **[PENDIENTE]**
-* **Objetivo:** Sustituir placeholders y graybox por los assets finales ilustrados (Blender + Inkscape), integrar diseño sonoro con buses de audio, implementar trauma shake en cámara y publicar para Halloween.
+### Semana 4 (25/10/2026 – 31/10/2026): HUD, Arte Final, Audio, Pulido y Lanzamiento — **[EN CURSO - FALTAN 6 DÍAS]**
+* **Objetivo:** Conectar el feedback de usuario (HUD, pausa, linterna), sustituir placeholders por assets clave, orquestar música interactiva y SFX, configurar High Score y publicar para Halloween.
 * **Entregables Clave:**
-  - [ ] Generar los renders 3D base en Blender y vectorizar en Inkscape los sprites del jugador (15 frames) y criatura (2-3 frames).
-  - [ ] Ensamblar el Menú Principal en 3 capas con efecto de paralaje reactivo al ratón.
-  - [ ] Configurar el layout de 4 buses de audio (`Master`, `Ambiente`, `Efectos`, `Criatura`) con atenuación sonora 2D y filtro paso-bajo en fatiga.
-  - [ ] Implementar el sistema de trauma shake en la cámara centrado en eventos físicos.
+  - [ ] Diseñar el HUD in-game (`hud.tscn`) con `ProgressBar` nativo vinculado a `estamina_cambiada` y contador numérico elástico de notas.
+  - [ ] Implementar la linterna frontal desacoplada del personaje (halo radial + haz orientable 360° / movimiento).
+  - [ ] Integrar el Menú de Pausa (`CanvasLayer`, `layer=50`) pausando la partida (`process_mode = PROCESS_MODE_DISABLED`) con Escape/P.
+  - [ ] Generar los renders 3D base en Blender y vectorizar en Inkscape los sprites prioritarios del jugador (15 frames) y criatura (silueta + ojos emisivos).
+  - [ ] Configurar el Singleton Autoload `GestorMusica` con crossfade dinámico de pistas existentes (`Night Crawling` $\to$ `Haunted Boardwalk`) y buses de audio.
+  - [ ] Implementar el sistema de trauma shake en [`camara.tscn`](../../escenas/camara.tscn) (impacto de plancha y muerte).
   - [ ] Implementar persistencia de High Score en Web (`user://` sobre `IndexedDB` y fallback a `localStorage`).
+  - [ ] Pulir pantalla de Game Over con comparativa de récord.
   - [ ] Probar compatibilidad en navegadores principales (Chrome, Firefox, Edge).
   - [ ] Diseñar portada promocional (*Key Art*), banners y capturas.
   - [ ] Publicar y verificar el juego en Newgrounds e itch.io el **31 de Octubre de 2026**.

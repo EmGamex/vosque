@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ConfiguracionNiebla" format=3 uid="uid://bgokli5kooqfg"]
+
+[ext_resource type="Script" uid="uid://o0fiy5a15bpe" path="res://scripts/configuracion_niebla.gd" id="1_gd6ih"]
+
+[resource]
+script = ExtResource("1_gd6ih")
+color_niebla = Color(0.8509804, 0.9019608, 0.98039216, 0.09411765)
+color_niebla_secundaria = Color(0.6509804, 0.7490196, 0.8784314, 0.18431373)
+opacidad_velo_fondo = 0.05
+difuminado_borde = 0.01

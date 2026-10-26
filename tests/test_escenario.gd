@@ -149,15 +149,13 @@ func test_efecto_niebla_mutacion() -> void:
 	assert_true(efecto_niebla != null, "Escenario debe contener EfectoNieblaMutacion")
 	assert_eq(efecto_niebla.layer, 15, "EfectoNieblaMutacion debe estar en layer 15")
 
-	# Verificar que las variables exportadas configurables existen y son válidas
-	assert_true(efecto_niebla.duracion_cierre > 0.0, "duracion_cierre debe ser mayor a 0")
-	assert_true(efecto_niebla.pausa_oscuridad >= 0.0, "pausa_oscuridad debe ser no negativa")
-	assert_true(efecto_niebla.duracion_apertura > 0.0, "duracion_apertura debe ser mayor a 0")
-	assert_true(efecto_niebla.radio_despejado > 0.0, "radio_despejado debe ser mayor a 0")
-	assert_true(efecto_niebla.radio_cerrado >= 0.0, "radio_cerrado debe ser no negativo")
-	assert_true(efecto_niebla.difuminado_borde > 0.0, "difuminado_borde debe ser mayor a 0")
+	# Verificar configuración e inicialización de controladores
+	assert_true(efecto_niebla.config != null, "efecto_niebla debe tener una instancia de ConfiguracionNiebla")
+	assert_true(efecto_niebla.config.duracion_cierre > 0.0, "config.duracion_cierre debe ser mayor a 0")
+	assert_true(efecto_niebla.config.radio_despejado > 0.0, "config.radio_despejado debe ser mayor a 0")
 	assert_true("objetivo_jugador" in efecto_niebla, "efecto_niebla debe soportar objetivo_jugador")
 
+	efecto_niebla.add_to_group("modo_test")
 	efecto_niebla._ready()
 	assert_false(efecto_niebla.visible, "Efecto de niebla debe iniciar invisible en reposo tras _ready (0% overhead)")
 	assert_false(efecto_niebla.is_processing(), "Efecto de niebla debe tener process desactivado en reposo")
@@ -178,6 +176,23 @@ func test_efecto_niebla_mutacion() -> void:
 	await (Engine.get_main_loop() as SceneTree).process_frame
 	assert_true(senales["ceguera"], "cubrir() en modo desactivado debe emitir ceguera_alcanzada")
 	assert_true(senales["disipada"], "despejar() en modo desactivado debe emitir niebla_disipada")
+
+	# Probar token y descarte de señales si se desactiva durante la pausa de oscuridad
+	efecto_niebla.desactivado = false
+	var token_previo: int = efecto_niebla.transicion_ctrl.token_transicion
+	efecto_niebla.ejecutar_transicion(Callable(), 0.05, 0.05, 0.5)
+	await efecto_niebla.ceguera_alcanzada
+	assert_eq(efecto_niebla.fase_actual, EfectoNieblaMutacion.Fase.CEGUERA, "Debe estar en fase CEGUERA durante la pausa")
+	# Desactivamos a mitad de la pausa
+	efecto_niebla.desactivado = true
+	assert_ne(efecto_niebla.transicion_ctrl.token_transicion, token_previo, "El token debe haberse invalidado tras desactivar")
+	assert_eq(efecto_niebla.fase_actual, EfectoNieblaMutacion.Fase.DESPEJADO, "Debe pasar de inmediato a DESPEJADO")
+
+	# Probar asignación de nuevo recurso ConfiguracionNiebla
+	var nueva_cfg := ConfiguracionNiebla.new()
+	nueva_cfg.cantidad_filas = 12
+	efecto_niebla.config = nueva_cfg
+	assert_eq(efecto_niebla.config.cantidad_filas, 12, "El nuevo recurso debe quedar asignado correctamente")
 
 	esc.free()
 

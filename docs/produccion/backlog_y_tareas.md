@@ -55,6 +55,7 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 - [x] **Algoritmo de Mutación Dinámica y Niebla:**
   - [x] Detección del cuadrante activo del jugador al recoger una nota o forzar mutación.
   - [x] Transición de niebla radial (`EfectoNieblaMutacion`) vía `ejecutar_transicion()` con cero consumo en reposo y blindaje asíncrono.
+  - [x] Refactorización de infraestructura de niebla: desacoplamiento con `ConfiguracionNiebla` (`config_niebla_defecto.tres`), integración monotónica continua de fase en shader (`fase_desplazamiento`) y máquina de estados con tokens de cancelación asíncronos (`_token_transicion`).
   - [x] Reemplazo atómico de las sub-escenas de los **3 cuadrantes lejanos** durante la fase de ceguera.
   - [x] Protocolo anti-atascamiento del monstruo con reubicación al punto transitable más próximo y reserva de marcador.
 
@@ -105,9 +106,9 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 - [x] **Orquestador Principal de Partida (`maain.gd`):**
   - [x] Referenciación segura de jugador, monstruo y escenario.
   - [x] Bus centralizado de señales: recolección $\to$ puntuación $\to$ mutación $\to$ nuevo spawn diferido.
-- [ ] **Progresión y Fin de Partida:**
-  - [ ] Escalado dinámico de velocidad del enemigo según notas recolectadas.
-  - [ ] Manejo de condición de derrota y salto a Game Over.
+- [x] **Progresión y Fin de Partida:**
+  - [x] Escalado dinámico de velocidad del enemigo según notas recolectadas (`actualizar_dificultad` y `VELOCIDADES_MONSTRUO` en `enemigo.gd`).
+  - [x] Manejo de condición de derrota y salto a Game Over al capturar al jugador (`jugador_capturado` y llamada al gestor).
 - [ ] **Persistencia de High Score:**
   - [ ] Guardado en archivo local `user://highscore.save` (IndexedDB en navegador).
   - [ ] Fallback web directo a `JavaScriptBridge` con `localStorage`.

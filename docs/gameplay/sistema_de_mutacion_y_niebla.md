@@ -2,7 +2,9 @@
 
 Este documento detalla el algoritmo procedural, la sincronización de estados, los tiempos de transición visual y las optimizaciones de rendimiento del sistema de mutación de **Vosque**.
 
-> 💻 **Scripts en motor:** [`scripts/escenario.gd`](../../scripts/escenario.gd), [`scripts/efecto_niebla_mutacion.gd`](../../scripts/efecto_niebla_mutacion.gd)  
+> 💻 **Scripts en motor:** [`scripts/escenario.gd`](../../scripts/escenario.gd), [`scripts/efecto_niebla/efecto_niebla_mutacion.gd`](../../scripts/efecto_niebla/efecto_niebla_mutacion.gd), [`scripts/efecto_niebla/niebla_material_controller.gd`](../../scripts/efecto_niebla/niebla_material_controller.gd), [`scripts/efecto_niebla/niebla_foco_controller.gd`](../../scripts/efecto_niebla/niebla_foco_controller.gd), [`scripts/efecto_niebla/niebla_transicion_controller.gd`](../../scripts/efecto_niebla/niebla_transicion_controller.gd), [`scripts/configuracion_niebla.gd`](../../scripts/configuracion_niebla.gd)  
+> 🧪 **Suites de pruebas:** [`tests/test_niebla.gd`](../../tests/test_niebla.gd), [`tests/test_escenario.gd`](../../tests/test_escenario.gd)  
+> 🎨 **Shader y Materiales:** [`shaders/niebla_mutacion.gdshader`](../../shaders/niebla_mutacion.gdshader), [`recursos/config_niebla_defecto.tres`](../../recursos/config_niebla_defecto.tres), [`recursos/materiales/mat_niebla_mutacion.tres`](../../recursos/materiales/mat_niebla_mutacion.tres)  
 > 🗺️ **Topología de base:** [Mapa y Sectores](mapa_y_sectores.md)  
 > 👾 **Comportamiento de la IA:** [Monstruo e IA](monstruo_e_ia.md)
 
@@ -69,9 +71,57 @@ sequenceDiagram
 
 ---
 
-## 3. Algoritmo de Selección y Reemplazo de Variantes
+## 3. Arquitectura del Sistema de Niebla
 
-### 3.1. Detección en Tiempo Real del Cuadrante del Jugador
+### 3.1. Desacoplamiento Modular y `ConfiguracionNiebla` (Resource)
+Para permitir *presets* reutilizables (niebla de tutorial, niebla densa de clímax, niebla de prueba rápida) y evitar un monolito con múltiples responsabilidades cruzadas, el subsistema se organiza bajo la carpeta modular `scripts/efecto_niebla/`:
+
+* **`EfectoNieblaMutacion` (`efecto_niebla_mutacion.gd`):** Fachada ligera del nodo `CanvasLayer`. Mantiene el ciclo de vida, señales públicas y delega las operaciones a los sub-controladores.
+* **`NieblaMaterialController` (`niebla_material_controller.gd`):** Aísla el `ShaderMaterial` mediante clonación en memoria (`duplicate()`) y sincroniza los uniforms estáticos y dinámicos (`radio_interno`, `densidad_global`, `suavizado`, etc.).
+* **`NieblaFocoController` (`niebla_foco_controller.gd`):** Resuelve el objetivo del jugador en el árbol y proyecta su posición mundial a coordenadas UV normalizadas de pantalla según la relación de aspecto del Viewport.
+* **`NieblaTransicionController` (`niebla_transicion_controller.gd`):** Gobierna la máquina de estados finita (`enum Fase`), orquesta los Tweens de cierre y apertura, integra la fase continua en CPU y gestiona los tokens de descarte asíncrono.
+* **`ConfiguracionNiebla` (`scripts/configuracion_niebla.gd`):** Recurso serializado (`.tres`) que centraliza:
+  * **Parámetros Geométricos:** `cantidad_filas`, `radio_capsula`, `largo_capsula`, `espaciado_horizontal`, `variacion_filas`.
+  * **Movimiento y Dinámica:** `velocidad_desplazamiento`, `multiplicador_velocidad_transicion`, `alternar_sentido_filas`.
+  * **Paleta y Halo de Visión:** `color_niebla`, `color_niebla_secundaria`, `opacidad_velo_fondo`, `difuminado_borde`, `radio_despejado`, `radio_cerrado`, `centro_pantalla`.
+  * **Tiempos y Curvas Tween:** `duracion_cierre`, `pausa_oscuridad`, `duracion_apertura`, `tipo_transicion`, `tipo_ease_cierre`, `tipo_ease_apertura`.
+
+`EfectoNieblaMutacion` observa la señal reactiva `config.changed` para sincronizar el shader al vuelo tanto en el editor como en ejecución. Al mismo tiempo, expone propiedades delegadas que redirigen a su recurso interno para mantener compatibilidad total con scripts y pruebas existentes.
+
+### 3.2. FSM y Blindaje Asíncrono con Tokens
+El controlador `EfectoNieblaMutacion` implementa una máquina de estados finita con `enum Fase`:
+* `Fase.DESPEJADO`: Niebla en reposo; `visible = false` y `set_process(false)` (0% overhead de renderizado y CPU).
+* `Fase.CERRANDO`: Contracción del halo e incremento controlado de velocidad y densidad global.
+* `Fase.CEGUERA`: Pantalla cubierta; emisión de `ceguera_alcanzada` y `oscuridad_iniciada`.
+* `Fase.ABRIENDO`: Expansión del halo y desvanecimiento de densidad hacia reposo.
+
+Para prevenir condiciones de carrera y *deadlocks* al interactuar con el menú de depuración (por ejemplo, conmutar `desactivado = true` a mitad de la pausa de oscuridad):
+1. Cada llamada a `cubrir()`, `despejar()`, `ejecutar_transicion()` o `_abortar_y_limpiar()` incrementa de forma atómica un contador interno `_token_transicion`.
+2. Las corrutinas que despiertan tras `await ceguera_alcanzada` o `await timer.timeout` comparan su token capturado con el actual. Si el token cambió o el efecto fue desactivado, la secuencia anterior se descarta inmediatamente sin emitir señales duplicadas.
+3. Al forzar la interrupción (`_abortar_y_limpiar()`), las señales pendientes se emiten vía `call_deferred()`, asegurando que `Escenario._mutacion_en_progreso` se restablezca siempre sin bloquear el bucle de juego.
+
+### 3.3. Acumulador Continuo de Fase en CPU vs `TIME` en Shader
+En shaders estándar, calcular el movimiento horizontal como `TIME * velocidad_desplazamiento` genera una discontinuidad severa si la velocidad se interpola durante la partida:
+$$\frac{d}{dt}\Big(t \cdot v(t)\Big) = v(t) + t \cdot v'(t)$$
+A medida que la partida avanza y `TIME` acumula cientos de segundos, cualquier cambio en la velocidad provoca que las cápsulas se desplacen a velocidades astronómicas o retrocedan bruscamente.
+
+**Solución Implementada:**
+* En `EfectoNieblaMutacion._process(delta)`, se realiza la integración continua de la fase:
+  $$\text{fase\_desplazamiento} \mathrel{+}= \Delta t \times v_{\text{actual}}$$
+* Este valor se envía al uniform `fase_desplazamiento` del shader.
+* En `niebla_mutacion.gdshader`, la posición periódica de cada cápsula se deriva de `fase_desplazamiento * factor_fila`, logrando una aceleración y deceleración perfectamente orgánicas y matemáticamente estables sin importar la duración de la sesión.
+
+### 3.4. Aislamiento de Recursos en Editor (`@tool`)
+En modo de herramientas (`@tool`), modificar un `ShaderMaterial` compartido altera el archivo serializado `.tres` en disco. Para blindar el control de versiones:
+* Al inicializarse en `_ready()` o en previsualización, `EfectoNieblaMutacion` clona localmente el material (`material.duplicate()`).
+* Todas las escrituras de parámetros de vista previa o aspecto de pantalla operan sobre la copia en memoria, evitando que `mat_niebla_mutacion.tres` se marque modificado en Git al abrir o redimensionar el *Viewport* de Godot.
+* `previsualizar_en_editor` se mantiene en `false` por defecto en la escena empaquetada.
+
+---
+
+## 4. Algoritmo de Selección y Reemplazo de Variantes
+
+### 4.1. Detección en Tiempo Real del Cuadrante del Jugador
 El cuadrante activo se calcula **en el fotograma exacto en que se emite la señal `ceguera_alcanzada`**, evaluando las coordenadas globales del protagonista respecto al origen `(0, 0)`:
 ```gdscript
 func obtener_cuadrante_posicion(pos: Vector2) -> String:
@@ -87,7 +137,7 @@ func obtener_cuadrante_posicion(pos: Vector2) -> String:
 > [!IMPORTANT]
 > **Anti-Glitches en la Frontera:** Evaluar el cuadrante al alcanzar la ceguera (y no al tocar la nota $1.3\text{ s}$ antes) garantiza que si el jugador cruzó un eje divisorio ($X=0$ o $Y=0$) durante el cierre de la niebla, el sector donde **efectivamente se encuentra** será el preservado, evitando que un sector mute bajo sus propios pies.
 
-### 3.2. Selección Aleatoria Ponderada sin Repetición Inmediata
+### 4.2. Selección Aleatoria Ponderada sin Repetición Inmediata
 Para los 3 cuadrantes lejanos:
 1. Se consulta el catálogo pre-cargado de variantes de ese sector en `res://escenas/sectores/variantes/`.
 2. Se filtra la variante que estaba activa previamente para evitar que un cuadrante vuelva a cargar idéntico.
@@ -98,7 +148,7 @@ Para los 3 cuadrantes lejanos:
 
 ---
 
-## 4. Protocolo Anti-Atascamiento de la Criatura
+## 5. Protocolo Anti-Atascamiento de la Criatura
 
 Dado que los 3 cuadrantes lejanos mutan proceduralmente, existe la posibilidad matemática de que el nuevo diseño de sector instancie un obstáculo sólido (árbol o roca de Capa 1) en las coordenadas exactas donde el monstruo se encontraba persiguiendo al jugador:
 
@@ -111,7 +161,7 @@ Dado que los 3 cuadrantes lejanos mutan proceduralmente, existe la posibilidad m
 
 ---
 
-## 5. Exclusión Mutua con el Spawner de Notas
+## 6. Exclusión Mutua con el Spawner de Notas
 
 Para que la nueva nota nunca aparezca en las garras de la bestia ni en un punto inalcanzable:
 * La nueva nota **solo puede aparecer en uno de los 3 sectores recién mutados**.
@@ -122,7 +172,7 @@ Para que la nueva nota nunca aparezca en las garras de la bestia ni en un punto 
 
 ---
 
-## 6. Optimizaciones Críticas para WebAssembly Mono-Hilo
+## 7. Optimizaciones Críticas para WebAssembly Mono-Hilo
 
 En la exportación Web (HTML5/WASM) de Godot 4, el motor opera en un único hilo (`threads = false`). La mutación debe mantener cero sobrecarga (*zero jank*):
 
