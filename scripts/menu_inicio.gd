@@ -147,31 +147,38 @@ const TEXTURAS_OPCIONES = MenuConstantes.TEXTURAS_OPCIONES
 	set(v): if _particulas != null: _particulas.nubes_factor_rotacion = v
 
 # Sub-controladores
+@warning_ignore("unused_private_class_variable")
 var _cinematica: MenuCinematica = MenuCinematica.new()
 var _particulas: MenuParticulas = MenuParticulas.new()
 var _parallax: MenuParallax = MenuParallax.new()
 var _seleccion: MenuSeleccion = MenuSeleccion.new()
 
 # Proxies de acceso para pruebas y compatibilidad interna
+@warning_ignore("unused_private_class_variable")
 var _opcion_actual: Opcion:
 	get: return _seleccion.opcion_actual if _seleccion != null else Opcion.JUGAR
 	set(v): if _seleccion != null: _seleccion.opcion_actual = v
 
+@warning_ignore("unused_private_class_variable")
 var _bloqueado: bool:
 	get: return _seleccion.bloqueado if _seleccion != null else false
 	set(v): if _seleccion != null: _seleccion.bloqueado = v
 
+@warning_ignore("unused_private_class_variable")
 var _datos_opciones: Dictionary:
 	get: return _seleccion.datos_opciones if _seleccion != null else {}
 
+@warning_ignore("unused_private_class_variable")
 var _estado: EstadoMenu:
 	get: return _cinematica.estado if _cinematica != null else EstadoMenu.PRESENTACION
 	set(v): if _cinematica != null: _cinematica.estado = v
 
+@warning_ignore("unused_private_class_variable")
 var _offset_base: Vector2:
 	get: return _parallax.offset_base if _parallax != null else Vector2.ZERO
 	set(v): if _parallax != null: _parallax.offset_base = v
 
+@warning_ignore("unused_private_class_variable")
 var _rotacion_base: float:
 	get: return _parallax.rotacion_base if _parallax != null else 0.0
 	set(v): if _parallax != null: _parallax.rotacion_base = v
