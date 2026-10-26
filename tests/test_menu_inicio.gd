@@ -28,10 +28,10 @@ func test_instanciacion_y_nodos_base() -> void:
 	assert_true(datos_opciones.has(1), "Debe contener JUGAR (1)")
 	assert_true(datos_opciones.has(2), "Debe contener CREDITOS (2)")
 
-	var arbol_jugar: Sprite2D = datos_opciones[1]["arbol"]
-	var arbol_opciones: Sprite2D = datos_opciones[0]["arbol"]
-	assert_eq(arbol_jugar.modulate.a, 1.0, "Árbol Jugar debe tener alpha 1.0 al estar seleccionado")
-	assert_eq(arbol_opciones.modulate.a, 0.0, "Árbol Opciones debe tener alpha 0.0 al no estar seleccionado")
+	var arbol_visual: Sprite2D = menu.get_node_or_null("Arboles/ArbolVisual") as Sprite2D
+	assert_true(arbol_visual != null, "Debe existir el nodo ArbolVisual")
+	assert_true(arbol_visual.material is ShaderMaterial, "ArbolVisual debe tener asignado ShaderMaterial")
+	assert_true(datos_opciones[1].has("textura"), "Debe contener textura de JUGAR")
 
 	menu.free()
 
@@ -238,5 +238,35 @@ func test_particulas_cielo_y_configurabilidad() -> void:
 	menu.free()
 
 
+func test_transicion_shader_crossfade() -> void:
+	var menu: Control = _crear_instancia_menu()
+	menu._ready()
 
+	# Añadir temporalmente al árbol para permitir animación con tweens
+	var root: Window = Engine.get_main_loop().root if Engine.get_main_loop() is SceneTree else null
+	if root != null:
+		root.add_child(menu)
 
+	var arbol_visual: Sprite2D = menu.get_node_or_null("Arboles/ArbolVisual") as Sprite2D
+	assert_true(arbol_visual != null, "Debe existir ArbolVisual")
+	var mat: ShaderMaterial = arbol_visual.material as ShaderMaterial
+	assert_true(mat != null, "Debe tener ShaderMaterial")
+
+	var datos_opciones: Dictionary = menu.get("_datos_opciones")
+	var tex_jugar: Texture2D = datos_opciones[1]["textura"]
+	var tex_creditos: Texture2D = datos_opciones[2]["textura"]
+
+	assert_eq(arbol_visual.texture, tex_jugar, "Textura inicial debe ser Jugar")
+	assert_eq(mat.get_shader_parameter("progreso"), 1.0, "Progreso inicial debe ser 1.0")
+
+	# Navegamos hacia Créditos (+1) con animación
+	menu._navegar(1)
+
+	# El shader debe configurar textura_anterior con Jugar, textura activa Créditos, y arrancar progreso en 0.0
+	assert_eq(arbol_visual.texture, tex_creditos, "Textura del sprite debe actualizarse a Créditos")
+	assert_eq(mat.get_shader_parameter("textura_anterior"), tex_jugar, "textura_anterior en shader debe ser Jugar")
+	assert_eq(mat.get_shader_parameter("progreso"), 0.0, "Progreso al iniciar transición debe arrancar en 0.0")
+
+	if root != null and menu.get_parent() == root:
+		root.remove_child(menu)
+	menu.free()

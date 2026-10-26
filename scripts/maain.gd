@@ -24,10 +24,12 @@ var notas_recolectadas: int = 0
 
 
 func _ready() -> void:
-	if Engine.is_editor_hint():
+	if Engine.is_editor_hint() and not is_in_group("modo_test"):
 		return
 	_resolver_referencias()
 	_conectar_senales_escenario()
+	if enemigo != null and is_instance_valid(enemigo):
+		enemigo.hibernar()
 	call_deferred("spawn_nota_inicial")
 
 
@@ -131,9 +133,71 @@ func _on_nota_recolectada(pos_nota: Vector2) -> void:
 	notas_recolectadas += 1
 	nota_recogida.emit(pos_nota, notas_recolectadas)
 
+	_resolver_referencias()
+	if enemigo != null and is_instance_valid(enemigo):
+		if notas_recolectadas == 1:
+			despertar_monstruo()
+		else:
+			enemigo.actualizar_dificultad(notas_recolectadas)
+
 	if escenario != null and is_instance_valid(escenario):
 		# Disparar mutación en frame diferido para evitar alterar estado durante flushing_queries
 		escenario.call_deferred("mutar_con_neblina")
+
+
+func despertar_monstruo() -> void:
+	if enemigo == null or not is_instance_valid(enemigo):
+		return
+
+	var pos_spawn: Vector2 = obtener_posicion_spawn_monstruo()
+	enemigo.global_position = pos_spawn
+	enemigo.visible = true
+	enemigo.process_mode = Node.PROCESS_MODE_INHERIT
+	enemigo.despertar(500.0)
+
+
+func obtener_posicion_spawn_monstruo() -> Vector2:
+	var pos_jugador: Vector2 = jugador.global_position if (jugador != null and is_instance_valid(jugador)) else Vector2.ZERO
+	var cuadrante_jugador: String = ""
+	var candidatos: Array[Marker2D] = []
+
+	if escenario != null and is_instance_valid(escenario):
+		cuadrante_jugador = escenario.obtener_cuadrante_jugador(pos_jugador)
+		candidatos = escenario.obtener_marcadores_nota_sectores_mutados(cuadrante_jugador)
+
+	return seleccionar_posicion_spawn_monstruo(candidatos, pos_jugador, distancia_segura_monstruo)
+
+
+static func seleccionar_posicion_spawn_monstruo(
+	candidatos: Array[Marker2D],
+	pos_jugador: Vector2,
+	distancia_segura: float = DISTANCIA_SEGURA_MONSTRUO_DEFECTO
+) -> Vector2:
+	var validos: Array[Marker2D] = []
+	for m in candidatos:
+		if m != null and is_instance_valid(m):
+			if m.global_position.distance_to(pos_jugador) >= distancia_segura:
+				validos.append(m)
+
+	if not validos.is_empty():
+		return validos[randi() % validos.size()].global_position
+
+	# Fallback 1: Si ninguno cumple la distancia completa, elegir el más lejano de los candidatos
+	var mejor_dist: float = -1.0
+	var mejor_pos: Vector2 = Vector2.INF
+	for m in candidatos:
+		if m != null and is_instance_valid(m):
+			var d := m.global_position.distance_to(pos_jugador)
+			if d > mejor_dist:
+				mejor_dist = d
+				mejor_pos = m.global_position
+	if mejor_pos != Vector2.INF:
+		return mejor_pos
+
+	# Fallback 2: Sin candidatos (ej. pruebas sin subescenas), sector opuesto
+	if pos_jugador == Vector2.ZERO:
+		return Vector2(1080.0, 1080.0)
+	return -pos_jugador.normalized() * maxf(distancia_segura, 1000.0)
 
 
 func _on_sectores_mutados(_cuadrante_jugador: String, _variantes: Dictionary) -> void:

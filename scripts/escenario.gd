@@ -60,8 +60,28 @@ func _resolver_referencias_objetivos() -> void:
 
 	if _efecto_niebla == null:
 		_efecto_niebla = get_node_or_null("EfectoNieblaMutacion") as EfectoNieblaMutacion
-	if _efecto_niebla != null and _efecto_niebla.objetivo_jugador == null:
-		_efecto_niebla.objetivo_jugador = objetivo_jugador
+	if _efecto_niebla != null:
+		if _efecto_niebla.objetivo_jugador == null:
+			_efecto_niebla.objetivo_jugador = objetivo_jugador
+		_conectar_senales_niebla()
+
+
+func _conectar_senales_niebla() -> void:
+	if _efecto_niebla != null:
+		if not _efecto_niebla.oscuridad_iniciada.is_connected(_on_niebla_oscuridad_iniciada):
+			_efecto_niebla.oscuridad_iniciada.connect(_on_niebla_oscuridad_iniciada)
+		if not _efecto_niebla.oscuridad_terminada.is_connected(_on_niebla_oscuridad_terminada):
+			_efecto_niebla.oscuridad_terminada.connect(_on_niebla_oscuridad_terminada)
+
+
+func _on_niebla_oscuridad_iniciada() -> void:
+	if objetivo_enemigo != null and is_instance_valid(objetivo_enemigo) and objetivo_enemigo.has_method("modular_velocidad_niebla"):
+		objetivo_enemigo.modular_velocidad_niebla(true)
+
+
+func _on_niebla_oscuridad_terminada() -> void:
+	if objetivo_enemigo != null and is_instance_valid(objetivo_enemigo) and objetivo_enemigo.has_method("modular_velocidad_niebla"):
+		objetivo_enemigo.modular_velocidad_niebla(false)
 
 
 func _inicializar_catalogo() -> void:
@@ -197,6 +217,10 @@ func mutar_sectores_lejanos() -> void:
 
 func validar_y_reubicar_enemigo() -> void:
 	if objetivo_enemigo == null or not is_instance_valid(objetivo_enemigo):
+		return
+
+	# Si el enemigo está hibernando o inactivo fuera de mapa, no se reubica
+	if objetivo_enemigo.get("hibernando") == true or objetivo_enemigo.process_mode == Node.PROCESS_MODE_DISABLED:
 		return
 
 	var pos_enemigo: Vector2 = objetivo_enemigo.global_position

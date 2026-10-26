@@ -1,14 +1,40 @@
+@tool
 class_name Enemigo
 extends CharacterBody2D
 
 ## Boceto del enemigo perseguidor: sigue al jugador y dispara Game Over al contacto.
 
+signal despertado(velocidad_inicial: float)
+signal hibernado
+signal jugador_capturado(posicion: Vector2)
+
+const POSICION_HIBERNACION: Vector2 = Vector2(-99999.0, -99999.0)
+const VELOCIDAD_MAXIMA: float = 920.0
+const ACELERACION_CONSTANTE: float = 3500.0
+
+const VELOCIDADES_MONSTRUO: Array[float] = [
+	0.0,   # Nota 0 (Hibernación / Tutorial)
+	500.0, # Nota 1 (Materialización y Despertar)
+	580.0, # Nota 2
+	620.0, # Nota 3
+	680.0, # Nota 4
+	730.0, # Nota 5
+	770.0, # Nota 6
+	800.0, # Nota 7 (Punto de inflexión: iguala caminata normal)
+	840.0, # Nota 8
+	880.0, # Nota 9
+	920.0  # Nota 10+ (Tope máximo estricto)
+]
+
 @export var objetivo: Node2D
+@export var hibernar_al_iniciar: bool = true
 
 @export_group("Físicas de Persecución")
 @export_range(50.0, 3000.0, 10.0, "suffix:px/s") var speed: float = 500.0
 @export_range(0.0, 10000.0, 50.0, "suffix:px/s²") var acceleration: float = 3500.0
 
+var hibernando: bool = false
+var modulador_velocidad_niebla: float = 1.0
 var _capturado: bool = false
 var tiene_linea_vision: bool = true
 var punto_impacto_local: Vector2 = Vector2.ZERO
@@ -22,9 +48,9 @@ var _trail_intervalo: float = 0.04
 var _trail_timer: float = 0.0
 const MAX_TRAIL_PUNTOS: int = 45
 
-@onready var _gestor: GestorDeEscenas = get_node_or_null("/root/GestorEscenas") as GestorDeEscenas
-@onready var _area_captura: Area2D = $AreaCaptura
-@onready var _visual: Node2D = $BocetoVisual
+@onready var _gestor: GestorDeEscenas = (get_node_or_null("/root/GestorEscenas") as GestorDeEscenas) if is_inside_tree() else null
+@onready var _area_captura: Area2D = get_node_or_null("AreaCaptura") as Area2D
+@onready var _visual: Node2D = get_node_or_null("BocetoVisual") as Node2D
 @onready var _raycast_vision: RayCast2D = get_node_or_null("RayCastVision") as RayCast2D
 
 
@@ -46,15 +72,69 @@ func _ready() -> void:
 	if objetivo != null:
 		_raycast_vision.add_exception(objetivo)
 
+	if (not Engine.is_editor_hint() or is_in_group("modo_test")) and hibernar_al_iniciar:
+		hibernar()
+
+
+func hibernar() -> void:
+	hibernando = true
+	visible = false
+	process_mode = Node.PROCESS_MODE_DISABLED
+	global_position = POSICION_HIBERNACION
+	velocity = Vector2.ZERO
+	speed = VELOCIDADES_MONSTRUO[0]
+	acceleration = ACELERACION_CONSTANTE
+	hibernado.emit()
+
+
+func despertar(velocidad_inicial: float = 500.0) -> void:
+	hibernando = false
+	visible = true
+	process_mode = Node.PROCESS_MODE_INHERIT
+	speed = velocidad_inicial
+	acceleration = ACELERACION_CONSTANTE
+	velocity = Vector2.ZERO
+	despertado.emit(velocidad_inicial)
+
+
+func actualizar_dificultad(notas_recogidas: int) -> void:
+	speed = obtener_velocidad_por_nota(notas_recogidas)
+	acceleration = ACELERACION_CONSTANTE
+
+
+static func obtener_velocidad_por_nota(notas: int) -> float:
+	if notas <= 0:
+		return VELOCIDADES_MONSTRUO[0]
+	if notas >= VELOCIDADES_MONSTRUO.size():
+		return VELOCIDADES_MONSTRUO[VELOCIDADES_MONSTRUO.size() - 1]
+	return VELOCIDADES_MONSTRUO[notas]
+
+
+func modular_velocidad_niebla(activa: bool) -> void:
+	modulador_velocidad_niebla = 0.5 if activa else 1.0
+
+
+func reducir_velocidad_oscuridad(duracion: float = 0.4) -> void:
+	modular_velocidad_niebla(true)
+	var tree := get_tree()
+	if tree != null and duracion > 0.0:
+		var timer := tree.create_timer(duracion)
+		timer.timeout.connect(func(): modular_velocidad_niebla(false))
+
+
+func obtener_velocidad_efectiva() -> float:
+	return speed * modulador_velocidad_niebla
+
 
 func _physics_process(delta: float) -> void:
-	if _capturado or objetivo == null or not is_instance_valid(objetivo):
+	if hibernando or _capturado or objetivo == null or not is_instance_valid(objetivo):
 		return
 
 	_actualizar_linea_vision()
 
+	var vel_deseada: float = obtener_velocidad_efectiva()
 	var direccion: Vector2 = global_position.direction_to(objetivo.global_position)
-	velocity = velocity.move_toward(direccion * speed, acceleration * delta)
+	velocity = velocity.move_toward(direccion * vel_deseada, acceleration * delta)
 	if velocity.length_squared() > 1.0 and _visual != null:
 		_visual.rotation = velocity.angle()
 
@@ -97,7 +177,7 @@ func _actualizar_linea_vision() -> void:
 
 
 func _draw() -> void:
-	if not debug_dibujar_rayo:
+	if hibernando or not debug_dibujar_rayo:
 		return
 
 	var cam := get_viewport().get_camera_2d()
@@ -164,19 +244,20 @@ func _on_body_entered(body: Node2D) -> void:
 
 
 func _intentar_capturar(body: Node2D) -> void:
-	if _capturado:
+	if _capturado or hibernando:
 		return
 	if body is Personaje or body == objetivo:
 		if body.get("god_mode") == true:
 			return
 		_capturado = true
 		velocity = Vector2.ZERO
+		jugador_capturado.emit(global_position)
 		if _gestor != null:
 			_gestor.ir_a(GestorDeEscenas.RUTA_GAME_OVER)
 
 
 func _comprobar_captura_continua() -> void:
-	if _capturado or _area_captura == null:
+	if _capturado or hibernando or _area_captura == null:
 		return
 	for body in _area_captura.get_overlapping_bodies():
 		if body is Personaje or body == objetivo:
@@ -184,6 +265,7 @@ func _comprobar_captura_continua() -> void:
 				continue
 			_capturado = true
 			velocity = Vector2.ZERO
+			jugador_capturado.emit(global_position)
 			if _gestor != null:
 				_gestor.ir_a(GestorDeEscenas.RUTA_GAME_OVER)
 			break

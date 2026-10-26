@@ -67,12 +67,12 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 - [x] **Persecución Básica Vectorial:** Movimiento hacia el jugador con `move_and_slide()` y aceleración controlada (`3500 px/s²`).
 - [x] **Rotación Continua 360°:** El nodo visual orienta sus garras y cabeza siguiendo el vector instantáneo de velocidad (`velocity.angle()`).
 - [x] **Geometría de Detección:** Colisión física sólida ($42\text{ px}$) y `AreaCaptura` letal ($56\text{ px}$) con `RayCastVision`.
-- [ ] **Hibernación Inicial y Despertar en Nota 1 (process_mode = DISABLED -> Reposicionar y Activar):**
-  - [ ] En Nota 0 (tutorial), el monstruo no aparece en el mapa para el jugador; en motor reside en hibernación total (`visible = false`, `process_mode = Node.PROCESS_MODE_DISABLED`, fuera de escena).
-  - [ ] Al recoger la Nota 1, el Game Director reposiciona al monstruo a una distancia segura fuera de pantalla, restaura `visible = true`, `process_mode = Node.PROCESS_MODE_INHERIT` y activa la persecución a $500\text{ px/s}$.
-- [ ] **Escalado Cuantitativo de Dificultad:**
-  - [ ] Implementar la progresión mediante arreglo discreto `VELOCIDADES_MONSTRUO` ($0 \to 500 \to 580 \dots 920\text{ px/s}$).
-  - [ ] Tope absoluto de $920\text{ px/s}$ para garantizar la maniobrabilidad del jugador durante el sprint ($1000\text{ px/s}$).
+- [x] **Hibernación Inicial y Despertar en Nota 1 (process_mode = DISABLED -> Reposicionar y Activar):**
+  - [x] En Nota 0 (tutorial), el monstruo no aparece en el mapa para el jugador; en motor reside en hibernación total (`visible = false`, `process_mode = Node.PROCESS_MODE_DISABLED`, fuera de escena).
+  - [x] Al recoger la Nota 1, el Game Director reposiciona al monstruo a una distancia segura fuera de pantalla, restaura `visible = true`, `process_mode = Node.PROCESS_MODE_INHERIT` y activa la persecución a $500\text{ px/s}$.
+- [x] **Escalado Cuantitativo de Dificultad:**
+  - [x] Implementar la progresión mediante arreglo discreto `VELOCIDADES_MONSTRUO` ($0 \to 500 \to 580 \dots 920\text{ px/s}$).
+  - [x] Tope absoluto de $920\text{ px/s}$ para garantizar la maniobrabilidad del jugador durante el sprint ($1000\text{ px/s}$).
 - [ ] **Desatasco Tangencial (*Steering*):** Vector de desvío lateral cuando la línea de visión se bloquea contra obstáculos sólidos.
 - [ ] **Ojos Reflectantes y Material Emisivo:** Ojos visibles en penumbra antes que la silueta completa penetre en el haz de luz.
 

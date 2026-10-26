@@ -1,0 +1,7 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://yb1fvvp7sowg"]
+
+[ext_resource type="Shader" path="res://shaders/crossfade_arboles.gdshader" id="1_2obyx"]
+
+[resource]
+shader = ExtResource("1_2obyx")
+shader_parameter/progreso = 1.0

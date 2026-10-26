@@ -7,6 +7,8 @@ extends CanvasLayer
 
 signal ceguera_alcanzada
 signal niebla_disipada
+signal oscuridad_iniciada
+signal oscuridad_terminada
 
 @export_group("Depuración y Anulación")
 ## Desactiva por completo la niebla visual y permite que las mutaciones ocurran instantáneamente.
@@ -186,6 +188,7 @@ func _abortar_y_limpiar() -> void:
 	if estaba_en_cierre:
 		ceguera_alcanzada.emit()
 	if estaba_en_apertura:
+		oscuridad_terminada.emit()
 		niebla_disipada.emit()
 
 
@@ -314,6 +317,8 @@ func ejecutar_transicion(
 			accion_en_ceguera.call()
 
 		ceguera_alcanzada.emit.call_deferred()
+		oscuridad_iniciada.emit.call_deferred()
+		oscuridad_terminada.emit.call_deferred()
 		niebla_disipada.emit.call_deferred()
 		return
 
@@ -324,6 +329,8 @@ func ejecutar_transicion(
 	cubrir(dur_cierre)
 	await ceguera_alcanzada
 
+	oscuridad_iniciada.emit()
+
 	if accion_en_ceguera.is_valid():
 		accion_en_ceguera.call()
 
@@ -332,5 +339,6 @@ func ejecutar_transicion(
 		if tree != null:
 			await tree.create_timer(dur_pausa).timeout
 
+	oscuridad_terminada.emit()
 	despejar(dur_apertura)
 	await niebla_disipada

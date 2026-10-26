@@ -19,7 +19,9 @@ objetivo_enemigo = NodePath("../Enemigo")
 [node name="Camera2D" parent="personaje" unique_id=292125370 instance=ExtResource("2_avuvp")]
 
 [node name="Enemigo" parent="." unique_id=1591042193 node_paths=PackedStringArray("objetivo") instance=ExtResource("5_vhdvh")]
-position = Vector2(-650, -450)
+process_mode = 4
+visible = false
+position = Vector2(-99999, -99999)
 objetivo = NodePath("../personaje")
 
 [node name="DebugMenu" parent="." unique_id=85566436 node_paths=PackedStringArray("target_character", "target_enemigo", "target_camara", "target_camara_dios", "target_escenario") instance=ExtResource("4_kcfdb")]

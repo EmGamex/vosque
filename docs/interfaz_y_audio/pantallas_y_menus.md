@@ -30,7 +30,10 @@ El jugador observa la oscuridad a través de una linterna sostenida en mano. La 
 2. **Árbol Central:** `Jugar` (inclinación $0.0^\circ$, offset $0\text{ px}$).
 3. **Árbol Derecho:** `Créditos` (inclinación $-1.2^\circ$, offset $-95\text{ px}$).
 
-Al navegar entre opciones, la linterna se desplaza y realiza un *crossfade* suave de transparencia (`modulate:a`) entre los sprites correspondientes (`ArbolOpciones`, `ArbolJugar`, `ArbolCreditos`), iluminando únicamente el tronco y follaje de la opción seleccionada mientras los demás permanecen en penumbra.
+Al navegar entre opciones, la linterna se desplaza y realiza una transición por **Shader de Mezcla Directa (`shaders/crossfade_arboles.gdshader`)** sobre un único nodo `Sprite2D` (`$Arboles/ArbolVisual`). El shader interpola fragmento a fragmento (`mix(textura_anterior, textura_actual, progreso)`):
+* **Cero caída de alfa (Alpha Dip):** Como la mezcla se calcula a nivel de fragmento sobre las texturas, las regiones cubiertas por los árboles conservan el 100% de opacidad ($1.0$), impidiendo totalmente que las montañas y degradados del fondo se transparenten.
+* **Cero texturas huérfanas o conflictos de Z-Index:** Al no existir múltiples sprites encendiéndose o apagándose por separado, es imposible que una textura de otra opción quede superpuesta por error al navegar rápidamente.
+* **Texturas precargadas:** `menu_inicio.gd` gestiona un diccionario constante `TEXTURAS_OPCIONES` que asigna de forma directa las variaciones (`variacion izquierda inicio.png`, `manu seleccion inicio.png`, `variacion derecha inicio.png`) según el árbol enfocado.
 
 ### 1.2. Parallax Multicapa Relativo al Editor 2D
 El fondo se organiza en tres planos de profundidad bajo el nodo `$Fondos`:
