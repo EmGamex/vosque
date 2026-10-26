@@ -20,10 +20,12 @@ func test_instanciacion_y_nodos_base() -> void:
 
 	menu._ready()
 
-	assert_eq(menu.get("_opcion_actual"), 1, "La opción inicial debe ser Jugar (1)")
-	assert_false(menu.get("_bloqueado"), "El menú no debe arrancar bloqueado")
+	assert_eq(menu.get("opcion_actual"), 1, "La opción inicial debe ser Jugar (1)")
+	assert_false(menu.get("bloqueado"), "El menú no debe arrancar bloqueado")
 
-	var datos_opciones: Dictionary = menu.get("_datos_opciones")
+	var seleccion = menu.get("seleccion")
+	assert_true(seleccion != null, "Debe existir el controlador seleccion")
+	var datos_opciones: Dictionary = seleccion.datos_opciones
 	assert_true(datos_opciones.has(0), "Debe contener OPCIONES (0)")
 	assert_true(datos_opciones.has(1), "Debe contener JUGAR (1)")
 	assert_true(datos_opciones.has(2), "Debe contener CREDITOS (2)")
@@ -41,23 +43,23 @@ func test_navegacion_ciclica() -> void:
 	menu._ready()
 
 	# Estado inicial: JUGAR (1)
-	assert_eq(menu.get("_opcion_actual"), 1)
+	assert_eq(menu.get("opcion_actual"), 1)
 
 	# Navegar a la derecha (+1) -> CREDITOS (2)
 	menu._navegar(1)
-	assert_eq(menu.get("_opcion_actual"), 2, "Navegar +1 desde JUGAR debe ir a CREDITOS")
+	assert_eq(menu.get("opcion_actual"), 2, "Navegar +1 desde JUGAR debe ir a CREDITOS")
 
 	# Navegar a la derecha (+1) cíclico -> OPCIONES (0)
 	menu._navegar(1)
-	assert_eq(menu.get("_opcion_actual"), 0, "Navegar +1 desde CREDITOS debe ciclar a OPCIONES")
+	assert_eq(menu.get("opcion_actual"), 0, "Navegar +1 desde CREDITOS debe ciclar a OPCIONES")
 
 	# Navegar a la izquierda (-1) cíclico -> CREDITOS (2)
 	menu._navegar(-1)
-	assert_eq(menu.get("_opcion_actual"), 2, "Navegar -1 desde OPCIONES debe ciclar a CREDITOS")
+	assert_eq(menu.get("opcion_actual"), 2, "Navegar -1 desde OPCIONES debe ciclar a CREDITOS")
 
 	# Llamar a enfocar() debe restaurar a JUGAR (1)
 	menu.enfocar()
-	assert_eq(menu.get("_opcion_actual"), 1, "enfocar() debe restablecer la opción a JUGAR")
+	assert_eq(menu.get("opcion_actual"), 1, "enfocar() debe restablecer la opción a JUGAR")
 
 	menu.free()
 
@@ -73,19 +75,19 @@ func test_senales_de_confirmacion() -> void:
 	menu.connect("creditos_solicitado", func(): senales_recibidas.append("creditos"))
 
 	# Confirmar estando en JUGAR (1)
-	menu.set("_opcion_actual", 1)
+	menu.set("opcion_actual", 1)
 	menu._confirmar_opcion()
 	assert_true(senales_recibidas.has("jugar"), "Debe emitir jugar_solicitado")
-	assert_true(menu.get("_bloqueado"), "Confirmar Jugar debe bloquear el menú para evitar doble click")
+	assert_true(menu.get("bloqueado"), "Confirmar Jugar debe bloquear el menú para evitar doble click")
 
 	# Confirmar OPCIONES (0)
-	menu.set("_bloqueado", false)
-	menu.set("_opcion_actual", 0)
+	menu.set("bloqueado", false)
+	menu.set("opcion_actual", 0)
 	menu._confirmar_opcion()
 	assert_true(senales_recibidas.has("opciones"), "Debe emitir opciones_solicitado")
 
 	# Confirmar CREDITOS (2)
-	menu.set("_opcion_actual", 2)
+	menu.set("opcion_actual", 2)
 	menu._confirmar_opcion()
 	assert_true(senales_recibidas.has("creditos"), "Debe emitir creditos_solicitado")
 
@@ -102,8 +104,10 @@ func test_parallax_respeta_posiciones_capturadas() -> void:
 
 	menu._ready()
 
-	# Comprobamos que capturó la posición del editor
-	assert_eq(menu.get("_pos_inicial_montana_1"), posicion_custom, "Debe haber capturado la posición inicial del nodo")
+	# Comprobamos que capturó la posición del editor en el controlador de parallax
+	var parallax = menu.get("parallax")
+	assert_true(parallax != null, "Debe existir controlador parallax")
+	assert_eq(parallax.pos_inicial_montana_1, posicion_custom, "Debe haber capturado la posición inicial del nodo")
 
 	# Corremos un frame de _process
 	menu.add_to_group("modo_test")
@@ -137,11 +141,11 @@ func test_nodos_y_estado_cinematica() -> void:
 	assert_true(animador.has_animation("bajar_al_bosque"), "Debe tener animación bajar_al_bosque")
 
 	# Estado inicial debe ser PRESENTACION
-	assert_eq(menu.get("_estado"), 0, "Debe iniciar en estado PRESENTACION (0)")
+	assert_eq(menu.get("estado"), 0, "Debe iniciar en estado PRESENTACION (0)")
 
 	# Iniciar descenso
 	menu.iniciar_descenso()
-	assert_eq(menu.get("_estado"), 1, "iniciar_descenso debe pasar a CINEMATICA_BAJANDO (1)")
+	assert_eq(menu.get("estado"), 1, "iniciar_descenso debe pasar a CINEMATICA_BAJANDO (1)")
 	assert_eq(animador.speed_scale, 1.0, "Velocidad normal debe ser 1.0")
 
 	# Probar skip de cinemática
@@ -150,14 +154,14 @@ func test_nodos_y_estado_cinematica() -> void:
 
 	# Finalización de la animación de descenso
 	menu._on_animacion_terminada(&"bajar_al_bosque")
-	assert_eq(menu.get("_estado"), 2, "Al terminar la animación debe pasar a MENU_ACTIVO (2)")
+	assert_eq(menu.get("estado"), 2, "Al terminar la animación debe pasar a MENU_ACTIVO (2)")
 	assert_eq(animador.speed_scale, 1.0, "Velocidad debe restaurarse a 1.0")
 	assert_eq(camara.position, Vector2(540.0, 540.0), "Cámara debe encuadrar el bosque (540, 540)")
 
 	# Probar regreso a presentación (presionar Escape en MENU_ACTIVO)
 	menu.regresar_a_presentacion()
-	assert_eq(menu.get("_estado"), 3, "regresar_a_presentacion debe pasar a CINEMATICA_SUBIENDO (3)")
-	assert_true(menu.get("_bloqueado"), "El menú debe bloquearse durante la cinemática de subida")
+	assert_eq(menu.get("estado"), 3, "regresar_a_presentacion debe pasar a CINEMATICA_SUBIENDO (3)")
+	assert_true(menu.get("bloqueado"), "El menú debe bloquearse durante la cinemática de subida")
 
 	# Probar skip de subida
 	menu.skipear_cinematica()
@@ -165,8 +169,8 @@ func test_nodos_y_estado_cinematica() -> void:
 
 	# Finalización de la animación de subida
 	menu._on_animacion_terminada(&"bajar_al_bosque")
-	assert_eq(menu.get("_estado"), 0, "Al terminar de subir debe volver a PRESENTACION (0)")
-	assert_false(menu.get("_bloqueado"), "El menú debe desbloquearse al llegar a PRESENTACION")
+	assert_eq(menu.get("estado"), 0, "Al terminar de subir debe volver a PRESENTACION (0)")
+	assert_false(menu.get("bloqueado"), "El menú debe desbloquearse al llegar a PRESENTACION")
 	assert_eq(camara.position, Vector2(540.0, -540.0), "Cámara debe encuadrar el cielo (540, -540)")
 	assert_eq(presentacion.modulate.a, 1.0, "Presentación debe restaurar opacidad 1.0")
 	var textos: Control = menu.get_node_or_null("Textos") as Control
@@ -225,8 +229,10 @@ func test_particulas_cielo_y_configurabilidad() -> void:
 		assert_eq(p_nubes.amount, 14, "Cambiar nubes_cantidad debe actualizar amount del emisor")
 
 		# Comprobar parallax en _process (traslación y rotación reactiva)
-		menu.set("_offset_base", Vector2(95.0, 0.0))
-		menu.set("_rotacion_base", deg_to_rad(1.2))
+		var parallax = menu.get("parallax")
+		assert_true(parallax != null, "Debe existir controlador parallax")
+		parallax.offset_base = Vector2(95.0, 0.0)
+		parallax.rotacion_base = deg_to_rad(1.2)
 		menu._process(0.1)
 
 		# Comprobar que el parallax desplaza y rota los emisores con la linterna
@@ -252,7 +258,9 @@ func test_transicion_shader_crossfade() -> void:
 	var mat: ShaderMaterial = arbol_visual.material as ShaderMaterial
 	assert_true(mat != null, "Debe tener ShaderMaterial")
 
-	var datos_opciones: Dictionary = menu.get("_datos_opciones")
+	var seleccion = menu.get("seleccion")
+	assert_true(seleccion != null, "Debe existir controlador seleccion")
+	var datos_opciones: Dictionary = seleccion.datos_opciones
 	var tex_jugar: Texture2D = datos_opciones[1]["textura"]
 	var tex_creditos: Texture2D = datos_opciones[2]["textura"]
 

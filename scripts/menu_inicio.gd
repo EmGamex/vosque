@@ -29,163 +29,141 @@ const TEXTURAS_OPCIONES = MenuConstantes.TEXTURAS_OPCIONES
 # ==========================================
 @export_group("Cinemática de Inicio")
 @export var habilitar_presentacion: bool:
-	get: return _cinematica.habilitar_presentacion if _cinematica != null else true
-	set(v): if _cinematica != null: _cinematica.habilitar_presentacion = v
+	get: return cinematica.habilitar_presentacion if cinematica != null else true
+	set(v): if cinematica != null: cinematica.habilitar_presentacion = v
 
 @export_range(1.5, 10.0, 0.5) var multiplicador_velocidad_skip: float:
-	get: return _cinematica.multiplicador_velocidad_skip if _cinematica != null else 4.0
-	set(v): if _cinematica != null: _cinematica.multiplicador_velocidad_skip = v
+	get: return cinematica.multiplicador_velocidad_skip if cinematica != null else 4.0
+	set(v): if cinematica != null: cinematica.multiplicador_velocidad_skip = v
 
 @export_group("Partículas y Ambiente")
 @export_subgroup("Estrellas")
 @export var habilitar_estrellas: bool:
-	get: return _particulas.habilitar_estrellas if _particulas != null else true
+	get: return particulas.habilitar_estrellas if particulas != null else true
 	set(v):
-		if _particulas != null:
-			_particulas.habilitar_estrellas = v
-			_particulas.aplicar_configuracion_estrellas()
+		if particulas != null:
+			particulas.habilitar_estrellas = v
+			particulas.aplicar_configuracion_estrellas()
 
 @export_range(5, 200, 1) var estrellas_cantidad: int:
-	get: return _particulas.estrellas_cantidad if _particulas != null else 55
+	get: return particulas.estrellas_cantidad if particulas != null else 55
 	set(v):
-		if _particulas != null:
-			_particulas.estrellas_cantidad = v
-			_particulas.aplicar_configuracion_estrellas()
+		if particulas != null:
+			particulas.estrellas_cantidad = v
+			particulas.aplicar_configuracion_estrellas()
 
 @export_range(0.5, 15.0, 0.1) var estrellas_lifetime: float:
-	get: return _particulas.estrellas_lifetime if _particulas != null else 4.5
+	get: return particulas.estrellas_lifetime if particulas != null else 4.5
 	set(v):
-		if _particulas != null:
-			_particulas.estrellas_lifetime = v
-			_particulas.aplicar_configuracion_estrellas()
+		if particulas != null:
+			particulas.estrellas_lifetime = v
+			particulas.aplicar_configuracion_estrellas()
 
 @export_range(0.1, 2.0, 0.05) var estrellas_escala_min: float:
-	get: return _particulas.estrellas_escala_min if _particulas != null else 0.35
+	get: return particulas.estrellas_escala_min if particulas != null else 0.35
 	set(v):
-		if _particulas != null:
-			_particulas.estrellas_escala_min = v
-			_particulas.aplicar_configuracion_estrellas()
+		if particulas != null:
+			particulas.estrellas_escala_min = v
+			particulas.aplicar_configuracion_estrellas()
 
 @export_range(0.2, 3.0, 0.05) var estrellas_escala_max: float:
-	get: return _particulas.estrellas_escala_max if _particulas != null else 0.95
+	get: return particulas.estrellas_escala_max if particulas != null else 0.95
 	set(v):
-		if _particulas != null:
-			_particulas.estrellas_escala_max = v
-			_particulas.aplicar_configuracion_estrellas()
+		if particulas != null:
+			particulas.estrellas_escala_max = v
+			particulas.aplicar_configuracion_estrellas()
 
 @export var estrellas_color: Color:
-	get: return _particulas.estrellas_color if _particulas != null else Color.WHITE
+	get: return particulas.estrellas_color if particulas != null else Color.WHITE
 	set(v):
-		if _particulas != null:
-			_particulas.estrellas_color = v
-			_particulas.aplicar_configuracion_estrellas()
+		if particulas != null:
+			particulas.estrellas_color = v
+			particulas.aplicar_configuracion_estrellas()
 
 @export_range(0.0, 0.5, 0.01) var estrellas_factor_parallax: float:
-	get: return _particulas.estrellas_factor_parallax if _particulas != null else 0.08
-	set(v): if _particulas != null: _particulas.estrellas_factor_parallax = v
+	get: return particulas.estrellas_factor_parallax if particulas != null else 0.08
+	set(v): if particulas != null: particulas.estrellas_factor_parallax = v
 
 @export_range(0.0, 0.5, 0.01) var estrellas_factor_rotacion: float:
-	get: return _particulas.estrellas_factor_rotacion if _particulas != null else 0.06
-	set(v): if _particulas != null: _particulas.estrellas_factor_rotacion = v
+	get: return particulas.estrellas_factor_rotacion if particulas != null else 0.06
+	set(v): if particulas != null: particulas.estrellas_factor_rotacion = v
 
 @export_subgroup("Nubes y Bruma")
 @export var habilitar_nubes: bool:
-	get: return _particulas.habilitar_nubes if _particulas != null else true
+	get: return particulas.habilitar_nubes if particulas != null else true
 	set(v):
-		if _particulas != null:
-			_particulas.habilitar_nubes = v
-			_particulas.aplicar_configuracion_nubes()
+		if particulas != null:
+			particulas.habilitar_nubes = v
+			particulas.aplicar_configuracion_nubes()
 
 @export_range(1, 30, 1) var nubes_cantidad: int:
-	get: return _particulas.nubes_cantidad if _particulas != null else 10
+	get: return particulas.nubes_cantidad if particulas != null else 10
 	set(v):
-		if _particulas != null:
-			_particulas.nubes_cantidad = v
-			_particulas.aplicar_configuracion_nubes()
+		if particulas != null:
+			particulas.nubes_cantidad = v
+			particulas.aplicar_configuracion_nubes()
 
 @export_range(0.0, 100.0, 1.0) var nubes_velocidad_x: float:
-	get: return _particulas.nubes_velocidad_x if _particulas != null else 18.0
+	get: return particulas.nubes_velocidad_x if particulas != null else 18.0
 	set(v):
-		if _particulas != null:
-			_particulas.nubes_velocidad_x = v
-			_particulas.aplicar_configuracion_nubes()
+		if particulas != null:
+			particulas.nubes_velocidad_x = v
+			particulas.aplicar_configuracion_nubes()
 
 @export_range(3.0, 40.0, 0.5) var nubes_lifetime: float:
-	get: return _particulas.nubes_lifetime if _particulas != null else 16.0
+	get: return particulas.nubes_lifetime if particulas != null else 16.0
 	set(v):
-		if _particulas != null:
-			_particulas.nubes_lifetime = v
-			_particulas.aplicar_configuracion_nubes()
+		if particulas != null:
+			particulas.nubes_lifetime = v
+			particulas.aplicar_configuracion_nubes()
 
 @export_range(0.5, 6.0, 0.1) var nubes_escala_min: float:
-	get: return _particulas.nubes_escala_min if _particulas != null else 2.0
+	get: return particulas.nubes_escala_min if particulas != null else 2.0
 	set(v):
-		if _particulas != null:
-			_particulas.nubes_escala_min = v
-			_particulas.aplicar_configuracion_nubes()
+		if particulas != null:
+			particulas.nubes_escala_min = v
+			particulas.aplicar_configuracion_nubes()
 
 @export_range(1.0, 8.0, 0.1) var nubes_escala_max: float:
-	get: return _particulas.nubes_escala_max if _particulas != null else 4.2
+	get: return particulas.nubes_escala_max if particulas != null else 4.2
 	set(v):
-		if _particulas != null:
-			_particulas.nubes_escala_max = v
-			_particulas.aplicar_configuracion_nubes()
+		if particulas != null:
+			particulas.nubes_escala_max = v
+			particulas.aplicar_configuracion_nubes()
 
 @export var nubes_color: Color:
-	get: return _particulas.nubes_color if _particulas != null else Color(0.75, 0.82, 0.95, 0.16)
+	get: return particulas.nubes_color if particulas != null else Color(0.75, 0.82, 0.95, 0.16)
 	set(v):
-		if _particulas != null:
-			_particulas.nubes_color = v
-			_particulas.aplicar_configuracion_nubes()
+		if particulas != null:
+			particulas.nubes_color = v
+			particulas.aplicar_configuracion_nubes()
 
 @export_range(0.0, 0.5, 0.01) var nubes_factor_parallax: float:
-	get: return _particulas.nubes_factor_parallax if _particulas != null else 0.16
-	set(v): if _particulas != null: _particulas.nubes_factor_parallax = v
+	get: return particulas.nubes_factor_parallax if particulas != null else 0.16
+	set(v): if particulas != null: particulas.nubes_factor_parallax = v
 
 @export_range(0.0, 0.5, 0.01) var nubes_factor_rotacion: float:
-	get: return _particulas.nubes_factor_rotacion if _particulas != null else 0.12
-	set(v): if _particulas != null: _particulas.nubes_factor_rotacion = v
+	get: return particulas.nubes_factor_rotacion if particulas != null else 0.12
+	set(v): if particulas != null: particulas.nubes_factor_rotacion = v
 
-# Sub-controladores
-@warning_ignore("unused_private_class_variable")
-var _cinematica: MenuCinematica = MenuCinematica.new()
-var _particulas: MenuParticulas = MenuParticulas.new()
-var _parallax: MenuParallax = MenuParallax.new()
-var _seleccion: MenuSeleccion = MenuSeleccion.new()
+# Controladores modulares (accesibles directamente)
+var cinematica: MenuCinematica = MenuCinematica.new()
+var particulas: MenuParticulas = MenuParticulas.new()
+var parallax: MenuParallax = MenuParallax.new()
+var seleccion: MenuSeleccion = MenuSeleccion.new()
 
-# Proxies de acceso para pruebas y compatibilidad interna
-@warning_ignore("unused_private_class_variable")
-var _opcion_actual: Opcion:
-	get: return _seleccion.opcion_actual if _seleccion != null else Opcion.JUGAR
-	set(v): if _seleccion != null: _seleccion.opcion_actual = v
+# Propiedades públicas para consulta limpia y tests
+var opcion_actual: Opcion:
+	get: return seleccion.opcion_actual if seleccion != null else Opcion.JUGAR
+	set(v): if seleccion != null: seleccion.opcion_actual = v
 
-@warning_ignore("unused_private_class_variable")
-var _bloqueado: bool:
-	get: return _seleccion.bloqueado if _seleccion != null else false
-	set(v): if _seleccion != null: _seleccion.bloqueado = v
+var bloqueado: bool:
+	get: return seleccion.bloqueado if seleccion != null else false
+	set(v): if seleccion != null: seleccion.bloqueado = v
 
-@warning_ignore("unused_private_class_variable")
-var _datos_opciones: Dictionary:
-	get: return _seleccion.datos_opciones if _seleccion != null else {}
-
-@warning_ignore("unused_private_class_variable")
-var _estado: EstadoMenu:
-	get: return _cinematica.estado if _cinematica != null else EstadoMenu.PRESENTACION
-	set(v): if _cinematica != null: _cinematica.estado = v
-
-@warning_ignore("unused_private_class_variable")
-var _offset_base: Vector2:
-	get: return _parallax.offset_base if _parallax != null else Vector2.ZERO
-	set(v): if _parallax != null: _parallax.offset_base = v
-
-@warning_ignore("unused_private_class_variable")
-var _rotacion_base: float:
-	get: return _parallax.rotacion_base if _parallax != null else 0.0
-	set(v): if _parallax != null: _parallax.rotacion_base = v
-
-@warning_ignore("unused_private_class_variable")
-var _pos_inicial_montana_1: Vector2:
-	get: return _parallax.pos_inicial_montana_1 if _parallax != null else Vector2.ZERO
+var estado: EstadoMenu:
+	get: return cinematica.estado if cinematica != null else EstadoMenu.PRESENTACION
+	set(v): if cinematica != null: cinematica.estado = v
 
 # Nodos
 @onready var _camara: Camera2D = $CamaraMenu
@@ -212,12 +190,12 @@ func _ready() -> void:
 	if _textos_nodo != null:
 		_textos_nodo.z_index = 10
 
-	_cinematica.inicializar_nodos(_camara, _animador, _presentacion, _fondo_presentacion, _textos_nodo)
-	_particulas.inicializar(self, _particulas_estrellas, _particulas_nubes)
-	_parallax.inicializar_nodos(_fondos, _fondo_degradado, _montana_2, _montana_1, _arboles_tercera, _arboles_segunda, _arboles_nodo, _textos_nodo)
-	_parallax.capturar_posiciones_iniciales(_particulas.obtener_particulas_estrellas(), _particulas.obtener_particulas_nubes())
+	cinematica.inicializar_nodos(_camara, _animador, _presentacion, _fondo_presentacion, _textos_nodo)
+	particulas.inicializar(self, _particulas_estrellas, _particulas_nubes)
+	parallax.inicializar_nodos(_fondos, _fondo_degradado, _montana_2, _montana_1, _arboles_tercera, _arboles_segunda, _arboles_nodo, _textos_nodo)
+	parallax.capturar_posiciones_iniciales(particulas.obtener_particulas_estrellas(), particulas.obtener_particulas_nubes())
 
-	_seleccion.inicializar_nodos(self, _arbol_visual, _texto_opciones, _texto_jugar, _texto_creditos)
+	seleccion.inicializar_nodos(self, _arbol_visual, _texto_opciones, _texto_jugar, _texto_creditos)
 	_conectar_senales_submodulos()
 	_conectar_animador()
 
@@ -226,14 +204,14 @@ func _ready() -> void:
 
 
 func _conectar_senales_submodulos() -> void:
-	if not _seleccion.jugar_solicitado.is_connected(jugar_solicitado.emit):
-		_seleccion.jugar_solicitado.connect(jugar_solicitado.emit)
-	if not _seleccion.opciones_solicitado.is_connected(opciones_solicitado.emit):
-		_seleccion.opciones_solicitado.connect(opciones_solicitado.emit)
-	if not _seleccion.creditos_solicitado.is_connected(creditos_solicitado.emit):
-		_seleccion.creditos_solicitado.connect(creditos_solicitado.emit)
-	if not _seleccion.offset_rotacion_cambiado.is_connected(_on_offset_rotacion_cambiado):
-		_seleccion.offset_rotacion_cambiado.connect(_on_offset_rotacion_cambiado)
+	if not seleccion.jugar_solicitado.is_connected(jugar_solicitado.emit):
+		seleccion.jugar_solicitado.connect(jugar_solicitado.emit)
+	if not seleccion.opciones_solicitado.is_connected(opciones_solicitado.emit):
+		seleccion.opciones_solicitado.connect(opciones_solicitado.emit)
+	if not seleccion.creditos_solicitado.is_connected(creditos_solicitado.emit):
+		seleccion.creditos_solicitado.connect(creditos_solicitado.emit)
+	if not seleccion.offset_rotacion_cambiado.is_connected(_on_offset_rotacion_cambiado):
+		seleccion.offset_rotacion_cambiado.connect(_on_offset_rotacion_cambiado)
 
 
 func _conectar_animador() -> void:
@@ -242,47 +220,48 @@ func _conectar_animador() -> void:
 
 
 func _on_offset_rotacion_cambiado(nuevo_offset: Vector2, nueva_rotacion: float, animar: bool) -> void:
-	if not animar:
-		_offset_base = nuevo_offset
-		_rotacion_base = nueva_rotacion
+	if not animar and parallax != null:
+		parallax.offset_base = nuevo_offset
+		parallax.rotacion_base = nueva_rotacion
 
 
 func _animar_offset_rotacion(tween: Tween, target_pos: Vector2, target_rot: float) -> void:
-	tween.tween_property(self, "_offset_base", target_pos, DURACION_TRANSICION)\
-		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	tween.tween_property(self, "_rotacion_base", target_rot, DURACION_TRANSICION)\
-		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	if parallax != null:
+		tween.tween_property(parallax, "offset_base", target_pos, DURACION_TRANSICION)\
+			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+		tween.tween_property(parallax, "rotacion_base", target_rot, DURACION_TRANSICION)\
+			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 
 
 func iniciar_presentacion() -> void:
-	_seleccion.opcion_actual = Opcion.JUGAR
-	_seleccion.bloqueado = false
-	_cinematica.iniciar_presentacion(Engine.is_editor_hint(), is_in_group("modo_test"))
+	seleccion.opcion_actual = Opcion.JUGAR
+	seleccion.bloqueado = false
+	cinematica.iniciar_presentacion(Engine.is_editor_hint(), is_in_group("modo_test"))
 
 
 func iniciar_descenso() -> void:
-	_cinematica.iniciar_descenso(_on_animacion_terminada)
+	cinematica.iniciar_descenso(_on_animacion_terminada)
 
 
 func regresar_a_presentacion() -> void:
-	if _estado != EstadoMenu.MENU_ACTIVO or _bloqueado:
+	if estado != EstadoMenu.MENU_ACTIVO or bloqueado:
 		return
-	_seleccion.bloqueado = true
-	_seleccion.opcion_actual = Opcion.JUGAR
+	seleccion.bloqueado = true
+	seleccion.opcion_actual = Opcion.JUGAR
 	_actualizar_seleccion(true)
-	_cinematica.regresar_a_presentacion(_on_animacion_terminada)
+	cinematica.regresar_a_presentacion(_on_animacion_terminada)
 
 
 func skipear_cinematica() -> void:
-	_cinematica.skipear_cinematica()
+	cinematica.skipear_cinematica()
 
 
 func _on_animacion_terminada(nombre: StringName) -> void:
-	var volvio_a_presentacion: bool = _cinematica.procesar_animacion_terminada(nombre)
+	var volvio_a_presentacion: bool = cinematica.procesar_animacion_terminada(nombre)
 	if nombre == &"bajar_al_bosque":
-		_seleccion.bloqueado = false
+		seleccion.bloqueado = false
 		if volvio_a_presentacion:
-			_seleccion.opcion_actual = Opcion.JUGAR
+			seleccion.opcion_actual = Opcion.JUGAR
 			_actualizar_seleccion(false)
 		else:
 			_actualizar_seleccion(false)
@@ -294,24 +273,24 @@ func enfocar() -> void:
 
 
 func _navegar(direccion: int) -> void:
-	_seleccion.navegar(direccion)
+	seleccion.navegar(direccion)
 
 
 func _actualizar_seleccion(animar: bool) -> void:
-	_seleccion.actualizar_seleccion(animar)
+	seleccion.actualizar_seleccion(animar)
 
 
 func _confirmar_opcion() -> void:
-	_seleccion.confirmar_opcion()
+	seleccion.confirmar_opcion()
 
 
 func _process(delta: float) -> void:
 	if Engine.is_editor_hint() and not is_in_group("modo_test"):
 		return
-	_parallax.procesar_balanceo(
+	parallax.procesar_balanceo(
 		delta,
-		_particulas.obtener_particulas_estrellas(),
-		_particulas.obtener_particulas_nubes(),
+		particulas.obtener_particulas_estrellas(),
+		particulas.obtener_particulas_nubes(),
 		estrellas_factor_parallax,
 		estrellas_factor_rotacion,
 		nubes_factor_parallax,
@@ -323,7 +302,7 @@ func _unhandled_input(evento: InputEvent) -> void:
 	if Engine.is_editor_hint():
 		return
 
-	match _estado:
+	match estado:
 		EstadoMenu.PRESENTACION:
 			if evento.is_action_pressed("ui_accept") or evento.is_action_pressed("personaje-salto"):
 				iniciar_descenso()
@@ -335,7 +314,7 @@ func _unhandled_input(evento: InputEvent) -> void:
 				get_viewport().set_input_as_handled()
 
 		EstadoMenu.MENU_ACTIVO:
-			if _bloqueado:
+			if bloqueado:
 				return
 
 			if evento.is_action_pressed("ui_cancel"):
