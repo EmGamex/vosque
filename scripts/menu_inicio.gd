@@ -176,6 +176,7 @@ var _rotacion_base: float:
 	get: return _parallax.rotacion_base if _parallax != null else 0.0
 	set(v): if _parallax != null: _parallax.rotacion_base = v
 
+@warning_ignore("unused_private_class_variable")
 var _pos_inicial_montana_1: Vector2:
 	get: return _parallax.pos_inicial_montana_1 if _parallax != null else Vector2.ZERO
 
