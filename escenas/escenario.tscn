@@ -89,4 +89,4 @@ position = Vector2(1080, 1080)
 [node name="EfectoNieblaMutacion" parent="." unique_id=943449726 instance=ExtResource("5_a55de")]
 
 [node name="CanvasModulate" type="CanvasModulate" parent="." unique_id=398605903]
-color = Color(0.078431375, 0.101960786, 0.14901961, 1)
+color = Color(0.4, 0.4509804, 0.6, 1)

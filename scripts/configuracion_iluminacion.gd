@@ -6,13 +6,13 @@ extends Resource
 
 # --- GRUPO AMBIENTE ---
 @export_group("Ambiente")
-@export var color_ambiente_inicial: Color = Color(0.08, 0.10, 0.15, 1.0):
+@export var color_ambiente_inicial: Color = Color(0.40, 0.45, 0.60, 1.0):
 	set(val):
 		color_ambiente_inicial = val
 		emit_changed()
 		changed.emit()
 
-@export var color_ambiente_final: Color = Color(0.04, 0.05, 0.07, 1.0):
+@export var color_ambiente_final: Color = Color(0.18, 0.22, 0.32, 1.0):
 	set(val):
 		color_ambiente_final = val
 		emit_changed()
@@ -82,13 +82,13 @@ extends Resource
 
 # --- GRUPO HALO CORPORAL ---
 @export_group("Halo Corporal")
-@export var color_halo: Color = Color(0.8, 0.85, 1.0, 0.25):
+@export var color_halo: Color = Color(0.8, 0.85, 1.0, 0.35):
 	set(val):
 		color_halo = val
 		emit_changed()
 		changed.emit()
 
-@export_range(20.0, 400.0, 5.0, "suffix:px") var radio_halo_px: float = 120.0:
+@export_range(20.0, 400.0, 5.0, "suffix:px") var radio_halo_px: float = 140.0:
 	set(val):
 		radio_halo_px = val
 		emit_changed()

@@ -4,7 +4,8 @@
 
 [resource]
 script = ExtResource("1_jdlar")
-color_ambiente_inicial = Color(0.078431375, 0.101960786, 0.14901961, 1)
-color_ambiente_final = Color(0.039215688, 0.050980393, 0.07058824, 1)
+color_ambiente_inicial = Color(0.4, 0.4509804, 0.6, 1)
+color_ambiente_final = Color(0.18039216, 0.21960784, 0.32156864, 1)
 color_linterna = Color(1, 0.9607843, 0.8784314, 1)
-color_halo = Color(0.8, 0.8039216, 1, 0.2509804)
+color_halo = Color(0.8, 0.8039216, 1, 0.34901962)
+radio_halo_px = 140.0

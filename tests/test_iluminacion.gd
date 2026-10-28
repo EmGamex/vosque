@@ -10,14 +10,14 @@ func suite_name() -> String:
 
 func test_configuracion_iluminacion_valores_y_reactividad() -> void:
 	var cfg := ConfiguracionIluminacion.new()
-	assert_eq(cfg.color_ambiente_inicial, Color(0.08, 0.10, 0.15, 1.0), "Color ambiente inicial debe ser penumbra azul petróleo")
-	assert_eq(cfg.color_ambiente_final, Color(0.04, 0.05, 0.07, 1.0), "Color ambiente final debe ser noche cerrada")
+	assert_eq(cfg.color_ambiente_inicial, Color(0.40, 0.45, 0.60, 1.0), "Color ambiente inicial debe ser penumbra azulada visible")
+	assert_eq(cfg.color_ambiente_final, Color(0.18, 0.22, 0.32, 1.0), "Color ambiente final debe ser penumbra cerrada")
 	assert_eq(cfg.color_linterna, Color(1.0, 0.96, 0.88, 1.0), "Color linterna debe ser blanco cálido halógeno")
 	assert_eq(cfg.energia_base, 1.2, "Energía base debe ser 1.2")
 	assert_eq(cfg.alcance_px, 700.0, "Alcance debe ser 700 px")
 	assert_eq(cfg.apertura_grados, 60.0, "Apertura debe ser 60°")
 	assert_eq(cfg.velocidad_giro_teclado, 10.0, "Velocidad de giro por teclado debe ser 10 rad/s")
-	assert_eq(cfg.radio_halo_px, 120.0, "Radio de halo debe ser 120 px")
+	assert_eq(cfg.radio_halo_px, 140.0, "Radio de halo debe ser 140 px")
 	assert_eq(cfg.intensidad_flicker, 0.10, "Intensidad de flicker debe ser 10%")
 
 	# Test interpolación de ambiente por notas
