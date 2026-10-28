@@ -98,7 +98,7 @@ shape = SubResource("CircleShape2D_5nfxw")
 position = Vector2(0, 7.9999995)
 scale = Vector2(0.075, 0.074999996)
 sprite_frames = SubResource("SpriteFrames_g4v7s")
-animation = &"Salto"
+animation = &"arriba"
 autoplay = "idle-arriba"
 
 [node name="Sombra" type="Polygon2D" parent="Visual" unique_id=1928397469]
@@ -111,7 +111,14 @@ script = ExtResource("8_kmopf")
 config = ExtResource("9_8xrj8")
 
 [node name="LinternaFrontal" type="PointLight2D" parent="PivoteLinterna" unique_id=956915416]
+position = Vector2(96, 0)
+color = Color(1, 0.9607843, 0.8784314, 1)
+energy = 1.2
+offset = Vector2(256, 0)
+texture_scale = 1.3671875
 
 [node name="HaloCorporal" type="Sprite2D" parent="PivoteLinterna" unique_id=1633382745]
+modulate = Color(0.8, 0.8039216, 1, 0.2509804)
 material = ExtResource("10_tbkpf")
+scale = Vector2(0.9375, 0.9375)
 texture = ExtResource("11_41mom")
