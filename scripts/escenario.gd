@@ -17,6 +17,7 @@ const RUTAS_VARIANTES_DEFECTO: Array[String] = [
 @export var objetivo_jugador: Node2D
 @export var objetivo_enemigo: CharacterBody2D
 @export var catalogo_variantes: Array[PackedScene] = []
+@export var config_iluminacion: ConfiguracionIluminacion
 
 var variantes_activas: Dictionary = {
 	"NO": "",
@@ -36,6 +37,7 @@ var _mutacion_en_progreso: bool = false
 var ultimo_marcador_desatasco: Vector2 = Vector2.INF
 
 @onready var _efecto_niebla: EfectoNieblaMutacion = get_node_or_null("EfectoNieblaMutacion") as EfectoNieblaMutacion
+@onready var _modulador_ambiental: CanvasModulate = get_node_or_null("CanvasModulate") as CanvasModulate
 @onready var _nodo_no: Node2D = get_node_or_null("Sectores/SectorNO") as Node2D
 @onready var _nodo_ne: Node2D = get_node_or_null("Sectores/SectorNE") as Node2D
 @onready var _nodo_so: Node2D = get_node_or_null("Sectores/SectorSO") as Node2D
@@ -47,6 +49,36 @@ func _ready() -> void:
 	_resolver_referencias_objetivos()
 	_inicializar_catalogo()
 	_instanciar_sectores_iniciales()
+	_inicializar_iluminacion_ambiental()
+
+
+func _inicializar_iluminacion_ambiental() -> void:
+	if _modulador_ambiental == null:
+		_modulador_ambiental = get_node_or_null("CanvasModulate") as CanvasModulate
+
+	if config_iluminacion == null:
+		if ResourceLoader.exists("res://recursos/iluminacion/config_iluminacion_defecto.tres"):
+			config_iluminacion = load("res://recursos/iluminacion/config_iluminacion_defecto.tres") as ConfiguracionIluminacion
+		else:
+			config_iluminacion = ConfiguracionIluminacion.new()
+
+	if _modulador_ambiental != null and config_iluminacion != null:
+		_modulador_ambiental.color = config_iluminacion.calcular_color_ambiente(0)
+
+
+## Modula suavemente la penumbra ambiental (CanvasModulate) conforme se recolectan notas.
+func actualizar_iluminacion_ambiental(notas_recolectadas: int, duracion_transicion: float = 1.0) -> void:
+	if _modulador_ambiental == null:
+		_modulador_ambiental = get_node_or_null("CanvasModulate") as CanvasModulate
+	if _modulador_ambiental == null or config_iluminacion == null:
+		return
+
+	var color_objetivo: Color = config_iluminacion.calcular_color_ambiente(notas_recolectadas)
+	if duracion_transicion > 0.0 and is_inside_tree():
+		var tween := create_tween()
+		tween.tween_property(_modulador_ambiental, "color", color_objetivo, duracion_transicion)
+	else:
+		_modulador_ambiental.color = color_objetivo
 
 
 func _resolver_referencias_objetivos() -> void:

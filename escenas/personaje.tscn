@@ -7,6 +7,10 @@
 [ext_resource type="Texture2D" uid="uid://c8532ifckormt" path="res://graficos/lsdo abajo boceto.png" id="3_im2y8"]
 [ext_resource type="Texture2D" uid="uid://dbk2wyrqh5vx0" path="res://graficos/lsdo arriba boceto.png" id="4_h42ap"]
 [ext_resource type="Texture2D" uid="uid://23tsn8fcifgs" path="res://graficos/lado boceto.png" id="6_57ngn"]
+[ext_resource type="Script" uid="uid://c1t6h1dv5pmy0" path="res://scripts/controlador_linterna.gd" id="8_kmopf"]
+[ext_resource type="Resource" uid="uid://cqqirq3y7pg12" path="res://recursos/iluminacion/config_iluminacion_defecto.tres" id="9_8xrj8"]
+[ext_resource type="Material" uid="uid://bg56lmqx5obua" path="res://recursos/iluminacion/mat_halo_corporal.tres" id="10_tbkpf"]
+[ext_resource type="Texture2D" uid="uid://b8duj3viyr6eg" path="res://recursos/iluminacion/textura_halo_corporal.tres" id="11_41mom"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_5nfxw"]
 radius = 32.0
@@ -101,3 +105,13 @@ autoplay = "idle-arriba"
 position = Vector2(0, 48)
 color = Color(0, 0, 0, 0.45)
 polygon = PackedVector2Array(32, 0, 28, 6, 16, 12, 0, 14, -16, 12, -28, 6, -32, 0, -28, -6, -16, -12, 0, -14, 16, -12, 28, -6)
+
+[node name="PivoteLinterna" type="Node2D" parent="." unique_id=2073641112]
+script = ExtResource("8_kmopf")
+config = ExtResource("9_8xrj8")
+
+[node name="LinternaFrontal" type="PointLight2D" parent="PivoteLinterna" unique_id=956915416]
+
+[node name="HaloCorporal" type="Sprite2D" parent="PivoteLinterna" unique_id=1633382745]
+material = ExtResource("10_tbkpf")
+texture = ExtResource("11_41mom")

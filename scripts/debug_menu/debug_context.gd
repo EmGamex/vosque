@@ -9,6 +9,7 @@ var target_camara: Camera2D
 var target_camara_dios: Camera2D
 var target_escenario: Node2D
 var target_efecto_niebla: EfectoNieblaMutacion
+var target_linterna: ControladorLinterna
 
 var camara_zoom_original: Vector2 = Vector2.ONE
 var camara_offset_original: Vector2 = Vector2.ZERO
@@ -52,6 +53,12 @@ func buscar_nodos(escena_actual: Node, god_view_activo: bool) -> void:
 			target_efecto_niebla = target_escenario.find_child("EfectoNieblaMutacion", true, false) as EfectoNieblaMutacion
 		if target_efecto_niebla == null:
 			target_efecto_niebla = escena_actual.find_child("EfectoNieblaMutacion", true, false) as EfectoNieblaMutacion
+
+	if target_linterna == null or not is_instance_valid(target_linterna):
+		if target_character != null:
+			target_linterna = target_character.find_child("PivoteLinterna", true, false) as ControladorLinterna
+		if target_linterna == null:
+			target_linterna = escena_actual.find_child("PivoteLinterna", true, false) as ControladorLinterna
 
 
 func _buscar_nodo_por_tipo(nodo_raiz: Node, tipo: String, nombres_clave: Array[String]) -> CharacterBody2D:

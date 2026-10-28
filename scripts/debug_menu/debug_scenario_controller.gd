@@ -9,6 +9,7 @@ var god_view_activo: bool = false
 var debug_dibujar_cuadrantes: bool = false
 var debug_dibujar_corredores: bool = false
 var niebla_desactivada: bool = false
+var flicker_forzado: bool = false
 
 
 func restaurar_desde_config(cfg: Node, check_god_view: CheckBox, check_corr: CheckBox, check_cuad: CheckBox, check_niebla: CheckBox = null) -> void:
@@ -18,6 +19,7 @@ func restaurar_desde_config(cfg: Node, check_god_view: CheckBox, check_corr: Che
 	debug_dibujar_cuadrantes = cfg.debug_dibujar_cuadrantes
 	debug_dibujar_corredores = cfg.debug_dibujar_corredores
 	niebla_desactivada = cfg.get("niebla_desactivada") if "niebla_desactivada" in cfg else false
+	flicker_forzado = cfg.get("flicker_forzado") if "flicker_forzado" in cfg else false
 
 	if check_god_view != null:
 		check_god_view.set_pressed_no_signal(god_view_activo)
@@ -109,6 +111,17 @@ func aplicar_estado_niebla(context: DebugContext) -> void:
 	if context.target_efecto_niebla != null and is_instance_valid(context.target_efecto_niebla):
 		if context.target_efecto_niebla.desactivado != niebla_desactivada:
 			context.target_efecto_niebla.desactivado = niebla_desactivada
+
+	if context.target_linterna != null and is_instance_valid(context.target_linterna) and context.target_linterna.config != null:
+		context.target_linterna.config.flicker_forzado_debug = flicker_forzado
+
+
+func set_forzar_flicker(activo: bool, context: DebugContext, cfg: Node) -> void:
+	flicker_forzado = activo
+	if cfg != null and "flicker_forzado" in cfg:
+		cfg.flicker_forzado = activo
+	if context != null and context.target_linterna != null and is_instance_valid(context.target_linterna) and context.target_linterna.config != null:
+		context.target_linterna.config.flicker_forzado_debug = activo
 
 
 func forzar_mutacion(escenario: Node2D) -> void:

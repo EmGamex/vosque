@@ -55,6 +55,7 @@ const MAX_TRAIL_PUNTOS: int = 45
 
 
 func _ready() -> void:
+	add_to_group("monstruo")
 	motion_mode = CharacterBody2D.MOTION_MODE_FLOATING
 	if objetivo == null and get_parent() != null:
 		objetivo = get_parent().get_node_or_null("personaje") as Node2D
