@@ -155,7 +155,10 @@ func _actualizar_posicion_foco() -> void:
 	if not is_inside_tree():
 		return
 
-	if not Engine.is_editor_hint() and (objetivo_jugador == null or not is_instance_valid(objetivo_jugador)):
+	if objetivo_jugador != null and not is_instance_valid(objetivo_jugador):
+		objetivo_jugador = null
+
+	if not Engine.is_editor_hint() and objetivo_jugador == null:
 		_resolver_referencia_jugador()
 
 	var res := foco_ctrl.calcular_foco_y_aspecto(self, objetivo_jugador, centro_pantalla, Engine.is_editor_hint())
