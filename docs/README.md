@@ -40,6 +40,7 @@ Para facilitar la lectura y desarrollo, la documentación está dividida en las 
 - [La Criatura (Monstruo) y su IA](gameplay/monstruo_e_ia.md): Ciclo de vida (hibernación en Nota 0 $\to$ despertar en Nota 1), cinemática, línea de visión, desatasco tangencial (*steering*) y detección letal.
 - [Mapa y Sectores](gameplay/mapa_y_sectores.md): Topología 2x2 ($4320 \times 4320\text{ px}$), límites físicos/visuales perimetrales, corredores seguros ($160\text{ px}$) y diseño de variantes.
 - [Sistema de Mutación y Niebla](gameplay/sistema_de_mutacion_y_niebla.md): Algoritmo dinámico de reemplazo de los 3 sectores lejanos, telón visual de niebla, exclusión mutua y optimizaciones WebGL.
+- [Sistema de Iluminación](gameplay/sistema_de_iluminacion.md): Arquitectura de penumbra (Noche Americana), presupuesto WebGL 2.0 (2 luces reales), linterna procedural, halo aditivo y detección analítica del monstruo.
 - [Sistema de Notas y Spawner](gameplay/sistema_de_notas_y_spawner.md): Jerarquía de `Area2D`, baliza luminosa, recolección atómica y algoritmo con filtros espaciales.
 - [Dificultad y Balance](gameplay/dificultad_y_balance.md): Progresión por notas, tabla cuantitativa de velocidades ($500 \to 920\text{ px/s}$) y reglas de mutación.
 - [Arquitectura de Partida y Director](gameplay/arquitectura_de_partida_y_director.md): Game Director (`maain.gd`), ciclo de señales, Game Over y persistencia de récords en Web.

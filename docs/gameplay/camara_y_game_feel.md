@@ -50,10 +50,12 @@ $$\text{Desplazamiento} = \text{Trauma}^2 \times \text{AmplitudMáxima} \times \
 
 ## 3. Post-Procesamiento e Iluminación Atmosférica
 
+> 💡 **Especificación completa:** Ver [Sistema de Iluminación](sistema_de_iluminacion.md) para el análisis cuantitativo de WebGL 2.0, cálculo matemático del cono y modulación por recolección de notas.
+
 ### 3.1. Iluminación Ambiental con `CanvasModulate`
 * Color base: `Color(0.08, 0.10, 0.15, 1.0)`.
-* Genera una penumbra azul petróleo que evita la oscuridad absoluta, permitiendo discernir las siluetas de los troncos a media distancia sin linterna.
+* Genera una penumbra azul petróleo que evita la oscuridad absoluta, permitiendo discernir las siluetas de los troncos a media distancia sin linterna. Conforme se recogen notas, se oscurece gradualmente intensificando la tensión.
 
 ### 3.2. Linterna y Alto Contraste
-* La linterna frontal (`PointLight2D`) recorta la oscuridad con una textura cónica de alta penetración ($700\text{ px}$ de alcance).
-* Actúa como el elemento de contraste principal que revela detalles, texturas y los ojos retro-reflectantes del enemigo.
+* La linterna frontal (`PointLight2D`) recorta la oscuridad con una textura cónica de alta penetración ($700\text{ px}$ de alcance, $60^\circ$ de apertura).
+* Actúa como el elemento de contraste principal que revela detalles, texturas y los ojos retro-reflectantes del enemigo (`LIGHT_MODE_UNSHADED`). Al penetrar la bestia en el haz, desencadena un titileo estocástico electromagnético ($\pm 10\%$) e incrementa el trauma de estrés de la cámara ($+0.12\text{ / s}$).

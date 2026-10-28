@@ -16,16 +16,20 @@ En los juegos clásicos de recolección de notas, el jugador suele detenerse a l
 
 ```text
 Nota (Area2D) [scripts/nota.gd, Capa 5: Interactuables]
-├── VisualPapel (Sprite2D)          # Textura de papel antiguo arrugado (64x64 px)
-├── CollisionShape2D                # Círculo de colisión física (radio: 32 px)
-├── LuzBaliza (Sprite2D o PointLight2D) # Resplandor radial ámbar (~200 px)
+├── VisualPapel (Sprite2D)              # Textura de papel antiguo arrugado (64x64 px)
+├── CollisionShape2D                    # Círculo de colisión física (radio: 32 px)
+├── LuzBaliza (PointLight2D)            # Resplandor radial ámbar (~256 px, 2ª luz permitida WebGL)
 └── ParticulasRecogida (CPUParticles2D) # Emisión puntual de micro-chispas al recolectarse
 ```
 
 ### 2.1. Iluminación y Rendimiento en WebGL 2.0
-* **Variante Optimizada Web (Recomendada):** Implementar `LuzBaliza` como un `Sprite2D` con gradiente radial y `CanvasItemMaterial(blend_mode = BLEND_MODE_ADD)`, modulando `modulate.a` senoidalmente ($\pm 0.15$ a $1.5\text{ Hz}$). Esto emula a la perfección el pulso de baliza sin añadir un pase de iluminación multipase en `gl_compatibility`.
-* **Variante con `PointLight2D`:** Si se utiliza `PointLight2D`, asegurar `shadow_enabled = false` y energía moderada ($0.8$).
-* **Color:** Blanco cálido / pergamino (`Color(1.0, 0.95, 0.8, 1.0)`).
+
+> 💡 **Detalles del presupuesto:** Ver [Sistema de Iluminación](sistema_de_iluminacion.md).
+
+* **Integración en el Presupuesto Lumínico:** `LuzBaliza` constituye la segunda y última luz `PointLight2D` permitida en simultáneo en el mundo (`shadow_enabled = false`).
+* **Implementación con `PointLight2D`:** Utiliza `res://escenas/luz_baliza_textura.tres` con modulación senoidal en su propiedad `energy` ($\text{rango } 0.65 - 0.95$, frecuencia angular $3.5\text{ rad/s}$).
+* **Color:** Blanco cálido / pergamino ámbar (`Color(1.0, 0.95, 0.8, 1.0)`).
+* **Apagado Atómico:** Al recolectar la nota, `_luz_baliza.visible = false` de forma sincrónica para liberar de inmediato el pase de luz en GPU antes de que el spawner cree la nota siguiente.
 
 ### 2.2. Animación Procedural de Flotación
 Para evitar requerir spritesheets adicionales, el nodo `VisualPapel` realiza una levitación suave en motor:

@@ -32,9 +32,14 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
   - [x] Impacto contra el suelo y ventana de inmovilidad/recuperación de $0.6\text{ s}$ con arrastre (`dive_slide_friction = 2200 px/s²`).
 - [ ] **Animaciones de Salto y Recuperación en Motor:**
   - [ ] Integrar poses estáticas y recuperación (`jugador_salto_aire`, `jugador_plancha_aire`, `jugador_suelo_recuperacion`) en `_actualizar_animacion()` de [`scripts/personaje.gd`](../../scripts/personaje.gd).
-- [ ] **Linterna Frontal Desacoplada:**
-  - [ ] Halo radial permanente centrado en el personaje.
-  - [ ] Haz cónico orientable libremente en $360^\circ$ hacia el ratón o alineado automáticamente con la dirección de marcha.
+- [ ] **Sistema de Iluminación y Linterna Frontal Desacoplada:**
+  - [x] Especificación canónica en [`docs/gameplay/sistema_de_iluminacion.md`](../gameplay/sistema_de_iluminacion.md) con presupuesto WebGL 2.0 (máximo 2 `PointLight2D`).
+  - [ ] Recurso serializado `ConfiguracionIluminacion` (`scripts/configuracion_iluminacion.gd` y `.tres`).
+  - [ ] `HaloCorporal`: Sprite2D aditivo (`BLEND_MODE_ADD`) centrado en el personaje.
+  - [ ] `LinternaFrontal`: PointLight2D con haz cónico procedural ($60^\circ$, $700\text{ px}$) desacoplado en $360^\circ$ (ratón / teclado).
+  - [ ] Detección analítica del monstruo (vector `dot` + distancia) y perturbación electromagnética (flicker $\pm 10\%$).
+  - [ ] `CanvasModulate` en `Escenario.tscn` con oscurecimiento reactivo por notas.
+  - [ ] Controles de calibración en vivo en `DebugMenu.tscn`.
 
 ---
 

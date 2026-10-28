@@ -97,10 +97,13 @@ El proyecto cuenta con un plugin de editor dedicado (`character_bar.gd`) que per
   * **Vulnerabilidad Total:** Si el monstruo se encuentra demasiado cerca, alcanzará al jugador indefenso, culminando en Game Over.
 
 ### 3.4. Linterna Atmosférica y Desacople de Orientación
+
+> 💡 **Especificación completa:** Ver [Sistema de Iluminación](sistema_de_iluminacion.md) para detalles de presupuesto WebGL, generación procedural del haz cónico y perturbación electromagnética.
+
 * **Comportamiento:** La linterna es un elemento **decorativo y atmosférico siempre activo**. No requiere recarga de baterías ni posee interruptor de apagado manual.
 * **Estructura de Iluminación Optimizada para Web:**
-  1. **Halo de Proximidad (`LuzCuerpo`):** Para economizar pases de renderizado en WebGL 2.0 (`gl_compatibility`), se implementa como un `Sprite2D` radial translúcido con material `CanvasItemMaterial(blend_mode = BLEND_MODE_ADD)`, proporcionando iluminación suave en los pies sin generar un pase de luz real en GPU.
-  2. **Haz Direccional (`LinternaFrontal`):** Un nodo `PointLight2D` frontal (sin sombras dinámicas `shadow_enabled = false`) que proyecta visión a media distancia hacia donde apunta.
+  1. **Halo Corporal Aditivo (`HaloCorporal`):** Para economizar pases de renderizado en WebGL 2.0 (`gl_compatibility`), se implementa como un `Sprite2D` radial translúcido con material `CanvasItemMaterial(blend_mode = BLEND_MODE_ADD)`, proporcionando iluminación suave en los pies sin generar un pase de luz real en GPU.
+  2. **Haz Direccional (`LinternaFrontal`):** Un nodo `PointLight2D` frontal (sin sombras dinámicas `shadow_enabled = false`) con textura cónica procedural ($60^\circ$ de apertura, $700\text{ px}$ de alcance) que proyecta visión a media distancia hacia donde apunta. Ambos se organizan bajo `PivoteLinterna`.
 * **Desacople y Conmutación Inteligente de Orientación:**
   - El sprite del personaje orienta sus animaciones según el vector de entrada de movimiento (`velocity`).
   - **Detección Dinámica de Entrada (Ratón vs. Teclado):** Para evitar que en Web la linterna quede anclada a la última posición estática del cursor tras hacer clic en la pantalla de inicio:
@@ -157,14 +160,15 @@ stateDiagram-v2
 
 ```text
 Personaje (CharacterBody2D) [scripts/personaje.gd, y_sort_enabled=true]
-├── Sombra (Node2D)                   # Sprite/óvalo en suelo (nodo hermano de Visual)
-├── Visual (Node2D)                   # Contenedor para elevación en eje Z durante salto
-│   └── Sprite2D (AnimatedSprite2D)   # Animaciones y vistas direccionales (pivote en pies)
-├── CollisionShape2D                  # Colisión física circular compacta en los pies
-├── LinternaFrontal (PointLight2D)    # Haz cónico libremente orientable en 360° hacia el ratón
-├── LuzCuerpo (PointLight2D)          # Halo radial 360° tenue centrado en el protagonista
-├── Camera2D                          # Cámara principal de seguimiento
-└── AudioPasos (AudioStreamPlayer2D)  # Reproductor de pisadas en hojarasca
+├── Sombra (Node2D)                     # Sprite/óvalo en suelo (nodo hermano de Visual)
+├── Visual (Node2D)                     # Contenedor para elevación en eje Z durante salto
+│   └── Sprite2D (AnimatedSprite2D)     # Animaciones y vistas direccionales (pivote en pies)
+├── CollisionShape2D                    # Colisión física circular compacta en los pies
+├── PivoteLinterna (Node2D)             # Contenedor orientable 360° desacoplado
+│   ├── LinternaFrontal (PointLight2D)  # Haz cónico procedural orientable hacia el ratón/marcha
+│   └── HaloCorporal (Sprite2D)         # Halo radial translúcido aditivo (BLEND_MODE_ADD)
+├── Camera2D                            # Cámara principal de seguimiento
+└── AudioPasos (AudioStreamPlayer2D)    # Reproductor de pisadas en hojarasca
 ```
 
 * **Gestión de Pivote y Profundidad:** El nodo raíz `Personaje` y el mapa tienen `y_sort_enabled = true`. El pivote del sprite se ubica exactamente en la base de los pies para ordenar correctamente el renderizado delante o detrás de los árboles.

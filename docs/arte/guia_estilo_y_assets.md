@@ -94,16 +94,19 @@ Para poblar la arena completa de $4320 \times 4320\text{ px}$ (4 cuadrantes de $
 
 ### 2.6. Pantallas de Impacto e Iluminación (Presupuesto WebGL 2.0)
 
+> 💡 **Especificación completa:** Ver [Sistema de Iluminación](../gameplay/sistema_de_iluminacion.md) para fórmulas, detección de entidades y arquitectura de renderizado.
+
 En el renderizador `gl_compatibility`, cada `PointLight2D` activo genera un pase adicional de renderizado sobre cada elemento en pantalla que intersecte su área. Para evitar la sobrecarga de fragmentos en Web:
 
-* **Linterna Frontal:** Un único nodo `PointLight2D` cónico con textura `luz_linterna_cono` y **`shadow_enabled = false`** (sin sombras proyectadas dinámicas de 360°, las cuales son extremadamente costosas en WebGL).
-* **Halos Secundarios:** En lugar de múltiples nodos `PointLight2D`, el halo corporal del protagonista (`luz_halo_corporal`) y el halo de la nota se implementan mediante `Sprite2D` con material aditivo (`CanvasItemMaterial` en `BLEND_MODE_ADD`). Esto ofrece el mismo efecto visual de iluminación sobre la penumbra de `CanvasModulate` sin pases extras de luz en GPU.
-* **Ojos Reflectantes:** Los ojos de la criatura usan `LIGHT_MODE_UNSHADED` en su material, brillando con total nitidez en la oscuridad con coste computacional despreciable.
+* **Regla de 2 Luces Reales:** Solo se permiten un máximo de dos nodos `PointLight2D` activos simultáneos en el mundo: la **Linterna Frontal** del jugador y la **Baliza de la Nota** activa.
+* **Linterna Frontal:** Un único nodo `PointLight2D` cónico con textura generada proceduralmente (o `luz_linterna_cono`) y **`shadow_enabled = false`** (sin sombras proyectadas dinámicas de 360°, las cuales son extremadamente costosas en WebGL).
+* **Halos Secundarios Aditivos:** En lugar de múltiples nodos `PointLight2D`, el halo corporal del protagonista (`luz_halo_corporal`) se implementa mediante `Sprite2D` con material aditivo (`CanvasItemMaterial` en `BLEND_MODE_ADD`). Esto ofrece el mismo efecto visual de iluminación sobre la penumbra de `CanvasModulate` sin pases extras de luz en GPU.
+* **Ojos Reflectantes:** Los ojos de la criatura usan `LIGHT_MODE_UNSHADED` en su material, brillando con total nitidez en la penumbra con coste computacional despreciable.
 
 | ID de Asset | Descripción | Resolución | Comportamiento / Integración |
 | :--- | :--- | :---: | :--- |
 | `game_over_jumpscare` | Ilustración de alto impacto del rostro o garra de la bestia en tinta negra y rojo sangre | $512 \times 512$ px | Aparece instantáneamente en la pantalla de Game Over con sacudida brusca de pantalla (*camera shake*), estática y destello rojo estroboscópico. |
-| `luz_linterna_cono` | Gradiente radial de cono angular para la linterna frontal | $512 \times 512$ px | Asignado al `PointLight2D` frontal del protagonista (sin sombras dinámicas). |
+| `luz_linterna_cono` | Gradiente radial de cono angular para la linterna frontal (opcional / fallback procedural) | $512 \times 512$ px | Asignado al `PointLight2D` frontal del protagonista (sin sombras dinámicas). |
 | `luz_halo_corporal` | Gradiente radial circular suave de penumbra | $256 \times 256$ px | Sprite aditivo (`BLEND_MODE_ADD`) centrado en el protagonista. |
 
 ---
