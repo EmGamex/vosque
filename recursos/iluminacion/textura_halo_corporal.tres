@@ -8,3 +8,5 @@ gradient = SubResource("Gradient_0r6ta")
 width = 256
 height = 256
 fill = 1
+fill_from = Vector2(0.4878472, 0.5225694)
+fill_to = Vector2(0.7899306, 0.21006945)

@@ -9,7 +9,6 @@
 [ext_resource type="Texture2D" uid="uid://23tsn8fcifgs" path="res://graficos/lado boceto.png" id="6_57ngn"]
 [ext_resource type="Script" uid="uid://c1t6h1dv5pmy0" path="res://scripts/controlador_linterna.gd" id="8_kmopf"]
 [ext_resource type="Resource" uid="uid://cqqirq3y7pg12" path="res://recursos/iluminacion/config_iluminacion_defecto.tres" id="9_8xrj8"]
-[ext_resource type="Material" uid="uid://bg56lmqx5obua" path="res://recursos/iluminacion/mat_halo_corporal.tres" id="10_tbkpf"]
 [ext_resource type="Texture2D" uid="uid://b8duj3viyr6eg" path="res://recursos/iluminacion/textura_halo_corporal.tres" id="11_41mom"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_5nfxw"]
@@ -103,11 +102,11 @@ energy = 1.2
 offset = Vector2(256, 0)
 texture_scale = 1.3671875
 
-[node name="HaloCorporal" type="Sprite2D" parent="PivoteLinterna" unique_id=1633382745]
-modulate = Color(0.8, 0.8039216, 1, 0.2509804)
-material = ExtResource("10_tbkpf")
-scale = Vector2(0.9375, 0.9375)
+[node name="HaloCorporal" type="PointLight2D" parent="PivoteLinterna" unique_id=1792487907]
+color = Color(0.8, 0.8509804, 1, 1)
+energy = 0.5
 texture = ExtResource("11_41mom")
+texture_scale = 1.09375
 
 [node name="Visual" type="Node2D" parent="." unique_id=438058484]
 

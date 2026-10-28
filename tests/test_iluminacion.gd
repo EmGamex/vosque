@@ -68,11 +68,10 @@ func test_jerarquia_y_presupuesto_personaje() -> void:
 	assert_false(linterna.shadow_enabled, "Sombras dinámicas deben estar deshabilitadas (shadow_enabled=false)")
 	assert_eq(linterna.blend_mode, PointLight2D.BLEND_MODE_ADD, "LinternaFrontal debe usar BLEND_MODE_ADD")
 
-	var halo: Sprite2D = pivote.get_node_or_null("HaloCorporal") as Sprite2D
+	var halo: PointLight2D = pivote.get_node_or_null("HaloCorporal") as PointLight2D
 	assert_true(halo != null, "Debe existir HaloCorporal en PivoteLinterna")
-	assert_true(halo.material is CanvasItemMaterial, "HaloCorporal debe tener CanvasItemMaterial")
-	var mat := halo.material as CanvasItemMaterial
-	assert_eq(mat.blend_mode, CanvasItemMaterial.BLEND_MODE_ADD, "HaloCorporal debe tener BLEND_MODE_ADD")
+	assert_false(halo.shadow_enabled, "HaloCorporal no debe tener sombras dinámicas")
+	assert_eq(halo.blend_mode, PointLight2D.BLEND_MODE_ADD, "HaloCorporal debe tener BLEND_MODE_ADD")
 
 	inst.free()
 
@@ -157,7 +156,7 @@ func test_canvas_modulate_escenario() -> void:
 	inst.free()
 
 
-func test_presupuesto_webgl_maximo_dos_luces() -> void:
+func test_presupuesto_webgl_maximo_tres_luces() -> void:
 	var escena_main: PackedScene = load("res://escenas/maain.tscn")
 	assert_true(escena_main != null, "escenas/maain.tscn debe poder cargarse")
 	var main_node: Node2D = escena_main.instantiate() as Node2D
@@ -171,7 +170,7 @@ func test_presupuesto_webgl_maximo_dos_luces() -> void:
 		if pl != null and pl.enabled and pl.visible:
 			luces_activas += 1
 
-	# En reposo solo debe estar la LinternaFrontal (y cuando haya nota en escena, máximo 2)
-	assert_true(luces_activas <= 2, "El presupuesto de PointLight2D activas nunca debe superar 2 (activo: %d)" % luces_activas)
+	# En reposo están LinternaFrontal y HaloCorporal (y cuando haya nota en escena, máximo 3)
+	assert_true(luces_activas <= 3, "El presupuesto de PointLight2D activas nunca debe superar 3 (activo: %d)" % luces_activas)
 
 	main_node.free()

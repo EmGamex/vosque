@@ -82,9 +82,15 @@ extends Resource
 
 # --- GRUPO HALO CORPORAL ---
 @export_group("Halo Corporal")
-@export var color_halo: Color = Color(0.8, 0.85, 1.0, 0.35):
+@export var color_halo: Color = Color(0.8, 0.85, 1.0, 1.0):
 	set(val):
 		color_halo = val
+		emit_changed()
+		changed.emit()
+
+@export_range(0.0, 2.0, 0.05) var energia_halo: float = 0.5:
+	set(val):
+		energia_halo = val
 		emit_changed()
 		changed.emit()
 

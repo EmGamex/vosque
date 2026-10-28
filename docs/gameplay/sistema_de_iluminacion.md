@@ -27,17 +27,17 @@ En el renderizador `gl_compatibility` de Godot 4, cada nodo `PointLight2D` activ
 
 ### 2.1. Regla de Oro del Presupuesto Lumínico
 Para mantener $60\text{ FPS}$ estables en navegadores de escritorio:
-* **Presupuesto Máximo:** **2 nodos `PointLight2D` activos simultáneamente en el árbol de escena del mundo.**
+* **Presupuesto Máximo:** **3 nodos `PointLight2D` activos simultáneamente en el árbol de escena del mundo.**
   1. `LinternaFrontal` (Protagonista): Haz direccional cónico siempre activo.
-  2. `LuzBaliza` (Nota activa): Halo radial pulsante que sirve como objetivo. Al recolectarse, su luz se apaga de inmediato antes de que el spawner instancie la siguiente.
+  2. `HaloCorporal` (Protagonista): Luz radial suave centrada en el personaje para iluminar sus pies y entorno inmediato.
+  3. `LuzBaliza` (Nota activa): Halo radial pulsante que sirve como objetivo. Al recolectarse, su luz se apaga de inmediato antes de que el spawner instancie la siguiente.
 * **Prohibición de Sombras Dinámicas:** Todos los nodos `PointLight2D` deben configurarse con **`shadow_enabled = false`**. El cálculo de oclusión de sombras dinámicas 2D en WebGL resulta prohibitivo.
-* **Halos Secundarios Aditivos:** Las fuentes de luz secundarias (como el brillo bajo los pies del jugador) no son luces reales, sino `Sprite2D` con material aditivo (`CanvasItemMaterial` en `BLEND_MODE_ADD`). Producen el mismo impacto estético sobre la penumbra sin coste de pases extras de luz en GPU.
 
 | Elemento | Tipo de Nodo | Técnica | Coste GPU |
 | :--- | :--- | :--- | :---: |
 | **Linterna Frontal** | `PointLight2D` | Textura cónica procedural ($700\text{ px}$, $60^\circ$) | 1 pase de luz |
+| **Halo Corporal** | `PointLight2D` | Gradiente radial suave nativo ($140\text{ px}$) | 1 pase de luz |
 | **Baliza de Nota** | `PointLight2D` | Gradiente radial ámbar pulsante ($\approx 256\text{ px}$) | 1 pase de luz |
-| **Halo Corporal** | `Sprite2D` | Material aditivo (`BLEND_MODE_ADD`) | 0 pases de luz |
 | **Ojos del Monstruo** | `Sprite2D` | Material con `LIGHT_MODE_UNSHADED` | 0 pases de luz |
 | **Penumbra Base** | `CanvasModulate` | Multiplicación cromática global del Canvas | 1 operación de pase |
 

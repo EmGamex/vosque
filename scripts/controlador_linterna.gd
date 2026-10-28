@@ -19,7 +19,7 @@ signal flicker_actualizado(energia: float)
 @export var objetivo_monstruo: Node2D
 
 @onready var linterna: PointLight2D = get_node_or_null("LinternaFrontal") as PointLight2D
-@onready var halo: Sprite2D = get_node_or_null("HaloCorporal") as Sprite2D
+@onready var halo: PointLight2D = get_node_or_null("HaloCorporal") as PointLight2D
 
 var _tiempo_desde_raton: float = 999.0
 var _modo_raton_activo: bool = false
@@ -32,7 +32,7 @@ func _ready() -> void:
 	if linterna == null:
 		linterna = get_node_or_null("LinternaFrontal") as PointLight2D
 	if halo == null:
-		halo = get_node_or_null("HaloCorporal") as Sprite2D
+		halo = get_node_or_null("HaloCorporal") as PointLight2D
 
 	if config == null:
 		if ResourceLoader.exists("res://recursos/iluminacion/config_iluminacion_defecto.tres"):
@@ -219,10 +219,15 @@ func _aplicar_configuracion() -> void:
 			linterna.texture = _textura_cache
 
 	if halo != null:
-		halo.modulate = config.color_halo
+		halo.color = config.color_halo
+		halo.energy = config.energia_halo
+		halo.blend_mode = PointLight2D.BLEND_MODE_ADD
+		halo.shadow_enabled = false
+		halo.range_layer_min = 0
+		halo.range_layer_max = 0
 		# Radio efectivo: textura de 256x256 tiene radio 128px
 		var escala_halo: float = config.radio_halo_px / 128.0
-		halo.scale = Vector2(escala_halo, escala_halo)
+		halo.texture_scale = escala_halo
 
 
 func _on_config_changed() -> void:
