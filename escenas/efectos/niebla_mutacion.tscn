@@ -6,33 +6,42 @@
 
 [sub_resource type="Resource" id="Resource_ja5pk"]
 script = ExtResource("2_3ecnl")
+cantidad_filas = 16
+radio_capsula = 0.03499999999999999
+largo_capsula = 0.45
+alternar_sentido_filas = true
+color_niebla = Color(0.8509804, 0.9019608, 0.98039216, 0.13333334)
+color_niebla_secundaria = Color(0.6509804, 0.7490196, 0.8784314, 0.20784314)
+opacidad_velo_fondo = 0.1
+difuminado_borde = 0.01
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_3ecnl"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_sychq"]
 shader = ExtResource("3_sychq")
-shader_parameter/cantidad_filas = 8
-shader_parameter/radio_capsula = 0.035
-shader_parameter/largo_capsula = 0.55
+shader_parameter/cantidad_filas = 16
+shader_parameter/radio_capsula = 0.03499999999999999
+shader_parameter/largo_capsula = 0.45
 shader_parameter/espaciado_x = 1.0
 shader_parameter/variacion_filas = 0.35
 shader_parameter/velocidad_desplazamiento = 0.25
-shader_parameter/alternar_sentido_filas = false
-shader_parameter/color_niebla = Color(0.85, 0.9, 0.98, 0.82)
-shader_parameter/color_niebla_secundaria = Color(0.65, 0.75, 0.88, 0.65)
-shader_parameter/opacidad_velo_fondo = 0.45
-shader_parameter/densidad_global = 0.0
-shader_parameter/radio_interno = 2.0
-shader_parameter/suavizado = 0.25
+shader_parameter/fase_desplazamiento = 0.6378216666666691
+shader_parameter/alternar_sentido_filas = true
+shader_parameter/color_niebla = Color(0.8509804, 0.9019608, 0.98039216, 0.13333334)
+shader_parameter/color_niebla_secundaria = Color(0.6509804, 0.7490196, 0.8784314, 0.20784314)
+shader_parameter/opacidad_velo_fondo = 0.1
+shader_parameter/densidad_global = 1.0
+shader_parameter/radio_interno = 0.15
+shader_parameter/suavizado = 0.01
 shader_parameter/centro = Vector2(0.5, 0.5)
 shader_parameter/aspecto = 1.9325842696629214
 
 [node name="EfectoNieblaMutacion" type="CanvasLayer" unique_id=943449726]
 layer = 15
-visible = false
 script = ExtResource("1_sychq")
 config = SubResource("Resource_ja5pk")
+previsualizar_en_editor = true
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=1893546325]
-material = SubResource("ShaderMaterial_3ecnl")
+material = SubResource("ShaderMaterial_sychq")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
