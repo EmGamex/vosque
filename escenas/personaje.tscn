@@ -91,6 +91,20 @@ script = ExtResource("1_5nfxw")
 position = Vector2(0, 32)
 shape = SubResource("CircleShape2D_5nfxw")
 
+[node name="Visual" type="Node2D" parent="." unique_id=438058484]
+
+[node name="Sprite2D" type="AnimatedSprite2D" parent="Visual" unique_id=911995098]
+position = Vector2(0, 7.9999995)
+scale = Vector2(0.075, 0.074999996)
+sprite_frames = SubResource("SpriteFrames_g4v7s")
+animation = &"arriba"
+autoplay = "idle-arriba"
+
+[node name="Sombra" type="Polygon2D" parent="Visual" unique_id=1928397469]
+position = Vector2(0, 48)
+color = Color(0, 0, 0, 0.45)
+polygon = PackedVector2Array(32, 0, 28, 6, 16, 12, 0, 14, -16, 12, -28, 6, -32, 0, -28, -6, -16, -12, 0, -14, 16, -12, 28, -6)
+
 [node name="PivoteLinterna" type="Node2D" parent="." unique_id=2073641112]
 script = ExtResource("8_kmopf")
 config = ExtResource("9_8xrj8")
@@ -106,18 +120,4 @@ texture_scale = 1.3671875
 color = Color(0.8, 0.8509804, 1, 1)
 energy = 0.5
 texture = ExtResource("11_41mom")
-texture_scale = 1.09375
-
-[node name="Visual" type="Node2D" parent="." unique_id=438058484]
-
-[node name="Sprite2D" type="AnimatedSprite2D" parent="Visual" unique_id=911995098]
-position = Vector2(0, 7.9999995)
-scale = Vector2(0.075, 0.074999996)
-sprite_frames = SubResource("SpriteFrames_g4v7s")
-animation = &"arriba"
-autoplay = "idle-arriba"
-
-[node name="Sombra" type="Polygon2D" parent="Visual" unique_id=1928397469]
-position = Vector2(0, 48)
-color = Color(0, 0, 0, 0.45)
-polygon = PackedVector2Array(32, 0, 28, 6, 16, 12, 0, 14, -16, 12, -28, 6, -32, 0, -28, -6, -16, -12, 0, -14, 16, -12, 28, -6)
+texture_scale = 1.09
