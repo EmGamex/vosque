@@ -70,6 +70,9 @@ var _salto_registrado: bool = false
 var _dive_registrado: bool = false
 var _sprint_registrado: bool = false
 
+var _distancia_raton_acumulada: float = 0.0
+const UMBRAL_MOVIMIENTO_RATON: float = 30.0
+var _tiempo_completado_paso_1: float = 0.0
 var _tiempo_desplazamiento: float = 0.0
 var _tiempo_iluminacion_raton: float = 0.0
 var _tiempo_en_paso_actual: float = 0.0
@@ -216,10 +219,13 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 
 	if event is InputEventMouseMotion:
-		if event.relative.length() >= 3.0:
+		var mov: float = event.relative.length()
+		if mov >= 1.0:
 			_raton_activo = true
-			_raton_registrado = true
 			_tiempo_iluminacion_raton = 0.35
+			_distancia_raton_acumulada += mov
+			if _distancia_raton_acumulada >= UMBRAL_MOVIMIENTO_RATON:
+				_raton_registrado = true
 			_actualizar_estilo_raton()
 
 
@@ -369,9 +375,17 @@ func _procesar_paso_1(delta: float) -> void:
 		if padre.velocity.length() > 30.0:
 			_tiempo_desplazamiento += delta
 
-	var todas_pulsadas: bool = _w_registrado and _a_registrado and _s_registrado and _d_registrado
-	if todas_pulsadas and (_tiempo_en_paso_actual >= 0.5 or _tiempo_desplazamiento >= 1.0):
-		_avanzar_paso(Paso.PASO_2_SALTO)
+	var todo_completado: bool = (
+		_w_registrado
+		and _a_registrado
+		and _s_registrado
+		and _d_registrado
+		and _raton_registrado
+	)
+	if todo_completado:
+		_tiempo_completado_paso_1 += delta
+		if _tiempo_completado_paso_1 >= 0.35:
+			_avanzar_paso(Paso.PASO_2_SALTO)
 
 
 func _procesar_paso_2(_delta: float) -> void:
@@ -380,10 +394,9 @@ func _procesar_paso_2(_delta: float) -> void:
 
 
 func _procesar_paso_3(_delta: float) -> void:
-	# En el aire, si pulsa salto -> se ejecuta plancha
-	if _en_el_aire and Input.is_action_just_pressed("personaje-salto"):
-		_dive_registrado = true
-		_animar_pulso_dive()
+	# El dive se detecta cuando el personaje entra en Estado.PLANCHA_AIRE (5)
+	# a través de _on_padre_estado_cambiado, garantizando que no se confunda con el salto previo.
+	pass
 
 
 func _procesar_paso_4(_delta: float) -> void:
@@ -401,11 +414,13 @@ func _on_padre_estado_cambiado(nuevo_estado: int, _nombre_estado: String) -> voi
 	if nuevo_estado == 4: # SALTO
 		_salto_en_curso = true
 		_en_el_aire = true
-		_salto_registrado = true
+		if paso_actual == Paso.PASO_2_SALTO:
+			_salto_registrado = true
 	elif nuevo_estado == 5: # PLANCHA_AIRE
-		_dive_registrado = true
-		_en_el_aire = true
-		_animar_pulso_dive()
+		if paso_actual == Paso.PASO_3_PLANCHA_DIVE:
+			_dive_registrado = true
+			_en_el_aire = true
+			_animar_pulso_dive()
 	else:
 		if _salto_en_curso:
 			_salto_en_curso = false
@@ -414,10 +429,13 @@ func _on_padre_estado_cambiado(nuevo_estado: int, _nombre_estado: String) -> voi
 				# Tras completar el salto regular, avanzamos al paso dedicado de Plancha/Dive
 				_avanzar_paso(Paso.PASO_3_PLANCHA_DIVE)
 			elif paso_actual == Paso.PASO_3_PLANCHA_DIVE:
+				# Si ejecutó el dive con éxito y aterriza, avanzamos a Sprint
 				if _dive_registrado:
 					_avanzar_paso(Paso.PASO_4_SPRINT)
 		elif _en_el_aire:
 			_en_el_aire = false
+			if paso_actual == Paso.PASO_3_PLANCHA_DIVE and _dive_registrado:
+				_avanzar_paso(Paso.PASO_4_SPRINT)
 
 
 func _animar_pulso_dive() -> void:
@@ -427,12 +445,13 @@ func _animar_pulso_dive() -> void:
 		if _tween_pop != null and _tween_pop.is_valid():
 			_tween_pop.kill()
 		_tween_pop = create_tween()
-		_tween_pop.tween_property(self, "scale", Vector2(1.2, 1.2), 0.1).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-		_tween_pop.tween_property(self, "scale", Vector2.ONE, 0.1).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+		_tween_pop.tween_property(self, "scale", Vector2(1.2, 1.2), 0.12).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		_tween_pop.tween_property(self, "scale", Vector2.ONE, 0.12).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+		_tween_pop.tween_interval(0.15)
 		_tween_pop.tween_callback(func():
 			_flash_unisono = false
 			_color_flash = Color.WHITE
-			if paso_actual == Paso.PASO_3_PLANCHA_DIVE:
+			if paso_actual == Paso.PASO_3_PLANCHA_DIVE and _dive_registrado:
 				_avanzar_paso(Paso.PASO_4_SPRINT)
 		)
 
@@ -440,8 +459,14 @@ func _animar_pulso_dive() -> void:
 func _avanzar_paso(siguiente_paso: Paso) -> void:
 	if _cerrando:
 		return
+	if paso_actual == siguiente_paso:
+		return
 	paso_actual = siguiente_paso
 	_tiempo_en_paso_actual = 0.0
+	if paso_actual == Paso.PASO_3_PLANCHA_DIVE:
+		_dive_registrado = false
+		_salto_en_curso = false
+		_en_el_aire = false
 	_actualizar_visibilidad_pasos()
 	paso_cambiado.emit(paso_actual)
 

@@ -56,13 +56,28 @@ func test_paso_1_deteccion_movimiento() -> void:
 	tut._w_registrado = true
 	tut._a_registrado = true
 	tut._s_registrado = true
+	tut._raton_registrado = true
 	assert_eq(tut.paso_actual, TutorialCabeza.Paso.PASO_1_MOVIMIENTO, "Aún no debe avanzar con solo 3 direcciones")
 
 	tut._d_registrado = true
-	tut._tiempo_en_paso_actual = 0.6
-	tut._procesar_paso_1(0.016)
-	assert_eq(tut.paso_actual, TutorialCabeza.Paso.PASO_2_SALTO, "Debe avanzar a PASO_2_SALTO al registrar las 4 direcciones")
+	tut._procesar_paso_1(0.4)
+	assert_eq(tut.paso_actual, TutorialCabeza.Paso.PASO_2_SALTO, "Debe avanzar a PASO_2_SALTO al registrar las 4 direcciones y la orientación de ratón")
 
+	tut.free()
+
+
+func test_paso_1_no_avanza_sin_raton() -> void:
+	var tut: TutorialCabeza = _crear_tutorial()
+	tut._ready()
+
+	tut._w_registrado = true
+	tut._a_registrado = true
+	tut._s_registrado = true
+	tut._d_registrado = true
+	tut._raton_registrado = false
+	tut._procesar_paso_1(0.5)
+
+	assert_eq(tut.paso_actual, TutorialCabeza.Paso.PASO_1_MOVIMIENTO, "No debe avanzar a PASO_2_SALTO si no se ha orientado con el ratón")
 	tut.free()
 
 
@@ -76,6 +91,20 @@ func test_paso_2_salto_regular_avanza_a_dive() -> void:
 	tut._on_padre_estado_cambiado(0, "REPOSO")
 
 	assert_eq(tut.paso_actual, TutorialCabeza.Paso.PASO_3_PLANCHA_DIVE, "Al completar el salto regular debe avanzar al paso dedicado de Plancha/Dive")
+	tut.free()
+
+
+func test_paso_3_salto_regular_no_avanza_a_sprint() -> void:
+	var tut: TutorialCabeza = _crear_tutorial()
+	tut._ready()
+	tut.paso_actual = TutorialCabeza.Paso.PASO_3_PLANCHA_DIVE
+
+	# Salto en suelo y aterrizaje sin hacer dive
+	tut._on_padre_estado_cambiado(4, "SALTO")
+	tut._on_padre_estado_cambiado(0, "REPOSO")
+
+	assert_eq(tut.paso_actual, TutorialCabeza.Paso.PASO_3_PLANCHA_DIVE, "Un salto regular sin plancha debe permanecer en PASO_3_PLANCHA_DIVE")
+	assert_false(tut._dive_registrado, "_dive_registrado debe ser false tras solo saltar")
 	tut.free()
 
 
