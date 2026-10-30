@@ -31,11 +31,12 @@ Este documento especifica los esquemas de entrada para teclado en PC, los elemen
   - Posición: Esquina superior izquierda (`Vector2(32, 32)`).
   - Componentes: Icono vectorial simple de página (`hud_icono_nota`, $32 \times 32$ px) seguido del valor numérico con tipografía limpia y de alto contraste (ejemplo: `x 0`).
   - Animación de Recogida: Al tomar una nota, el contador realiza un salto de escala elástico mediante un `Tween` (`scale` $1.3 \to 1.0$ en $0.25\text{ s}$) y un breve destello blanco.
-* **Barra de Estamina (Resistencia):**
-  - Indicador visual discreto construido 100% mediante nodos nativos de Godot (`ProgressBar` con `StyleBoxFlat`, **cero dibujo manual**).
-  - Fondo: Rectángulo delgado ($200 \times 12$ px) gris carbón oscuro (`#101216`) con borde de $1\text{ px}$.
-  - Relleno normal: Tono amarillo tenue o ámbar (`#D4A836`) que vacía de derecha a izquierda según el gasto de Sprint, Salto o Plancha.
-  - Estado de Fatiga: Cuando la estamina cae por debajo de los 30 pts o llega a 0, la barra pulsa en rojo carmesí (`#B82828`) y titila hasta superar el umbral de recuperación.
+* **Indicador Diegético de Estamina (Resistencia):**
+  - Componente circular procedural anclado a la cabeza del personaje (`Vector2(0, -60)`).
+  - Anillo radial nítido dibujado proceduralmente con `_draw()` (`draw_arc`).
+  - Totalmente invisible en reposo (100% estamina); aparece con fade-in y micro-pop ($0.8 \to 1.0$) al consumir energía.
+  - Paleta semántica: Ámbar cálido (`#E5A93C`) en régimen normal y titileo intermitente en carmesí (`#D13438`) durante fatiga o umbral crítico ($< 30\%$).
+  - Animación de cierre al recargar al 100%: destello blanco-dorado, pulso elástico ($1.0 \to 1.2 \to 1.0$ en $0.2\text{ s}$) y fade-out suave a alfa 0.0 en $0.3\text{ s}$.
 * **Feedback de Recolección Arcade (Sin Pausas ni Flashes Bloqueantes):**
   - Al hacer contacto con el `Area2D` de la nota, la recolección es **inmediata y desatendida** (estilo moneda o reliquia arcade).
   - El jugador no sufre parones, ni se abre ninguna ilustración que le tape la pantalla.

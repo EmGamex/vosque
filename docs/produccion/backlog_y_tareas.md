@@ -151,8 +151,8 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
   - [ ] Componente visual flotante a $Y \approx -90\text{ px}$ con fondo traslúcido y badges de teclas.
   - [ ] Secuencia de 3 pasos: WASD (ilumina teclas al pulsar) $\to$ Salto (Espacio) $\to$ Sprint (Shift).
   - [ ] Cierre automático con `Tween` al completar o al recoger la Nota 1.
-- [ ] **Barra de Estamina en HUD:** `ProgressBar` nativo con `StyleBoxFlat` delgado ($200 \times 12$ px), color ámbar normal y titileo carmesí en fatiga.
-- [ ] **Contador de Notas en HUD:** Icono de nota y texto numérico con `Tween` elástico de recogida ($1.3 \to 1.0$).
+- [x] **Indicador Diegético de Estamina (`escenas/ui/indicador_estamina.tscn`):** Anillo procedural con `_draw()` anclado sobre la cabeza del personaje (`Vector2(0, -60)`), invisible en reposo (100%), micro-pop al consumir, titileo carmesí en fatiga y animación elástica de cierre al recargar.
+- [x] **Contador de Notas en HUD (`escenas/hud.tscn`):** `CanvasLayer` (layer 10) con icono estilizado y texto numérico con `Tween` de *Scale Punch* elástico ($1.3 \to 1.0$) y flash reactivo.
 - [ ] **Menú de Pausa Superpuesto (`CanvasLayer`, layer=50):**
   - [ ] Congelación de la simulación del nodo de partida (`process_mode = PROCESS_MODE_DISABLED`) sin apagar la cámara ni el gestor de escenas.
   - [ ] Botones estilizados: Continuar, Reiniciar y Menú Principal.

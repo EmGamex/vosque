@@ -1,0 +1,44 @@
+[gd_scene format=3 uid="uid://dm42uepd8qqc0"]
+
+[ext_resource type="Script" uid="uid://bbcgmbpmn453o" path="res://scripts/hud.gd" id="1_0sskl"]
+[ext_resource type="Texture2D" uid="uid://cfsys4vyiwpya" path="res://graficos/coleccionable_nota.svg" id="2_hrvm2"]
+[ext_resource type="FontVariation" uid="uid://0htusin8b5jm" path="res://fuentes/raleway_bold.tres" id="3_8qmdo"]
+
+[node name="HUD" type="CanvasLayer" unique_id=1856511085]
+layer = 10
+script = ExtResource("1_0sskl")
+
+[node name="MargenSeguridad" type="MarginContainer" parent="." unique_id=351273265]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 32
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 32
+
+[node name="ContadorNotas" type="HBoxContainer" parent="MargenSeguridad" unique_id=262447706]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="IconoNota" type="TextureRect" parent="MargenSeguridad/ContadorNotas" unique_id=1404096595]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("2_hrvm2")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="LabelNotas" type="Label" parent="MargenSeguridad/ContadorNotas" unique_id=143704275]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("3_8qmdo")
+theme_override_font_sizes/font_size = 28
+text = "x 0"
+vertical_alignment = 1
