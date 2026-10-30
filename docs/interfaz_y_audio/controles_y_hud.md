@@ -16,8 +16,8 @@ Este documento especifica los esquemas de entrada para teclado en PC, los elemen
 | **Moverse Izquierda** | <kbd>A</kbd> / <kbd>←</kbd> | Desplazamiento horizontal a la izquierda ($-X$) |
 | **Moverse Derecha** | <kbd>D</kbd> / <kbd>→</kbd> | Desplazamiento horizontal a la derecha ($+X$) |
 | **Sprint (Correr)** | <kbd>Shift</kbd> | Aceleración temporal continua consumiendo la barra de estamina |
-| **Salto / Plancha (*Dive*)** | <kbd>Espacio</kbd> | Salto en suelo; segunda pulsación en el aire ejecuta plancha hacia adelante con caída e inmovilidad de recuperación |
-| **Pausar / Reanudar** | <kbd>Escape</kbd> / <kbd>P</kbd> (`pausa` / `ui_cancel`) | Alterna el menú de pausa superpuesto en partida activa mediante congelación híbrida del `SceneTree`. Si la consola F3 está abierta, <kbd>Escape</kbd> cierra primero el debug. |
+| **Salto / Plancha (*Dive*)** | <kbd>Espacio</kbd> | Salto en suelo; segunda pulsación en el aire ejecuta plancha hacia adelante con caída e inmovilidad de recuperación. En el menú de pausa y menú principal, confirma la opción seleccionada. |
+| **Pausar / Reanudar** | <kbd>Escape</kbd> / <kbd>P</kbd> (`pausa` / `ui_cancel`) | Alterna el menú de pausa superpuesto en partida activa mediante congelación híbrida del `SceneTree`. En el menú de pausa se puede navegar con <kbd>W</kbd>/<kbd>S</kbd> y confirmar con <kbd>Espacio</kbd>. Si la consola F3 está abierta, <kbd>Escape</kbd> cierra primero el debug. |
 | **Orientar Linterna** | *Movimiento del Ratón* / *Automático* | Apunta al cursor si se usa el ratón, o sigue la dirección de marcha si se juega solo con teclado |
 | **Reintentar Partida** | <kbd>Espacio</kbd> / <kbd>Enter</kbd> / Clic en botón | Reinicio inmediato tras Game Over o desde el menú de pausa |
 | **Panel de Depuración** | <kbd>F3</kbd> | Alterna el ciclo tri-estado de depuración (Oculto $\to$ Mini-HUD $\to$ Menú Completo) |

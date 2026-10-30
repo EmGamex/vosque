@@ -119,8 +119,11 @@ Para lograr una pausa **100% atómica, inmune a desincronizaciones y libre de co
    - La recuperación de velocidad del monstruo (`reducir_velocidad_oscuridad` en `enemigo.gd`)
    - La autodestrucción de partículas tras recoger notas (`nota.gd`)
    sigan corriendo en segundo plano durante la pausa.
-3. **Despausa Diferida y Consumo de Input Anti-Salto Fantasma (<kbd>Espacio</kbd>):**
-   Si el jugador reanuda con <kbd>Espacio</kbd> sobre *"Continuar"*, `_menu_pausa` consume el evento con `get_viewport().set_input_as_handled()` y restaura la pausa de manera diferida (`get_tree().set_deferred("paused", false)` al final del frame). Esto impide que `personaje.gd` interprete esa pulsación como `personaje-salto` y ejecute un salto no deseado que gaste $-20\text{ pts}$ de estamina.
+3. **Despausa Diferida y Blindaje Robusto Anti-Salto Fantasma (<kbd>Espacio</kbd>):**
+   Si el jugador reanuda con <kbd>Espacio</kbd> sobre *"Continuar"*, se aplica una solución en 3 capas de protección:
+   - `MenuPausa` y `GestorDeEscenas` liberan proactivamente las acciones en `Input` con `Input.action_release("personaje-salto")` e `Input.action_release("ui_accept")`.
+   - `GestorDeEscenas` llama a `consumir_buffer_salto()` en el personaje activo y restaura el árbol de forma diferida (`get_tree().set_deferred("paused", false)` al final del frame).
+   - `Personaje` intercepta `NOTIFICATION_UNPAUSED` y anula `quiere_salto` en su primer fotograma de físicas activo. Esto impide totalmente que `personaje.gd` interprete esa pulsación como `personaje-salto` y ejecute un salto no deseado que gaste $-20\text{ pts}$ de estamina.
 4. **Limpieza Atómica en Transiciones (`ir_a()`):**
    Al transicionar hacia *Reiniciar*, *Menú Principal* o por muerte hacia *Game Over*, la función `ir_a()` ejecuta de inmediato `_limpiar_pausa_forzada()`:
    - Cierra y oculta `_menu_pausa` (`visible = false`, botones deshabilitados para evitar dobles clics).

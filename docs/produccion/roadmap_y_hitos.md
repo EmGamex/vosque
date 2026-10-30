@@ -96,7 +96,7 @@ flowchart TD
 * **Entregables Clave:**
   - [ ] Diseñar el HUD in-game (`hud.tscn`) con `ProgressBar` nativo vinculado a `estamina_cambiada` y contador numérico elástico de notas.
   - [ ] Implementar la linterna frontal desacoplada del personaje (halo radial + haz orientable 360° / movimiento).
-  - [ ] Integrar el Menú de Pausa (`escenas/menu_pausa.tscn`, `CanvasLayer`, `layer=50`) con congelación híbrida blindada (`SceneTree.paused` + `PROCESS_MODE_ALWAYS` en UI/orquestador), salvaguarda anti-salto y soporte Escape/P.
+  - [x] Integrar el Menú de Pausa (`escenas/menu_pausa.tscn`, `CanvasLayer`, `layer=50`) con congelación híbrida blindada (`SceneTree.paused` + `PROCESS_MODE_ALWAYS` en UI/orquestador), blindaje anti-salto en 3 capas, navegación con controles de movimiento y soporte Escape/P.
   - [ ] Generar los renders 3D base en Blender y vectorizar en Inkscape los sprites prioritarios del jugador (15 frames) y criatura (silueta + ojos emisivos).
   - [ ] Configurar el Singleton Autoload `GestorMusica` con crossfade dinámico de pistas existentes (`Night Crawling` $\to$ `Haunted Boardwalk`) y buses de audio.
   - [ ] Implementar el sistema de trauma shake en [`camara.tscn`](../../escenas/camara.tscn) (impacto de plancha y muerte).
