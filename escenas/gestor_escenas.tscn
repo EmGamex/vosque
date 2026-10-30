@@ -6,8 +6,9 @@
 [ext_resource type="PackedScene" uid="uid://dl88w12yyd8ee" path="res://escenas/maain.tscn" id="3_jbqwm"]
 [ext_resource type="Shader" uid="uid://dqxjjk2xmymf8" path="res://shaders/transicion_iris.gdshader" id="3_tepdp"]
 [ext_resource type="PackedScene" uid="uid://c7acatnude74i" path="res://escenas/game_over.tscn" id="4_tepdp"]
+[ext_resource type="PackedScene" uid="uid://ca751a2ntrauj" path="res://escenas/menu_pausa.tscn" id="7_ap2e7"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_tepdp"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_n7npm"]
 resource_local_to_scene = true
 shader = ExtResource("3_tepdp")
 shader_parameter/center = Vector2(0.5, 0.5)
@@ -17,13 +18,14 @@ shader_parameter/color = Color(0, 0, 0, 1)
 shader_parameter/aspect_ratio = 1.0
 
 [node name="GestorEscenas" type="Node" unique_id=1515374323]
+process_mode = 3
 script = ExtResource("1_ve7em")
 
 [node name="Transicion" parent="." unique_id=1215309266 instance=ExtResource("2_jbqwm")]
 
 [node name="Velo" parent="Transicion" index="0" unique_id=175064061]
 modulate = Color(1, 1, 1, 0.20000005)
-material = SubResource("ShaderMaterial_tepdp")
+material = SubResource("ShaderMaterial_n7npm")
 
 [node name="Contenedor" type="Node" parent="." unique_id=1002276879]
 
@@ -38,5 +40,7 @@ process_mode = 4
 visible = false
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="MenuPausa" parent="." unique_id=2007741614 instance=ExtResource("7_ap2e7")]
 
 [editable path="Transicion"]

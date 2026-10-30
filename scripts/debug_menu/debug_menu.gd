@@ -205,7 +205,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event.keycode == KEY_F3:
 			modo_actual = ((int(modo_actual) + 1) % 3) as ModoVisual
 			get_viewport().set_input_as_handled()
-		elif event.keycode == KEY_ESCAPE and modo_actual == ModoVisual.COMPLETO:
+		elif modo_actual == ModoVisual.COMPLETO and (event.keycode == KEY_ESCAPE or event.is_action_pressed("pausa") or event.is_action_pressed("ui_cancel")):
 			modo_actual = ModoVisual.OCULTO
 			get_viewport().set_input_as_handled()
 
@@ -325,6 +325,9 @@ func _actualizar_telemetria() -> void:
 			"lbl_enemigo_vel": lbl_enemigo_vel,
 			"lbl_enemigo_atascado": lbl_enemigo_atascado
 		}, context.target_enemigo, pos_jugador, context, enemy_ctrl.debug_dibujar_vectores_ia)
+
+		if check_pausar != null:
+			check_pausar.set_pressed_no_signal(get_tree().paused)
 
 		telemetry.actualizar_tab_sistema({
 			"lbl_sys_fps": lbl_sys_fps,
