@@ -53,11 +53,24 @@ var _altura_despegue: float = 0.0
 var _tiempo_recuperacion: float = 0.0
 var _ultima_direccion: Vector2 = Vector2.DOWN
 var _direccion_plancha: Vector2 = Vector2.DOWN
+var _bloquear_salto_un_frame: bool = false
 
 @onready var _visual: Node2D = get_node_or_null("Visual") as Node2D
 @onready var _sprite: AnimatedSprite2D = get_node_or_null("Visual/Sprite2D") as AnimatedSprite2D
 @onready var _sombra: Node2D = get_node_or_null("Sombra") as Node2D
 @onready var pivote_linterna: ControladorLinterna = get_node_or_null("PivoteLinterna") as ControladorLinterna
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_UNPAUSED:
+		_bloquear_salto_un_frame = true
+
+
+## Fuerza la limpieza de cualquier intento de salto residual acumulado en pausa o transiciones.
+func consumir_buffer_salto() -> void:
+	_bloquear_salto_un_frame = true
+	Input.action_release("personaje-salto")
+	Input.action_release("ui_accept")
 
 
 func _ready() -> void:
@@ -71,7 +84,10 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	if Engine.is_editor_hint():
 		return
+	_physics_process_logica(delta)
 
+
+func _physics_process_logica(delta: float) -> void:
 	var direction: Vector2 = Input.get_vector(
 		"personaje-izquierda", "personaje-derecha", "personaje-arriba", "personaje-abajo"
 	)
@@ -84,6 +100,9 @@ func _physics_process(delta: float) -> void:
 		or (InputMap.has_action("personaje-sprint") and Input.is_action_pressed("personaje-sprint"))
 	)
 	var quiere_salto: bool = Input.is_action_just_pressed("personaje-salto")
+	if _bloquear_salto_un_frame:
+		_bloquear_salto_un_frame = false
+		quiere_salto = false
 
 	var estamina_consumida_en_frame: bool = false
 

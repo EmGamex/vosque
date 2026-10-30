@@ -108,6 +108,31 @@ func test_navegacion_inputs_personaje() -> void:
 	menu.free()
 
 
+func test_anti_salto_fantasma_personaje() -> void:
+	var escena_personaje: PackedScene = load("res://escenas/personaje.tscn")
+	assert_true(escena_personaje != null, "La escena personaje.tscn debe existir")
+	var personaje: Personaje = escena_personaje.instantiate() as Personaje
+	assert_true(personaje != null, "Debe instanciarse Personaje")
+
+	personaje._ready()
+	assert_eq(personaje.estado_actual, Personaje.Estado.REPOSO)
+	assert_eq(personaje.stamina, 100.0)
+
+	# Simular consumo y despausa
+	personaje.consumir_buffer_salto()
+	assert_true(personaje.get("_bloquear_salto_un_frame"), "consumir_buffer_salto() debe activar la bandera")
+
+	# Simular intento de salto en el primer fotograma tras despausar
+	# (Incluso si Input estuviera reportando just_pressed, la bandera lo neutraliza)
+	personaje._physics_process_logica(0.016)
+
+	assert_eq(personaje.estado_actual, Personaje.Estado.REPOSO, "El personaje no debe saltar en el primer frame tras reanudar")
+	assert_eq(personaje.stamina, 100.0, "La estamina debe permanecer intacta en 100.0")
+	assert_false(personaje.get("_bloquear_salto_un_frame"), "La bandera debe resetearse tras el frame")
+
+	personaje.free()
+
+
 func test_senales_menu_pausa() -> void:
 	var menu: MenuPausa = _crear_instancia_menu()
 	menu._ready()

@@ -88,6 +88,18 @@ func reanudar() -> void:
 	_pausado = false
 	if _menu_pausa != null:
 		_menu_pausa.ocultar()
+
+	Input.action_release("personaje-salto")
+	Input.action_release("ui_accept")
+
+	var juego: Node = _pantallas.get(RUTA_JUEGO) as Node
+	if juego != null and is_instance_valid(juego):
+		var pj: Node = juego.get_node_or_null("personaje")
+		if pj == null:
+			pj = juego.get_node_or_null("EmGamex")
+		if pj != null and pj.has_method("consumir_buffer_salto"):
+			pj.consumir_buffer_salto()
+
 	var tree: SceneTree = get_tree()
 	if tree != null:
 		tree.set_deferred("paused", false)

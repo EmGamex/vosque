@@ -68,6 +68,8 @@ func _unhandled_input(evento: InputEvent) -> void:
 		_navegar_vertical(1)
 		get_viewport().set_input_as_handled()
 	elif evento.is_action_pressed("personaje-salto"):
+		Input.action_release("personaje-salto")
+		Input.action_release("ui_accept")
 		_activar_boton_actual()
 		get_viewport().set_input_as_handled()
 
