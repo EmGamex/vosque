@@ -7,6 +7,9 @@
 [ext_resource type="Texture2D" uid="uid://c8532ifckormt" path="res://graficos/lsdo abajo boceto.png" id="3_im2y8"]
 [ext_resource type="Texture2D" uid="uid://dbk2wyrqh5vx0" path="res://graficos/lsdo arriba boceto.png" id="4_h42ap"]
 [ext_resource type="Texture2D" uid="uid://23tsn8fcifgs" path="res://graficos/lado boceto.png" id="6_57ngn"]
+[ext_resource type="Script" uid="uid://c1t6h1dv5pmy0" path="res://scripts/controlador_linterna.gd" id="8_kmopf"]
+[ext_resource type="Resource" uid="uid://cqqirq3y7pg12" path="res://recursos/iluminacion/config_iluminacion_defecto.tres" id="9_8xrj8"]
+[ext_resource type="Texture2D" uid="uid://b8duj3viyr6eg" path="res://recursos/iluminacion/textura_halo_corporal.tres" id="11_41mom"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_5nfxw"]
 radius = 32.0
@@ -94,10 +97,27 @@ shape = SubResource("CircleShape2D_5nfxw")
 position = Vector2(0, 7.9999995)
 scale = Vector2(0.075, 0.074999996)
 sprite_frames = SubResource("SpriteFrames_g4v7s")
-animation = &"Salto"
+animation = &"arriba"
 autoplay = "idle-arriba"
 
 [node name="Sombra" type="Polygon2D" parent="Visual" unique_id=1928397469]
 position = Vector2(0, 48)
 color = Color(0, 0, 0, 0.45)
 polygon = PackedVector2Array(32, 0, 28, 6, 16, 12, 0, 14, -16, 12, -28, 6, -32, 0, -28, -6, -16, -12, 0, -14, 16, -12, 28, -6)
+
+[node name="PivoteLinterna" type="Node2D" parent="." unique_id=2073641112]
+script = ExtResource("8_kmopf")
+config = ExtResource("9_8xrj8")
+
+[node name="LinternaFrontal" type="PointLight2D" parent="PivoteLinterna" unique_id=956915416]
+position = Vector2(96, 0)
+color = Color(1, 0.9607843, 0.8784314, 1)
+energy = 1.2
+offset = Vector2(256, 0)
+texture_scale = 1.3671875
+
+[node name="HaloCorporal" type="PointLight2D" parent="PivoteLinterna" unique_id=1792487907]
+color = Color(0.8, 0.8509804, 1, 1)
+energy = 0.5
+texture = ExtResource("11_41mom")
+texture_scale = 1.09

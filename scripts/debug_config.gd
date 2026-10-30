@@ -20,6 +20,7 @@ var god_view_activo: bool = false
 
 # Efectos visuales de escenario
 var niebla_desactivada: bool = false
+var flicker_forzado: bool = false
 
 # Ajustes de físicas y velocidades modificados por sliders (null si no han sido modificados)
 var fisicas_personalizadas: bool = false

@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://cdg7eeqnykjnu"]
 
 [ext_resource type="Script" uid="uid://ccr00dcd1n8h6" path="res://scripts/enemigo.gd" id="1_sms58"]
+[ext_resource type="Material" uid="uid://c1pvk48d3mcik" path="res://recursos/iluminacion/mat_ojos_monstruo.tres" id="2_uhebs"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_uhebs"]
 radius = 42.0
@@ -8,9 +9,10 @@ radius = 42.0
 [sub_resource type="CircleShape2D" id="CircleShape2D_743j8"]
 radius = 56.0
 
-[node name="Enemigo" type="CharacterBody2D" unique_id=1591042193]
+[node name="Enemigo" type="CharacterBody2D" unique_id=1591042193 groups=["monstruo"]]
 collision_layer = 8
 collision_mask = 7
+motion_mode = 1
 script = ExtResource("1_sms58")
 
 [node name="BocetoVisual" type="Node2D" parent="." unique_id=372931188]
@@ -22,6 +24,10 @@ polygon = PackedVector2Array(55, 0, 0, 40, -45, 0, 0, -40)
 [node name="Nucleo" type="Polygon2D" parent="BocetoVisual" unique_id=914408147]
 color = Color(0.9019608, 0.14901961, 0.2, 1)
 polygon = PackedVector2Array(30, 0, 0, 20, -20, 0, 0, -20)
+
+[node name="OjosCriatura" type="Polygon2D" parent="BocetoVisual" unique_id=283257288]
+material = ExtResource("2_uhebs")
+color = Color(1, 0.2, 0.06666667, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=437516853]
 shape = SubResource("CircleShape2D_uhebs")

@@ -141,6 +141,8 @@ func _on_nota_recolectada(pos_nota: Vector2) -> void:
 			enemigo.actualizar_dificultad(notas_recolectadas)
 
 	if escenario != null and is_instance_valid(escenario):
+		if escenario.has_method("actualizar_iluminacion_ambiental"):
+			escenario.actualizar_iluminacion_ambiental(notas_recolectadas)
 		# Disparar mutación en frame diferido para evitar alterar estado durante flushing_queries
 		escenario.call_deferred("mutar_con_neblina")
 

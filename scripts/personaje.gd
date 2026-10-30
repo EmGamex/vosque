@@ -57,6 +57,7 @@ var _direccion_plancha: Vector2 = Vector2.DOWN
 @onready var _visual: Node2D = get_node_or_null("Visual") as Node2D
 @onready var _sprite: AnimatedSprite2D = get_node_or_null("Visual/Sprite2D") as AnimatedSprite2D
 @onready var _sombra: Node2D = get_node_or_null("Sombra") as Node2D
+@onready var pivote_linterna: ControladorLinterna = get_node_or_null("PivoteLinterna") as ControladorLinterna
 
 
 func _ready() -> void:

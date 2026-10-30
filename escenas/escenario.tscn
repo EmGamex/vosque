@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://clntbhmsji5os" path="res://escenas/sectores/variantes/variante_bosque_denso.tscn" id="3_a55de"]
 [ext_resource type="PackedScene" uid="uid://if7eayy3eh5f" path="res://escenas/sectores/variantes/variante_sendero_troncos.tscn" id="4_kkql1"]
 [ext_resource type="PackedScene" uid="uid://1ghcw0gsau84" path="res://escenas/efectos/niebla_mutacion.tscn" id="5_a55de"]
+[ext_resource type="Resource" uid="uid://cqqirq3y7pg12" path="res://recursos/iluminacion/config_iluminacion_defecto.tres" id="5_kkql1"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_3m15c"]
 size = Vector2(4320, 64)
@@ -22,6 +23,7 @@ size = Vector2(64, 4320)
 y_sort_enabled = true
 script = ExtResource("1_1uc0k")
 catalogo_variantes = Array[PackedScene]([ExtResource("2_3m15c"), ExtResource("3_a55de"), ExtResource("4_kkql1")])
+config_iluminacion = ExtResource("5_kkql1")
 
 [node name="SueloContinuo" type="Polygon2D" parent="." unique_id=329049469]
 z_index = -10
@@ -85,3 +87,6 @@ position = Vector2(-1080, 1080)
 position = Vector2(1080, 1080)
 
 [node name="EfectoNieblaMutacion" parent="." unique_id=943449726 instance=ExtResource("5_a55de")]
+
+[node name="CanvasModulate" type="CanvasModulate" parent="." unique_id=398605903]
+color = Color(0.4, 0.4509804, 0.6, 1)
