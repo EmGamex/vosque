@@ -139,7 +139,7 @@ layout_mode = 2
 
 [node name="LabelEspacioDive" type="Label" parent="Contenedor/Paso3_PlanchaDive/BadgeEspacioDive" unique_id=1259635041]
 layout_mode = 2
-text = "Espacio en el aire"
+text = "Espacio + Espacio"
 
 [node name="LabelAccionDive" type="Label" parent="Contenedor/Paso3_PlanchaDive" unique_id=2126113747]
 layout_mode = 2
