@@ -91,11 +91,9 @@ layout_mode = 2
 [node name="ContenedorRaton" type="HBoxContainer" parent="Contenedor/Paso1_Movimiento" unique_id=284159327]
 layout_mode = 2
 
-[node name="IconoRaton" type="TextureRect" parent="Contenedor/Paso1_Movimiento/ContenedorRaton" unique_id=597900750]
-custom_minimum_size = Vector2(16, 16)
+[node name="IconoRaton" type="Control" parent="Contenedor/Paso1_Movimiento/ContenedorRaton" unique_id=586260082]
+custom_minimum_size = Vector2(18, 18)
 layout_mode = 2
-expand_mode = 1
-stretch_mode = 5
 
 [node name="LabelOrientar" type="Label" parent="Contenedor/Paso1_Movimiento/ContenedorRaton" unique_id=631803650]
 layout_mode = 2
