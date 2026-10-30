@@ -18,7 +18,6 @@ enum Paso {
 
 static var tutorial_visto: bool = false
 
-@export var fuente: Font = preload("res://fuentes/raleway_bold.tres")
 @export var color_fondo: Color = Color(0.08, 0.10, 0.15, 0.85)
 @export var color_borde: Color = Color(0.30, 0.40, 0.55, 0.70)
 @export var color_activo: Color = Color("#4ade80")
@@ -26,6 +25,26 @@ static var tutorial_visto: bool = false
 @export var color_acento_dorado: Color = Color("#fbbf24")
 
 var paso_actual: Paso = Paso.PASO_1_MOVIMIENTO
+
+# Nodos del árbol de UI
+@onready var contenedor: PanelContainer = get_node_or_null("Contenedor") as PanelContainer
+@onready var paso1_movimiento: HBoxContainer = get_node_or_null("Contenedor/Paso1_Movimiento") as HBoxContainer
+@onready var paso2_salto_dive: HBoxContainer = get_node_or_null("Contenedor/Paso2_SaltoDive") as HBoxContainer
+@onready var paso3_sprint: HBoxContainer = get_node_or_null("Contenedor/Paso3_Sprint") as HBoxContainer
+
+@onready var badge_w: PanelContainer = get_node_or_null("Contenedor/Paso1_Movimiento/ContenedorWASD/BadgeW") as PanelContainer
+@onready var badge_a: PanelContainer = get_node_or_null("Contenedor/Paso1_Movimiento/ContenedorWASD/BadgeA") as PanelContainer
+@onready var badge_s: PanelContainer = get_node_or_null("Contenedor/Paso1_Movimiento/ContenedorWASD/BadgeS") as PanelContainer
+@onready var badge_d: PanelContainer = get_node_or_null("Contenedor/Paso1_Movimiento/ContenedorWASD/BadgeD") as PanelContainer
+
+@onready var icono_raton: Control = get_node_or_null("Contenedor/Paso1_Movimiento/ContenedorRaton/IconoRaton") as Control
+@onready var label_orientar: Label = get_node_or_null("Contenedor/Paso1_Movimiento/ContenedorRaton/LabelOrientar") as Label
+
+@onready var badge_espacio: PanelContainer = get_node_or_null("Contenedor/Paso2_SaltoDive/BadgeEspacio") as PanelContainer
+@onready var label_accion_salto: Label = get_node_or_null("Contenedor/Paso2_SaltoDive/LabelAccionSalto") as Label
+
+@onready var badge_shift: PanelContainer = get_node_or_null("Contenedor/Paso3_Sprint/BadgeShift") as PanelContainer
+@onready var label_accion_sprint: Label = get_node_or_null("Contenedor/Paso3_Sprint/LabelAccionSprint") as Label
 
 # Estado de teclas / inputs
 var _tecla_w_activa: bool = false
@@ -56,6 +75,12 @@ var _cerrando: bool = false
 var _tween_cierre: Tween = null
 var _tween_pop: Tween = null
 
+# Estilos cacheados
+var _sb_fondo: StyleBoxFlat = null
+var _sb_badge_inactivo: StyleBoxFlat = null
+var _sb_badge_activo: StyleBoxFlat = null
+var _sb_badge_dive: StyleBoxFlat = null
+
 
 static func reiniciar_tutorial() -> void:
 	tutorial_visto = false
@@ -70,8 +95,16 @@ func _ready() -> void:
 	scale = Vector2.ONE
 	modulate.a = 1.0
 
+	_crear_estilos()
+	_aplicar_estilos_base()
+	_centrar_contenedor()
 	_conectar_padre()
 	_conectar_director_juego()
+
+	if icono_raton != null and not icono_raton.draw.is_connected(_on_icono_raton_draw):
+		icono_raton.draw.connect(_on_icono_raton_draw)
+
+	_actualizar_visibilidad_pasos()
 
 
 func _notification(what: int) -> void:
@@ -80,6 +113,74 @@ func _notification(what: int) -> void:
 			_tween_cierre.kill()
 		if _tween_pop != null and _tween_pop.is_valid():
 			_tween_pop.kill()
+
+
+func _crear_estilos() -> void:
+	_sb_fondo = StyleBoxFlat.new()
+	_sb_fondo.bg_color = color_fondo
+	_sb_fondo.border_color = color_borde
+	_sb_fondo.set_border_width_all(1)
+	_sb_fondo.set_corner_radius_all(8)
+	_sb_fondo.content_margin_left = 8
+	_sb_fondo.content_margin_right = 8
+	_sb_fondo.content_margin_top = 4
+	_sb_fondo.content_margin_bottom = 4
+
+	_sb_badge_inactivo = StyleBoxFlat.new()
+	_sb_badge_inactivo.bg_color = Color(0.14, 0.18, 0.25, 0.90)
+	_sb_badge_inactivo.border_color = Color(0.35, 0.45, 0.55, 0.80)
+	_sb_badge_inactivo.set_border_width_all(1)
+	_sb_badge_inactivo.set_corner_radius_all(4)
+	_sb_badge_inactivo.content_margin_left = 6
+	_sb_badge_inactivo.content_margin_right = 6
+	_sb_badge_inactivo.content_margin_top = 2
+	_sb_badge_inactivo.content_margin_bottom = 2
+
+	_sb_badge_activo = StyleBoxFlat.new()
+	_sb_badge_activo.bg_color = Color(0.18, 0.55, 0.35, 0.95)
+	_sb_badge_activo.border_color = color_activo
+	_sb_badge_activo.set_border_width_all(1)
+	_sb_badge_activo.set_corner_radius_all(4)
+	_sb_badge_activo.content_margin_left = 6
+	_sb_badge_activo.content_margin_right = 6
+	_sb_badge_activo.content_margin_top = 2
+	_sb_badge_activo.content_margin_bottom = 2
+
+	_sb_badge_dive = StyleBoxFlat.new()
+	_sb_badge_dive.bg_color = Color(0.85, 0.70, 0.20, 0.95)
+	_sb_badge_dive.border_color = color_acento_dorado
+	_sb_badge_dive.set_border_width_all(1)
+	_sb_badge_dive.set_corner_radius_all(4)
+	_sb_badge_dive.content_margin_left = 6
+	_sb_badge_dive.content_margin_right = 6
+	_sb_badge_dive.content_margin_top = 2
+	_sb_badge_dive.content_margin_bottom = 2
+
+
+func _aplicar_estilos_base() -> void:
+	if contenedor != null and _sb_fondo != null:
+		contenedor.add_theme_stylebox_override("panel", _sb_fondo)
+
+	var badges = [badge_w, badge_a, badge_s, badge_d, badge_espacio, badge_shift]
+	for b in badges:
+		if b != null and _sb_badge_inactivo != null:
+			b.add_theme_stylebox_override("panel", _sb_badge_inactivo)
+
+
+func _centrar_contenedor() -> void:
+	if contenedor == null:
+		return
+	contenedor.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	contenedor.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	# Centrar el contenedor respecto a Vector2(0, 0)
+	contenedor.position = -contenedor.size * 0.5
+	if not contenedor.resized.is_connected(_on_contenedor_resized):
+		contenedor.resized.connect(_on_contenedor_resized)
+
+
+func _on_contenedor_resized() -> void:
+	if contenedor != null:
+		contenedor.position = -contenedor.size * 0.5
 
 
 func _conectar_padre() -> void:
@@ -109,7 +210,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event.relative.length() >= 3.0:
 			_raton_activo = true
 			_tiempo_iluminacion_raton = 0.35
-			queue_redraw()
+			_actualizar_estilo_raton()
 
 
 func _physics_process(delta: float) -> void:
@@ -127,7 +228,7 @@ func _physics_process(delta: float) -> void:
 		Paso.PASO_3_SPRINT:
 			_procesar_paso_3(delta)
 
-	queue_redraw()
+	_actualizar_estilos_reactivos()
 
 
 func _actualizar_entradas(delta: float) -> void:
@@ -145,6 +246,62 @@ func _actualizar_entradas(delta: float) -> void:
 		_tiempo_iluminacion_raton -= delta
 		if _tiempo_iluminacion_raton <= 0.0:
 			_raton_activo = false
+			_actualizar_estilo_raton()
+
+
+func _actualizar_estilos_reactivos() -> void:
+	if _cerrando and _flash_unisono:
+		_aplicar_estilo_badge(badge_w, true, _color_flash)
+		_aplicar_estilo_badge(badge_a, true, _color_flash)
+		_aplicar_estilo_badge(badge_s, true, _color_flash)
+		_aplicar_estilo_badge(badge_d, true, _color_flash)
+		_aplicar_estilo_badge(badge_espacio, true, _color_flash)
+		_aplicar_estilo_badge(badge_shift, true, _color_flash)
+		return
+
+	match paso_actual:
+		Paso.PASO_1_MOVIMIENTO:
+			_aplicar_estilo_badge(badge_w, _tecla_w_activa)
+			_aplicar_estilo_badge(badge_a, _tecla_a_activa)
+			_aplicar_estilo_badge(badge_s, _tecla_s_activa)
+			_aplicar_estilo_badge(badge_d, _tecla_d_activa)
+		Paso.PASO_2_SALTO_DIVE:
+			if _dive_realizado:
+				_aplicar_estilo_badge(badge_espacio, true, color_acento_dorado)
+			else:
+				_aplicar_estilo_badge(badge_espacio, _tecla_espacio_activa)
+		Paso.PASO_3_SPRINT:
+			_aplicar_estilo_badge(badge_shift, _tecla_shift_activa)
+
+
+func _aplicar_estilo_badge(badge: PanelContainer, activo: bool, color_override: Color = Color.TRANSPARENT) -> void:
+	if badge == null:
+		return
+	var sb: StyleBoxFlat = null
+	if color_override != Color.TRANSPARENT:
+		sb = StyleBoxFlat.new()
+		sb.bg_color = color_override.lerp(Color(0.2, 0.2, 0.2, 0.9), 0.2)
+		sb.border_color = color_override
+		sb.set_border_width_all(1)
+		sb.set_corner_radius_all(4)
+		sb.content_margin_left = 6
+		sb.content_margin_right = 6
+		sb.content_margin_top = 2
+		sb.content_margin_bottom = 2
+	elif activo:
+		sb = _sb_badge_activo
+	else:
+		sb = _sb_badge_inactivo
+
+	if sb != null:
+		badge.add_theme_stylebox_override("panel", sb)
+
+
+func _actualizar_estilo_raton() -> void:
+	if icono_raton != null:
+		icono_raton.queue_redraw()
+	if label_orientar != null:
+		label_orientar.add_theme_color_override("font_color", color_activo if _raton_activo else color_inactivo)
 
 
 func _verificar_fast_path() -> void:
@@ -200,11 +357,6 @@ func _procesar_paso_1(delta: float) -> void:
 
 
 func _procesar_paso_2(_delta: float) -> void:
-	var padre = get_parent()
-	if padre == null:
-		return
-
-	# Si está en el aire y pulsa salto -> se ejecuta plancha (dive)
 	if _en_el_aire and Input.is_action_just_pressed("personaje-salto"):
 		_dive_realizado = true
 		_animar_pulso_dive()
@@ -216,32 +368,35 @@ func _procesar_paso_3(_delta: float) -> void:
 		return
 
 	var estado_pj: int = padre.get("estado_actual") if "estado_actual" in padre else -1
-	# 2 corresponde a Estado.SPRINT en Personaje
 	if estado_pj == 2 or (_tecla_shift_activa and padre.velocity.length() > 50.0):
 		completar_tutorial_estandar()
 
 
 func _on_padre_estado_cambiado(nuevo_estado: int, _nombre_estado: String) -> void:
-	# Estados según enum en Personaje:
-	# 4: SALTO, 5: PLANCHA_AIRE, 0: REPOSO, 1: CAMINANDO, 2: SPRINT, 3: FATIGA, 6: RECUPERANDOSE
 	if nuevo_estado == 4: # SALTO
 		_salto_en_curso = true
 		_en_el_aire = true
-		queue_redraw()
+		_actualizar_texto_salto()
 	elif nuevo_estado == 5: # PLANCHA_AIRE
 		_dive_realizado = true
 		_en_el_aire = true
+		_actualizar_texto_salto()
 		_animar_pulso_dive()
 	else:
 		if _salto_en_curso:
 			_salto_en_curso = false
 			_en_el_aire = false
+			_actualizar_texto_salto()
 			if paso_actual == Paso.PASO_2_SALTO_DIVE:
-				# Convalidar salto regular o dive al tocar suelo
 				_avanzar_paso(Paso.PASO_3_SPRINT)
 		elif _en_el_aire:
 			_en_el_aire = false
-			queue_redraw()
+			_actualizar_texto_salto()
+
+
+func _actualizar_texto_salto() -> void:
+	if label_accion_salto != null:
+		label_accion_salto.text = "Plancha (Dive)" if _en_el_aire else "Saltar"
 
 
 func _animar_pulso_dive() -> void:
@@ -265,9 +420,9 @@ func _avanzar_paso(siguiente_paso: Paso) -> void:
 	if _cerrando:
 		return
 	paso_actual = siguiente_paso
+	_actualizar_visibilidad_pasos()
 	paso_cambiado.emit(paso_actual)
 
-	# Micro-pop de transición de paso
 	if is_inside_tree():
 		if _tween_pop != null and _tween_pop.is_valid():
 			_tween_pop.kill()
@@ -275,7 +430,18 @@ func _avanzar_paso(siguiente_paso: Paso) -> void:
 		_tween_pop.tween_property(self, "scale", Vector2(1.1, 1.1), 0.1).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		_tween_pop.tween_property(self, "scale", Vector2.ONE, 0.1).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 
-	queue_redraw()
+
+func _actualizar_visibilidad_pasos() -> void:
+	if paso1_movimiento != null:
+		paso1_movimiento.visible = (paso_actual == Paso.PASO_1_MOVIMIENTO)
+	if paso2_salto_dive != null:
+		paso2_salto_dive.visible = (paso_actual == Paso.PASO_2_SALTO_DIVE)
+	if paso3_sprint != null:
+		paso3_sprint.visible = (paso_actual == Paso.PASO_3_SPRINT)
+
+	# Forzar ajuste de centrado
+	if contenedor != null:
+		call_deferred("_centrar_contenedor")
 
 
 func completar_tutorial_estandar() -> void:
@@ -292,11 +458,9 @@ func completar_tutorial_estandar() -> void:
 
 	if is_inside_tree():
 		_tween_cierre = create_tween()
-		# Pulso de confirmación general
 		_tween_cierre.tween_property(self, "scale", Vector2(1.15, 1.15), 0.12).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 		_tween_cierre.parallel().tween_property(self, "_color_flash", color_activo, 0.12)
 		_tween_cierre.tween_property(self, "scale", Vector2.ONE, 0.12).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
-		# Fade-out en 0.4s
 		_tween_cierre.tween_property(self, "modulate:a", 0.0, 0.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
 		_tween_cierre.tween_callback(queue_free)
 	else:
@@ -328,145 +492,43 @@ func forzar_salida_nota() -> void:
 
 
 # -----------------------------------------------------------------------------
-# RENDERIZADO PROCEDURAL (_draw)
+# DIBUJADO PROCEDURAL DEL GLIFO DE RATÓN
 # -----------------------------------------------------------------------------
 
-func _draw() -> void:
-	if modulate.a <= 0.001:
+func _on_icono_raton_draw() -> void:
+	if icono_raton == null:
 		return
 
-	match paso_actual:
-		Paso.PASO_1_MOVIMIENTO:
-			_dibujar_paso_1()
-		Paso.PASO_2_SALTO_DIVE:
-			_dibujar_paso_2()
-		Paso.PASO_3_SPRINT:
-			_dibujar_paso_3()
-		Paso.COMPLETADO:
-			pass
-
-
-func _dibujar_pastilla_fondo(ancho: float, alto: float) -> Rect2:
-	var rect = Rect2(-ancho * 0.5, -alto * 0.5, ancho, alto)
-	var sb = StyleBoxFlat.new()
-	sb.bg_color = color_fondo
-	sb.set_border_width_all(1)
-	sb.border_color = color_borde if not _flash_unisono else _color_flash
-	sb.set_corner_radius_all(8)
-	draw_style_box(sb, rect)
-	return rect
-
-
-func _dibujar_badge_tecla(pos: Vector2, tamano: Vector2, texto: String, activo: bool) -> void:
-	var rect = Rect2(pos - tamano * 0.5, tamano)
-	var sb = StyleBoxFlat.new()
-	if _flash_unisono:
-		sb.bg_color = _color_flash.lerp(Color(0.2, 0.2, 0.2, 0.9), 0.2)
-		sb.border_color = _color_flash
-	elif activo:
-		sb.bg_color = Color(0.18, 0.55, 0.35, 0.95)
-		sb.border_color = color_activo
-	else:
-		sb.bg_color = Color(0.14, 0.18, 0.25, 0.90)
-		sb.border_color = Color(0.35, 0.45, 0.55, 0.80)
-
-	sb.set_border_width_all(1)
-	sb.set_corner_radius_all(4)
-	draw_style_box(sb, rect)
-
-	if fuente != null:
-		var col_texto: Color = Color.WHITE if (activo or _flash_unisono) else color_inactivo
-		var font_size: int = 12
-		var str_sz: Vector2 = fuente.get_string_size(texto, HORIZONTAL_ALIGNMENT_CENTER, -1, font_size)
-		var text_pos = Vector2(rect.position.x, rect.position.y + (tamano.y + str_sz.y * 0.6) * 0.5 - 2.0)
-		draw_string(fuente, text_pos, texto, HORIZONTAL_ALIGNMENT_CENTER, tamano.x, font_size, col_texto)
-
-
-func _dibujar_glifo_raton(pos: Vector2, activo: bool) -> void:
-	var col: Color = color_activo if (activo or _flash_unisono) else Color(0.70, 0.78, 0.88, 0.85)
+	var pos = icono_raton.size * 0.5
+	var col: Color = color_activo if (_raton_activo or _flash_unisono) else Color(0.70, 0.78, 0.88, 0.85)
 
 	# Cuerpo del ratón
-	var r_cuerpo = Rect2(pos.x - 6, pos.y - 8, 12, 16)
+	var r_cuerpo = Rect2(pos.x - 5, pos.y - 7, 10, 14)
 	var sb_raton = StyleBoxFlat.new()
 	sb_raton.bg_color = Color(0.14, 0.18, 0.25, 0.90)
 	sb_raton.border_color = col
 	sb_raton.set_border_width_all(1)
-	sb_raton.corner_radius_top_left = 5
-	sb_raton.corner_radius_top_right = 5
+	sb_raton.corner_radius_top_left = 4
+	sb_raton.corner_radius_top_right = 4
 	sb_raton.corner_radius_bottom_left = 3
 	sb_raton.corner_radius_bottom_right = 3
-	draw_style_box(sb_raton, r_cuerpo)
+	icono_raton.draw_style_box(sb_raton, r_cuerpo)
 
 	# Divisor de botones
-	draw_line(Vector2(pos.x, pos.y - 8), Vector2(pos.x, pos.y - 2), col, 1.0)
+	icono_raton.draw_line(Vector2(pos.x, pos.y - 7), Vector2(pos.x, pos.y - 2), col, 1.0)
 
-	# Flechas radiales sutiles de orientación
-	var dist: float = 12.0
-	var tam: float = 2.5
+	# Flechas radiales sutiles
+	var dist: float = 9.0
+	var tam: float = 2.0
 	# Arriba
-	draw_line(Vector2(pos.x, pos.y - dist), Vector2(pos.x - tam, pos.y - dist + tam), col, 1.0)
-	draw_line(Vector2(pos.x, pos.y - dist), Vector2(pos.x + tam, pos.y - dist + tam), col, 1.0)
+	icono_raton.draw_line(Vector2(pos.x, pos.y - dist), Vector2(pos.x - tam, pos.y - dist + tam), col, 1.0)
+	icono_raton.draw_line(Vector2(pos.x, pos.y - dist), Vector2(pos.x + tam, pos.y - dist + tam), col, 1.0)
 	# Abajo
-	draw_line(Vector2(pos.x, pos.y + dist), Vector2(pos.x - tam, pos.y + dist - tam), col, 1.0)
-	draw_line(Vector2(pos.x, pos.y + dist), Vector2(pos.x + tam, pos.y + dist - tam), col, 1.0)
+	icono_raton.draw_line(Vector2(pos.x, pos.y + dist), Vector2(pos.x - tam, pos.y + dist - tam), col, 1.0)
+	icono_raton.draw_line(Vector2(pos.x, pos.y + dist), Vector2(pos.x + tam, pos.y + dist - tam), col, 1.0)
 	# Izquierda
-	draw_line(Vector2(pos.x - dist, pos.y), Vector2(pos.x - dist + tam, pos.y - tam), col, 1.0)
-	draw_line(Vector2(pos.x - dist, pos.y), Vector2(pos.x - dist + tam, pos.y + tam), col, 1.0)
+	icono_raton.draw_line(Vector2(pos.x - dist, pos.y), Vector2(pos.x - dist + tam, pos.y - tam), col, 1.0)
+	icono_raton.draw_line(Vector2(pos.x - dist, pos.y), Vector2(pos.x - dist + tam, pos.y + tam), col, 1.0)
 	# Derecha
-	draw_line(Vector2(pos.x + dist, pos.y), Vector2(pos.x + dist - tam, pos.y - tam), col, 1.0)
-	draw_line(Vector2(pos.x + dist, pos.y), Vector2(pos.x + dist - tam, pos.y + tam), col, 1.0)
-
-
-func _dibujar_paso_1() -> void:
-	var ancho: float = 230.0
-	var alto: float = 34.0
-	_dibujar_pastilla_fondo(ancho, alto)
-
-	# Badges WASD
-	var tam_badge = Vector2(20, 20)
-	_dibujar_badge_tecla(Vector2(-90, 0), tam_badge, "W", _tecla_w_activa)
-	_dibujar_badge_tecla(Vector2(-66, 0), tam_badge, "A", _tecla_a_activa)
-	_dibujar_badge_tecla(Vector2(-42, 0), tam_badge, "S", _tecla_s_activa)
-	_dibujar_badge_tecla(Vector2(-18, 0), tam_badge, "D", _tecla_d_activa)
-
-	# Separador vertical sutil
-	draw_line(Vector2(2, -10), Vector2(2, 10), Color(0.3, 0.4, 0.5, 0.4), 1.0)
-
-	# Glifo de ratón y texto Orientar
-	_dibujar_glifo_raton(Vector2(24, 0), _raton_activo)
-
-	if fuente != null:
-		var col_texto: Color = color_activo if _raton_activo else color_inactivo
-		var font_size: int = 12
-		draw_string(fuente, Vector2(44, 4), "Orientar", HORIZONTAL_ALIGNMENT_LEFT, 60, font_size, col_texto)
-
-
-func _dibujar_paso_2() -> void:
-	var texto_accion: String = "Plancha (Dive)" if _en_el_aire else "Saltar"
-	var ancho: float = 180.0 if _en_el_aire else 150.0
-	var alto: float = 34.0
-	_dibujar_pastilla_fondo(ancho, alto)
-
-	var tam_badge = Vector2(64, 20)
-	var x_badge: float = -ancho * 0.5 + 40.0
-	_dibujar_badge_tecla(Vector2(x_badge, 0), tam_badge, "Espacio", _tecla_espacio_activa or _dive_realizado)
-
-	if fuente != null:
-		var col_texto: Color = color_acento_dorado if _dive_realizado else (color_activo if _tecla_espacio_activa else color_inactivo)
-		var font_size: int = 12
-		draw_string(fuente, Vector2(x_badge + 40.0, 4), texto_accion, HORIZONTAL_ALIGNMENT_LEFT, 90, font_size, col_texto)
-
-
-func _dibujar_paso_3() -> void:
-	var ancho: float = 140.0
-	var alto: float = 34.0
-	_dibujar_pastilla_fondo(ancho, alto)
-
-	var tam_badge = Vector2(50, 20)
-	var x_badge: float = -ancho * 0.5 + 34.0
-	_dibujar_badge_tecla(Vector2(x_badge, 0), tam_badge, "Shift", _tecla_shift_activa)
-
-	if fuente != null:
-		var col_texto: Color = color_activo if _tecla_shift_activa else color_inactivo
-		var font_size: int = 12
-		draw_string(fuente, Vector2(x_badge + 34.0, 4), "Correr", HORIZONTAL_ALIGNMENT_LEFT, 60, font_size, col_texto)
+	icono_raton.draw_line(Vector2(pos.x + dist, pos.y), Vector2(pos.x + dist - tam, pos.y - tam), col, 1.0)
+	icono_raton.draw_line(Vector2(pos.x + dist, pos.y), Vector2(pos.x + dist - tam, pos.y + tam), col, 1.0)

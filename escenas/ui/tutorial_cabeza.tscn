@@ -5,3 +5,81 @@
 [node name="TutorialCabeza" type="Node2D" unique_id=1460520052]
 z_index = 3
 script = ExtResource("1_tq8vd")
+
+[node name="Contenedor" type="PanelContainer" parent="." unique_id=1883258484]
+
+[node name="Paso1_Movimiento" type="HBoxContainer" parent="Contenedor" unique_id=1087242684]
+layout_mode = 2
+
+[node name="ContenedorWASD" type="HBoxContainer" parent="Contenedor/Paso1_Movimiento" unique_id=419131708]
+layout_mode = 2
+
+[node name="BadgeW" type="PanelContainer" parent="Contenedor/Paso1_Movimiento/ContenedorWASD" unique_id=1563591807]
+layout_mode = 2
+
+[node name="LabelW" type="Label" parent="Contenedor/Paso1_Movimiento/ContenedorWASD/BadgeW" unique_id=490691786]
+layout_mode = 2
+text = "W"
+
+[node name="BadgeA" type="PanelContainer" parent="Contenedor/Paso1_Movimiento/ContenedorWASD" unique_id=1643112029]
+layout_mode = 2
+
+[node name="LabelA" type="Label" parent="Contenedor/Paso1_Movimiento/ContenedorWASD/BadgeA" unique_id=477283174]
+layout_mode = 2
+text = "A"
+
+[node name="BadgeS" type="PanelContainer" parent="Contenedor/Paso1_Movimiento/ContenedorWASD" unique_id=748369261]
+layout_mode = 2
+
+[node name="LabelS" type="Label" parent="Contenedor/Paso1_Movimiento/ContenedorWASD/BadgeS" unique_id=1946464567]
+layout_mode = 2
+text = "S"
+
+[node name="BadgeD" type="PanelContainer" parent="Contenedor/Paso1_Movimiento/ContenedorWASD" unique_id=1911720328]
+layout_mode = 2
+
+[node name="LabelD" type="Label" parent="Contenedor/Paso1_Movimiento/ContenedorWASD/BadgeD" unique_id=1909385317]
+layout_mode = 2
+text = "D"
+
+[node name="Separador" type="VSeparator" parent="Contenedor/Paso1_Movimiento" unique_id=144231015]
+layout_mode = 2
+
+[node name="ContenedorRaton" type="HBoxContainer" parent="Contenedor/Paso1_Movimiento" unique_id=284159327]
+layout_mode = 2
+
+[node name="IconoRaton" type="Control" parent="Contenedor/Paso1_Movimiento/ContenedorRaton" unique_id=2019300054]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+
+[node name="LabelOrientar" type="Label" parent="Contenedor/Paso1_Movimiento/ContenedorRaton" unique_id=631803650]
+layout_mode = 2
+text = "Orientar"
+
+[node name="Paso2_SaltoDive" type="HBoxContainer" parent="Contenedor" unique_id=1869416121]
+layout_mode = 2
+
+[node name="BadgeEspacio" type="PanelContainer" parent="Contenedor/Paso2_SaltoDive" unique_id=970017081]
+layout_mode = 2
+
+[node name="LabelEspacio" type="Label" parent="Contenedor/Paso2_SaltoDive/BadgeEspacio" unique_id=1079757769]
+layout_mode = 2
+text = "Espacio"
+
+[node name="LabelAccionSalto" type="Label" parent="Contenedor/Paso2_SaltoDive" unique_id=173886931]
+layout_mode = 2
+text = "Saltar"
+
+[node name="Paso3_Sprint" type="HBoxContainer" parent="Contenedor" unique_id=14605777]
+layout_mode = 2
+
+[node name="BadgeShift" type="PanelContainer" parent="Contenedor/Paso3_Sprint" unique_id=2002542456]
+layout_mode = 2
+
+[node name="LabelShift" type="Label" parent="Contenedor/Paso3_Sprint/BadgeShift" unique_id=313619549]
+layout_mode = 2
+text = "Shift"
+
+[node name="LabelAccionSprint" type="Label" parent="Contenedor/Paso3_Sprint" unique_id=492951328]
+layout_mode = 2
+text = "Correr"
