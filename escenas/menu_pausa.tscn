@@ -1,0 +1,56 @@
+[gd_scene format=3 uid="uid://ca751a2ntrauj"]
+
+[ext_resource type="Script" uid="uid://duyewnli46en2" path="res://scripts/menu_pausa.gd" id="1_ceax1"]
+
+[node name="MenuPausa" type="CanvasLayer" unique_id=2007741614]
+process_mode = 3
+layer = 50
+visible = false
+script = ExtResource("1_ceax1")
+
+[node name="Control" type="Control" parent="." unique_id=421234022]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Fondo" type="ColorRect" parent="Control" unique_id=715534198]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.65)
+
+[node name="Layout" type="CenterContainer" parent="Control" unique_id=2079193157]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="Columna" type="VBoxContainer" parent="Control/Layout" unique_id=457792554]
+layout_mode = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="Titulo" type="Label" parent="Control/Layout/Columna" unique_id=526642235]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.95, 0.95, 1)
+theme_override_font_sizes/font_size = 64
+text = "PAUSA"
+horizontal_alignment = 1
+
+[node name="BotonContinuar" type="Button" parent="Control/Layout/Columna" unique_id=2057596305]
+custom_minimum_size = Vector2(280, 56)
+layout_mode = 2
+text = "Continuar"
+
+[node name="BotonReiniciar" type="Button" parent="Control/Layout/Columna" unique_id=1492983787]
+custom_minimum_size = Vector2(280, 56)
+layout_mode = 2
+text = "Reiniciar"
+
+[node name="BotonMenu" type="Button" parent="Control/Layout/Columna" unique_id=360397681]
+custom_minimum_size = Vector2(280, 48)
+layout_mode = 2
+text = "Menú Principal"

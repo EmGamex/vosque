@@ -112,10 +112,17 @@ Siguiendo el patrón *Signal Up, Call Down*:
   - `func ocultar_inmediato() -> void`: Limpieza forzada instantánea usada por `GestorDeEscenas.ir_a()` durante transiciones.
 
 ### 2.3. Opciones, Flujo de Interacción y Salvaguardas
+* **Navegación con Controles de Movimiento y UI:**
+  - El jugador puede navegar verticalmente entre las opciones tanto con el teclado/mando estándar de interfaz (`ui_up`, `ui_down`) como directamente con los controles de movimiento del personaje (<kbd>W</kbd> / <kbd>↑</kbd> para `personaje-arriba` y <kbd>S</kbd> / <kbd>↓</kbd> para `personaje-abajo`).
+  - La navegación es cíclica (`posmod`), recorriendo ordenadamente: *"Continuar"* $\leftrightarrow$ *"Reiniciar"* $\leftrightarrow$ *"Menú Principal"*.
+  - La opción enfocada puede confirmarse indistintamente con <kbd>Enter</kbd> (`ui_accept`) o con la tecla de salto del juego <kbd>Espacio</kbd> (`personaje-salto`).
 1. **Continuar:**
    - Cierra la superposición de pausa de inmediato (sin fundido a negro) y restaura la simulación.
    - Recibe el foco automático diferido al abrir el menú de pausa para reanudación instantánea con <kbd>Espacio</kbd>, <kbd>Enter</kbd> o pulsando nuevamente la acción `pausa` (<kbd>Escape</kbd> / <kbd>P</kbd>).
-   - **Salvaguarda Anti-Salto Fantasma:** Al pulsar <kbd>Espacio</kbd> en *"Continuar"*, el input se marca como consumido (`get_viewport().set_input_as_handled()`) y la despausa se aplica con `set_deferred("paused", false)` para que el personaje no salte ni consuma estamina en el mismo fotograma de salida.
+   - **Blindaje Robusto en 3 Capas Anti-Salto Fantasma:** Al pulsar <kbd>Espacio</kbd> en *"Continuar"*, para garantizar que el personaje no interprete el input como `personaje-salto` al reanudarse el juego ni gaste $-20\text{ pts}$ de estamina:
+     1. `MenuPausa` y `GestorDeEscenas` liberan proactivamente el buffer del singleton `Input` con `Input.action_release("personaje-salto")` e `Input.action_release("ui_accept")`.
+     2. `GestorDeEscenas` invoca `consumir_buffer_salto()` en el personaje y aplica la despausa diferida al final del frame (`set_deferred("paused", false)`).
+     3. `Personaje` intercepta la notificación nativa `NOTIFICATION_UNPAUSED` del motor y suprime cualquier lectura de `quiere_salto` durante exactamente su primer fotograma de físicas activo.
    - **Salvaguarda de Linterna:** Al cerrar el menú, se limpia o ignora el movimiento relativo del ratón acumulado durante la pausa para que la linterna frontal no dé un latigazo hacia la posición del botón.
 2. **Reiniciar Partida:**
    - Activa `_bloqueado = true` para impedir pulsaciones repetidas, oculta el menú de pausa y emite `reiniciar_solicitado`.
