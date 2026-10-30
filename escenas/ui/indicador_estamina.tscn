@@ -1,6 +1,10 @@
 [gd_scene format=3 uid="uid://bosn1xlpgwiqr"]
 
-[ext_resource type="Script" uid="uid://bss4x6pwo5xgw" path="res://scripts/indicador_estamina.gd" id="1_e4uvo"]
+[ext_resource type="Script" uid="uid://dscicbplr33cu" path="res://scripts/indicador_estamina.gd" id="1_e4uvo"]
 
 [node name="IndicadorEstamina" type="Node2D" unique_id=21503489]
+modulate = Color(1, 1, 1, 0)
+z_index = 2
 script = ExtResource("1_e4uvo")
+ancho_linea = 8.0
+color_normal = Color(0, 0.6627451, 0.23529412, 1)
