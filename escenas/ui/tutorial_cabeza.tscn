@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dte8iac0uavl"]
 
-[ext_resource type="Script" uid="uid://d2ycpgr6yvv4v" path="res://scripts/ui/tutorial_cabeza.gd" id="1_tq8vd"]
+[ext_resource type="Script" uid="uid://bgdclnvnftbib" path="res://scripts/tutorial_cabeza/tutorial_cabeza.gd" id="1_tq8vd"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tq8vd"]
 content_margin_left = 8.0
@@ -37,6 +37,10 @@ corner_radius_bottom_left = 4
 [node name="TutorialCabeza" type="Node2D" unique_id=1460520052]
 z_index = 3
 script = ExtResource("1_tq8vd")
+color_fondo = Color(0.12, 0.12, 0.13, 0.88)
+color_activo = Color(0.7, 0.7, 0.72, 1)
+color_inactivo = Color(0.85, 0.85, 0.85, 0.9)
+color_acento_dorado = Color(0.85, 0.85, 0.85, 1)
 
 [node name="Contenedor" type="PanelContainer" parent="." unique_id=1883258484]
 offset_left = -132.0
@@ -99,37 +103,21 @@ layout_mode = 2
 layout_mode = 2
 text = "Orientar"
 
-[node name="Paso2_SaltoDive" type="HBoxContainer" parent="Contenedor" unique_id=1869416121]
+[node name="Paso2_Salto" type="HBoxContainer" parent="Contenedor" unique_id=1869416121]
 visible = false
 layout_mode = 2
 
-[node name="BadgeEspacio" type="PanelContainer" parent="Contenedor/Paso2_SaltoDive" unique_id=970017081]
+[node name="BadgeEspacio" type="PanelContainer" parent="Contenedor/Paso2_Salto" unique_id=970017081]
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_6aqmr")
 
-[node name="LabelEspacio" type="Label" parent="Contenedor/Paso2_SaltoDive/BadgeEspacio" unique_id=1079757769]
+[node name="LabelEspacio" type="Label" parent="Contenedor/Paso2_Salto/BadgeEspacio" unique_id=1079757769]
 layout_mode = 2
 text = "Espacio"
 
-[node name="LabelAccionSalto" type="Label" parent="Contenedor/Paso2_SaltoDive" unique_id=173886931]
+[node name="LabelAccionSalto" type="Label" parent="Contenedor/Paso2_Salto" unique_id=173886931]
 layout_mode = 2
 text = "Saltar"
-
-[node name="Paso3_Sprint" type="HBoxContainer" parent="Contenedor" unique_id=14605777]
-visible = false
-layout_mode = 2
-
-[node name="BadgeShift" type="PanelContainer" parent="Contenedor/Paso3_Sprint" unique_id=2002542456]
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_6aqmr")
-
-[node name="LabelShift" type="Label" parent="Contenedor/Paso3_Sprint/BadgeShift" unique_id=313619549]
-layout_mode = 2
-text = "Shift"
-
-[node name="LabelAccionSprint" type="Label" parent="Contenedor/Paso3_Sprint" unique_id=492951328]
-layout_mode = 2
-text = "Correr"
 
 [node name="Paso3_PlanchaDive" type="HBoxContainer" parent="Contenedor" unique_id=472478106]
 visible = false
@@ -146,3 +134,19 @@ text = "Espacio + Espacio"
 [node name="LabelAccionDive" type="Label" parent="Contenedor/Paso3_PlanchaDive" unique_id=2126113747]
 layout_mode = 2
 text = "Plancha (Dive)"
+
+[node name="Paso4_Sprint" type="HBoxContainer" parent="Contenedor" unique_id=14605777]
+visible = false
+layout_mode = 2
+
+[node name="BadgeShift" type="PanelContainer" parent="Contenedor/Paso4_Sprint" unique_id=2002542456]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_6aqmr")
+
+[node name="LabelShift" type="Label" parent="Contenedor/Paso4_Sprint/BadgeShift" unique_id=313619549]
+layout_mode = 2
+text = "Shift"
+
+[node name="LabelAccionSprint" type="Label" parent="Contenedor/Paso4_Sprint" unique_id=492951328]
+layout_mode = 2
+text = "Correr"

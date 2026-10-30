@@ -190,3 +190,19 @@ func test_integracion_con_personaje() -> void:
 	assert_eq(tut.position, Vector2(0, -90), "TutorialCabeza debe restaurarse a Vector2(0, -90)")
 
 	pj.free()
+
+
+func test_arquitectura_modular_y_subcontroladores() -> void:
+	var tut: TutorialCabeza = _crear_tutorial()
+	tut._ready()
+
+	assert_true(tut.estado_ctrl != null, "TutorialCabeza debe delegar lógica en TutorialEstadoController")
+	assert_true(tut.vista_ctrl != null, "TutorialCabeza debe delegar presentación en TutorialVistaController")
+	assert_true(tut.vista_ctrl.sb_fondo != null, "TutorialVistaController debe cachear StyleBoxFlat del fondo")
+	assert_true(tut.vista_ctrl.sb_badge_activo != null, "TutorialVistaController debe cachear StyleBoxFlat activo")
+
+	# Probar los nuevos nombres normalizados de nodos
+	assert_true(tut.vista_ctrl.paso2_salto != null, "El nodo Paso2_Salto debe estar resuelto")
+	assert_true(tut.vista_ctrl.paso4_sprint != null, "El nodo Paso4_Sprint debe estar resuelto")
+
+	tut.free()
