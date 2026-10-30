@@ -50,27 +50,33 @@ Este documento especifica los esquemas de entrada para teclado en PC, los elemen
 
 ## 3. Tutorial Flotante sobre la Cabeza del Personaje (Onboarding In-Game)
 
-Para garantizar un onboarding inmediato que no rompa la inmersión cenital ni requiera pausas artificiales, al iniciar cada partida aparece un indicador flotante diegético centrado en la cabeza del personaje (`Vector2(0, -90)`):
+Para garantizar un onboarding inmediato que no rompa la inmersión cenital ni requiera pausas artificiales, al iniciar la partida aparece un indicador flotante diegético centrado en la cabeza del personaje (`Vector2(0, -90)`):
 
 ### 3.1. Estructura Visual
 * **Contenedor:** Pastilla flotante con fondo negro translúcido (`Color(0.08, 0.10, 0.15, 0.85)`), esquinas redondeadas y borde sutil.
-* **Badges de Teclas:** Representaciones visuales de teclas estilizadas con contraste alto.
+* **Badges de Teclas y Controles:** Representaciones visuales vectoriales y estilizadas de teclas con contraste alto, acompañadas por un glifo sutil de ratón con flechas radiales de orientación.
 
-### 3.2. Secuencia de 3 Pasos
-1. **Paso 1: Locomoción en 4 Direcciones:**
-   - Mensaje: `"Mueve con [W] [A] [S] [D]"` (o flechas).
-   - Comportamiento: A medida que el jugador presiona cada dirección, el badge de esa tecla se ilumina en ámbar/verde (`#4ade80`).
-   - Criterio de avance: Haber presionado las 4 direcciones (o alcanzar desplazamiento sostenido).
-2. **Paso 2: Superación de Obstáculos Bajos (Salto):**
-   - Mensaje: `"Presiona [Espacio] para saltar"`.
-   - Criterio de avance: Detectar `personaje-salto` y la transición al estado `SALTO`.
+### 3.2. Secuencia Progresiva de 3 Pasos
+1. **Paso 1: Locomoción en 4 Direcciones y Orientación:**
+   - Mensaje / Elementos: Badges de teclas `[W] [A] [S] [D]` acompañados de un glifo de ratón `[Ratón] Orientar`.
+   - Comportamiento: A medida que el jugador presiona cada dirección o rota la linterna con el ratón, el elemento respectivo se ilumina en ámbar/verde (`#4ade80`).
+   - Criterio de avance: Haber presionado las direcciones de movimiento (o mantener desplazamiento sostenido).
+2. **Paso 2: Superación de Obstáculos Bajos y Salto de Plancha (*Dive* Dinámico):**
+   - **En Suelo:** Muestra el badge `[Espacio] Saltar` para superar obstáculos bajos (Capa 2).
+   - **En el Aire (Transición Dinámica):** En el instante en que el personaje despega hacia el estado `SALTO`, el badge conmuta automáticamente a `[Espacio] Plancha (Dive)`.
+   - Criterio de avance:
+     - Si el jugador vuelve a presionar `Espacio` en el aire, ejecuta el *Dive* (impulso horizontal a $1200\text{ px/s}$) con un pulso de éxito en verde/dorado.
+     - Si el jugador aterriza sin presionar el segundo salto, el paso se convalida con éxito regular. En ambos casos avanza de inmediato al Paso 3 sin penalización.
 3. **Paso 3: Aceleración con Estamina (Sprint):**
-   - Mensaje: `"Mantén presionado [Shift] para correr"`.
-   - Criterio de avance: Sostener la acción `sprint` y transicionar a `SPRINT`.
-   - Cierre: Al activarse el sprint, la pastilla reproduce un pulso de confirmación y se desvanece suavemente con un `Tween` de alfa en $0.4\text{ s}$ antes de liberarse.
+   - Mensaje / Elementos: `[Shift] Correr`.
+   - Criterio de avance: Sostener la acción `sprint` y transicionar al estado `SPRINT`.
+   - Cierre estándar: Al activarse el sprint, la pastilla reproduce un pulso de confirmación general y se desvanece suavemente con un `Tween` de alfa en $0.4\text{ s}$ antes de liberarse.
 
-### 3.3. Protocolo de Desvanecimiento Forzado
-* Si el jugador se dirige directamente a la primera nota y la recolecta antes de completar los 3 pasos, el tutorial se desvanece instantáneamente para no entorpecer la cacería de la criatura.
+### 3.3. Protocolo de Aceleración para Veteranos (*Fast-Path*)
+Para evitar cualquier molestia o lentitud a los jugadores experimentados:
+* **Cierre Instantáneo por Input Combinado:** Si al iniciar la partida el jugador ejecuta directamente una maniobra de escape/carrera (`Shift + WASD`) o salto, la pastilla detecta el control avanzado, ilumina todas las teclas al unísono con un destello reactivo y se desvanece en menos de $0.25\text{ s}$.
+* **Desvanecimiento Forzado por Coleccionable:** Si el jugador va directo a la primera nota y la recoge antes de finalizar los pasos, el tutorial se destruye instantáneamente para despejar la visibilidad ante la activación de la criatura.
+* **Persistencia de Sesión:** Tras completarse con éxito una vez, queda registrado el flag `tutorial_visto = true` en la sesión para que en los reintentos tras morir el juego inicie limpio y sin interfaz sobre la cabeza (pudiendo reactivarse voluntariamente desde el Menú de Pausa).
 
 ### 3.4. Zona Segura Inicial (Ausencia de Monstruo en Nota 0)
 * Durante toda la fase de tutorial (Nota 0), el monstruo no está presente físicamente ni visible en el escenario.

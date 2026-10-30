@@ -148,9 +148,9 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
   - [ ] Pantalla de Opciones conectada a la señal `opciones_solicitado` de `MenuInicio`.
   - [ ] Pantalla de Créditos conectada a la señal `creditos_solicitado` de `MenuInicio`.
 - [ ] **Tutorial Flotante sobre la Cabeza (`TutorialCabeza`):**
-  - [ ] Componente visual flotante a $Y \approx -90\text{ px}$ con fondo traslúcido y badges de teclas.
-  - [ ] Secuencia de 3 pasos: WASD (ilumina teclas al pulsar) $\to$ Salto (Espacio) $\to$ Sprint (Shift).
-  - [ ] Cierre automático con `Tween` al completar o al recoger la Nota 1.
+  - [ ] Componente visual flotante a $Y \approx -90\text{ px}$ con fondo traslúcido, badges de teclas reactivos y glifo de orientación de ratón.
+  - [ ] Secuencia progresiva: WASD + Ratón $\to$ Salto con transición contextual en el aire a Plancha (*Dive*) $\to$ Sprint (Shift).
+  - [ ] Protocolo de aceleración para veteranos (*Fast-Path*): cierre inmediato en $< 0.25\text{ s}$ ante combinaciones avanzadas (`Shift + WASD`), salida forzada en Nota 1 y persistencia de sesión (`tutorial_visto`).
 - [x] **Indicador Diegético de Estamina (`escenas/ui/indicador_estamina.tscn`):** Anillo procedural con `_draw()` anclado sobre la cabeza del personaje (`Vector2(0, -60)`), invisible en reposo (100%), micro-pop al consumir, titileo carmesí en fatiga y animación elástica de cierre al recargar.
 - [x] **Contador de Notas en HUD (`escenas/hud.tscn`):** `CanvasLayer` (layer 10) con icono estilizado y texto numérico con `Tween` de *Scale Punch* elástico ($1.3 \to 1.0$) y flash reactivo.
 - [x] **Menú de Pausa Superpuesto (`escenas/menu_pausa.tscn`, `CanvasLayer`, layer=50):**
