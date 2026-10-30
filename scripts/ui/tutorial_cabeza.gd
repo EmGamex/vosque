@@ -19,11 +19,11 @@ enum Paso {
 
 static var tutorial_visto: bool = false
 
-@export var color_fondo: Color = Color(0.08, 0.10, 0.15, 0.85)
-@export var color_borde: Color = Color(0.30, 0.40, 0.55, 0.70)
-@export var color_activo: Color = Color("#4ade80")
-@export var color_inactivo: Color = Color(0.85, 0.90, 0.95, 0.90)
-@export var color_acento_dorado: Color = Color("#fbbf24")
+@export var color_fondo: Color = Color(0.12, 0.12, 0.13, 0.88)
+@export var color_borde: Color = Color.TRANSPARENT
+@export var color_activo: Color = Color(0.70, 0.70, 0.72)
+@export var color_inactivo: Color = Color(0.85, 0.85, 0.85, 0.90)
+@export var color_acento_dorado: Color = Color(0.85, 0.85, 0.85)
 
 var paso_actual: Paso = Paso.PASO_1_MOVIMIENTO
 
@@ -131,39 +131,39 @@ func _notification(what: int) -> void:
 func _crear_estilos() -> void:
 	_sb_fondo = StyleBoxFlat.new()
 	_sb_fondo.bg_color = color_fondo
-	_sb_fondo.border_color = color_borde
-	_sb_fondo.set_border_width_all(1)
-	_sb_fondo.set_corner_radius_all(8)
+	_sb_fondo.border_color = Color.TRANSPARENT
+	_sb_fondo.set_border_width_all(0)
+	_sb_fondo.set_corner_radius_all(0)
 	_sb_fondo.content_margin_left = 8
 	_sb_fondo.content_margin_right = 8
 	_sb_fondo.content_margin_top = 4
 	_sb_fondo.content_margin_bottom = 4
 
 	_sb_badge_inactivo = StyleBoxFlat.new()
-	_sb_badge_inactivo.bg_color = Color(0.14, 0.18, 0.25, 0.90)
-	_sb_badge_inactivo.border_color = Color(0.35, 0.45, 0.55, 0.80)
-	_sb_badge_inactivo.set_border_width_all(1)
-	_sb_badge_inactivo.set_corner_radius_all(4)
+	_sb_badge_inactivo.bg_color = Color(0.20, 0.20, 0.22, 0.90)
+	_sb_badge_inactivo.border_color = Color.TRANSPARENT
+	_sb_badge_inactivo.set_border_width_all(0)
+	_sb_badge_inactivo.set_corner_radius_all(0)
 	_sb_badge_inactivo.content_margin_left = 6
 	_sb_badge_inactivo.content_margin_right = 6
 	_sb_badge_inactivo.content_margin_top = 2
 	_sb_badge_inactivo.content_margin_bottom = 2
 
 	_sb_badge_activo = StyleBoxFlat.new()
-	_sb_badge_activo.bg_color = Color(0.18, 0.55, 0.35, 0.95)
-	_sb_badge_activo.border_color = color_activo
-	_sb_badge_activo.set_border_width_all(1)
-	_sb_badge_activo.set_corner_radius_all(4)
+	_sb_badge_activo.bg_color = Color(0.38, 0.38, 0.40, 0.95)
+	_sb_badge_activo.border_color = Color.TRANSPARENT
+	_sb_badge_activo.set_border_width_all(0)
+	_sb_badge_activo.set_corner_radius_all(0)
 	_sb_badge_activo.content_margin_left = 6
 	_sb_badge_activo.content_margin_right = 6
 	_sb_badge_activo.content_margin_top = 2
 	_sb_badge_activo.content_margin_bottom = 2
 
 	_sb_badge_dive = StyleBoxFlat.new()
-	_sb_badge_dive.bg_color = Color(0.85, 0.70, 0.20, 0.95)
-	_sb_badge_dive.border_color = color_acento_dorado
-	_sb_badge_dive.set_border_width_all(1)
-	_sb_badge_dive.set_corner_radius_all(4)
+	_sb_badge_dive.bg_color = Color(0.48, 0.48, 0.50, 0.95)
+	_sb_badge_dive.border_color = Color.TRANSPARENT
+	_sb_badge_dive.set_border_width_all(0)
+	_sb_badge_dive.set_corner_radius_all(0)
 	_sb_badge_dive.content_margin_left = 6
 	_sb_badge_dive.content_margin_right = 6
 	_sb_badge_dive.content_margin_top = 2
@@ -304,10 +304,10 @@ func _aplicar_estilo_badge(badge: PanelContainer, activo: bool, color_override: 
 	var sb: StyleBoxFlat = null
 	if color_override != Color.TRANSPARENT:
 		sb = StyleBoxFlat.new()
-		sb.bg_color = color_override.lerp(Color(0.2, 0.2, 0.2, 0.9), 0.2)
-		sb.border_color = color_override
-		sb.set_border_width_all(1)
-		sb.set_corner_radius_all(4)
+		sb.bg_color = color_override
+		sb.border_color = Color.TRANSPARENT
+		sb.set_border_width_all(0)
+		sb.set_corner_radius_all(0)
 		sb.content_margin_left = 6
 		sb.content_margin_right = 6
 		sb.content_margin_top = 2
@@ -549,18 +549,15 @@ func _on_icono_raton_draw() -> void:
 
 	var pos = icono_raton.size * 0.5
 	var iluminado = _raton_registrado or _raton_activo or _flash_unisono
-	var col: Color = color_activo if iluminado else Color(0.70, 0.78, 0.88, 0.85)
+	var col: Color = Color(0.9, 0.9, 0.9) if iluminado else Color(0.60, 0.60, 0.60, 0.85)
 
-	# Silueta limpia y estilizada del ratón (capsule)
+	# Silueta limpia y sobria del ratón
 	var r_cuerpo = Rect2(pos.x - 5, pos.y - 7, 10, 14)
 	var sb_raton = StyleBoxFlat.new()
-	sb_raton.bg_color = Color(0.14, 0.18, 0.25, 0.90)
-	sb_raton.border_color = col
-	sb_raton.set_border_width_all(1)
-	sb_raton.corner_radius_top_left = 4
-	sb_raton.corner_radius_top_right = 4
-	sb_raton.corner_radius_bottom_left = 3
-	sb_raton.corner_radius_bottom_right = 3
+	sb_raton.bg_color = Color(0.20, 0.20, 0.22, 0.90)
+	sb_raton.border_color = Color.TRANSPARENT
+	sb_raton.set_border_width_all(0)
+	sb_raton.set_corner_radius_all(0)
 	icono_raton.draw_style_box(sb_raton, r_cuerpo)
 
 	# Divisor de botones
