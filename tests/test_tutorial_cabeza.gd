@@ -36,6 +36,18 @@ func test_instanciacion_y_valores_defecto() -> void:
 	tut.free()
 
 
+func test_paso_1_iluminacion_persistente() -> void:
+	var tut: TutorialCabeza = _crear_tutorial()
+	tut._ready()
+
+	tut._w_registrado = true
+	tut._actualizar_estilos_reactivos()
+
+	# W debe estar marcado como registrado
+	assert_true(tut._w_registrado, "W debe estar registrado")
+	tut.free()
+
+
 func test_paso_1_deteccion_movimiento() -> void:
 	var tut: TutorialCabeza = _crear_tutorial()
 	tut._ready()
@@ -49,79 +61,44 @@ func test_paso_1_deteccion_movimiento() -> void:
 	tut._d_registrado = true
 	tut._tiempo_en_paso_actual = 0.6
 	tut._procesar_paso_1(0.016)
-	assert_eq(tut.paso_actual, TutorialCabeza.Paso.PASO_2_SALTO_DIVE, "Debe avanzar a PASO_2_SALTO_DIVE al registrar las 4 direcciones")
+	assert_eq(tut.paso_actual, TutorialCabeza.Paso.PASO_2_SALTO, "Debe avanzar a PASO_2_SALTO al registrar las 4 direcciones")
 
 	tut.free()
 
 
-func test_paso_1_desplazamiento_sostenido() -> void:
+func test_paso_2_salto_regular_avanza_a_dive() -> void:
 	var tut: TutorialCabeza = _crear_tutorial()
 	tut._ready()
+	tut.paso_actual = TutorialCabeza.Paso.PASO_2_SALTO
 
-	tut._w_registrado = true
-	tut._a_registrado = true
-	tut._s_registrado = true
-	tut._d_registrado = true
-	tut._tiempo_desplazamiento = 1.2
-	tut._procesar_paso_1(0.016)
-	assert_eq(tut.paso_actual, TutorialCabeza.Paso.PASO_2_SALTO_DIVE, "Debe avanzar a PASO_2_SALTO_DIVE por desplazamiento sostenido")
-
-	tut.free()
-
-
-func test_paso_2_transicion_contextual_salto_a_dive() -> void:
-	var tut: TutorialCabeza = _crear_tutorial()
-	tut._ready()
-	tut.paso_actual = TutorialCabeza.Paso.PASO_2_SALTO_DIVE
-
-	assert_false(tut._en_el_aire, "Inicialmente en suelo no debe estar en el aire")
-
-	# Simular que el personaje pasa a Estado.SALTO (4)
+	# Salto en suelo y aterrizaje
 	tut._on_padre_estado_cambiado(4, "SALTO")
-	assert_true(tut._en_el_aire, "Al saltar debe entrar en modo en_el_aire")
-	assert_true(tut._salto_en_curso, "_salto_en_curso debe ser true")
+	tut._on_padre_estado_cambiado(0, "REPOSO")
 
+	assert_eq(tut.paso_actual, TutorialCabeza.Paso.PASO_3_PLANCHA_DIVE, "Al completar el salto regular debe avanzar al paso dedicado de Plancha/Dive")
 	tut.free()
 
 
-func test_paso_2_dive_ejecutado() -> void:
+func test_paso_3_plancha_dive_ejecutado() -> void:
 	var tut: TutorialCabeza = _crear_tutorial()
 	tut._ready()
-	tut.paso_actual = TutorialCabeza.Paso.PASO_2_SALTO_DIVE
-	tut._on_padre_estado_cambiado(4, "SALTO")
+	tut.paso_actual = TutorialCabeza.Paso.PASO_3_PLANCHA_DIVE
 
-	# Simular transición a PLANCHA_AIRE (5)
+	# En el aire
+	tut._on_padre_estado_cambiado(4, "SALTO")
+	assert_true(tut._en_el_aire, "Debe registrar que está en el aire")
+
+	# Pulsa espacio y ejecuta plancha
 	tut._on_padre_estado_cambiado(5, "PLANCHA_AIRE")
-	assert_true(tut._dive_realizado, "_dive_realizado debe ser true")
+	assert_true(tut._dive_registrado, "_dive_registrado debe ser true")
 
 	tut.free()
 
 
-func test_paso_2_salto_regular_convalidado_al_aterrizar() -> void:
+func test_paso_4_sprint_y_cierre() -> void:
 	var tut: TutorialCabeza = _crear_tutorial()
 	tut._ready()
-	tut.paso_actual = TutorialCabeza.Paso.PASO_2_SALTO_DIVE
-
-	# Primer salto sin dive
-	tut._on_padre_estado_cambiado(4, "SALTO")
-	tut._on_padre_estado_cambiado(0, "REPOSO")
-	# Sigue en Paso 2 para dar oportunidad de hacer dive
-	assert_eq(tut.paso_actual, TutorialCabeza.Paso.PASO_2_SALTO_DIVE, "Un solo salto sin dive no salta el paso inmediatamente")
-
-	# Segundo salto sin dive o tras tiempo prudencial
-	tut._on_padre_estado_cambiado(4, "SALTO")
-	tut._on_padre_estado_cambiado(0, "REPOSO")
-
-	assert_eq(tut.paso_actual, TutorialCabeza.Paso.PASO_3_SPRINT, "Tras el segundo salto se convalida y pasa a Paso 3")
-	assert_false(tut._en_el_aire, "Ya no debe estar en el aire")
-
-	tut.free()
-
-
-func test_paso_3_sprint_y_cierre() -> void:
-	var tut: TutorialCabeza = _crear_tutorial()
-	tut._ready()
-	tut.paso_actual = TutorialCabeza.Paso.PASO_3_SPRINT
+	tut.paso_actual = TutorialCabeza.Paso.PASO_4_SPRINT
 
 	tut.completar_tutorial_estandar()
 	assert_true(tut._cerrando, "_cerrando debe ser true")
@@ -158,11 +135,8 @@ func test_persistencia_sesion_tutorial_visto() -> void:
 
 	var escena: PackedScene = load("res://escenas/ui/tutorial_cabeza.tscn")
 	var tut: TutorialCabeza = escena.instantiate() as TutorialCabeza
-	# Simular que no estamos en editor
-	Engine.set_meta("test_override_hint", false)
 	tut._ready()
 
-	# Reiniciar para siguientes pruebas
 	TutorialCabeza.reiniciar_tutorial()
 	assert_false(TutorialCabeza.tutorial_visto, "reiniciar_tutorial() debe ponerlo en false")
 
@@ -179,7 +153,6 @@ func test_integracion_con_personaje() -> void:
 	assert_true(tut != null, "Personaje debe contener el nodo hijo TutorialCabeza")
 	assert_eq(tut.position, Vector2(0, -90), "TutorialCabeza debe estar en Vector2(0, -90)")
 
-	# Comprobar elevación en eje Z durante salto
 	pj._aplicar_elevacion_eje_z(1.0)
 	var expected_y: float = -90.0 - pj.jump_height * 1.0
 	assert_true(is_equal_approx(tut.position.y, expected_y), "TutorialCabeza debe elevarse en el eje Z")

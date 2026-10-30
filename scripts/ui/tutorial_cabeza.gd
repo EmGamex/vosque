@@ -11,8 +11,9 @@ signal fast_path_activado
 
 enum Paso {
 	PASO_1_MOVIMIENTO,
-	PASO_2_SALTO_DIVE,
-	PASO_3_SPRINT,
+	PASO_2_SALTO,
+	PASO_3_PLANCHA_DIVE,
+	PASO_4_SPRINT,
 	COMPLETADO
 }
 
@@ -29,8 +30,9 @@ var paso_actual: Paso = Paso.PASO_1_MOVIMIENTO
 # Nodos del árbol de UI
 @onready var contenedor: PanelContainer = get_node_or_null("Contenedor") as PanelContainer
 @onready var paso1_movimiento: HBoxContainer = get_node_or_null("Contenedor/Paso1_Movimiento") as HBoxContainer
-@onready var paso2_salto_dive: HBoxContainer = get_node_or_null("Contenedor/Paso2_SaltoDive") as HBoxContainer
-@onready var paso3_sprint: HBoxContainer = get_node_or_null("Contenedor/Paso3_Sprint") as HBoxContainer
+@onready var paso2_salto: HBoxContainer = get_node_or_null("Contenedor/Paso2_SaltoDive") as HBoxContainer
+@onready var paso3_plancha_dive: HBoxContainer = get_node_or_null("Contenedor/Paso3_PlanchaDive") as HBoxContainer
+@onready var paso4_sprint: HBoxContainer = get_node_or_null("Contenedor/Paso3_Sprint") as HBoxContainer
 
 @onready var badge_w: PanelContainer = get_node_or_null("Contenedor/Paso1_Movimiento/ContenedorWASD/BadgeW") as PanelContainer
 @onready var badge_a: PanelContainer = get_node_or_null("Contenedor/Paso1_Movimiento/ContenedorWASD/BadgeA") as PanelContainer
@@ -42,6 +44,9 @@ var paso_actual: Paso = Paso.PASO_1_MOVIMIENTO
 
 @onready var badge_espacio: PanelContainer = get_node_or_null("Contenedor/Paso2_SaltoDive/BadgeEspacio") as PanelContainer
 @onready var label_accion_salto: Label = get_node_or_null("Contenedor/Paso2_SaltoDive/LabelAccionSalto") as Label
+
+@onready var badge_espacio_dive: PanelContainer = get_node_or_null("Contenedor/Paso3_PlanchaDive/BadgeEspacioDive") as PanelContainer
+@onready var label_accion_dive: Label = get_node_or_null("Contenedor/Paso3_PlanchaDive/LabelAccionDive") as Label
 
 @onready var badge_shift: PanelContainer = get_node_or_null("Contenedor/Paso3_Sprint/BadgeShift") as PanelContainer
 @onready var label_accion_sprint: Label = get_node_or_null("Contenedor/Paso3_Sprint/LabelAccionSprint") as Label
@@ -55,20 +60,23 @@ var _raton_activo: bool = false
 var _tecla_espacio_activa: bool = false
 var _tecla_shift_activa: bool = false
 
-# Criterios de avance Paso 1
+# Criterios de avance e iluminación persistente
 var _w_registrado: bool = false
 var _a_registrado: bool = false
 var _s_registrado: bool = false
 var _d_registrado: bool = false
+var _raton_registrado: bool = false
+var _salto_registrado: bool = false
+var _dive_registrado: bool = false
+var _sprint_registrado: bool = false
+
 var _tiempo_desplazamiento: float = 0.0
 var _tiempo_iluminacion_raton: float = 0.0
 var _tiempo_en_paso_actual: float = 0.0
 
-# Paso 2 - Contextual
+# Seguimiento físico de estados
 var _en_el_aire: bool = false
-var _dive_realizado: bool = false
 var _salto_en_curso: bool = false
-var _saltos_realizados: int = 0
 
 # Animaciones / Tweens
 var _flash_unisono: bool = false
@@ -163,7 +171,7 @@ func _aplicar_estilos_base() -> void:
 	if contenedor != null and _sb_fondo != null:
 		contenedor.add_theme_stylebox_override("panel", _sb_fondo)
 
-	var badges = [badge_w, badge_a, badge_s, badge_d, badge_espacio, badge_shift]
+	var badges = [badge_w, badge_a, badge_s, badge_d, badge_espacio, badge_espacio_dive, badge_shift]
 	for b in badges:
 		if b != null and _sb_badge_inactivo != null:
 			b.add_theme_stylebox_override("panel", _sb_badge_inactivo)
@@ -174,7 +182,6 @@ func _centrar_contenedor() -> void:
 		return
 	contenedor.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	contenedor.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	# Centrar el contenedor respecto a Vector2(0, 0)
 	contenedor.position = -contenedor.size * 0.5
 	if not contenedor.resized.is_connected(_on_contenedor_resized):
 		contenedor.resized.connect(_on_contenedor_resized)
@@ -211,6 +218,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
 		if event.relative.length() >= 3.0:
 			_raton_activo = true
+			_raton_registrado = true
 			_tiempo_iluminacion_raton = 0.35
 			_actualizar_estilo_raton()
 
@@ -226,10 +234,12 @@ func _physics_process(delta: float) -> void:
 	match paso_actual:
 		Paso.PASO_1_MOVIMIENTO:
 			_procesar_paso_1(delta)
-		Paso.PASO_2_SALTO_DIVE:
+		Paso.PASO_2_SALTO:
 			_procesar_paso_2(delta)
-		Paso.PASO_3_SPRINT:
+		Paso.PASO_3_PLANCHA_DIVE:
 			_procesar_paso_3(delta)
+		Paso.PASO_4_SPRINT:
+			_procesar_paso_4(delta)
 
 	_actualizar_estilos_reactivos()
 
@@ -259,22 +269,27 @@ func _actualizar_estilos_reactivos() -> void:
 		_aplicar_estilo_badge(badge_s, true, _color_flash)
 		_aplicar_estilo_badge(badge_d, true, _color_flash)
 		_aplicar_estilo_badge(badge_espacio, true, _color_flash)
+		_aplicar_estilo_badge(badge_espacio_dive, true, _color_flash)
 		_aplicar_estilo_badge(badge_shift, true, _color_flash)
 		return
 
 	match paso_actual:
 		Paso.PASO_1_MOVIMIENTO:
-			_aplicar_estilo_badge(badge_w, _tecla_w_activa)
-			_aplicar_estilo_badge(badge_a, _tecla_a_activa)
-			_aplicar_estilo_badge(badge_s, _tecla_s_activa)
-			_aplicar_estilo_badge(badge_d, _tecla_d_activa)
-		Paso.PASO_2_SALTO_DIVE:
-			if _dive_realizado:
-				_aplicar_estilo_badge(badge_espacio, true, color_acento_dorado)
+			# Los botones se mantienen iluminados si ya fueron presionados (_*_registrado o activo)
+			_aplicar_estilo_badge(badge_w, _w_registrado or _tecla_w_activa)
+			_aplicar_estilo_badge(badge_a, _a_registrado or _tecla_a_activa)
+			_aplicar_estilo_badge(badge_s, _s_registrado or _tecla_s_activa)
+			_aplicar_estilo_badge(badge_d, _d_registrado or _tecla_d_activa)
+			_actualizar_estilo_raton()
+		Paso.PASO_2_SALTO:
+			_aplicar_estilo_badge(badge_espacio, _salto_registrado or _tecla_espacio_activa)
+		Paso.PASO_3_PLANCHA_DIVE:
+			if _dive_registrado:
+				_aplicar_estilo_badge(badge_espacio_dive, true, color_acento_dorado)
 			else:
-				_aplicar_estilo_badge(badge_espacio, _tecla_espacio_activa)
-		Paso.PASO_3_SPRINT:
-			_aplicar_estilo_badge(badge_shift, _tecla_shift_activa)
+				_aplicar_estilo_badge(badge_espacio_dive, _en_el_aire or _tecla_espacio_activa)
+		Paso.PASO_4_SPRINT:
+			_aplicar_estilo_badge(badge_shift, _sprint_registrado or _tecla_shift_activa)
 
 
 func _aplicar_estilo_badge(badge: PanelContainer, activo: bool, color_override: Color = Color.TRANSPARENT) -> void:
@@ -304,15 +319,14 @@ func _actualizar_estilo_raton() -> void:
 	if icono_raton != null:
 		icono_raton.queue_redraw()
 	if label_orientar != null:
-		label_orientar.add_theme_color_override("font_color", color_activo if _raton_activo else color_inactivo)
+		var iluminado = _raton_registrado or _raton_activo
+		label_orientar.add_theme_color_override("font_color", color_activo if iluminado else color_inactivo)
 
 
 func _verificar_fast_path() -> void:
 	if paso_actual != Paso.PASO_1_MOVIMIENTO:
 		return
 
-	# Solo permitir Fast-Path si el jugador deliberadamente corre a toda velocidad
-	# o combina sprint con movimiento apenas inicia (veterano que no necesita el tutorial)
 	var hay_movimiento: bool = _tecla_w_activa or _tecla_a_activa or _tecla_s_activa or _tecla_d_activa
 	var sprint_combinado: bool = _tecla_shift_activa and hay_movimiento
 
@@ -355,26 +369,31 @@ func _procesar_paso_1(delta: float) -> void:
 		if padre.velocity.length() > 30.0:
 			_tiempo_desplazamiento += delta
 
-	# Requiere que el jugador realmente haya probado las 4 teclas WASD
-	# Y además un mínimo de tiempo en el paso para que no parpadee ni se salte sin asimilarlo
 	var todas_pulsadas: bool = _w_registrado and _a_registrado and _s_registrado and _d_registrado
 	if todas_pulsadas and (_tiempo_en_paso_actual >= 0.5 or _tiempo_desplazamiento >= 1.0):
-		_avanzar_paso(Paso.PASO_2_SALTO_DIVE)
+		_avanzar_paso(Paso.PASO_2_SALTO)
 
 
 func _procesar_paso_2(_delta: float) -> void:
-	if _en_el_aire and Input.is_action_just_pressed("personaje-salto"):
-		_dive_realizado = true
-		_animar_pulso_dive()
+	# El salto se completa cuando el personaje salta y toca tierra (en _on_padre_estado_cambiado)
+	pass
 
 
 func _procesar_paso_3(_delta: float) -> void:
+	# En el aire, si pulsa salto -> se ejecuta plancha
+	if _en_el_aire and Input.is_action_just_pressed("personaje-salto"):
+		_dive_registrado = true
+		_animar_pulso_dive()
+
+
+func _procesar_paso_4(_delta: float) -> void:
 	var padre = get_parent()
 	if padre == null:
 		return
 
 	var estado_pj: int = padre.get("estado_actual") if "estado_actual" in padre else -1
 	if estado_pj == 2 or (_tecla_shift_activa and padre.velocity.length() > 50.0):
+		_sprint_registrado = true
 		completar_tutorial_estandar()
 
 
@@ -382,36 +401,23 @@ func _on_padre_estado_cambiado(nuevo_estado: int, _nombre_estado: String) -> voi
 	if nuevo_estado == 4: # SALTO
 		_salto_en_curso = true
 		_en_el_aire = true
-		_actualizar_texto_salto()
+		_salto_registrado = true
 	elif nuevo_estado == 5: # PLANCHA_AIRE
-		_dive_realizado = true
+		_dive_registrado = true
 		_en_el_aire = true
-		_actualizar_texto_salto()
 		_animar_pulso_dive()
 	else:
 		if _salto_en_curso:
 			_salto_en_curso = false
 			_en_el_aire = false
-			_saltos_realizados += 1
-			_actualizar_texto_salto()
-			if paso_actual == Paso.PASO_2_SALTO_DIVE:
-				# Si ya realizó la plancha o hizo al menos un salto donde vio la transición,
-				# dejamos que asimile o avanzamos
-				if _dive_realizado:
-					_avanzar_paso(Paso.PASO_3_SPRINT)
-				else:
-					# Si fue solo un salto sin plancha, dar margen o avanzar al segundo salto
-					# para que el jugador tenga oportunidad de ver y probar la plancha en el aire
-					if _saltos_realizados >= 2 or _tiempo_en_paso_actual >= 2.5:
-						_avanzar_paso(Paso.PASO_3_SPRINT)
+			if paso_actual == Paso.PASO_2_SALTO:
+				# Tras completar el salto regular, avanzamos al paso dedicado de Plancha/Dive
+				_avanzar_paso(Paso.PASO_3_PLANCHA_DIVE)
+			elif paso_actual == Paso.PASO_3_PLANCHA_DIVE:
+				if _dive_registrado:
+					_avanzar_paso(Paso.PASO_4_SPRINT)
 		elif _en_el_aire:
 			_en_el_aire = false
-			_actualizar_texto_salto()
-
-
-func _actualizar_texto_salto() -> void:
-	if label_accion_salto != null:
-		label_accion_salto.text = "Plancha (Dive)" if _en_el_aire else "Saltar"
 
 
 func _animar_pulso_dive() -> void:
@@ -426,8 +432,8 @@ func _animar_pulso_dive() -> void:
 		_tween_pop.tween_callback(func():
 			_flash_unisono = false
 			_color_flash = Color.WHITE
-			if paso_actual == Paso.PASO_2_SALTO_DIVE:
-				_avanzar_paso(Paso.PASO_3_SPRINT)
+			if paso_actual == Paso.PASO_3_PLANCHA_DIVE:
+				_avanzar_paso(Paso.PASO_4_SPRINT)
 		)
 
 
@@ -450,12 +456,13 @@ func _avanzar_paso(siguiente_paso: Paso) -> void:
 func _actualizar_visibilidad_pasos() -> void:
 	if paso1_movimiento != null:
 		paso1_movimiento.visible = (paso_actual == Paso.PASO_1_MOVIMIENTO)
-	if paso2_salto_dive != null:
-		paso2_salto_dive.visible = (paso_actual == Paso.PASO_2_SALTO_DIVE)
-	if paso3_sprint != null:
-		paso3_sprint.visible = (paso_actual == Paso.PASO_3_SPRINT)
+	if paso2_salto != null:
+		paso2_salto.visible = (paso_actual == Paso.PASO_2_SALTO)
+	if paso3_plancha_dive != null:
+		paso3_plancha_dive.visible = (paso_actual == Paso.PASO_3_PLANCHA_DIVE)
+	if paso4_sprint != null:
+		paso4_sprint.visible = (paso_actual == Paso.PASO_4_SPRINT)
 
-	# Forzar ajuste de centrado
 	if contenedor != null:
 		call_deferred("_centrar_contenedor")
 
@@ -516,7 +523,8 @@ func _on_icono_raton_draw() -> void:
 		return
 
 	var pos = icono_raton.size * 0.5
-	var col: Color = color_activo if (_raton_activo or _flash_unisono) else Color(0.70, 0.78, 0.88, 0.85)
+	var iluminado = _raton_registrado or _raton_activo or _flash_unisono
+	var col: Color = color_activo if iluminado else Color(0.70, 0.78, 0.88, 0.85)
 
 	# Cuerpo del ratón
 	var r_cuerpo = Rect2(pos.x - 5, pos.y - 7, 10, 14)
