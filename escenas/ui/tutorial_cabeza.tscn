@@ -91,9 +91,11 @@ layout_mode = 2
 [node name="ContenedorRaton" type="HBoxContainer" parent="Contenedor/Paso1_Movimiento" unique_id=284159327]
 layout_mode = 2
 
-[node name="IconoRaton" type="Control" parent="Contenedor/Paso1_Movimiento/ContenedorRaton" unique_id=2019300054]
-custom_minimum_size = Vector2(20, 20)
+[node name="IconoRaton" type="TextureRect" parent="Contenedor/Paso1_Movimiento/ContenedorRaton" unique_id=597900750]
+custom_minimum_size = Vector2(16, 16)
 layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
 
 [node name="LabelOrientar" type="Label" parent="Contenedor/Paso1_Movimiento/ContenedorRaton" unique_id=631803650]
 layout_mode = 2
@@ -132,10 +134,12 @@ layout_mode = 2
 text = "Correr"
 
 [node name="Paso3_PlanchaDive" type="HBoxContainer" parent="Contenedor" unique_id=472478106]
+visible = false
 layout_mode = 2
 
 [node name="BadgeEspacioDive" type="PanelContainer" parent="Contenedor/Paso3_PlanchaDive" unique_id=2060635851]
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_6aqmr")
 
 [node name="LabelEspacioDive" type="Label" parent="Contenedor/Paso3_PlanchaDive/BadgeEspacioDive" unique_id=1259635041]
 layout_mode = 2

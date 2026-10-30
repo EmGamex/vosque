@@ -24,6 +24,7 @@ static var tutorial_visto: bool = false
 @export var color_activo: Color = Color("#4ade80")
 @export var color_inactivo: Color = Color(0.85, 0.90, 0.95, 0.90)
 @export var color_acento_dorado: Color = Color("#fbbf24")
+@export var textura_raton: Texture2D = preload("res://icon.svg")
 
 var paso_actual: Paso = Paso.PASO_1_MOVIMIENTO
 
@@ -39,7 +40,7 @@ var paso_actual: Paso = Paso.PASO_1_MOVIMIENTO
 @onready var badge_s: PanelContainer = get_node_or_null("Contenedor/Paso1_Movimiento/ContenedorWASD/BadgeS") as PanelContainer
 @onready var badge_d: PanelContainer = get_node_or_null("Contenedor/Paso1_Movimiento/ContenedorWASD/BadgeD") as PanelContainer
 
-@onready var icono_raton: Control = get_node_or_null("Contenedor/Paso1_Movimiento/ContenedorRaton/IconoRaton") as Control
+@onready var icono_raton: TextureRect = get_node_or_null("Contenedor/Paso1_Movimiento/ContenedorRaton/IconoRaton") as TextureRect
 @onready var label_orientar: Label = get_node_or_null("Contenedor/Paso1_Movimiento/ContenedorRaton/LabelOrientar") as Label
 
 @onready var badge_espacio: PanelContainer = get_node_or_null("Contenedor/Paso2_SaltoDive/BadgeEspacio") as PanelContainer
@@ -111,8 +112,8 @@ func _ready() -> void:
 	_conectar_padre()
 	_conectar_director_juego()
 
-	if icono_raton != null and not icono_raton.draw.is_connected(_on_icono_raton_draw):
-		icono_raton.draw.connect(_on_icono_raton_draw)
+	if icono_raton != null and textura_raton != null:
+		icono_raton.texture = textura_raton
 
 	_actualizar_visibilidad_pasos()
 
@@ -316,10 +317,10 @@ func _aplicar_estilo_badge(badge: PanelContainer, activo: bool, color_override: 
 
 
 func _actualizar_estilo_raton() -> void:
+	var iluminado = _raton_registrado or _raton_activo or _flash_unisono
 	if icono_raton != null:
-		icono_raton.queue_redraw()
+		icono_raton.modulate = color_activo if iluminado else color_inactivo
 	if label_orientar != null:
-		var iluminado = _raton_registrado or _raton_activo
 		label_orientar.add_theme_color_override("font_color", color_activo if iluminado else color_inactivo)
 
 
@@ -514,45 +515,4 @@ func forzar_salida_nota() -> void:
 		queue_free()
 
 
-# -----------------------------------------------------------------------------
-# DIBUJADO PROCEDURAL DEL GLIFO DE RATÓN
-# -----------------------------------------------------------------------------
 
-func _on_icono_raton_draw() -> void:
-	if icono_raton == null:
-		return
-
-	var pos = icono_raton.size * 0.5
-	var iluminado = _raton_registrado or _raton_activo or _flash_unisono
-	var col: Color = color_activo if iluminado else Color(0.70, 0.78, 0.88, 0.85)
-
-	# Cuerpo del ratón
-	var r_cuerpo = Rect2(pos.x - 5, pos.y - 7, 10, 14)
-	var sb_raton = StyleBoxFlat.new()
-	sb_raton.bg_color = Color(0.14, 0.18, 0.25, 0.90)
-	sb_raton.border_color = col
-	sb_raton.set_border_width_all(1)
-	sb_raton.corner_radius_top_left = 4
-	sb_raton.corner_radius_top_right = 4
-	sb_raton.corner_radius_bottom_left = 3
-	sb_raton.corner_radius_bottom_right = 3
-	icono_raton.draw_style_box(sb_raton, r_cuerpo)
-
-	# Divisor de botones
-	icono_raton.draw_line(Vector2(pos.x, pos.y - 7), Vector2(pos.x, pos.y - 2), col, 1.0)
-
-	# Flechas radiales sutiles
-	var dist: float = 9.0
-	var tam: float = 2.0
-	# Arriba
-	icono_raton.draw_line(Vector2(pos.x, pos.y - dist), Vector2(pos.x - tam, pos.y - dist + tam), col, 1.0)
-	icono_raton.draw_line(Vector2(pos.x, pos.y - dist), Vector2(pos.x + tam, pos.y - dist + tam), col, 1.0)
-	# Abajo
-	icono_raton.draw_line(Vector2(pos.x, pos.y + dist), Vector2(pos.x - tam, pos.y + dist - tam), col, 1.0)
-	icono_raton.draw_line(Vector2(pos.x, pos.y + dist), Vector2(pos.x + tam, pos.y + dist - tam), col, 1.0)
-	# Izquierda
-	icono_raton.draw_line(Vector2(pos.x - dist, pos.y), Vector2(pos.x - dist + tam, pos.y - tam), col, 1.0)
-	icono_raton.draw_line(Vector2(pos.x - dist, pos.y), Vector2(pos.x - dist + tam, pos.y + tam), col, 1.0)
-	# Derecha
-	icono_raton.draw_line(Vector2(pos.x + dist, pos.y), Vector2(pos.x + dist - tam, pos.y - tam), col, 1.0)
-	icono_raton.draw_line(Vector2(pos.x + dist, pos.y), Vector2(pos.x + dist - tam, pos.y + tam), col, 1.0)
