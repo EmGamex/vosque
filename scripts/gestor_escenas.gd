@@ -1,3 +1,4 @@
+@tool
 class_name GestorDeEscenas
 extends Node
 
@@ -80,20 +81,17 @@ func _registrar_pantallas() -> void:
 
 ## Conecta las señales de las pantallas hijas hacia los métodos del orquestador.
 func _conectar_senales_pantalla(pantalla: Node) -> void:
-	if pantalla.has_signal("jugar_solicitado"):
-		var sig_jugar: Signal = pantalla.get("jugar_solicitado")
-		if not sig_jugar.is_connected(_on_jugar_solicitado):
-			sig_jugar.connect(_on_jugar_solicitado)
+	if pantalla.has_user_signal("jugar_solicitado") or pantalla.has_signal("jugar_solicitado"):
+		if not pantalla.is_connected("jugar_solicitado", _on_jugar_solicitado):
+			pantalla.connect("jugar_solicitado", _on_jugar_solicitado)
 
-	if pantalla.has_signal("reintentar_solicitado"):
-		var sig_reintentar: Signal = pantalla.get("reintentar_solicitado")
-		if not sig_reintentar.is_connected(_on_jugar_solicitado):
-			sig_reintentar.connect(_on_jugar_solicitado)
+	if pantalla.has_user_signal("reintentar_solicitado") or pantalla.has_signal("reintentar_solicitado"):
+		if not pantalla.is_connected("reintentar_solicitado", _on_jugar_solicitado):
+			pantalla.connect("reintentar_solicitado", _on_jugar_solicitado)
 
-	if pantalla.has_signal("menu_solicitado"):
-		var sig_menu: Signal = pantalla.get("menu_solicitado")
-		if not sig_menu.is_connected(_on_menu_solicitado):
-			sig_menu.connect(_on_menu_solicitado)
+	if pantalla.has_user_signal("menu_solicitado") or pantalla.has_signal("menu_solicitado"):
+		if not pantalla.is_connected("menu_solicitado", _on_menu_solicitado):
+			pantalla.connect("menu_solicitado", _on_menu_solicitado)
 
 
 func _on_jugar_solicitado() -> void:
@@ -116,9 +114,18 @@ func _activar(ruta: String) -> void:
 		hijo.visible = activa
 		hijo.process_mode = Node.PROCESS_MODE_INHERIT if activa else Node.PROCESS_MODE_DISABLED
 		_fijar_camaras(hijo, activa)
+		_fijar_canvas_layers(hijo, activa)
 	_ruta_actual = ruta
 	if pantalla.has_method("enfocar"):
 		pantalla.call_deferred("enfocar")
+
+
+## Enciende o apaga CanvasLayers anidados dentro de una pantalla (ej. HUD en Maain).
+func _fijar_canvas_layers(raiz: Node, activa: bool) -> void:
+	if raiz is CanvasLayer and raiz.name != "Transicion":
+		(raiz as CanvasLayer).visible = activa
+	for hijo in raiz.get_children():
+		_fijar_canvas_layers(hijo, activa)
 
 
 ## Devuelve la instancia de una pantalla, creándola si hace falta.

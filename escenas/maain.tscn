@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://b1eu583e554ay" path="res://escenas/camara.tscn" id="2_avuvp"]
 [ext_resource type="PackedScene" uid="uid://b74g6q4tcthym" path="res://escenas/debug_menu.tscn" id="4_kcfdb"]
 [ext_resource type="PackedScene" uid="uid://cdg7eeqnykjnu" path="res://escenas/enemigo.tscn" id="5_vhdvh"]
+[ext_resource type="PackedScene" uid="uid://dm42uepd8qqc0" path="res://escenas/hud.tscn" id="7_rsede"]
 
 [node name="Maain" type="Node2D" unique_id=1472011216]
 script = ExtResource("1_x2pqb")
@@ -22,7 +23,6 @@ objetivo_enemigo = NodePath("../Enemigo")
 process_mode = 4
 visible = false
 position = Vector2(-99999, -99999)
-motion_mode = 1
 objetivo = NodePath("../personaje")
 
 [node name="DebugMenu" parent="." unique_id=85566436 node_paths=PackedStringArray("target_character", "target_enemigo", "target_camara", "target_camara_dios", "target_escenario") instance=ExtResource("4_kcfdb")]
@@ -35,3 +35,5 @@ target_escenario = NodePath("../Escenario")
 [node name="CamaraDios" type="Camera2D" parent="." unique_id=854112470 groups=["camaras_debug"]]
 enabled = false
 zoom = Vector2(0.225, 0.225)
+
+[node name="HUD" parent="." unique_id=1856511085 instance=ExtResource("7_rsede")]

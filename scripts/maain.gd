@@ -18,6 +18,7 @@ const DISTANCIA_SEGURA_MONSTRUO_DEFECTO: float = 800.0
 @onready var escenario: Escenario = get_node_or_null("Escenario") as Escenario
 @onready var jugador: Node2D = get_node_or_null("personaje") as Node2D
 @onready var enemigo: Enemigo = get_node_or_null("Enemigo") as Enemigo
+@onready var hud: HUD = get_node_or_null("HUD") as HUD
 
 var nota_activa: Nota = null
 var notas_recolectadas: int = 0
@@ -28,9 +29,19 @@ func _ready() -> void:
 		return
 	_resolver_referencias()
 	_conectar_senales_escenario()
+	if not visibility_changed.is_connected(_on_visibility_changed):
+		visibility_changed.connect(_on_visibility_changed)
+	_on_visibility_changed()
+	if hud != null and is_instance_valid(hud):
+		hud.actualizar_contador(notas_recolectadas, false)
 	if enemigo != null and is_instance_valid(enemigo):
 		enemigo.hibernar()
 	call_deferred("spawn_nota_inicial")
+
+
+func _on_visibility_changed() -> void:
+	if hud != null and is_instance_valid(hud):
+		hud.visible = is_visible_in_tree()
 
 
 func _resolver_referencias() -> void:
@@ -42,6 +53,8 @@ func _resolver_referencias() -> void:
 			jugador = get_node_or_null("EmGamex") as Node2D
 	if enemigo == null:
 		enemigo = get_node_or_null("Enemigo") as Enemigo
+	if hud == null:
+		hud = get_node_or_null("HUD") as HUD
 
 
 func _conectar_senales_escenario() -> void:
@@ -134,6 +147,9 @@ func _on_nota_recolectada(pos_nota: Vector2) -> void:
 	nota_recogida.emit(pos_nota, notas_recolectadas)
 
 	_resolver_referencias()
+	if hud != null and is_instance_valid(hud):
+		hud.actualizar_contador(notas_recolectadas, true)
+
 	if enemigo != null and is_instance_valid(enemigo):
 		if notas_recolectadas == 1:
 			despertar_monstruo()

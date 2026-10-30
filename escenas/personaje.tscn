@@ -10,6 +10,7 @@
 [ext_resource type="Script" uid="uid://c1t6h1dv5pmy0" path="res://scripts/controlador_linterna.gd" id="8_kmopf"]
 [ext_resource type="Resource" uid="uid://cqqirq3y7pg12" path="res://recursos/iluminacion/config_iluminacion_defecto.tres" id="9_8xrj8"]
 [ext_resource type="Texture2D" uid="uid://b8duj3viyr6eg" path="res://recursos/iluminacion/textura_halo_corporal.tres" id="11_41mom"]
+[ext_resource type="PackedScene" uid="uid://bosn1xlpgwiqr" path="res://escenas/ui/indicador_estamina.tscn" id="11_kmopf"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_5nfxw"]
 radius = 32.0
@@ -111,13 +112,18 @@ config = ExtResource("9_8xrj8")
 
 [node name="LinternaFrontal" type="PointLight2D" parent="PivoteLinterna" unique_id=956915416]
 position = Vector2(96, 0)
-color = Color(1, 0.9607843, 0.8784314, 1)
+color = Color(1, 0.96, 0.88, 1)
 energy = 1.2
 offset = Vector2(256, 0)
 texture_scale = 1.3671875
 
 [node name="HaloCorporal" type="PointLight2D" parent="PivoteLinterna" unique_id=1792487907]
-color = Color(0.8, 0.8509804, 1, 1)
+color = Color(0.8, 0.85, 1, 1)
 energy = 0.5
 texture = ExtResource("11_41mom")
-texture_scale = 1.09
+texture_scale = 1.09375
+
+[node name="IndicadorEstamina" parent="." unique_id=21503489 instance=ExtResource("11_kmopf")]
+modulate = Color(1, 1, 1, 0)
+z_index = 2
+position = Vector2(0, -60)
