@@ -153,10 +153,15 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
   - [ ] Cierre automático con `Tween` al completar o al recoger la Nota 1.
 - [x] **Indicador Diegético de Estamina (`escenas/ui/indicador_estamina.tscn`):** Anillo procedural con `_draw()` anclado sobre la cabeza del personaje (`Vector2(0, -60)`), invisible en reposo (100%), micro-pop al consumir, titileo carmesí en fatiga y animación elástica de cierre al recargar.
 - [x] **Contador de Notas en HUD (`escenas/hud.tscn`):** `CanvasLayer` (layer 10) con icono estilizado y texto numérico con `Tween` de *Scale Punch* elástico ($1.3 \to 1.0$) y flash reactivo.
-- [ ] **Menú de Pausa Superpuesto (`CanvasLayer`, layer=50):**
-  - [ ] Congelación de la simulación del nodo de partida (`process_mode = PROCESS_MODE_DISABLED`) sin apagar la cámara ni el gestor de escenas.
-  - [ ] Botones estilizados: Continuar, Reiniciar y Menú Principal.
-  - [ ] Apertura/cierre instantáneo con tecla `Escape` o `P`.
+- [ ] **Menú de Pausa Superpuesto (`escenas/menu_pausa.tscn`, `CanvasLayer`, layer=50):**
+  - [ ] Arquitectura híbrida: congelación atómica de simulación, físicas, tweens, partículas y `SceneTreeTimer` mediante `get_tree().paused = true`, manteniendo `GestorEscenas`, `MenuPausa` y `Transicion` con `process_mode = Node.PROCESS_MODE_ALWAYS` y `Maain` con `PROCESS_MODE_PAUSABLE`.
+  - [ ] Contrato desacoplado (*Signal Up*): señales `continuar_solicitado`, `reiniciar_solicitado` y `menu_solicitado`.
+  - [ ] Foco automático diferido en *"Continuar"* al abrir, liberación de foco al cerrar y bandera `_bloqueado` contra dobles clics al transicionar.
+  - [ ] Apertura/cierre instantáneo con acción `pausa` (<kbd>Escape</kbd> / <kbd>P</kbd>) con guardia estricta `puede_pausar()` (bloqueado durante transiciones o fin de partida).
+  - [ ] Salvaguarda anti-salto fantasma al reanudar con <kbd>Espacio</kbd> (`set_deferred("paused", false)` y consumo de input con `set_input_as_handled()`).
+  - [ ] Auto-pausa por pérdida de foco en navegadores Web (`NOTIFICATION_APPLICATION_FOCUS_OUT`).
+  - [ ] Precedencia con Menú de Depuración (<kbd>Escape</kbd> cierra primero `DebugMenu` si está completo).
+  - [ ] Suite de pruebas automatizadas `tests/test_menu_pausa.gd`.
 - [ ] **Pantalla de Game Over:** Sacudida súbita de cámara, destello rojo, ilustración de jumpscare y comparativa de notas recogidas vs High Score.
 
 ---

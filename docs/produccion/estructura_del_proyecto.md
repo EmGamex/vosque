@@ -27,15 +27,20 @@ c:/Proyectos/vosque/
 │   ├── obstaculos/             # Prefabs de colisión del mundo (arbol.tscn, roca.tscn, tronco_bajo.tscn)
 │   ├── sectores/               # Infraestructura modular de cuadrantes
 │   │   └── variantes/          # Sub-escenas de variantes 2160x2160 (variante_bosque_denso.tscn, etc.)
-│   ├── ui/                     # Menús e interfaz (menu_inicio.tscn, menu_pausa.tscn, hud.tscn, game_over.tscn)
+│   ├── ui/                     # Componentes específicos de UI (indicador_estamina.tscn)
 │   ├── camara.tscn             # Cámara 2D con suavizado y trauma shake
 │   ├── debug_menu.tscn         # Menú unificado de depuración in-game (F3)
 │   ├── enemigo.tscn            # Criatura perseguidora
 │   ├── escenario.tscn          # Arena 2x2, valla perimetral y orquestador de mutación
+│   ├── game_over.tscn          # Pantalla de derrota y estadísticas
 │   ├── gestor_escenas.tscn     # Escena raíz principal con transiciones entre pantallas
+│   ├── hud.tscn                # HUD in-game (contador de notas y alertas)
 │   ├── maain.tscn              # Escena del mundo activo (Game Director)
+│   ├── menu_inicio.tscn        # Menú principal diegético en primera persona
+│   ├── menu_pausa.tscn         # Menú de pausa superpuesto (CanvasLayer 50)
 │   ├── nota.tscn               # Coleccionable arcade baliza
-│   └── personaje.tscn          # Protagonista
+│   ├── personaje.tscn          # Protagonista
+│   └── transicion.tscn         # Transición con shader de iris / viñeta (CanvasLayer 100)
 ├── graficos/                   # Texturas y sprites importados (.png / .jpg)
 │   ├── bocetos/                # Graybox y bocetos provisionales de prototipado
 │   ├── criatura/               # Sprites finales de la criatura cenital y ojos
@@ -73,6 +78,7 @@ c:/Proyectos/vosque/
 │   ├── test_debug_menu.gd      # Pruebas de menú de depuración F3
 │   ├── test_escenario.gd       # Pruebas de escenario y mutación
 │   ├── test_menu_inicio.gd     # Pruebas de navegación cíclica, parallax relativo y señales de menú
+│   ├── test_menu_pausa.gd      # Pruebas de menú de pausa superpuesto, señales y congelación
 │   ├── test_nota.gd            # Pruebas de baliza luminosa y protocolo de nota
 │   └── test_spawner.gd         # Pruebas del algoritmo de spawner espacial
 ├── export_presets.cfg          # Configuración de exportación (WebGL Compatibility, threads=false)

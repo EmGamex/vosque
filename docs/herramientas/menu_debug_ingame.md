@@ -37,7 +37,7 @@ El acceso al menú se gestiona mediante pulsaciones sucesivas de <kbd>F3</kbd>:
 | **3. Menú Completo** | Panel modular con pestañas interactivas, botones de acción rápida, sliders y controles de diagnóstico visual (`_draw`). | Pruebas de mutación espacial, forzado de estados de IA, análisis de colisiones y cheats. |
 
 > [!TIP]
-> Dentro del **Menú Completo**, el selector `[x] Pausar Simulación` permite pausar el árbol del juego (`get_tree().paused = true`) para inspeccionar valores estáticos en un frame determinado.
+> Dentro del **Menú Completo**, el selector `[x] Pausar Simulación` comparte la misma fuente de verdad que el sistema de pausa in-game (`get_tree().paused = true`), garantizando que la congelación sea coherente. Asimismo, cuando el Menú Completo de debug está abierto, presionar <kbd>Escape</kbd> lo cierra a `ModoVisual.OCULTO` y consume el evento (`set_input_as_handled()`), evitando desplegar accidentalmente el `MenuPausa` del juego.
 
 ---
 

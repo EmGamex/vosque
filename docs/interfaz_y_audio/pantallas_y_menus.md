@@ -90,23 +90,39 @@ Para eliminar la monotonía visual del cielo nocturno tanto en espera como en el
 
 ---
 
-## 2. Menú de Pausa In-Game (`menu_pausa.gd`)
+## 2. Menú de Pausa In-Game (`escenas/menu_pausa.tscn` / `scripts/menu_pausa.gd`)
 
-El menú de pausa permite interrumpir temporalmente la sesión de juego sin perder el estado actual ni romper la inmersión visual.
+El menú de pausa permite interrumpir temporalmente la sesión de juego sin perder el estado actual ni romper la inmersión visual. Se implementa como una capa de interfaz desacoplada sobre `GestorEscenas` mediante un `CanvasLayer` con prioridad `layer = 50` (situado sobre el `HUD` con `layer = 10` y `EfectoNieblaMutacion` con `layer = 15`, pero por debajo de `Transicion` y `DebugMenu` con `layer = 100`).
 
 ### 2.1. Estética y Comportamiento Visual
 * **Superposición translúcida:** Un fondo oscuro semitransparente (`ColorRect` en `Color(0, 0, 0, 0.65)`) cubre la pantalla.
 * **Fondo congelado:** El bosque, el personaje y la criatura permanecen visibles bajo el velo en la posición exacta donde se pausó, y la `Camera2D` del personaje sigue centrando la vista en el viewport.
-* **Congelación de simulación:** Se desactivan las físicas (`_physics_process`), el movimiento de personajes, enemigos y temporizadores de notas.
+* **Congelación total del mundo (`SceneTree.paused = true`):** Se desactivan de manera atómica las físicas (`_physics_process`), el movimiento de personajes, enemigos, tweens del juego, partículas `CPUParticles2D`, audio 2D posicional y todos los `SceneTreeTimer` de notas y mutación de niebla.
+* **UI y transiciones inmunes (`PROCESS_MODE_ALWAYS`):** El nodo raíz del menú de pausa opera con `process_mode = PROCESS_MODE_ALWAYS`, permitiendo interactuar con el menú, mover el foco con teclado/mando y procesar clics sin importar que el árbol esté pausado.
 
-### 2.2. Opciones y Flujo de Interacción
+### 2.2. Contrato de Señales y Métodos Públicos
+Siguiendo el patrón *Signal Up, Call Down*:
+* **Señales emitidas:**
+  - `signal continuar_solicitado`: El jugador solicita reanudar la partida.
+  - `signal reiniciar_solicitado`: El jugador solicita recrear la partida desde cero.
+  - `signal menu_solicitado`: El jugador solicita volver al menú principal.
+* **Métodos públicos:**
+  - `func mostrar() -> void`: Hace visible el menú, reinicia la bandera `_bloqueado = false`, habilita los botones y otorga foco diferido (`call_deferred("grab_focus")`) al botón *"Continuar"*.
+  - `func ocultar() -> void`: Libera el foco (`release_focus()`) y oculta la capa.
+  - `func ocultar_inmediato() -> void`: Limpieza forzada instantánea usada por `GestorDeEscenas.ir_a()` durante transiciones.
+
+### 2.3. Opciones, Flujo de Interacción y Salvaguardas
 1. **Continuar:**
    - Cierra la superposición de pausa de inmediato (sin fundido a negro) y restaura la simulación.
-   - Recibe el foco automático (`grab_focus()`) al abrir el menú de pausa para reanudación instantánea con <kbd>Espacio</kbd>, <kbd>Enter</kbd> o pulsando nuevamente <kbd>Escape</kbd>.
+   - Recibe el foco automático diferido al abrir el menú de pausa para reanudación instantánea con <kbd>Espacio</kbd>, <kbd>Enter</kbd> o pulsando nuevamente la acción `pausa` (<kbd>Escape</kbd> / <kbd>P</kbd>).
+   - **Salvaguarda Anti-Salto Fantasma:** Al pulsar <kbd>Espacio</kbd> en *"Continuar"*, el input se marca como consumido (`get_viewport().set_input_as_handled()`) y la despausa se aplica con `set_deferred("paused", false)` para que el personaje no salte ni consuma estamina en el mismo fotograma de salida.
+   - **Salvaguarda de Linterna:** Al cerrar el menú, se limpia o ignora el movimiento relativo del ratón acumulado durante la pausa para que la linterna frontal no dé un latigazo hacia la posición del botón.
 2. **Reiniciar Partida:**
-   - Oculta el menú de pausa, ejecuta un fundido a negro vía `GestorDeEscenas.iniciar_partida()` y recrea la pantalla de juego (`maain.tscn`) desde cero.
+   - Activa `_bloqueado = true` para impedir pulsaciones repetidas, oculta el menú de pausa y emite `reiniciar_solicitado`.
+   - `GestorDeEscenas` ejecuta un fundido a negro vía `iniciar_partida()` y recrea la pantalla de juego (`maain.tscn`) desde cero, restableciendo `get_tree().paused = false`.
 3. **Menú Principal:**
-   - Oculta el menú de pausa, ejecuta un fundido a negro vía `GestorDeEscenas.volver_al_menu()` y transiciona a `menu_inicio.tscn`.
+   - Activa `_bloqueado = true`, oculta el menú de pausa y emite `menu_solicitado`.
+   - `GestorDeEscenas` ejecuta un fundido a negro vía `volver_al_menu()`, transicionando a `menu_inicio.tscn` y restableciendo `get_tree().paused = false`.
 
 ---
 

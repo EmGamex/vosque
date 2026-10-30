@@ -45,7 +45,37 @@ Procedimiento para validar que la mutación nunca atrape al monstruo dentro de u
 
 ---
 
-## 4. Checklist de Validación en Navegador Web (HTML5)
+## 4. Protocolo de Validación y Estrés del Sistema de Pausa (Issue #17)
+
+Procedimiento para certificar que el menú de pausa superpuesto no introduce bugs de temporizadores, estados fantasma ni desincronización:
+
+1. **Prueba de Congelación de `SceneTreeTimer` (Niebla y Mutación):**
+   - Recoger una nota para iniciar la mutación.
+   - En el instante en que la pantalla se cubre por niebla (`Fase.CEGUERA`), presionar inmediatamente <kbd>Escape</kbd> o <kbd>P</kbd>.
+   - Esperar 5 a 10 segundos con el menú de pausa abierto.
+   - ✅ **Confirmar:** La pausa de oscuridad ($0.4\text{ s}$) **no** se consume en segundo plano. Al pulsar *"Continuar"*, la niebla completa exactamente el tiempo de ceguera restante y abre con fluidez.
+2. **Prueba Anti-Salto Fantasma (<kbd>Espacio</kbd>):**
+   - Iniciar partida con estamina al 100%.
+   - Pausar el juego mediante <kbd>Escape</kbd> o <kbd>P</kbd>.
+   - Presionar <kbd>Espacio</kbd> para activar el botón enfocado *"Continuar"*.
+   - ✅ **Confirmar:** El menú se cierra y el personaje reanuda en suelo sin ejecutar un salto involuntario ni gastar $-20\text{ pts}$ de estamina.
+3. **Prueba de Invariante de Transición y Muerte:**
+   - Durante el fundido de iris al iniciar partida o reiniciar, pulsar repetidamente <kbd>Escape</kbd>.
+   - ✅ **Confirmar:** La guardia `puede_pausar()` ignora la entrada mientras `_cambiando == true`.
+   - Permitir que el monstruo capture al jugador y presionar <kbd>Escape</kbd> simultáneamente.
+   - ✅ **Confirmar:** La pantalla de Game Over transiciona limpiamente sin dejar el menú de pausa flotando encima.
+4. **Prueba de Precedencia con Menú de Debug (<kbd>F3</kbd>):**
+   - Presionar <kbd>F3</kbd> dos veces hasta abrir el Menú Completo de depuración.
+   - Presionar <kbd>Escape</kbd>.
+   - ✅ **Confirmar:** El Menú Completo se oculta inmediatamente y el input queda consumido, **sin abrir** el menú de pausa del juego.
+5. **Prueba de Auto-Pausa por Pérdida de Foco en Navegador:**
+   - Ejecutar el juego en ventana o navegador.
+   - Pinchar fuera de la ventana del juego o cambiar a otra pestaña.
+   - ✅ **Confirmar:** `GestorDeEscenas` intercepta `NOTIFICATION_APPLICATION_FOCUS_OUT` y despliega automáticamente el `MenuPausa`.
+
+---
+
+## 5. Checklist de Validación en Navegador Web (HTML5)
 
 Antes de publicar cualquier actualización en itch.io o Newgrounds:
 * [ ] **Captura de Teclas:** Verificar que presionar <kbd>Espacio</kbd>, flechas o <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> no haga scroll en la página web del navegador (`get_viewport().set_input_as_handled()`).
