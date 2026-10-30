@@ -47,6 +47,7 @@ func test_paso_1_deteccion_movimiento() -> void:
 	assert_eq(tut.paso_actual, TutorialCabeza.Paso.PASO_1_MOVIMIENTO, "Aún no debe avanzar con solo 3 direcciones")
 
 	tut._d_registrado = true
+	tut._tiempo_en_paso_actual = 0.6
 	tut._procesar_paso_1(0.016)
 	assert_eq(tut.paso_actual, TutorialCabeza.Paso.PASO_2_SALTO_DIVE, "Debe avanzar a PASO_2_SALTO_DIVE al registrar las 4 direcciones")
 
@@ -57,9 +58,13 @@ func test_paso_1_desplazamiento_sostenido() -> void:
 	var tut: TutorialCabeza = _crear_tutorial()
 	tut._ready()
 
-	tut._tiempo_desplazamiento = 0.85
+	tut._w_registrado = true
+	tut._a_registrado = true
+	tut._s_registrado = true
+	tut._d_registrado = true
+	tut._tiempo_desplazamiento = 1.2
 	tut._procesar_paso_1(0.016)
-	assert_eq(tut.paso_actual, TutorialCabeza.Paso.PASO_2_SALTO_DIVE, "Debe avanzar a PASO_2_SALTO_DIVE por desplazamiento sostenido >= 0.8s")
+	assert_eq(tut.paso_actual, TutorialCabeza.Paso.PASO_2_SALTO_DIVE, "Debe avanzar a PASO_2_SALTO_DIVE por desplazamiento sostenido")
 
 	tut.free()
 
@@ -97,12 +102,17 @@ func test_paso_2_salto_regular_convalidado_al_aterrizar() -> void:
 	tut._ready()
 	tut.paso_actual = TutorialCabeza.Paso.PASO_2_SALTO_DIVE
 
-	# Salto
+	# Primer salto sin dive
 	tut._on_padre_estado_cambiado(4, "SALTO")
-	# Aterriza en suelo (REPOSO = 0) sin haber pulsado dive
+	tut._on_padre_estado_cambiado(0, "REPOSO")
+	# Sigue en Paso 2 para dar oportunidad de hacer dive
+	assert_eq(tut.paso_actual, TutorialCabeza.Paso.PASO_2_SALTO_DIVE, "Un solo salto sin dive no salta el paso inmediatamente")
+
+	# Segundo salto sin dive o tras tiempo prudencial
+	tut._on_padre_estado_cambiado(4, "SALTO")
 	tut._on_padre_estado_cambiado(0, "REPOSO")
 
-	assert_eq(tut.paso_actual, TutorialCabeza.Paso.PASO_3_SPRINT, "Al tocar suelo el salto regular se convalida y pasa a Paso 3")
+	assert_eq(tut.paso_actual, TutorialCabeza.Paso.PASO_3_SPRINT, "Tras el segundo salto se convalida y pasa a Paso 3")
 	assert_false(tut._en_el_aire, "Ya no debe estar en el aire")
 
 	tut.free()

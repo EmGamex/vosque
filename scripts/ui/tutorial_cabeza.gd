@@ -62,11 +62,13 @@ var _s_registrado: bool = false
 var _d_registrado: bool = false
 var _tiempo_desplazamiento: float = 0.0
 var _tiempo_iluminacion_raton: float = 0.0
+var _tiempo_en_paso_actual: float = 0.0
 
 # Paso 2 - Contextual
 var _en_el_aire: bool = false
 var _dive_realizado: bool = false
 var _salto_en_curso: bool = false
+var _saltos_realizados: int = 0
 
 # Animaciones / Tweens
 var _flash_unisono: bool = false
@@ -217,6 +219,7 @@ func _physics_process(delta: float) -> void:
 	if Engine.is_editor_hint() or _cerrando:
 		return
 
+	_tiempo_en_paso_actual += delta
 	_actualizar_entradas(delta)
 	_verificar_fast_path()
 
@@ -308,11 +311,12 @@ func _verificar_fast_path() -> void:
 	if paso_actual != Paso.PASO_1_MOVIMIENTO:
 		return
 
+	# Solo permitir Fast-Path si el jugador deliberadamente corre a toda velocidad
+	# o combina sprint con movimiento apenas inicia (veterano que no necesita el tutorial)
 	var hay_movimiento: bool = _tecla_w_activa or _tecla_a_activa or _tecla_s_activa or _tecla_d_activa
 	var sprint_combinado: bool = _tecla_shift_activa and hay_movimiento
-	var salto_directo: bool = Input.is_action_just_pressed("personaje-salto")
 
-	if sprint_combinado or salto_directo:
+	if sprint_combinado:
 		ejecutar_fast_path()
 
 
@@ -351,8 +355,10 @@ func _procesar_paso_1(delta: float) -> void:
 		if padre.velocity.length() > 30.0:
 			_tiempo_desplazamiento += delta
 
+	# Requiere que el jugador realmente haya probado las 4 teclas WASD
+	# Y además un mínimo de tiempo en el paso para que no parpadee ni se salte sin asimilarlo
 	var todas_pulsadas: bool = _w_registrado and _a_registrado and _s_registrado and _d_registrado
-	if todas_pulsadas or _tiempo_desplazamiento >= 0.8:
+	if todas_pulsadas and (_tiempo_en_paso_actual >= 0.5 or _tiempo_desplazamiento >= 1.0):
 		_avanzar_paso(Paso.PASO_2_SALTO_DIVE)
 
 
@@ -386,9 +392,18 @@ func _on_padre_estado_cambiado(nuevo_estado: int, _nombre_estado: String) -> voi
 		if _salto_en_curso:
 			_salto_en_curso = false
 			_en_el_aire = false
+			_saltos_realizados += 1
 			_actualizar_texto_salto()
 			if paso_actual == Paso.PASO_2_SALTO_DIVE:
-				_avanzar_paso(Paso.PASO_3_SPRINT)
+				# Si ya realizó la plancha o hizo al menos un salto donde vio la transición,
+				# dejamos que asimile o avanzamos
+				if _dive_realizado:
+					_avanzar_paso(Paso.PASO_3_SPRINT)
+				else:
+					# Si fue solo un salto sin plancha, dar margen o avanzar al segundo salto
+					# para que el jugador tenga oportunidad de ver y probar la plancha en el aire
+					if _saltos_realizados >= 2 or _tiempo_en_paso_actual >= 2.5:
+						_avanzar_paso(Paso.PASO_3_SPRINT)
 		elif _en_el_aire:
 			_en_el_aire = false
 			_actualizar_texto_salto()
@@ -420,6 +435,7 @@ func _avanzar_paso(siguiente_paso: Paso) -> void:
 	if _cerrando:
 		return
 	paso_actual = siguiente_paso
+	_tiempo_en_paso_actual = 0.0
 	_actualizar_visibilidad_pasos()
 	paso_cambiado.emit(paso_actual)
 
