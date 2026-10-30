@@ -76,6 +76,38 @@ func test_mostrar_y_ocultar() -> void:
 	menu.free()
 
 
+func test_navegacion_inputs_personaje() -> void:
+	var menu: MenuPausa = _crear_instancia_menu()
+	menu._ready()
+	menu.mostrar()
+
+	assert_eq(menu.get("_indice_foco"), 0, "El índice inicial de foco debe ser 0 (Continuar)")
+
+	# 1. Navegar abajo con personaje-abajo
+	menu._navegar_vertical(1)
+	assert_eq(menu.get("_indice_foco"), 1, "Debe pasar al índice 1 (Reiniciar)")
+
+	# 2. Navegar abajo de nuevo
+	menu._navegar_vertical(1)
+	assert_eq(menu.get("_indice_foco"), 2, "Debe pasar al índice 2 (Menú Principal)")
+
+	# 3. Navegación cíclica abajo
+	menu._navegar_vertical(1)
+	assert_eq(menu.get("_indice_foco"), 0, "Debe volver cíclicamente al índice 0 (Continuar)")
+
+	# 4. Navegación cíclica arriba con personaje-arriba
+	menu._navegar_vertical(-1)
+	assert_eq(menu.get("_indice_foco"), 2, "Debe ir cíclicamente al índice 2 (Menú Principal)")
+
+	# 5. Confirmar opción con personaje-salto
+	var emitio_menu: Array = [false]
+	menu.menu_solicitado.connect(func(): emitio_menu[0] = true)
+	menu._activar_boton_actual()
+	assert_true(emitio_menu[0], "Al activar la opción actual debe dispararse la señal del botón enfocado")
+
+	menu.free()
+
+
 func test_senales_menu_pausa() -> void:
 	var menu: MenuPausa = _crear_instancia_menu()
 	menu._ready()
