@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dm42uepd8qqc0"]
 
-[ext_resource type="Script" uid="uid://bbcgmbpmn453o" path="res://scripts/hud.gd" id="1_0sskl"]
+[ext_resource type="Script" uid="uid://dny1ysj1ge1m3" path="res://scripts/hud.gd" id="1_0sskl"]
 [ext_resource type="Texture2D" uid="uid://cfsys4vyiwpya" path="res://graficos/coleccionable_nota.svg" id="2_hrvm2"]
 [ext_resource type="FontVariation" uid="uid://0htusin8b5jm" path="res://fuentes/raleway_bold.tres" id="3_8qmdo"]
 

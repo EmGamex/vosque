@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://dte8iac0uavl"]
+
+[ext_resource type="Script" uid="uid://d2ycpgr6yvv4v" path="res://scripts/ui/tutorial_cabeza.gd" id="1_tq8vd"]
+
+[node name="TutorialCabeza" type="Node2D" unique_id=1460520052]
+z_index = 3
+script = ExtResource("1_tq8vd")

@@ -280,6 +280,9 @@ func _aplicar_elevacion_eje_z(factor_altura: float) -> void:
 	var indicador = get_node_or_null("IndicadorEstamina")
 	if indicador != null:
 		indicador.position.y = -60.0 - jump_height * factor_altura
+	var tutorial = get_node_or_null("TutorialCabeza")
+	if tutorial != null:
+		tutorial.position.y = -90.0 - jump_height * factor_altura
 
 
 func _restaurar_visuales_eje_z() -> void:
@@ -291,6 +294,9 @@ func _restaurar_visuales_eje_z() -> void:
 	var indicador = get_node_or_null("IndicadorEstamina")
 	if indicador != null:
 		indicador.position = Vector2(0, -60)
+	var tutorial = get_node_or_null("TutorialCabeza")
+	if tutorial != null:
+		tutorial.position = Vector2(0, -90)
 
 
 func _actualizar_procedural_suelo(direction: Vector2, _delta: float) -> void:
