@@ -59,6 +59,8 @@ var _bloquear_salto_un_frame: bool = false
 @onready var _sprite: AnimatedSprite2D = get_node_or_null("Visual/Sprite2D") as AnimatedSprite2D
 @onready var _sombra: Node2D = get_node_or_null("Sombra") as Node2D
 @onready var pivote_linterna: ControladorLinterna = get_node_or_null("PivoteLinterna") as ControladorLinterna
+@onready var _indicador_estamina: Node2D = get_node_or_null("IndicadorEstamina") as Node2D
+@onready var _tutorial_cabeza: Node2D = get_node_or_null("TutorialCabeza") as Node2D
 
 
 func _notification(what: int) -> void:
@@ -277,9 +279,14 @@ func _aplicar_elevacion_eje_z(factor_altura: float) -> void:
 		_visual.position.y = -jump_height * factor_altura
 	if _sombra != null:
 		_sombra.scale = Vector2.ONE.lerp(shadow_min_scale, factor_altura)
-	var indicador = get_node_or_null("IndicadorEstamina")
-	if indicador != null:
-		indicador.position.y = -60.0 - jump_height * factor_altura
+	if _tutorial_cabeza == null:
+		_tutorial_cabeza = get_node_or_null("TutorialCabeza") as Node2D
+	if _indicador_estamina == null:
+		_indicador_estamina = get_node_or_null("IndicadorEstamina") as Node2D
+	if _indicador_estamina != null and is_instance_valid(_indicador_estamina):
+		_indicador_estamina.position.y = -60.0 - jump_height * factor_altura
+	if _tutorial_cabeza != null and is_instance_valid(_tutorial_cabeza):
+		_tutorial_cabeza.position.y = -90.0 - jump_height * factor_altura
 
 
 func _restaurar_visuales_eje_z() -> void:
@@ -288,9 +295,14 @@ func _restaurar_visuales_eje_z() -> void:
 		_visual.rotation = 0.0
 	if _sombra != null:
 		_sombra.scale = Vector2.ONE
-	var indicador = get_node_or_null("IndicadorEstamina")
-	if indicador != null:
-		indicador.position = Vector2(0, -60)
+	if _tutorial_cabeza == null:
+		_tutorial_cabeza = get_node_or_null("TutorialCabeza") as Node2D
+	if _indicador_estamina == null:
+		_indicador_estamina = get_node_or_null("IndicadorEstamina") as Node2D
+	if _indicador_estamina != null and is_instance_valid(_indicador_estamina):
+		_indicador_estamina.position = Vector2(0, -60)
+	if _tutorial_cabeza != null and is_instance_valid(_tutorial_cabeza):
+		_tutorial_cabeza.position = Vector2(0, -90)
 
 
 func _actualizar_procedural_suelo(direction: Vector2, _delta: float) -> void:

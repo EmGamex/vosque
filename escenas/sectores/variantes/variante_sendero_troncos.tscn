@@ -1,10 +1,6 @@
-[gd_scene format=3 uid="uid://if7eayy3eh5f"]
+[gd_scene format=4 uid="uid://if7eayy3eh5f"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_tosgu"]
-radius = 40.0
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_jryw0"]
-radius = 40.0
+[ext_resource type="TileSet" uid="uid://dx6qk1mgn5btq" path="res://recursos/tilesets/tileset_obstaculos.tres" id="1_jryw0"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_aeg6w"]
 size = Vector2(160, 40)
@@ -14,38 +10,6 @@ y_sort_enabled = true
 
 [node name="ObstaculosAltos" type="StaticBody2D" parent="." unique_id=2032199186]
 collision_mask = 0
-
-[node name="Arbol1" type="CollisionShape2D" parent="ObstaculosAltos" unique_id=1419607749]
-position = Vector2(-450, -450)
-shape = SubResource("CircleShape2D_tosgu")
-
-[node name="Visual" type="Polygon2D" parent="ObstaculosAltos/Arbol1" unique_id=338695873]
-color = Color(0.10980392, 0.1764706, 0.11764706, 1)
-polygon = PackedVector2Array(-40, -14, -24, -38, 22, -40, 40, -14, 36, 26, 18, 40, -22, 38, -38, 18)
-
-[node name="Arbol2" type="CollisionShape2D" parent="ObstaculosAltos" unique_id=205897667]
-position = Vector2(450, 450)
-shape = SubResource("CircleShape2D_jryw0")
-
-[node name="Visual" type="Polygon2D" parent="ObstaculosAltos/Arbol2" unique_id=1466339430]
-color = Color(0.10980392, 0.1764706, 0.11764706, 1)
-polygon = PackedVector2Array(-40, -14, -24, -38, 22, -40, 40, -14, 36, 26, 18, 40, -22, 38, -38, 18)
-
-[node name="ArbolFlancoNorte" type="CollisionShape2D" parent="ObstaculosAltos" unique_id=1304510951]
-position = Vector2(150, -550)
-shape = SubResource("CircleShape2D_tosgu")
-
-[node name="Visual" type="Polygon2D" parent="ObstaculosAltos/ArbolFlancoNorte" unique_id=1112056279]
-color = Color(0.10980392, 0.1764706, 0.11764706, 1)
-polygon = PackedVector2Array(-40, -14, -24, -38, 22, -40, 40, -14, 36, 26, 18, 40, -22, 38, -38, 18)
-
-[node name="ArbolFlancoSur" type="CollisionShape2D" parent="ObstaculosAltos" unique_id=1166688499]
-position = Vector2(-150, 550)
-shape = SubResource("CircleShape2D_jryw0")
-
-[node name="Visual" type="Polygon2D" parent="ObstaculosAltos/ArbolFlancoSur" unique_id=230221901]
-color = Color(0.10980392, 0.1764706, 0.11764706, 1)
-polygon = PackedVector2Array(-40, -14, -24, -38, 22, -40, 40, -14, 36, 26, 18, 40, -22, 38, -38, 18)
 
 [node name="ObstaculosBajos" type="StaticBody2D" parent="." unique_id=866157927]
 collision_layer = 2
@@ -81,3 +45,7 @@ position = Vector2(-550, 550)
 
 [node name="MarkerNota2" type="Marker2D" parent="PuntosDeNota" unique_id=1932528507 groups=["puntos_nota"]]
 position = Vector2(550, -550)
+
+[node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=1454220102]
+tile_map_data = PackedByteArray("AAD4//n/AAAAAAAAAQAHAAYAAAAAAAAAAQD9/wgAAAAAAAAAAQD5//n/AAAAAAAAAAAHAAcAAAAAAAAAAAD+/wkAAAAAAAAAAAACAPf/AAAAAAAAAAA=")
+tile_set = ExtResource("1_jryw0")
