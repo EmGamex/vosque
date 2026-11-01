@@ -32,13 +32,13 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
   - [x] Impacto contra el suelo y ventana de inmovilidad/recuperación de $0.6\text{ s}$ con arrastre (`dive_slide_friction = 2200 px/s²`).
 - [ ] **Animaciones de Salto y Recuperación en Motor:**
   - [ ] Integrar poses estáticas y recuperación (`jugador_salto_aire`, `jugador_plancha_aire`, `jugador_suelo_recuperacion`) en `_actualizar_animacion()` de [`scripts/personaje.gd`](../../scripts/personaje.gd).
-- [ ] **Sistema de Iluminación y Linterna Frontal Desacoplada:**
+- [x] **Sistema de Iluminación y Linterna Frontal Desacoplada:**
   - [x] Especificación canónica en [`docs/gameplay/sistema_de_iluminacion.md`](../gameplay/sistema_de_iluminacion.md) con presupuesto WebGL 2.0 (máximo 2 `PointLight2D`).
-  - [ ] Recurso serializado `ConfiguracionIluminacion` (`scripts/configuracion_iluminacion.gd` y `.tres`).
-  - [ ] `HaloCorporal`: Sprite2D aditivo (`BLEND_MODE_ADD`) centrado en el personaje.
-  - [ ] `LinternaFrontal`: PointLight2D con haz cónico procedural ($60^\circ$, $700\text{ px}$) desacoplado en $360^\circ$ (ratón / teclado).
-  - [ ] Detección analítica del monstruo (vector `dot` + distancia) y perturbación electromagnética (flicker $\pm 10\%$).
-  - [ ] `CanvasModulate` en `Escenario.tscn` con oscurecimiento reactivo por notas.
+  - [x] Recurso serializado `ConfiguracionIluminacion` (`scripts/configuracion_iluminacion.gd` y `.tres`).
+  - [x] `HaloCorporal`: PointLight2D aditivo centrado en el personaje.
+  - [x] `LinternaFrontal`: PointLight2D con haz cónico procedural ($60^\circ$, $700\text{ px}$) desacoplado en $360^\circ$ (ratón / teclado).
+  - [x] Detección analítica del monstruo (vector `dot` + distancia) y perturbación electromagnética (flicker $\pm 10\%$).
+  - [x] `CanvasModulate` en `Escenario.tscn` con oscurecimiento reactivo por notas.
   - [ ] Controles de calibración en vivo en `DebugMenu.tscn`.
 
 ---
@@ -147,10 +147,10 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 - [ ] **Sub-Pantallas del Menú Principal:**
   - [ ] Pantalla de Opciones conectada a la señal `opciones_solicitado` de `MenuInicio`.
   - [ ] Pantalla de Créditos conectada a la señal `creditos_solicitado` de `MenuInicio`.
-- [ ] **Tutorial Flotante sobre la Cabeza (`TutorialCabeza`):**
-  - [ ] Componente visual flotante a $Y \approx -90\text{ px}$ con fondo traslúcido, badges de teclas reactivos y glifo de orientación de ratón.
-  - [ ] Secuencia progresiva: WASD + Ratón $\to$ Salto con transición contextual en el aire a Plancha (*Dive*) $\to$ Sprint (Shift).
-  - [ ] Protocolo de aceleración para veteranos (*Fast-Path*): cierre inmediato en $< 0.25\text{ s}$ ante combinaciones avanzadas (`Shift + WASD`), salida forzada en Nota 1 y persistencia de sesión (`tutorial_visto`).
+- [x] **Tutorial Flotante sobre la Cabeza (`TutorialCabeza`):**
+  - [x] Componente visual flotante a $Y \approx -90\text{ px}$ con fondo traslúcido, badges de teclas reactivos y glifo de orientación de ratón.
+  - [x] Secuencia progresiva: WASD + Ratón $\to$ Salto con transición contextual en el aire a Plancha (*Dive*) $\to$ Sprint (Shift).
+  - [x] Protocolo de aceleración para veteranos (*Fast-Path*): cierre inmediato en $< 0.25\text{ s}$ ante combinaciones avanzadas (`Shift + WASD`), salida forzada en Nota 1 y persistencia de sesión (`tutorial_visto`).
 - [x] **Indicador Diegético de Estamina (`escenas/ui/indicador_estamina.tscn`):** Anillo procedural con `_draw()` anclado sobre la cabeza del personaje (`Vector2(0, -60)`), invisible en reposo (100%), micro-pop al consumir, titileo carmesí en fatiga y animación elástica de cierre al recargar.
 - [x] **Contador de Notas en HUD (`escenas/hud.tscn`):** `CanvasLayer` (layer 10) con icono estilizado y texto numérico con `Tween` de *Scale Punch* elástico ($1.3 \to 1.0$) y flash reactivo.
 - [x] **Menú de Pausa Superpuesto (`escenas/menu_pausa.tscn`, `CanvasLayer`, layer=50):**
