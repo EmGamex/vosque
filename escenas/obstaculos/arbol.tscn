@@ -1,5 +1,7 @@
 [gd_scene format=3 uid="uid://b6bfgvahe6fuf"]
 
+[ext_resource type="Texture2D" uid="uid://blbq7p53egmkr" path="res://recursos/Arbol grande.png" id="1_qawra"]
+
 [sub_resource type="CircleShape2D" id="CircleShape2D_wrfkb"]
 radius = 38.0
 
@@ -7,8 +9,14 @@ radius = 38.0
 collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1439645171]
+scale = Vector2(3.119999, 3.119999)
 shape = SubResource("CircleShape2D_wrfkb")
 
 [node name="Visual" type="Polygon2D" parent="CollisionShape2D" unique_id=491988624]
+visible = false
 color = Color(0.10980392, 0.1764706, 0.11764706, 1)
 polygon = PackedVector2Array(-38, -14, -22, -36, 20, -38, 38, -14, 34, 24, 18, 38, -20, 36, -36, 18)
+
+[node name="ArbolGrande" type="Sprite2D" parent="." unique_id=1939999603]
+scale = Vector2(0.24203622, 0.24203628)
+texture = ExtResource("1_qawra")

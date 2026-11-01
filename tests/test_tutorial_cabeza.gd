@@ -40,11 +40,11 @@ func test_paso_1_iluminacion_persistente() -> void:
 	var tut: TutorialCabeza = _crear_tutorial()
 	tut._ready()
 
-	tut._w_registrado = true
-	tut._actualizar_estilos_reactivos()
+	tut.estado_ctrl.w_registrado = true
+	tut.vista_ctrl.actualizar_estilos_reactivos(tut.estado_ctrl)
 
 	# W debe estar marcado como registrado
-	assert_true(tut._w_registrado, "W debe estar registrado")
+	assert_true(tut.estado_ctrl.w_registrado, "W debe estar registrado")
 	tut.free()
 
 
@@ -53,14 +53,14 @@ func test_paso_1_deteccion_movimiento() -> void:
 	tut._ready()
 
 	# Simular registro de teclas
-	tut._w_registrado = true
-	tut._a_registrado = true
-	tut._s_registrado = true
-	tut._raton_registrado = true
+	tut.estado_ctrl.w_registrado = true
+	tut.estado_ctrl.a_registrado = true
+	tut.estado_ctrl.s_registrado = true
+	tut.estado_ctrl.raton_registrado = true
 	assert_eq(tut.paso_actual, TutorialCabeza.Paso.PASO_1_MOVIMIENTO, "Aún no debe avanzar con solo 3 direcciones")
 
-	tut._d_registrado = true
-	tut._procesar_paso_1(0.4)
+	tut.estado_ctrl.d_registrado = true
+	tut.estado_ctrl._procesar_paso_1(0.4, Vector2.ZERO)
 	assert_eq(tut.paso_actual, TutorialCabeza.Paso.PASO_2_SALTO, "Debe avanzar a PASO_2_SALTO al registrar las 4 direcciones y la orientación de ratón")
 
 	tut.free()
@@ -70,12 +70,12 @@ func test_paso_1_no_avanza_sin_raton() -> void:
 	var tut: TutorialCabeza = _crear_tutorial()
 	tut._ready()
 
-	tut._w_registrado = true
-	tut._a_registrado = true
-	tut._s_registrado = true
-	tut._d_registrado = true
-	tut._raton_registrado = false
-	tut._procesar_paso_1(0.5)
+	tut.estado_ctrl.w_registrado = true
+	tut.estado_ctrl.a_registrado = true
+	tut.estado_ctrl.s_registrado = true
+	tut.estado_ctrl.d_registrado = true
+	tut.estado_ctrl.raton_registrado = false
+	tut.estado_ctrl._procesar_paso_1(0.5, Vector2.ZERO)
 
 	assert_eq(tut.paso_actual, TutorialCabeza.Paso.PASO_1_MOVIMIENTO, "No debe avanzar a PASO_2_SALTO si no se ha orientado con el ratón")
 	tut.free()
@@ -87,8 +87,8 @@ func test_paso_2_salto_regular_avanza_a_dive() -> void:
 	tut.paso_actual = TutorialCabeza.Paso.PASO_2_SALTO
 
 	# Salto en suelo y aterrizaje
-	tut._on_padre_estado_cambiado(4, "SALTO")
-	tut._on_padre_estado_cambiado(0, "REPOSO")
+	tut._on_padre_estado_cambiado(Personaje.Estado.SALTO, "SALTO")
+	tut._on_padre_estado_cambiado(Personaje.Estado.REPOSO, "REPOSO")
 
 	assert_eq(tut.paso_actual, TutorialCabeza.Paso.PASO_3_PLANCHA_DIVE, "Al completar el salto regular debe avanzar al paso dedicado de Plancha/Dive")
 	tut.free()
@@ -100,11 +100,11 @@ func test_paso_3_salto_regular_no_avanza_a_sprint() -> void:
 	tut.paso_actual = TutorialCabeza.Paso.PASO_3_PLANCHA_DIVE
 
 	# Salto en suelo y aterrizaje sin hacer dive
-	tut._on_padre_estado_cambiado(4, "SALTO")
-	tut._on_padre_estado_cambiado(0, "REPOSO")
+	tut._on_padre_estado_cambiado(Personaje.Estado.SALTO, "SALTO")
+	tut._on_padre_estado_cambiado(Personaje.Estado.REPOSO, "REPOSO")
 
 	assert_eq(tut.paso_actual, TutorialCabeza.Paso.PASO_3_PLANCHA_DIVE, "Un salto regular sin plancha debe permanecer en PASO_3_PLANCHA_DIVE")
-	assert_false(tut._dive_registrado, "_dive_registrado debe ser false tras solo saltar")
+	assert_false(tut.estado_ctrl.dive_registrado, "dive_registrado debe ser false tras solo saltar")
 	tut.free()
 
 
@@ -114,12 +114,12 @@ func test_paso_3_plancha_dive_ejecutado() -> void:
 	tut.paso_actual = TutorialCabeza.Paso.PASO_3_PLANCHA_DIVE
 
 	# En el aire
-	tut._on_padre_estado_cambiado(4, "SALTO")
-	assert_true(tut._en_el_aire, "Debe registrar que está en el aire")
+	tut._on_padre_estado_cambiado(Personaje.Estado.SALTO, "SALTO")
+	assert_true(tut.estado_ctrl.en_el_aire, "Debe registrar que está en el aire")
 
 	# Pulsa espacio y ejecuta plancha
-	tut._on_padre_estado_cambiado(5, "PLANCHA_AIRE")
-	assert_true(tut._dive_registrado, "_dive_registrado debe ser true")
+	tut._on_padre_estado_cambiado(Personaje.Estado.PLANCHA_AIRE, "PLANCHA_AIRE")
+	assert_true(tut.estado_ctrl.dive_registrado, "dive_registrado debe ser true")
 
 	tut.free()
 
@@ -130,7 +130,7 @@ func test_paso_4_sprint_y_cierre() -> void:
 	tut.paso_actual = TutorialCabeza.Paso.PASO_4_SPRINT
 
 	tut.completar_tutorial_estandar()
-	assert_true(tut._cerrando, "_cerrando debe ser true")
+	assert_true(tut.estado_ctrl.cerrando, "cerrando debe ser true")
 	assert_true(TutorialCabeza.tutorial_visto, "tutorial_visto debe ser true tras completar")
 
 	tut.free()
@@ -141,8 +141,8 @@ func test_fast_path_veteranos() -> void:
 	tut._ready()
 
 	tut.ejecutar_fast_path()
-	assert_true(tut._cerrando, "_cerrando debe ser true al disparar fast path")
-	assert_true(tut._flash_unisono, "Debe activar el destello de todas las teclas al unísono")
+	assert_true(tut.estado_ctrl.cerrando, "cerrando debe ser true al disparar fast path")
+	assert_true(tut.vista_ctrl.flash_unisono, "Debe activar el destello de todas las teclas al unísono")
 	assert_true(TutorialCabeza.tutorial_visto, "tutorial_visto debe quedar registrado")
 
 	tut.free()
@@ -153,7 +153,7 @@ func test_salida_forzada_recoleccion_nota() -> void:
 	tut._ready()
 
 	tut._on_nota_recogida(Vector2.ZERO, 1)
-	assert_true(tut._cerrando, "Recoger la nota 1 debe forzar la salida")
+	assert_true(tut.estado_ctrl.cerrando, "Recoger la nota 1 debe forzar la salida")
 	assert_true(TutorialCabeza.tutorial_visto, "tutorial_visto debe ser true")
 
 	tut.free()
@@ -204,5 +204,6 @@ func test_arquitectura_modular_y_subcontroladores() -> void:
 	# Probar los nuevos nombres normalizados de nodos
 	assert_true(tut.vista_ctrl.paso2_salto != null, "El nodo Paso2_Salto debe estar resuelto")
 	assert_true(tut.vista_ctrl.paso4_sprint != null, "El nodo Paso4_Sprint debe estar resuelto")
+	assert_true(tut.vista_ctrl.badge_raton != null, "El badge del ratón debe estar resuelto")
 
 	tut.free()

@@ -25,6 +25,7 @@ var notas_recolectadas: int = 0
 
 
 func _ready() -> void:
+	add_to_group("director_juego")
 	if Engine.is_editor_hint() and not is_in_group("modo_test"):
 		return
 	_resolver_referencias()
