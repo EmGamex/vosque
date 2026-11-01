@@ -63,9 +63,9 @@ stateDiagram-v2
 ### 3.4. Secuencia de Muerte y Efecto Game Over (*Nightmare Decay*)
 1. **Fotograma de Impacto (Jumpscare):**
    * En el instante del contacto letal, la música se corta instantáneamente a **$0\text{ ms}$** (`stop()` o volumen $-80\text{ dB}$ en $0.05\text{ s}$).
-   * El sonido del jumpscare y el flash visual reciben el impacto acústico total y seco.
-2. **Entrada a Pantalla de Game Over ($0.5\text{ s}$ post-impacto):**
-   * `Haunted Boardwalk` reanuda su reproducción en bucle con modificaciones en tiempo real:
+   * El sonido del jumpscare y el flash visual reciben el impacto acústico total y seco, disparado directamente por la pista de audio del `AnimationPlayer` en `escenas/game_over.tscn`.
+2. **Entrada a Pantalla de Game Over ($0.5\text{ s}$ post-impacto en timeline):**
+   * Sincronizado con la conclusión del susto en la línea de tiempo del `AnimationPlayer`, `Haunted Boardwalk` reanuda su reproducción en bucle con modificaciones en tiempo real:
      * **Ralentización de Cinta:** `pitch_scale = 0.65` (emulando un tocadiscos desacelerándose o una mente desvaneciéndose).
      * **Reverberación Cavernosa:** Se activa el efecto `AudioEffectReverb` en el bus `musica` (`room_size = 0.85`, `wet = 0.65`, `damping = 0.7`).
 3. **Restauración:**

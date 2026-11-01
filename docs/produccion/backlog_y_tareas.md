@@ -163,7 +163,11 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
   - [x] Auto-pausa por pérdida de foco en navegadores Web (`NOTIFICATION_APPLICATION_FOCUS_OUT`).
   - [x] Precedencia con Menú de Depuración (<kbd>Escape</kbd> cierra primero `DebugMenu` si está completo).
   - [x] Suite de pruebas automatizadas `tests/test_menu_pausa.gd` (9 tests pasando).
-- [ ] **Pantalla de Game Over:** Sacudida súbita de cámara, destello rojo, ilustración de jumpscare y comparativa de notas recogidas vs High Score.
+- [ ] **Pantalla de Game Over con Orquestador `AnimationPlayer`:**
+  - [ ] Nodo `AnimationPlayer` en `escenas/game_over.tscn` con animación multicanal `jumpscare_derrota` (escala elástica de ilustración 512x512, modulación carmesí de flash, inyección de trauma de cámara a 1.0 y pista de audio en bus `sfx`).
+  - [ ] Revelación progresiva del panel de estadísticas y resultados (páginas recogidas vs High Score persistido).
+  - [ ] Transición fluida hacia `GestorMusica` con activación de reverberación cavernosa y `pitch_scale = 0.65` post-impacto.
+  - [ ] Enfoque diferido automático en botón `BotonReintentar` tras la secuencia con reinicio instantáneo en <kbd>Espacio</kbd>/<kbd>Enter</kbd>.
 
 ---
 

@@ -135,14 +135,43 @@ Siguiendo el patrón *Signal Up, Call Down*:
 
 ## 3. Pantalla de Game Over (`game_over.gd`)
 
-Aparece de forma inmediata tras el contacto mortal con el monstruo:
-1. **Arte de Impacto:** Ilustración de jumpscare de alto contraste (`game_over_jumpscare`, $512 \times 512$ px) enmarcada en el tercio superior/central.
+Aparece tras el contacto mortal con el monstruo y orquesta la experiencia de derrota en dos tiempos mediante un nodo central **`AnimationPlayer`**:
+
+### 3.1. Orquestación Cinemática con `AnimationPlayer`
+En lugar de animar propiedades imperativamente por código mediante `Tween` o temporizadores dispersos, [`escenas/game_over.tscn`](../../escenas/game_over.tscn) integra un **`AnimationPlayer`** que garantiza sincronización multicanal determinista sin asignación de memoria en tiempo de ejecución:
+
+```text
+GameOver (Control) [scripts/game_over.gd]
+├── Fondo (ColorRect negro)
+├── Impacto (ColorRect rojo de flash / viñeta)
+├── JumpscareSprite (TextureRect con ilustración 512x512)
+├── Layout (CenterContainer con Título, Stats y Botones)
+├── AudioJumpscare (AudioStreamPlayer en bus "sfx")
+└── AnimationPlayer (Línea de tiempo de la secuencia de muerte)
+```
+
+#### Línea de Tiempo de la Animación `jumpscare_derrota` (~$1.0\text{ s}$ - $1.2\text{ s}$):
+1. **$t = 0.00\text{ s}$ (El Golpe Seco):**
+   * **Pista de Audio:** Disparo instantáneo de `AudioJumpscare` en el bus `sfx` (sin latencia de callbacks de script).
+   * **Pista Visual (Jumpscare):** `JumpscareSprite` escala súbitamente de `Vector2(0.3, 0.3)` a `Vector2(1.15, 1.15)` con curva elástica rápida (`TRANS_BACK`), acompañada de micro-vibración en posición.
+   * **Pista de Flash:** `Impacto.color.a` salta a `0.85` (flash carmesí).
+   * **Pista de Llamada a Métodos:** Inyección de sacudida máxima a la cámara (`camara.agregar_trauma(1.0)`).
+   * **Pista de UI:** El contenedor `Layout` permanece oculto (`modulate.a = 0.0`).
+2. **$t = 0.05\text{ s} \to 0.40\text{ s}$ (Desvanecimiento del Susto):**
+   * El flash carmesí se disuelve progresivamente a oscuridad profunda (`Impacto.color.a = 0.0`).
+   * `JumpscareSprite` reduce su opacidad (`modulate.a \to 0.0`) o se reubica sutilmente en segundo plano.
+3. **$t = 0.50\text{ s} \to 1.00\text{ s}$ (Revelación de Resultados y Nightmare Decay):**
+   * **Música Post-Derrota:** El `GestorMusica` reanuda la pista ambiental con efecto *Nightmare Decay* (`pitch_scale = 0.65` + reverberación cavernosa activa en el bus `musica`).
+   * **Pista de UI (Entrada de Resultados):** Fundido suave (`modulate.a \to 1.0`) y ligero desplazamiento vertical del contenedor `Layout`.
+   * **Foco Inmediato:** Al concluir la animación (`animation_finished`), el script enfoca automáticamente `BotonReintentar`.
+
+### 3.2. Contenido y Feedback de la Pantalla
+1. **Arte de Impacto:** Ilustración de jumpscare de alto contraste (`game_over_jumpscare`, $512 \times 512$ px) controlada por la animación.
 2. **Efectos en Motor:**
    - Sacudida súbita de pantalla (*Camera Shake*) durante $0.3\text{ s}$ (ver [Cámara y Game Feel](../gameplay/camara_y_game_feel.md)).
    - Flash rojo intenso instantáneo que se disuelve en oscuridad total.
-   - Estática y ruido sutil analógico.
-   - **Tratamiento Sonoro Post-Jumpscare:** Silencio instantáneo en el impacto y entrada posterior de la música ralentizada (`pitch_scale = 0.65`) con reverberación cavernosa en el bus `musica` (ver [Sistema de Música Interactiva](sistema_de_musica.md#34-secuencia-de-muerte-y-efecto-game-over-nightmare-decay)).
+   - **Tratamiento Sonoro Post-Jumpscare:** Silencio instantáneo en el impacto y entrada posterior de la música ralentizada con reverberación en el bus `musica` (ver [Sistema de Música Interactiva](sistema_de_musica.md#34-secuencia-de-muerte-y-efecto-game-over-nightmare-decay)).
 3. **Resultados de la Partida:**
    - Páginas recogidas en la sesión actual.
    - Récord histórico (*High Score* persistido en IndexedDB y `LocalStorage` Web).
-4. **Acción Rápida:** Botón llamativo de "Reintentar" y soporte nativo para presionar <kbd>Espacio</kbd> o <kbd>Enter</kbd> para reiniciar la partida en menos de 1 segundo.
+4. **Acción Rápida:** Botón llamativo de "Reintentar" y soporte nativo para presionar <kbd>Espacio</kbd> o <kbd>Enter</kbd> para reiniciar la partida en menos de 1 segundo tras la revelación.

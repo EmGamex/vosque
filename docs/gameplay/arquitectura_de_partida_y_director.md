@@ -70,11 +70,11 @@ sequenceDiagram
 * **Disparador:** La señal `_on_body_entered` o `_comprobar_captura_continua` del `AreaCaptura` del enemigo hace contacto con el jugador.
 * **Manejo de Casos Borde y Cancelación de Corrutinas:**
   - Si el contacto mortal ocurre simultáneamente con la recolección de una nota o durante el ciclo asíncrono de mutación/niebla (`mutar_con_neblina()`), el Game Director interrumpe o descarta inmediatamente el ciclo de mutación y generación de notas, evitando referencias nulas o invocaciones diferidas en escenas destruidas.
-* **Efectos:**
-  1. La velocidad del jugador y del enemigo se anula a `Vector2.ZERO`.
-  2. Se reproduce el sonido de impacto/jumpscare.
-  3. Se compara la puntuación actual con el récord persistido.
-  4. Se delega la transición a `GestorDeEscenas.ir_a(GestorDeEscenas.RUTA_GAME_OVER)`.
+* **Efectos y Transición Cinemática:**
+  1. La velocidad del jugador y del enemigo se anula a `Vector2.ZERO`, congelando la simulación de movimiento.
+  2. El Game Director guarda y compara la puntuación actual con el récord persistido.
+  3. Se delega la transición inmediata a `GestorDeEscenas.ir_a(GestorDeEscenas.RUTA_GAME_OVER)`.
+  4. La pantalla de destino (`escenas/game_over.tscn`) toma el control cinemático ejecutando su nodo **`AnimationPlayer`** (`jumpscare_derrota`), que reproduce simultáneamente el golpe acústico seco, el zoom elástico de la ilustración de la criatura, el flash carmesí y la inyección de trauma de cámara, antes de revelar las estadísticas y habilitar el botón de reinicio.
 
 ### 3.2. Filosofía de Victoria vs. Supervivencia Arcade Infinita
 * **Modo Arcade Infinito (Predeterminado):** La partida continúa mientras el jugador conserve la vida. La dificultad alcanza su meseta máxima en la Nota 10+ ($920\text{ px/s}$), donde el juego se convierte en una prueba de resistencia extrema para alcanzar el récord más alto posible.
