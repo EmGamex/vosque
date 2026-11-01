@@ -143,4 +143,4 @@ position = Vector2(0, -60)
 
 [node name="TutorialCabeza" parent="." unique_id=1460520052 instance=ExtResource("12_8xrj8")]
 position = Vector2(0, -112)
-scale = Vector2(1.8800008, 1.8800008)
+scale = Vector2(1, 1)

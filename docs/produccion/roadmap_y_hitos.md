@@ -1,48 +1,42 @@
 # Roadmap e Hitos de Producción
 
-Este documento detalla el cronograma de desarrollo acotado a 4 semanas para alcanzar el objetivo de lanzamiento en Halloween (31 de Octubre de 2026), reflejando el progreso técnico real del proyecto a fecha de **25 de Octubre de 2026**.
+Este documento detalla el cronograma de desarrollo integral de *Vosque*, reflejando el progreso técnico real consolidado del sprint fundacional de Octubre y la planificación operativa de 4 semanas para **Noviembre de 2026** hacia el lanzamiento final v1.0 en *itch.io* y *Newgrounds* a fecha de **1 de Noviembre de 2026**.
 
 ---
 
-## 1. Visión Temporal y Flujo de Hitos (4 Semanas)
+## 1. Visión Temporal y Flujo de Hitos (8 Semanas)
 
 ```mermaid
 flowchart TD
-    subgraph S1 ["Semana 1 (04/10 - 10/10): Prototipo Graybox [100%]"]
-        W1A["Movimiento 8-Dir + Telemetría F3"] --> W1B["Plugin de Editor personaje_tools"]
-        W1B --> W1C["Gestor de Escenas, Menús y Transiciones"]
-        W1C --> W1D["IA Base del Monstruo con Rotación Continua"]
+    subgraph OCT ["Octubre 2026: Cimientos, Mecánicas y Sistemas Core [100% COMPLETADO]"]
+        S1["Semana 1 (04/10 - 10/10): Prototipo Graybox y Core [100%]"]
+        S2["Semana 2 (11/10 - 17/10): Especificación GDD y Mecánicas Evasivas [100%]"]
+        S3["Semana 3 (18/10 - 24/10): Mutación 2x2, Spawner y Web Base [100%]"]
+        S4["Semana 4 (25/10 - 31/10): HUD, Pausa, Iluminación y Tutorial [100%]"]
+        S1 --> S2
+        S2 --> S3
+        S3 --> S4
     end
 
-    subgraph S2 ["Semana 2 (11/10 - 17/10): Mecánicas Evasivas y GDD Técnico [100%]"]
-        W2A["GDD: Salto Libre y Salto de Plancha (Dive)"] --> W2B["GDD: Sistema de Estamina y Fatiga"]
-        W2B --> W2C["GDD: Arena 2x2 y Sectores Mutables"]
-        W2C --> W2D["GDD: Sistema de Notas, Director, Audio y Cámara"]
-        W2D --> W2E["Catálogo Artístico de ~30 Assets"]
+    subgraph NOV ["Noviembre 2026: Game Feel, Audio, Arte y Lanzamiento v1.0"]
+        S5["Semana 5 (01/11 - 07/11): Feedback Sensorial, Jumpscare y Audio Core [EN CURSO]"]
+        S6["Semana 6 (08/11 - 14/11): Persistencia Web, IA Steering y Menús [PENDIENTE]"]
+        S7["Semana 7 (15/11 - 21/11): Pipeline Artístico y Sustitución de Assets [PENDIENTE]"]
+        S8["Semana 8 (22/11 - 30/11): QA Multi-Navegador, Key Art y Lanzamiento v1.0 [PENDIENTE]"]
+        S5 --> S6
+        S6 --> S7
+        S7 --> S8
     end
 
-    subgraph S3 ["Semana 3 (18/10 - 24/10): Integración en Motor y Web [COMPLETADA]"]
-        W3A["Implementación de Salto, Plancha y Estamina"] --> W3B["Sectores Mutables 2x2 y Corredores Seguros"]
-        W3B --> W3C["Spawner de Notas Baliza y Escalado Cuantitativo"]
-        W3C --> W3D["Director maain.gd, Condición Derrota y Preset Web"]
-    end
-
-    subgraph S4 ["Semana 4 (25/10 - 31/10): HUD, Arte Final, Audio y Lanzamiento [EN CURSO]"]
-        W4A["HUD In-Game, Linterna y Menú de Pausa"] --> W4B["Producción de Sprites Finales (Blender + Inkscape)"]
-        W4B --> W4C["Integración de SFX, Gestor de Música y Trauma Shake"]
-        W4C --> W4D["Persistencia High Score y Publicación (itch.io / Newgrounds)"]
-    end
-
-    S1 --> S2
-    S2 --> S3
-    S3 --> S4
+    S4 --> S5
 
     classDef done fill:#2d4a22,stroke:#529e3a,color:#ffffff;
     classDef current fill:#5a451b,stroke:#e69f0c,color:#ffffff;
     classDef pending fill:#1f2430,stroke:#4f5b66,color:#c0c5ce;
 
-    class W1A,W1B,W1C,W1D,W2A,W2B,W2C,W2D,W2E,W3A,W3B,W3C,W3D done;
-    class W4A,W4B,W4C,W4D current;
+    class S1,S2,S3,S4 done;
+    class S5 current;
+    class S6,S7,S8 pending;
 ```
 
 ---
@@ -62,8 +56,8 @@ flowchart TD
 ---
 
 ### Semana 2 (11/10/2026 – 17/10/2026): Especificación Técnica y Mecánicas Evasivas — **[100% COMPLETADA]**
-* **Objetivo:** Formalizar el GDD modular, diseñar habilidades de evasión arcade de alto riesgo, delimitar el mapa modular, especificar los subsistemas clave (Notas, Spawner, Game Director, Audio y Cámara) y definir el pipeline artístico óptimo de 30 piezas.
-* **Entregables:**
+* **Objetivo:** Formalizar el GDD modular, diseñar habilidades de evasión arcade de alto riesgo, delimitar el mapa modular, especificar los subsistemas clave (Notas, Spawner, Game Director, Audio y Cámara) y definir el pipeline artístico óptimo de ~30 piezas.
+* **Entregables Concluidos:**
   - [x] Especificación técnica de **Salto Libre** (arco Z simulado en $0.45\text{ s}$ superando obstáculos bajos) y **Salto de Plancha (*Dive*)** con vulnerabilidad de $0.6\text{ s}$ en suelo en [`personaje_y_habilidades.md`](../gameplay/personaje_y_habilidades.md).
   - [x] Especificación de **Sprint y Barra de Estamina** nativa con retardo de recarga de $0.8\text{ s}$ y umbral de seguridad de fatiga ($30\%$).
   - [x] Diseño topológico de la **Arena 2x2 ($4320 \times 4320$ px con cuadrantes de $2160 \times 2160$ px)**, sub-escenas de variantes, franjas seguras de $160\text{ px}$ en intersecciones y algoritmo de mutación de los 3 sectores lejanos en [`mapa_y_sectores.md`](../gameplay/mapa_y_sectores.md).
@@ -76,35 +70,73 @@ flowchart TD
 
 ---
 
-### Semana 3 (18/10/2026 – 24/10/2026): Integración en Motor, Mutación 2x2 y Web — **[100% COMPLETADA]**
+### Semana 3 (18/10/2026 – 24/10/2026): Integración en Motor, Mutación 2x2 y Web Base — **[100% COMPLETADA]**
 * **Objetivo:** Trasladar las mecánicas documentadas al código GDScript de Godot 4, habilitar la mutación continua de cuadrantes y validar la primera compilación funcional en navegador.
-* **Entregables Clave:**
+* **Entregables Concluidos:**
   - [x] Implementar la máquina de estados de Salto Libre, Plancha (*Dive*) y simulación de elevación en eje Z en [`personaje.gd`](../../scripts/personaje.gd).
   - [x] Implementar la lógica de Estamina y fatiga en [`personaje.gd`](../../scripts/personaje.gd).
   - [x] Crear la estructura modular de [`escenas/escenario.tscn`](../../escenas/escenario.tscn) con valla perimetral fija y las sub-escenas de variantes con corredores de paso seguros.
-  - [x] Programar la lógica de mutación de los 3 sectores lejanos, niebla de transición (`EfectoNieblaMutacion`) y reposicionamiento anti-atascamiento del monstruo.
+  - [x] Programar la lógica de mutación de los 3 sectores lejanos, niebla de transición (`EfectoNieblaMutacion`) vía shaders con fase continua y reposicionamiento anti-atascamiento del monstruo.
   - [x] Crear la entidad coleccionable [`escenas/nota.tscn`](../../escenas/nota.tscn) con baliza luminosa y recolección arcade instantánea.
   - [x] Implementar el orquestador Game Director en [`scripts/maain.gd`](../../scripts/maain.gd) conectando las señales de recolección, mutación y el algoritmo de Spawner con exclusión espacial.
-  - [x] Implementar el escalado de velocidad del enemigo según el modelo cuantitativo acotado ($500 \to 920\text{ px/s}$) y condición de derrota hacia Game Over en [`enemigo.gd`](../../scripts/enemigo.gd).
-  - [x] Implementar suite de telemetría y menú unificado de diagnóstico in-game en [`escenas/debug_menu.tscn`](../../escenas/debug_menu.tscn).
-  - [x] Configurar preset de exportación Web en [`export_presets.cfg`](../../export_presets.cfg) y preparar flags de compatibilidad navegador.
+  - [x] Implementar el escalado de velocidad del enemigo según el modelo cuantitativo acotado ($500 \to 920\text{ px/s}$) e hibernación en Nota 0 en [`enemigo.gd`](../../scripts/enemigo.gd).
+  - [x] Implementar suite de telemetría y menú unificado de diagnóstico in-game en [`escenas/debug_menu.tscn`](../../escenas/debug_menu.tscn) con persistencia vía Autoload `DebugConfig`.
+  - [x] Configurar preset de exportación Web en [`export_presets.cfg`](../../export_presets.cfg) (`gl_compatibility`, `threads = false`).
 
 ---
 
-### Semana 4 (25/10/2026 – 31/10/2026): HUD, Arte Final, Audio, Pulido y Lanzamiento — **[EN CURSO - FALTAN 6 DÍAS]**
-* **Objetivo:** Conectar el feedback de usuario (HUD, pausa, linterna), sustituir placeholders por assets clave, orquestar música interactiva y SFX, configurar High Score y publicar para Halloween.
+### Semana 4 (25/10/2026 – 31/10/2026): HUD, Menú de Pausa, Iluminación y Tutorial — **[100% COMPLETADA]**
+* **Objetivo:** Desarrollar los sistemas de interfaz in-game, retroalimentación diegética, control de pausa desacoplado, sistema de luz desacoplado y tutorial contextual sin fricción.
+* **Entregables Concluidos:**
+  - [x] Diseñar el HUD in-game ([`escenas/hud.tscn`](../../escenas/hud.tscn)) con contador elástico de notas (*Scale Punch* $1.3 \to 1.0$) y flash reactivo.
+  - [x] Implementar el indicador diegético de estamina ([`escenas/ui/indicador_estamina.tscn`](../../escenas/ui/indicador_estamina.tscn)) como anillo procedural anclado a la cabeza del personaje, con titileo en fatiga y auto-ocultamiento.
+  - [x] Implementar el sistema de iluminación desacoplado en $360^\circ$ ([`docs/gameplay/sistema_de_iluminacion.md`](../gameplay/sistema_de_iluminacion.md)) con `HaloCorporal`, `LinternaFrontal` cónica procedimental orientada por ratón/movimiento y `CanvasModulate` con oscurecimiento reactivo en [`escenario.tscn`](../../escenas/escenario.tscn).
+  - [x] Integrar el Menú de Pausa ([`escenas/menu_pausa.tscn`](../../escenas/menu_pausa.tscn)) con arquitectura híbrida (`SceneTree.paused = true` + `PROCESS_MODE_ALWAYS` en UI), triple blindaje anti-salto (<kbd>Espacio</kbd>), auto-pausa por pérdida de foco web y soporte de mando/teclado.
+  - [x] Desarrollar el tutorial contextual flotante ([`escenas/ui/tutorial_cabeza.tscn`](../../escenas/ui/tutorial_cabeza.tscn)) con progresión escalonada, badges vectoriales y acelerador (*Fast-Path*) para jugadores veteranos.
+  - [x] Diseñar el Menú Principal diegético ([`escenas/menu_inicio.tscn`](../../escenas/menu_inicio.tscn)) con parallax en 3 planos y enfoque de linterna sobre las opciones.
+
+---
+
+### Semana 5 (01/11/2026 – 07/11/2026): Feedback Sensorial, Jumpscare y Audio Core — **[EN CURSO]**
+* **Objetivo:** Conectar el impacto físico y auditivo del juego mediante retroalimentación táctil de cámara y orquestación audiovisual dramática.
 * **Entregables Clave:**
-  - [ ] Diseñar el HUD in-game (`hud.tscn`) con `ProgressBar` nativo vinculado a `estamina_cambiada` y contador numérico elástico de notas.
-  - [ ] Implementar la linterna frontal desacoplada del personaje (halo radial + haz orientable 360° / movimiento).
-  - [x] Integrar el Menú de Pausa (`escenas/menu_pausa.tscn`, `CanvasLayer`, `layer=50`) con congelación híbrida blindada (`SceneTree.paused` + `PROCESS_MODE_ALWAYS` en UI/orquestador), blindaje anti-salto en 3 capas, navegación con controles de movimiento y soporte Escape/P.
-  - [ ] Generar los renders 3D base en Blender y vectorizar en Inkscape los sprites prioritarios del jugador (15 frames) y criatura (silueta + ojos emisivos).
-  - [ ] Configurar el Singleton Autoload `GestorMusica` con crossfade dinámico de pistas existentes (`Night Crawling` $\to$ `Haunted Boardwalk`) y buses de audio.
-  - [ ] Implementar el sistema de trauma shake en [`camara.tscn`](../../escenas/camara.tscn) (impacto de plancha y muerte).
-  - [ ] Implementar persistencia de High Score en Web (`user://` sobre `IndexedDB` y fallback a `localStorage`).
-  - [ ] Pulir pantalla de Game Over con comparativa de récord.
-  - [ ] Probar compatibilidad en navegadores principales (Chrome, Firefox, Edge).
-  - [ ] Diseñar portada promocional (*Key Art*), banners y capturas.
-  - [ ] Publicar y verificar el juego en Newgrounds e itch.io el **31 de Octubre de 2026**.
+  - [ ] Implementar el sistema de sacudida por trauma (*Camera Shake*) en [`escenas/camara.tscn`](../../escenas/camara.tscn) con modelo de trauma cuadrático ($T^2$), decaimiento lineal e impulsos por caída de plancha ($+0.35$), proximidad y muerte ($+1.0$).
+  - [ ] Implementar la orquestación de Game Over en [`escenas/game_over.tscn`](../../escenas/game_over.tscn) mediante `AnimationPlayer` con track multicanal de zoom de jumpscare, flash carmesí, trauma de cámara y audio de impacto.
+  - [ ] Crear el Singleton Autoload `GestorMusica` ([`scripts/gestor_musica.gd`](../../scripts/gestor_musica.gd)) con crossfade fluido de $2.0\text{ s}$ de `Night Crawling` a `Haunted Boardwalk` al recolectar la Nota 1, atenuación por proximidad de la criatura (*audio ducking*) y corte súbito en derrota.
+  - [ ] Configurar buses de audio en `default_bus_layout.tres` (`Master`, `sfx`, `musica`) con filtros de ambiente (reverberación cavernosa post-derrota y filtro pasa-bajos en fatiga).
+  - [ ] Integrar biblioteca de SFX esenciales (pasos según velocidad sobre hojarasca, despegue de salto, golpe de plancha, rasgado de nota y zumbido/alarma de la criatura).
+
+---
+
+### Semana 6 (08/11/2026 – 14/11/2026): Persistencia Web, IA Steering y Menús — **[PLANIFICADA]**
+* **Objetivo:** Asegurar la retención de progreso del jugador en navegadores, afinar la navegación del monstruo en la arena y completar el flujo de menús secundarios.
+* **Entregables Clave:**
+  - [ ] Implementar persistencia de High Score en Web mediante `user://` (IndexedDB en Godot Web) y fallback a `JavaScriptBridge` (`localStorage`).
+  - [ ] Presentar estadísticas de fin de partida (páginas recolectadas vs récord histórico) en la pantalla de Game Over.
+  - [ ] Programar vector de desatasco tangencial (*steering*) en [`scripts/enemigo.gd`](../../scripts/enemigo.gd) para sortear obstáculos convexos sin perder agresividad.
+  - [ ] Conectar las sub-pantallas de Opciones y Créditos a las señales de [`escenas/menu_inicio.tscn`](../../escenas/menu_inicio.tscn).
+  - [ ] Añadir controles de calibración en vivo para linterna y trauma de cámara en [`escenas/debug_menu.tscn`](../../escenas/debug_menu.tscn).
+
+---
+
+### Semana 7 (15/11/2026 – 21/11/2026): Pipeline Artístico y Sustitución de Assets — **[PLANIFICADA]**
+* **Objetivo:** Sustituir los placeholders geométricos por el catálogo visual definitivo de ~30 piezas vectorizadas/renderizadas bajo el pipeline híbrido (Blender + Inkscape).
+* **Entregables Clave:**
+  - [ ] Crear estructura de directorio `assets_raw/` con `.gdignore` para archivos fuente de Blender e Inkscape.
+  - [ ] Exportar los 15 frames definitivos del protagonista (caminar 3 perspectivas, salto en aire, plancha aerodinámica, recuperación y sombra).
+  - [ ] Integrar sprite cenital del monstruo con garras y máscara de ojos brillantes/emisivos.
+  - [ ] Sustituir los tiles y obstáculos modulares (suelo hojarasca, árboles secos/frondosos, rocas asimétricas, troncos caídos y vallas de estacas).
+  - [ ] Producir la ilustración final de impacto de jumpscare ($512 \times 512$ px) para el `AnimationPlayer` de Game Over.
+
+---
+
+### Semana 8 (22/11/2026 – 30/11/2026): QA Multi-Navegador, Key Art y Lanzamiento v1.0 — **[PLANIFICADA]**
+* **Objetivo:** Asegurar la robustez técnica en navegadores, generar el material de difusión y publicar la versión 1.0.
+* **Entregables Clave:**
+  - [ ] Validar compatibilidad y rendimiento en Chrome, Firefox y Edge bajo `gl_compatibility` y `threads = false`.
+  - [ ] Verificar políticas de desbloqueo de AudioContext Web API en el primer clic de usuario en el lienzo.
+  - [ ] Diseñar el Key Art promocional, banners de cabecera y capturas de pantalla para las plataformas de distribución.
+  - [ ] Empaquetar la compilación web optimizada `.zip` y publicar oficialmente el juego en *itch.io* y *Newgrounds*.
 
 ---
 
@@ -112,7 +144,8 @@ flowchart TD
 
 | Riesgo Identificado | Impacto | Probabilidad | Estrategia de Mitigación |
 | :--- | :---: | :---: | :--- |
-| **Cuello de botella en dibujo de sprites** | Alto | Media | Catálogo congelado a un máximo estricto de ~30 piezas; uso de animación procedural (escala de respiración, aceleración de ciclo para sprint, rotación matemática 360° del monstruo). |
-| **Problemas de CORS/COOP en Web** | Crítico | Media | Mantener hilos desactivados (`threads = false`) en el preset Web; de este modo el juego corre en cualquier iframe sin requerir cabeceras HTTP especiales en itch.io/Newgrounds. |
+| **Bloqueo de AudioContext en Web** | Alto | Alta | Desbloquear automáticamente los buses de sonido al registrar la primera interacción de ratón o teclado en el canvas HTML antes de disparar pistas críticas. |
+| **Sobrecarga en el pipeline de 30 sprites** | Alto | Media | Catálogo congelado a un máximo estricto de ~30 piezas; priorizar silueta y ojos de la criatura y animación procedural complementaria (escala de respiración, rotación matemática 360°). |
+| **Problemas de CORS/COOP en Web** | Crítico | Baja | Mantener hilos desactivados (`threads = false`) en el preset Web; de este modo el juego corre en cualquier iframe sin requerir cabeceras HTTP especiales en itch.io/Newgrounds. |
 | **Atascamiento del monstruo al mutar** | Alto | Baja | Algoritmo anti-atascamiento con `test_move()`, reubicando a la criatura al `Marker2D` libre más cercano y excluyéndolo del sorteo de la nueva nota. |
-| **Pérdida de foco del teclado en iframe** | Medio | Alta | Script en contenedor HTML (`canvas.focus()`) y anulación de propagación de teclas (`preventDefault` para Espacio y Flechas). |
+| **Pérdida de foco del teclado en iframe** | Medio | Alta | Script en contenedor HTML (`canvas.focus()`) y anulación de propagación de teclas (`preventDefault` para Espacio y Flechas), respaldado por auto-pausa de motor. |

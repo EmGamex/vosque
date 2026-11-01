@@ -8,7 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://c7acatnude74i" path="res://escenas/game_over.tscn" id="4_tepdp"]
 [ext_resource type="PackedScene" uid="uid://ca751a2ntrauj" path="res://escenas/menu_pausa.tscn" id="7_ap2e7"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_n7npm"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ap2e7"]
 resource_local_to_scene = true
 shader = ExtResource("3_tepdp")
 shader_parameter/center = Vector2(0.5, 0.5)
@@ -25,7 +25,7 @@ script = ExtResource("1_ve7em")
 
 [node name="Velo" parent="Transicion" index="0" unique_id=175064061]
 modulate = Color(1, 1, 1, 0.20000005)
-material = SubResource("ShaderMaterial_n7npm")
+material = SubResource("ShaderMaterial_ap2e7")
 
 [node name="Contenedor" type="Node" parent="." unique_id=1002276879]
 
