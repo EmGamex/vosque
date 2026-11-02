@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://b6bfgvahe6fuf"]
 
-[ext_resource type="Texture2D" uid="uid://blbq7p53egmkr" path="res://recursos/Arbol grande.png" id="1_qawra"]
+[ext_resource type="Texture2D" uid="uid://blbq7p53egmkr" path="res://graficos/obstaculos/Arbol grande.png" id="1_qawra"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_wrfkb"]
 radius = 38.0

@@ -289,21 +289,43 @@ func test_tileset_scenes_collection_y_tilemap_layer() -> void:
 
 	if source == null:
 		source = TileSetScenesCollectionSource.new()
-		var arbol_scene: PackedScene = load("res://escenas/obstaculos/arbol.tscn")
-		var roca_scene: PackedScene = load("res://escenas/obstaculos/roca.tscn")
-		var tronco_scene: PackedScene = load("res://escenas/obstaculos/tronco_bajo.tscn")
-		assert_true(arbol_scene != null, "arbol.tscn debe cargar")
-		assert_true(roca_scene != null, "roca.tscn debe cargar")
-		assert_true(tronco_scene != null, "tronco_bajo.tscn debe cargar")
-
-		source.create_scene_tile(arbol_scene)
-		source.create_scene_tile(roca_scene)
-		source.create_scene_tile(tronco_scene)
 		tileset.add_source(source)
+
+	var arbol_scene: PackedScene = load("res://escenas/obstaculos/arbol.tscn")
+	var roca_scene: PackedScene = load("res://escenas/obstaculos/roca.tscn")
+	var tronco_scene: PackedScene = load("res://escenas/obstaculos/tronco_bajo.tscn")
+	var arbol_alto_scene: PackedScene = load("res://escenas/obstaculos/arbol_alto.tscn")
+	var roca_2_scene: PackedScene = load("res://escenas/obstaculos/roca_2.tscn")
+	assert_true(arbol_scene != null, "arbol.tscn debe cargar")
+	assert_true(roca_scene != null, "roca.tscn debe cargar")
+	assert_true(tronco_scene != null, "tronco_bajo.tscn debe cargar")
+	assert_true(arbol_alto_scene != null, "arbol_alto.tscn debe cargar")
+	assert_true(roca_2_scene != null, "roca_2.tscn debe cargar")
+
+	# Asegurar que arbol_alto y roca_2 estén registrados en la fuente
+	var tiene_arbol_alto := false
+	var tiene_roca_2 := false
+	for i in range(source.get_scene_tiles_count()):
+		var id := source.get_scene_tile_id(i)
+		var sc := source.get_scene_tile_scene(id)
+		if sc == arbol_alto_scene:
+			tiene_arbol_alto = true
+		elif sc == roca_2_scene:
+			tiene_roca_2 = true
+
+	var cambio := false
+	if not tiene_arbol_alto:
+		source.create_scene_tile(arbol_alto_scene)
+		cambio = true
+	if not tiene_roca_2:
+		source.create_scene_tile(roca_2_scene)
+		cambio = true
+
+	if cambio:
 		ResourceSaver.save(tileset, "res://recursos/tilesets/tileset_obstaculos.tres")
 
 	assert_true(source != null, "Debe existir TileSetScenesCollectionSource en tileset")
-	assert_true(source.get_scene_tiles_count() >= 3, "Debe contener al menos 3 escenas registradas (árbol, roca, tronco)")
+	assert_true(source.get_scene_tiles_count() >= 5, "Debe contener al menos 5 escenas registradas (árbol, roca, tronco, árbol alto, roca 2)")
 
 	# Probar instanciación de un TileMapLayer con este TileSet
 	var layer := TileMapLayer.new()

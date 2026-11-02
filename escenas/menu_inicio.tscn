@@ -15,6 +15,7 @@
 [ext_resource type="FontVariation" uid="uid://0htusin8b5jm" path="res://fuentes/raleway_bold.tres" id="9_f3do1"]
 [ext_resource type="Material" uid="uid://dfcf4xfct740f" path="res://shaders/material_motion_blur.tres" id="9_q78gw"]
 [ext_resource type="Material" uid="uid://yb1fvvp7sowg" path="res://shaders/material_crossfade_arboles.tres" id="12_xbcmh"]
+[ext_resource type="Texture2D" uid="uid://dtddin3bi5hb2" path="res://graficos/vosque logotipo.png" id="16_883rq"]
 
 [sub_resource type="Animation" id="Animation_q78gw"]
 length = 0.001
@@ -412,18 +413,6 @@ offset_top = -1080.0
 offset_right = 1080.0
 mouse_filter = 2
 
-[node name="Logo" type="Label" parent="Presentacion" unique_id=1831017180]
-layout_mode = 0
-offset_left = 140.0
-offset_top = 360.0
-offset_right = 940.0
-offset_bottom = 510.0
-theme_override_fonts/font = ExtResource("9_f3do1")
-theme_override_font_sizes/font_size = 88
-text = "V O S Q U E"
-horizontal_alignment = 1
-vertical_alignment = 1
-
 [node name="TextoComenzar" type="Label" parent="Presentacion" unique_id=757412386]
 layout_mode = 0
 offset_left = 140.0
@@ -435,6 +424,15 @@ theme_override_font_sizes/font_size = 32
 text = "PRESIONA ENTER PARA COMENZAR"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="Logo" type="TextureRect" parent="Presentacion" unique_id=1435197706]
+layout_mode = 0
+offset_left = 160.0
+offset_top = 200.0
+offset_right = 920.0
+offset_bottom = 524.0
+mouse_filter = 2
+texture = ExtResource("16_883rq")
 
 [node name="AnimadorCinematica" type="AnimationPlayer" parent="." unique_id=513910754]
 libraries/ = SubResource("AnimationLibrary_mpb5u")

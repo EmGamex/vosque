@@ -1,5 +1,7 @@
 [gd_scene format=3 uid="uid://cr1kke8d4wxbn"]
 
+[ext_resource type="Texture2D" uid="uid://dlr5d8mqm2a1g" path="res://graficos/obstaculos/Tronco.png" id="1_hka7w"]
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ngdes"]
 size = Vector2(140, 40)
 
@@ -11,5 +13,10 @@ collision_mask = 0
 shape = SubResource("RectangleShape2D_ngdes")
 
 [node name="Visual" type="Polygon2D" parent="CollisionShape2D" unique_id=1134834650]
+visible = false
 color = Color(0.3647059, 0.2509804, 0.21568628, 1)
 polygon = PackedVector2Array(-70, -20, 70, -20, 70, 20, -70, 20)
+
+[node name="Tronco" type="Sprite2D" parent="CollisionShape2D" unique_id=1551651862]
+scale = Vector2(0.14611876, 0.14611872)
+texture = ExtResource("1_hka7w")

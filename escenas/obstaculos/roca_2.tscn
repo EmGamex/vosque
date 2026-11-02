@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://dyfdk2038f402"]
+
+[ext_resource type="Texture2D" uid="uid://ddvvh22ff7pjq" path="res://graficos/obstaculos/Piedra 2.png" id="1_jevhj"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_yq6hy"]
+radius = 42.0
+
+[node name="Roca2" type="StaticBody2D" unique_id=359131499]
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1536693112]
+shape = SubResource("CircleShape2D_yq6hy")
+
+[node name="Piedra2" type="Sprite2D" parent="." unique_id=966975176]
+scale = Vector2(0.11, 0.11)
+texture = ExtResource("1_jevhj")

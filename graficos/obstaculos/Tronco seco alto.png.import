@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://blbq7p53egmkr"
-path="res://.godot/imported/Arbol grande.png-43e8db34f4859766064124a09db3ac14.ctex"
+uid="uid://bgmy6cxldeywv"
+path="res://.godot/imported/Tronco seco alto.png-73241a1ae7f7f3308fb4c31b0a16a5bc.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://recursos/Arbol grande.png"
-dest_files=["res://.godot/imported/Arbol grande.png-43e8db34f4859766064124a09db3ac14.ctex"]
+source_file="res://graficos/obstaculos/Tronco seco alto.png"
+dest_files=["res://.godot/imported/Tronco seco alto.png-73241a1ae7f7f3308fb4c31b0a16a5bc.ctex"]
 
 [params]
 

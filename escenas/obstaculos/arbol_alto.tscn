@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://5vi10u2bxvva"]
+
+[ext_resource type="Texture2D" uid="uid://dwe4wb08w5lv1" path="res://graficos/obstaculos/Arbol alto.png" id="1_geujv"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_fboys"]
+radius = 38.0
+
+[node name="ArbolAlto" type="StaticBody2D" unique_id=711579737]
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2044644367]
+scale = Vector2(3.12, 3.12)
+shape = SubResource("CircleShape2D_fboys")
+
+[node name="ArbolAlto" type="Sprite2D" parent="." unique_id=143932987]
+scale = Vector2(0.242, 0.242)
+texture = ExtResource("1_geujv")

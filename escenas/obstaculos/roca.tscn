@@ -1,5 +1,7 @@
 [gd_scene format=3 uid="uid://ubufxvikk2hl"]
 
+[ext_resource type="Texture2D" uid="uid://1lxh700gexwv" path="res://graficos/obstaculos/Piedra 1.png" id="1_vqkqp"]
+
 [sub_resource type="CircleShape2D" id="CircleShape2D_ysaam"]
 radius = 42.0
 
@@ -10,5 +12,10 @@ collision_mask = 0
 shape = SubResource("CircleShape2D_ysaam")
 
 [node name="Visual" type="Polygon2D" parent="CollisionShape2D" unique_id=165855913]
+visible = false
 color = Color(0.22745098, 0.23921569, 0.27058825, 1)
 polygon = PackedVector2Array(-42, -14, -24, -40, 20, -42, 42, -14, 38, 26, 18, 42, -20, 40, -40, 18)
+
+[node name="Piedra1" type="Sprite2D" parent="." unique_id=752077837]
+scale = Vector2(0.10958899, 0.10958904)
+texture = ExtResource("1_vqkqp")
