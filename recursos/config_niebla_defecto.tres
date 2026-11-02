@@ -1,4 +1,4 @@
-﻿[gd_resource type="Resource" script_class="ConfiguracionNiebla" format=3 uid="uid://bgokli5kooqfg"]
+[gd_resource type="Resource" script_class="ConfiguracionNiebla" format=3 uid="uid://bgokli5kooqfg"]
 
 [ext_resource type="Script" uid="uid://o0fiy5a15bpe" path="res://scripts/mundo/configuracion_niebla.gd" id="1_gd6ih"]
 

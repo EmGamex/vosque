@@ -1,4 +1,4 @@
-﻿[gd_scene format=3 uid="uid://bosn1xlpgwiqr"]
+[gd_scene format=3 uid="uid://bosn1xlpgwiqr"]
 
 [ext_resource type="Script" uid="uid://dscicbplr33cu" path="res://scripts/ui/indicador_estamina.gd" id="1_e4uvo"]
 

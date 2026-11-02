@@ -1,4 +1,4 @@
-﻿[gd_scene format=3 uid="uid://1ghcw0gsau84"]
+[gd_scene format=3 uid="uid://1ghcw0gsau84"]
 
 [ext_resource type="Script" uid="uid://b0uuym7phch8j" path="res://scripts/mundo/efecto_niebla/efecto_niebla_mutacion.gd" id="1_sychq"]
 [ext_resource type="Script" uid="uid://o0fiy5a15bpe" path="res://scripts/mundo/configuracion_niebla.gd" id="2_3ecnl"]

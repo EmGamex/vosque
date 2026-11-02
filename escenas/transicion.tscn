@@ -1,4 +1,4 @@
-﻿[gd_scene format=3 uid="uid://q7eut14gtt1u"]
+[gd_scene format=3 uid="uid://q7eut14gtt1u"]
 
 [ext_resource type="Script" uid="uid://savg24on0e3t" path="res://scripts/core/transicion.gd" id="1_ge0l3"]
 [ext_resource type="Material" uid="uid://u43ok6k7sinr" path="res://shaders/material_transicion_iris.tres" id="2_biku6"]

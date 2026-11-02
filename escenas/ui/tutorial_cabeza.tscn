@@ -1,4 +1,4 @@
-﻿[gd_scene format=3 uid="uid://dte8iac0uavl"]
+[gd_scene format=3 uid="uid://dte8iac0uavl"]
 
 [ext_resource type="Script" uid="uid://bgdclnvnftbib" path="res://scripts/ui/tutorial_cabeza/tutorial_cabeza.gd" id="1_tq8vd"]
 [ext_resource type="Texture2D" uid="uid://b6ijb42ds2xvn" path="res://graficos/ui/icono_raton.svg" id="2_6aqmr"]

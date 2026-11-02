@@ -1,4 +1,4 @@
-﻿[gd_scene format=3 uid="uid://b3dierpagcaih"]
+[gd_scene format=3 uid="uid://b3dierpagcaih"]
 
 [ext_resource type="Script" uid="uid://bm561vv7tuxt4" path="res://scripts/entidades/personaje/personaje.gd" id="1_5nfxw"]
 [ext_resource type="Texture2D" uid="uid://ddjl04k42w54l" path="res://icon.svg" id="1_v023a"]
