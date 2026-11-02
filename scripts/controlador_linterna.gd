@@ -186,9 +186,11 @@ func _resolver_objetivo_monstruo() -> void:
 				objetivo_monstruo = candidato as Node2D
 
 
-var _textura_cache: ImageTexture = null
-var _apertura_cache: float = -1.0
-var _suavizado_cache: float = -1.0
+const TEXTURA_CANONICA_PATH := "res://recursos/iluminacion/textura_luz_cono.png"
+
+var _textura_cache: Texture2D = null
+var _apertura_cache: float = 60.0
+var _suavizado_cache: float = 0.25
 
 
 func _aplicar_configuracion() -> void:
@@ -205,18 +207,34 @@ func _aplicar_configuracion() -> void:
 		linterna.offset = Vector2(256.0, 0.0)
 		linterna.texture_scale = config.alcance_px / 512.0
 
-		if _textura_cache == null or _apertura_cache != config.apertura_grados or _suavizado_cache != config.suavizado_borde:
-			_apertura_cache = config.apertura_grados
-			_suavizado_cache = config.suavizado_borde
-			_textura_cache = GeneradorLuzCono.generar_textura_cono(
-				config.alcance_px,
-				config.apertura_grados,
-				config.suavizado_borde,
-				512
-			)
-			linterna.texture = _textura_cache
-		elif linterna.texture != _textura_cache:
-			linterna.texture = _textura_cache
+		var es_config_por_defecto: bool = (
+			is_equal_approx(config.apertura_grados, 60.0)
+			and is_equal_approx(config.suavizado_borde, 0.25)
+		)
+
+		if es_config_por_defecto:
+			if linterna.texture == null and ResourceLoader.exists(TEXTURA_CANONICA_PATH):
+				linterna.texture = load(TEXTURA_CANONICA_PATH)
+			_textura_cache = linterna.texture
+			_apertura_cache = 60.0
+			_suavizado_cache = 0.25
+		else:
+			if (
+				_textura_cache == null
+				or not is_equal_approx(_apertura_cache, config.apertura_grados)
+				or not is_equal_approx(_suavizado_cache, config.suavizado_borde)
+			):
+				_apertura_cache = config.apertura_grados
+				_suavizado_cache = config.suavizado_borde
+				_textura_cache = GeneradorLuzCono.generar_textura_cono(
+					config.alcance_px,
+					config.apertura_grados,
+					config.suavizado_borde,
+					512
+				)
+				linterna.texture = _textura_cache
+			elif linterna.texture != _textura_cache:
+				linterna.texture = _textura_cache
 
 	if halo != null:
 		halo.color = config.color_halo

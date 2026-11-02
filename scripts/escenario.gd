@@ -82,10 +82,11 @@ func actualizar_iluminacion_ambiental(notas_recolectadas: int, duracion_transici
 
 
 func _resolver_referencias_objetivos() -> void:
-	if objetivo_jugador == null and get_parent() != null:
-		objetivo_jugador = get_parent().find_child("personaje", true, false) as Node2D
-		if objetivo_jugador == null:
-			objetivo_jugador = get_parent().find_child("EmGamex", true, false) as Node2D
+	if objetivo_jugador == null:
+		if is_inside_tree():
+			objetivo_jugador = get_tree().get_first_node_in_group("jugador") as Node2D
+		if objetivo_jugador == null and get_parent() != null:
+			objetivo_jugador = get_parent().find_child("personaje", true, false) as Node2D
 
 	if objetivo_enemigo == null and get_parent() != null:
 		objetivo_enemigo = get_parent().find_child("Enemigo", true, false) as CharacterBody2D

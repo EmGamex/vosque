@@ -163,3 +163,45 @@ func test_director_orquestacion_despertar() -> void:
 	mock_jugador.free()
 	mock_enemigo.free()
 	maain.free()
+
+
+func test_director_orquestacion_captura_y_game_over() -> void:
+	var maain := Maain.new()
+	maain.add_to_group("modo_test")
+
+	var mock_jugador := CharacterBody2D.new()
+	mock_jugador.name = "personaje"
+	mock_jugador.velocity = Vector2(300, 300)
+	maain.add_child(mock_jugador)
+
+	var mock_enemigo := Enemigo.new()
+	mock_enemigo.name = "Enemigo"
+	mock_enemigo.hibernar_al_iniciar = false
+	mock_enemigo.hibernando = false
+	maain.add_child(mock_enemigo)
+
+	maain._ready()
+	mock_enemigo.hibernando = false
+
+	# 1. Comprobar inyección de dependencias desde el director
+	assert_eq(mock_enemigo.objetivo, mock_jugador, "Maain debe inyectar el jugador como objetivo del enemigo")
+
+	var signal_game_over_recibida := [false]
+	maain.game_over_solicitado.connect(func(): signal_game_over_recibida[0] = true)
+
+	# 2. Simular captura del jugador por el enemigo
+	mock_enemigo._intentar_capturar(mock_jugador)
+
+	assert_true(mock_enemigo.get("_capturado"), "El enemigo debe marcar _capturado = true")
+	assert_true(maain.partida_terminada, "Maain debe registrar partida_terminada = true al ser notificado")
+	assert_true(signal_game_over_recibida[0], "Maain debe emitir game_over_solicitado hacia GestorDeEscenas")
+	assert_eq(mock_jugador.velocity, Vector2.ZERO, "El jugador debe frenarse a Vector2.ZERO al ser capturado")
+	assert_false(mock_jugador.is_physics_processing(), "El proceso físico del jugador debe desactivarse tras la captura")
+
+	# 3. Invariante: mientras partida_terminada sea true, no deben generarse nuevas notas
+	var nota_invalida := maain.generar_nota()
+	assert_true(nota_invalida == null, "generar_nota() debe retornar null si la partida terminó")
+
+	mock_jugador.free()
+	mock_enemigo.free()
+	maain.free()

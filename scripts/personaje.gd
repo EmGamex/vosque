@@ -76,6 +76,7 @@ func consumir_buffer_salto() -> void:
 
 
 func _ready() -> void:
+	add_to_group("jugador")
 	motion_mode = CharacterBody2D.MOTION_MODE_FLOATING
 	stamina = max_stamina
 	_restaurar_mascara_colision_suelo()

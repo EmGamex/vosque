@@ -48,7 +48,6 @@ var _trail_intervalo: float = 0.04
 var _trail_timer: float = 0.0
 const MAX_TRAIL_PUNTOS: int = 45
 
-@onready var _gestor: GestorDeEscenas = (get_node_or_null("/root/GestorEscenas") as GestorDeEscenas) if is_inside_tree() else null
 @onready var _area_captura: Area2D = get_node_or_null("AreaCaptura") as Area2D
 @onready var _visual: Node2D = get_node_or_null("BocetoVisual") as Node2D
 @onready var _raycast_vision: RayCast2D = get_node_or_null("RayCastVision") as RayCast2D
@@ -57,8 +56,11 @@ const MAX_TRAIL_PUNTOS: int = 45
 func _ready() -> void:
 	add_to_group("monstruo")
 	motion_mode = CharacterBody2D.MOTION_MODE_FLOATING
-	if objetivo == null and get_parent() != null:
-		objetivo = get_parent().get_node_or_null("personaje") as Node2D
+	if objetivo == null:
+		if is_inside_tree():
+			objetivo = get_tree().get_first_node_in_group("jugador") as Node2D
+		if objetivo == null and get_parent() != null:
+			objetivo = get_parent().get_node_or_null("personaje") as Node2D
 	if _area_captura != null:
 		_area_captura.body_entered.connect(_on_body_entered)
 	if _raycast_vision == null:
@@ -253,8 +255,6 @@ func _intentar_capturar(body: Node2D) -> void:
 		_capturado = true
 		velocity = Vector2.ZERO
 		jugador_capturado.emit(global_position)
-		if _gestor != null:
-			_gestor.ir_a(GestorDeEscenas.RUTA_GAME_OVER)
 
 
 func _comprobar_captura_continua() -> void:
@@ -267,6 +267,4 @@ func _comprobar_captura_continua() -> void:
 			_capturado = true
 			velocity = Vector2.ZERO
 			jugador_capturado.emit(global_position)
-			if _gestor != null:
-				_gestor.ir_a(GestorDeEscenas.RUTA_GAME_OVER)
 			break

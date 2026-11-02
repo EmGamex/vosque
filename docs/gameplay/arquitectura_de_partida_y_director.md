@@ -58,7 +58,8 @@ sequenceDiagram
     opt Contacto Mortal con Enemigo
         Monstruo->>Director: jugador_capturado
         Director->>Director: registrar_high_score(notas_recogidas)
-        Director->>Gestor: ir_a(RUTA_GAME_OVER)
+        Director->>Gestor: game_over_solicitado (Signal Up)
+        Gestor->>Gestor: ir_a(RUTA_GAME_OVER)
     end
 ```
 
@@ -73,8 +74,9 @@ sequenceDiagram
 * **Efectos y Transición Cinemática:**
   1. La velocidad del jugador y del enemigo se anula a `Vector2.ZERO`, congelando la simulación de movimiento.
   2. El Game Director guarda y compara la puntuación actual con el récord persistido.
-  3. Se delega la transición inmediata a `GestorDeEscenas.ir_a(GestorDeEscenas.RUTA_GAME_OVER)`.
-  4. La pantalla de destino (`escenas/game_over.tscn`) toma el control cinemático ejecutando su nodo **`AnimationPlayer`** (`jumpscare_derrota`), que reproduce simultáneamente el golpe acústico seco, el zoom elástico de la ilustración de la criatura, el flash carmesí y la inyección de trauma de cámara, antes de revelar las estadísticas y habilitar el botón de reinicio.
+  3. El Game Director emite la señal `game_over_solicitado` hacia `GestorDeEscenas`.
+  4. `GestorDeEscenas` ejecuta la transición con fundido iris hacia `GestorDeEscenas.RUTA_GAME_OVER`.
+  5. La pantalla de destino (`escenas/game_over.tscn`) toma el control cinemático ejecutando su nodo **`AnimationPlayer`** (`jumpscare_derrota`), que reproduce simultáneamente el golpe acústico seco, el zoom elástico de la ilustración de la criatura, el flash carmesí y la inyección de trauma de cámara, antes de revelar las estadísticas y habilitar el botón de reinicio.
 
 ### 3.2. Filosofía de Victoria vs. Supervivencia Arcade Infinita
 * **Modo Arcade Infinito (Predeterminado):** La partida continúa mientras el jugador conserve la vida. La dificultad alcanza su meseta máxima en la Nota 10+ ($920\text{ px/s}$), donde el juego se convierte en una prueba de resistencia extrema para alcanzar el récord más alto posible.

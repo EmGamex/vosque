@@ -87,8 +87,8 @@ func _es_jugador(body: Node2D) -> bool:
 		return false
 	if body is Personaje:
 		return true
-	if body.name.to_lower() == "personaje" or body.name == "EmGamex":
-		return true
 	if body.is_in_group("jugador"):
+		return true
+	if body.name.to_lower() == "personaje":
 		return true
 	return false

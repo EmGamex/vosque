@@ -102,8 +102,8 @@ flowchart TD
 * **Entregables Clave:**
   - [ ] Implementar el sistema de sacudida por trauma (*Camera Shake*) en [`escenas/camara.tscn`](../../escenas/camara.tscn) con modelo de trauma cuadrático ($T^2$), decaimiento lineal e impulsos por caída de plancha ($+0.35$), proximidad y muerte ($+1.0$).
   - [ ] Implementar la orquestación de Game Over en [`escenas/game_over.tscn`](../../escenas/game_over.tscn) mediante `AnimationPlayer` con track multicanal de zoom de jumpscare, flash carmesí, trauma de cámara y audio de impacto.
-  - [ ] Crear el Singleton Autoload `GestorMusica` ([`scripts/gestor_musica.gd`](../../scripts/gestor_musica.gd)) con crossfade fluido de $2.0\text{ s}$ de `Night Crawling` a `Haunted Boardwalk` al recolectar la Nota 1, atenuación por proximidad de la criatura (*audio ducking*) y corte súbito en derrota.
-  - [ ] Configurar buses de audio en `default_bus_layout.tres` (`Master`, `sfx`, `musica`) con filtros de ambiente (reverberación cavernosa post-derrota y filtro pasa-bajos en fatiga).
+  - [ ] Crear el Singleton Autoload `GestorMusica` ([`scripts/gestor_musica.gd`](../../scripts/gestor_musica.gd)) y recurso `AudioStreamInteractive` con conmutación en `NEXT_BEAT` sin fade de `Night Crawling` a `Haunted Boardwalk` al recolectar la Nota 1, atenuación de doble capa por proximidad y linterna (*audio ducking*), atenuación en pausa ($-16\text{ dB}$) y corte súbito a $0\text{ ms}$ en derrota.
+  - [ ] Configurar los 5 buses de audio en `default_bus_layout.tres` (`Master`, `Ambiente`, `sfx`, `Criatura`, `musica`) con filtros dedicados (reverberación cavernosa en `musica` post-derrota y filtro pasa-bajos en `Master` para fatiga).
   - [ ] Integrar biblioteca de SFX esenciales (pasos según velocidad sobre hojarasca, despegue de salto, golpe de plancha, rasgado de nota y zumbido/alarma de la criatura).
 
 ---

@@ -34,12 +34,12 @@ flowchart TD
     subgraph Modulaciones ["Efectos y Modulaciones en Tiempo Real"]
         FiltroFatiga["AudioEffectLowPassFilter<br/>(Bus Master - Activo en fatiga)"]
         ReverbGameOver["AudioEffectReverb<br/>(Bus Musica - Activo en Game Over)"]
-        DuckingCriatura["Ducking Proximidad<br/>(Baja Bus Musica de -8 dB a -20 dB)"]
+        DuckingDobleCapa["Ducking Doble Capa & Pausa<br/>(Bus Musica: -8 dB a -20 dB / -28 dB / -16 dB)"]
     end
 
     Master --- FiltroFatiga
     Musica --- ReverbGameOver
-    Criatura -.-> DuckingCriatura
+    Criatura -.-> DuckingDobleCapa
 ```
 
 | Bus de Audio | Volumen Base | Efectos Asignados | Propósito |
@@ -48,7 +48,7 @@ flowchart TD
 | **Ambiente** | $-6.0\text{ dB}$ | Pre-procesado (Bypass en motor) | Viento sibilante continuo y crujidos con reverberación horneada en el `.ogg`. |
 | **Efectos** | $-2.0\text{ dB}$ | Ninguno | Pasos en hojarasca, jadeos de recuperación, salto y rasgado de notas. |
 | **Criatura** | $+1.0\text{ dB}$ | Pre-procesado (Bypass en motor) | Sonidos guturales y estática con máxima prioridad auditiva. |
-| **Musica** | $-8.0\text{ dB}$ | `AudioEffectReverb` (bypass) | Pistas musicales interactivas; aplica atenuación por proximidad y efecto pesadilla en derrota. |
+| **Musica** | $-8.0\text{ dB}$ | `AudioEffectReverb` (bypass) | Pistas musicales interactivas; modula ducking por distancia/linterna, atenuación en pausa y efecto pesadilla en derrota. |
 
 ---
 
@@ -56,11 +56,11 @@ flowchart TD
 
 > 📖 **Especificación completa:** Para consultar la máquina de estados detallada, diagramas de transición, arquitectura del Autoload `GestorMusica` y fórmulas matemáticas de atenuación, consulta [Sistema de Música Interactiva](sistema_de_musica.md).
 
-El diseño musical acompaña la evolución emocional del jugador desde la intriga inicial hasta la paranoia absoluta del bosque abierto:
+El diseño musical acompaña la evolución emocional del jugador desde la intriga inicial hasta la paranoia absoluta del bosque abierto mediante el recurso `AudioStreamInteractive`:
 * **Menú Principal + Tutorial (`Night Crawling`):** Mantiene continuidad fluida entre el menú con linterna y el aprendizaje seguro en el Sector Central sin cortes de reproducción.
-* **Supervivencia Activa (`Haunted Boardwalk`):** Transición mediante crossfade de $2.0\text{ s}$ al recolectar la Nota 1.
-* **Audio Ducking:** Atenuación dinámica de $-8\text{ dB}$ a $-20\text{ dB}$ cuando la criatura se sitúa a menos de $800\text{ px}$.
-* **Game Over (Nightmare Decay):** Detención súbita en jumpscare seguida de ralentización (`pitch_scale = 0.65`) y activación de `AudioEffectReverb` cavernoso en la pantalla de derrota.
+* **Supervivencia Activa (`Haunted Boardwalk`):** Conmutación instantánea pero rítmicamente alineada en el siguiente pulso (`NEXT_BEAT`) sin fade al recolectar la Nota 1.
+* **Audio Ducking de Doble Capa y Pausa:** Atenuación dinámica de $-8\text{ dB}$ a $-20\text{ dB}$ por cercanía ($< 800\text{ px}$), caída extra hasta $-28\text{ dB}$ si la linterna enfoca a la criatura con visión directa, y atenuación fija a $-16\text{ dB}$ al pausar.
+* **Game Over (Nightmare Decay):** Detención súbita a $0\text{ ms}$ en jumpscare seguida de reanudación con ralentización (`pitch_scale = 0.65`) y activación de `AudioEffectReverb` cavernoso en la pantalla de derrota.
 
 ---
 
@@ -69,7 +69,7 @@ El diseño musical acompaña la evolución emocional del jugador desde la intrig
 En compilaciones HTML5 sin soporte de hilos, el motor de mezcla de audio se ejecuta en el mismo hilo de CPU que las físicas y el renderizado:
 
 1. **Efectos Pre-procesados (*Baked DSP*):**
-   - Efectos pesados en tiempo real como `AudioEffectReverb` o distorsiones continuas pueden generar crepitaciones (*audio crackling*) si el framerate fluctúa. Por ello, **la reverberación del bosque y la distorsión del monstruo deben venir pre-procesadas directamente en las pistas de audio** (.ogg/.wav), reservando únicamente el `AudioEffectLowPassFilter` dinámico en el bus `Master` para la mecánica de fatiga.
+   - Efectos pesados en tiempo real como `AudioEffectReverb` o distorsiones continuas pueden generar crepitaciones (*audio crackling*) si el framerate fluctúa. Por ello, **la reverberación del bosque y la distorsión del monstruo deben venir pre-procesadas directamente en las pistas de audio** (.ogg/.wav), reservando únicamente el `AudioEffectLowPassFilter` dinámico en el bus `Master` para fatiga y aislando el `AudioEffectReverb` del bus `musica` para que solo se encienda en Game Over.
 2. **Límites de Polifonía (`max_polyphony`):**
    - En todos los nodos `AudioStreamPlayer2D` (como los pasos del protagonista o el rasgado de la nota), fijar `max_polyphony = 2` o `3` para evitar que llamadas rápidas acumulen instancias virtuales en WebAudio.
 3. **Formatos de Archivo:**
@@ -78,27 +78,27 @@ En compilaciones HTML5 sin soporte de hilos, el motor de mezcla de audio se ejec
 
 ---
 
-## 4. Catálogo de Efectos de Sonido (SFX)
+## 5. Catálogo de Efectos de Sonido (SFX)
 
-### 3.1. Jugador
+### 5.1. Jugador
 * **Pasos en Hojarasca:** Sonido seco y crujiente reproducido mediante `AudioStreamPlayer2D` con modulación de pitch aleatoria ($\pm 0.08$) para evitar monotonía. Su cadencia acelera automáticamente al entrar en `SPRINT`.
 * **Despegue de Salto:** Esfuerzo breve y susurro de ropa al impulsarse.
 * **Impacto y Recuperación de Plancha:** Golpe sordo y arrastre pesado en el suelo hojoso, seguido de una respiración agitada durante los $0.6\text{ s}$ de inmovilidad.
 
-### 3.2. Criatura y Proximidad Amenazante
+### 5.2. Criatura y Proximidad Amenazante
 * **Radar de Proximidad 2D:** El monstruo cuenta con un `AudioStreamPlayer2D` continuo emitiendo una combinación de respiración cavernosa y zumbido electromagnético/estática de radio.
 * **Modelo de Atenuación Sonora:**
   - `max_distance`: $1400.0\text{ px}$.
   - `attenuation`: Curva logarítmica ($1.8$) para que el sonido empiece casi inaudible a larga distancia pero aumente con una presencia sofocante en los últimos $400\text{ px}$.
 * **Jumpscare Letal:** Golpe orquestal súbito, seco y disonante en el milisegundo de contacto que culmina en Game Over.
 
-### 3.3. Entorno y Coleccionables
+### 5.3. Entorno y Coleccionables
 * **Recolección de Nota:** Rasgado nítido de papel antiguo acompañado de un breve acorde tenso de advertencia que confirma la recogida sin interrumpir la música.
 * **Viento Ominoso:** Bucle de baja frecuencia continuo que genera sensación de desamparo y frío nocturno.
 
 ---
 
-## 4. Feedback Sensorial y Tensión Visual
+## 6. Feedback Sensorial y Tensión Visual
 
 * **Monstruo en el Haz de Luz:** Cuando el enemigo penetra el cono de la linterna frontal:
   - Se activa una ligera vibración de cámara (ver [Cámara y Game Feel](../gameplay/camara_y_game_feel.md)).

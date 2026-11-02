@@ -7,6 +7,7 @@ extends Node2D
 
 signal nota_aparecida(posicion: Vector2)
 signal nota_recogida(posicion: Vector2, total_recogidas: int)
+signal game_over_solicitado
 
 const DISTANCIA_SEGURA_JUGADOR_DEFECTO: float = 600.0
 const DISTANCIA_SEGURA_MONSTRUO_DEFECTO: float = 800.0
@@ -22,6 +23,7 @@ const DISTANCIA_SEGURA_MONSTRUO_DEFECTO: float = 800.0
 
 var nota_activa: Nota = null
 var notas_recolectadas: int = 0
+var partida_terminada: bool = false
 
 
 func _ready() -> void:
@@ -29,7 +31,9 @@ func _ready() -> void:
 	if Engine.is_editor_hint() and not is_in_group("modo_test"):
 		return
 	_resolver_referencias()
+	_inyectar_dependencias()
 	_conectar_senales_escenario()
+	_conectar_senales_enemigo()
 	if not visibility_changed.is_connected(_on_visibility_changed):
 		visibility_changed.connect(_on_visibility_changed)
 	_on_visibility_changed()
@@ -50,6 +54,8 @@ func _resolver_referencias() -> void:
 		escenario = get_node_or_null("Escenario") as Escenario
 	if jugador == null:
 		jugador = get_node_or_null("personaje") as Node2D
+		if jugador == null and is_inside_tree():
+			jugador = get_tree().get_first_node_in_group("jugador") as Node2D
 		if jugador == null:
 			jugador = get_node_or_null("EmGamex") as Node2D
 	if enemigo == null:
@@ -58,9 +64,36 @@ func _resolver_referencias() -> void:
 		hud = get_node_or_null("HUD") as HUD
 
 
+func _inyectar_dependencias() -> void:
+	if enemigo != null and is_instance_valid(enemigo) and jugador != null:
+		enemigo.objetivo = jugador
+	if escenario != null and is_instance_valid(escenario):
+		if jugador != null and escenario.objetivo_jugador == null:
+			escenario.objetivo_jugador = jugador
+		if enemigo != null and escenario.objetivo_enemigo == null:
+			escenario.objetivo_enemigo = enemigo
+
+
 func _conectar_senales_escenario() -> void:
 	if escenario != null and not escenario.sectores_mutados.is_connected(_on_sectores_mutados):
 		escenario.sectores_mutados.connect(_on_sectores_mutados)
+
+
+func _conectar_senales_enemigo() -> void:
+	if enemigo != null and not enemigo.jugador_capturado.is_connected(_on_jugador_capturado):
+		enemigo.jugador_capturado.connect(_on_jugador_capturado)
+
+
+func _on_jugador_capturado(_posicion_captura: Vector2) -> void:
+	if partida_terminada:
+		return
+	partida_terminada = true
+
+	if jugador != null and is_instance_valid(jugador):
+		jugador.set("velocity", Vector2.ZERO)
+		jugador.set_physics_process(false)
+
+	game_over_solicitado.emit()
 
 
 func hay_nota_activa() -> bool:
@@ -86,8 +119,8 @@ func spawn_nota_inicial() -> Nota:
 
 
 func generar_nota() -> Nota:
-	# 1. Invariante de Existencia
-	if hay_nota_activa():
+	# 1. Invariante de Existencia y Estado de Partida
+	if partida_terminada or hay_nota_activa():
 		return null
 
 	_resolver_referencias()
@@ -143,6 +176,8 @@ func generar_nota() -> Nota:
 
 
 func _on_nota_recolectada(pos_nota: Vector2) -> void:
+	if partida_terminada:
+		return
 	nota_activa = null
 	notas_recolectadas += 1
 	nota_recogida.emit(pos_nota, notas_recolectadas)

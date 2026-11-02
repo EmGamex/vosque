@@ -14,6 +14,7 @@ Para garantizar alta cohesión, modularidad y testabilidad en Godot 4:
 * **Call Down (Orquestador $\to$ Pantallas):** `GestorDeEscenas` gestiona la visibilidad (`visible`), el modo de proceso (`process_mode`), apaga cámaras (`_fijar_camaras`) e invoca el método `enfocar()` de forma diferida en la pantalla activa.
 * **Signal Up (Pantallas $\to$ Orquestador):** Las pantallas no dependen de rutas fijas (`/root/GestorEscenas`) y son completamente autónomas (pueden instanciarse y probarse solas con <kbd>F6</kbd> o en tests automatizados). Notifican sus eventos mediante señales:
   - `MenuInicio`: emite `jugar_solicitado`, `opciones_solicitado` y `creditos_solicitado`.
+  - `Maain`: emite `game_over_solicitado` al ser notificado de la captura del jugador.
   - `GameOver`: emite `reintentar_solicitado` y `menu_solicitado`.
   - `MenuPausa`: emite `continuar_solicitado`, `reiniciar_solicitado` y `menu_solicitado`.
   - `GestorDeEscenas`: conecta dinámicamente estas señales en `_conectar_senales_pantalla()` al registrar o instanciar cada pantalla.
@@ -22,16 +23,20 @@ Para garantizar alta cohesión, modularidad y testabilidad en Godot 4:
 flowchart TD
     GE["GestorDeEscenas (Orquestador Raíz)"]
     MI["MenuInicio (Control)"]
+    M["Maain (Partida Activa)"]
     GO["GameOver (Control)"]
     MP["MenuPausa (CanvasLayer 50)"]
 
     GE -- "Call Down: enfocar() / visibilidad / process_mode" --> MI
+    GE -- "Call Down: enfocar() / visibilidad / process_mode" --> M
     GE -- "Call Down: enfocar() / visibilidad / process_mode" --> GO
     GE -- "Call Down: pausar() / reanudar()" --> MP
 
     MI -. "Signal Up: jugar_solicitado" .-> GE
     MI -. "Signal Up: opciones_solicitado" .-> GE
     MI -. "Signal Up: creditos_solicitado" .-> GE
+
+    M -. "Signal Up: game_over_solicitado" .-> GE
 
     GO -. "Signal Up: reintentar_solicitado" .-> GE
     GO -. "Signal Up: menu_solicitado" .-> GE

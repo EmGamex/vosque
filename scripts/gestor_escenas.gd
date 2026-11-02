@@ -58,6 +58,8 @@ func puede_pausar() -> bool:
 	var juego: Node = _pantallas.get(RUTA_JUEGO) as Node
 	if juego == null or not is_instance_valid(juego):
 		return false
+	if juego.get("partida_terminada") == true:
+		return false
 	var enemigo: Node = juego.get_node_or_null("Enemigo")
 	if enemigo != null and enemigo.get("_capturado") == true:
 		return false
@@ -131,8 +133,7 @@ func _unhandled_input(evento: InputEvent) -> void:
 			volver_al_menu()
 			get_viewport().set_input_as_handled()
 	elif evento is InputEventKey and evento.pressed and not evento.echo and evento.keycode == KEY_G:
-		# Provisional: dispara el Game Over para probar el bucle.
-		# Sustituir por la muerte real cuando exista la criatura.
+		# Atajo de depuración: fuerza Game Over para pruebas rápidas de transición.
 		ir_a(RUTA_GAME_OVER)
 		get_viewport().set_input_as_handled()
 
@@ -188,6 +189,10 @@ func _conectar_senales_pantalla(pantalla: Node) -> void:
 		if not pantalla.is_connected("menu_solicitado", _on_menu_solicitado):
 			pantalla.connect("menu_solicitado", _on_menu_solicitado)
 
+	if pantalla.has_user_signal("game_over_solicitado") or pantalla.has_signal("game_over_solicitado"):
+		if not pantalla.is_connected("game_over_solicitado", _on_game_over_solicitado):
+			pantalla.connect("game_over_solicitado", _on_game_over_solicitado)
+
 
 func _on_jugar_solicitado() -> void:
 	iniciar_partida()
@@ -195,6 +200,10 @@ func _on_jugar_solicitado() -> void:
 
 func _on_menu_solicitado() -> void:
 	volver_al_menu()
+
+
+func _on_game_over_solicitado() -> void:
+	ir_a(RUTA_GAME_OVER)
 
 
 ## Deja activa la pantalla de la ruta dada y aparca el resto.

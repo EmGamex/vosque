@@ -52,6 +52,14 @@ func test_generador_textura_cono() -> void:
 	var pixel_fuera := img.get_pixel(100, 10)
 	assert_eq(pixel_fuera.a, 0.0, "Píxel fuera de los 60° debe ser completamente transparente")
 
+	# Generar el PNG canónico para recursos/iluminacion/textura_luz_cono.png si no existe
+	var png_path := "res://recursos/iluminacion/textura_luz_cono.png"
+	if not FileAccess.file_exists(png_path):
+		var tex_canonical := GeneradorLuzCono.generar_textura_cono(700.0, 60.0, 0.25, 512)
+		var img_canonical := tex_canonical.get_image()
+		var err := img_canonical.save_png(png_path)
+		assert_eq(err, OK, "Debe poder guardarse textura_luz_cono.png")
+
 
 func test_jerarquia_y_presupuesto_personaje() -> void:
 	var escena_personaje: PackedScene = load("res://escenas/personaje.tscn")
