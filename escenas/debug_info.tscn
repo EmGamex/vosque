@@ -1,6 +1,6 @@
-[gd_scene format=3 uid="uid://c8k73gfe30jxy"]
+﻿[gd_scene format=3 uid="uid://c8k73gfe30jxy"]
 
-[ext_resource type="Script" uid="uid://cg8fbqp0qq0e7" path="res://scripts/debug_info.gd" id="1_debug"]
+[ext_resource type="Script" uid="uid://cg8fbqp0qq0e7" path="res://scripts/debug/debug_info.gd" id="1_debug"]
 [ext_resource type="StyleBox" uid="uid://cqttojwkq103m" path="res://escenas/debug_key_bg.tres" id="2_iiocv"]
 [ext_resource type="StyleBox" uid="uid://b3ulhrcjolqpr" path="res://escenas/debug_center_bg.tres" id="3_h2i7j"]
 

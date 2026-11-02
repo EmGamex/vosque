@@ -1,6 +1,6 @@
-[gd_scene format=3 uid="uid://d3e688a28kpuq"]
+﻿[gd_scene format=3 uid="uid://d3e688a28kpuq"]
 
-[ext_resource type="Script" uid="uid://b6jiwn4xdtmcp" path="res://scripts/menu_inicio.gd" id="1_leqng"]
+[ext_resource type="Script" uid="uid://b6jiwn4xdtmcp" path="res://scripts/ui/menu_inicio.gd" id="1_leqng"]
 [ext_resource type="Texture2D" uid="uid://bbhkpjs77itdn" path="res://graficos/menu principal/fondo degradado.jpg" id="2_pwyh3"]
 [ext_resource type="Texture2D" uid="uid://bee043igkwa1n" path="res://graficos/menu principal/fondo degradado alargado.jpg" id="3_2v816"]
 [ext_resource type="Texture2D" uid="uid://dhkyi68atr4si" path="res://graficos/menu principal/montaña 2.png" id="3_q3oj6"]

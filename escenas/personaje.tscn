@@ -1,6 +1,6 @@
-[gd_scene format=3 uid="uid://b3dierpagcaih"]
+﻿[gd_scene format=3 uid="uid://b3dierpagcaih"]
 
-[ext_resource type="Script" uid="uid://bm561vv7tuxt4" path="res://scripts/personaje.gd" id="1_5nfxw"]
+[ext_resource type="Script" uid="uid://bm561vv7tuxt4" path="res://scripts/entidades/personaje/personaje.gd" id="1_5nfxw"]
 [ext_resource type="Texture2D" uid="uid://ddjl04k42w54l" path="res://icon.svg" id="1_v023a"]
 [ext_resource type="Texture2D" uid="uid://y5a2ch4xeco4" path="res://graficos/abajo boceto.png" id="2_im2y8"]
 [ext_resource type="Texture2D" uid="uid://uew6f7q372am" path="res://graficos/arriba boceto.png" id="2_jt8tj"]
@@ -8,7 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://dbk2wyrqh5vx0" path="res://graficos/lsdo arriba boceto.png" id="4_h42ap"]
 [ext_resource type="Texture2D" uid="uid://boneo8lfscjlb" path="res://recursos/iluminacion/textura_luz_cono.png" id="4_tbkpf"]
 [ext_resource type="Texture2D" uid="uid://23tsn8fcifgs" path="res://graficos/lado boceto.png" id="6_57ngn"]
-[ext_resource type="Script" uid="uid://c1t6h1dv5pmy0" path="res://scripts/controlador_linterna.gd" id="8_kmopf"]
+[ext_resource type="Script" uid="uid://c1t6h1dv5pmy0" path="res://scripts/entidades/personaje/controlador_linterna.gd" id="8_kmopf"]
 [ext_resource type="Resource" uid="uid://cqqirq3y7pg12" path="res://recursos/iluminacion/config_iluminacion_defecto.tres" id="9_8xrj8"]
 [ext_resource type="Texture2D" uid="uid://b8duj3viyr6eg" path="res://recursos/iluminacion/textura_halo_corporal.tres" id="11_41mom"]
 [ext_resource type="PackedScene" uid="uid://bosn1xlpgwiqr" path="res://escenas/ui/indicador_estamina.tscn" id="11_kmopf"]

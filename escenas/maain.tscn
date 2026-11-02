@@ -1,8 +1,8 @@
-[gd_scene format=3 uid="uid://dl88w12yyd8ee"]
+﻿[gd_scene format=3 uid="uid://dl88w12yyd8ee"]
 
 [ext_resource type="PackedScene" uid="uid://b3dierpagcaih" path="res://escenas/personaje.tscn" id="1_p5vnh"]
 [ext_resource type="PackedScene" uid="uid://bkuxmlnw8klod" path="res://escenas/escenario.tscn" id="1_vhdvh"]
-[ext_resource type="Script" uid="uid://bxcnswhr8yg5g" path="res://scripts/maain.gd" id="1_x2pqb"]
+[ext_resource type="Script" uid="uid://bxcnswhr8yg5g" path="res://scripts/core/maain.gd" id="1_x2pqb"]
 [ext_resource type="PackedScene" uid="uid://b1eu583e554ay" path="res://escenas/camara.tscn" id="2_avuvp"]
 [ext_resource type="PackedScene" uid="uid://b74g6q4tcthym" path="res://escenas/debug_menu.tscn" id="4_kcfdb"]
 [ext_resource type="PackedScene" uid="uid://cdg7eeqnykjnu" path="res://escenas/enemigo.tscn" id="5_vhdvh"]

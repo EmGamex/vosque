@@ -1,7 +1,7 @@
-[gd_scene format=3 uid="uid://b74g6q4tcthym"]
+﻿[gd_scene format=3 uid="uid://b74g6q4tcthym"]
 
-[ext_resource type="Script" uid="uid://bm3vcl3iyab1w" path="res://scripts/debug_menu/debug_menu.gd" id="1_5npcy"]
-[ext_resource type="Script" uid="uid://cjuqj2hl4gtyx" path="res://scripts/debug_menu/debug_overlay.gd" id="2_knsa1"]
+[ext_resource type="Script" uid="uid://bm3vcl3iyab1w" path="res://scripts/debug/debug_menu/debug_menu.gd" id="1_5npcy"]
+[ext_resource type="Script" uid="uid://cjuqj2hl4gtyx" path="res://scripts/debug/debug_menu/debug_overlay.gd" id="2_knsa1"]
 
 [node name="DebugMenu" type="CanvasLayer" unique_id=85566436]
 process_mode = 3

@@ -1,6 +1,6 @@
-[gd_resource type="Resource" script_class="ConfiguracionIluminacion" format=3 uid="uid://cqqirq3y7pg12"]
+﻿[gd_resource type="Resource" script_class="ConfiguracionIluminacion" format=3 uid="uid://cqqirq3y7pg12"]
 
-[ext_resource type="Script" uid="uid://dngl7exyklntr" path="res://scripts/configuracion_iluminacion.gd" id="1_jdlar"]
+[ext_resource type="Script" uid="uid://dngl7exyklntr" path="res://scripts/mundo/configuracion_iluminacion.gd" id="1_jdlar"]
 
 [resource]
 script = ExtResource("1_jdlar")

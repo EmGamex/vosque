@@ -1,6 +1,6 @@
-[gd_scene format=3 uid="uid://bosn1xlpgwiqr"]
+﻿[gd_scene format=3 uid="uid://bosn1xlpgwiqr"]
 
-[ext_resource type="Script" uid="uid://dscicbplr33cu" path="res://scripts/indicador_estamina.gd" id="1_e4uvo"]
+[ext_resource type="Script" uid="uid://dscicbplr33cu" path="res://scripts/ui/indicador_estamina.gd" id="1_e4uvo"]
 
 [node name="IndicadorEstamina" type="Node2D" unique_id=21503489]
 modulate = Color(1, 1, 1, 0)
