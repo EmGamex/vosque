@@ -168,7 +168,7 @@ Cuando el monstruo está dentro del haz:
 
 ## 6. Centralización con el Recurso `ConfiguracionIluminacion`
 
-Siguiendo el patrón modular utilizado en `ConfiguracionNiebla`, el sistema se centraliza en un recurso `ConfiguracionIluminacion` (`scripts/configuracion_iluminacion.gd` y `recursos/config_iluminacion_defecto.tres`):
+Siguiendo el patrón modular utilizado en `ConfiguracionNiebla`, el sistema se centraliza en un recurso `ConfiguracionIluminacion` (`scripts/mundo/configuracion_iluminacion.gd` y `recursos/config_iluminacion_defecto.tres`):
 
 * **Grupo Ambiente:**
   * `color_ambiente_inicial: Color = Color(0.08, 0.10, 0.15, 1.0)`

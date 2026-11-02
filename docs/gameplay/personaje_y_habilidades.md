@@ -14,7 +14,7 @@ Este documento define la identidad, parámetros físicos, mecánicas de movimien
 
 ## 2. Atributos y Parámetros Físicos
 
-El movimiento del personaje está gobernado por un modelo de velocidad con aceleración y fricción continuas ([`scripts/personaje.gd`](../../scripts/personaje.gd)), lo que proporciona un control responsivo pero con peso físico tangible.
+El movimiento del personaje está gobernado por un modelo de velocidad con aceleración y fricción continuas ([`scripts/entidades/personaje/personaje.gd`](../../scripts/entidades/personaje/personaje.gd)), lo que proporciona un control responsivo pero con peso físico tangible.
 
 ### 2.1. Propiedades Exportadas (`@export`)
 
@@ -159,7 +159,7 @@ stateDiagram-v2
 ### 5.1. Jerarquía de Escena (`escenas/personaje.tscn`)
 
 ```text
-Personaje (CharacterBody2D) [scripts/personaje.gd, y_sort_enabled=true]
+Personaje (CharacterBody2D) [scripts/entidades/personaje/personaje.gd, y_sort_enabled=true]
 ├── Sombra (Node2D)                     # Sprite/óvalo en suelo (nodo hermano de Visual)
 ├── Visual (Node2D)                     # Contenedor para elevación en eje Z durante salto
 │   └── Sprite2D (AnimatedSprite2D)     # Animaciones y vistas direccionales (pivote en pies)

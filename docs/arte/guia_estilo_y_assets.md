@@ -41,7 +41,7 @@ Para maximizar la eficiencia y reducir el tiempo de dibujo a mano alzada en Inks
 
 ### 2.2. La Criatura (Pipeline Ultra-Minimalista de 2 a 3 Cuadros)
 
-Aprovechando que la lógica en `scripts/enemigo.gd` ya calcula la rotación continua hacia la velocidad (`_visual.rotation = velocity.angle()`), **no se dibujan direcciones adicionales**. Se dibuja en una única vista horizontal mirando a la derecha ($+X$, $0^\circ$) y Godot la orienta dinámicamente en $360^\circ$.
+Aprovechando que la lógica en `scripts/entidades/enemigo/enemigo.gd` ya calcula la rotación continua hacia la velocidad (`_visual.rotation = velocity.angle()`), **no se dibujan direcciones adicionales**. Se dibuja en una única vista horizontal mirando a la derecha ($+X$, $0^\circ$) y Godot la orienta dinámicamente en $360^\circ$.
 
 | ID de Animación / Asset | Descripción / Pose | Cuadros | Resolución | Comportamiento / Optimización en Motor |
 | :--- | :--- | :---: | :---: | :--- |

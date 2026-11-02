@@ -9,7 +9,7 @@ Este documento detalla la estética visual, comportamiento cinematográfico, fó
 
 ## 1. Menú Principal (Linterna Diegética en Primera Persona)
 
-El Menú Principal (`escenas/menu_inicio.tscn` / `scripts/menu_inicio.gd`) es la pieza visual prioritaria y carta de presentación de *Vosque*. En lugar de un menú convencional plano, presenta una **experiencia diegética e inmersiva en primera persona** ambientada en la noche del bosque.
+El Menú Principal (`escenas/menu_inicio.tscn` / `scripts/ui/menu_inicio.gd`) es la pieza visual prioritaria y carta de presentación de *Vosque*. En lugar de un menú convencional plano, presenta una **experiencia diegética e inmersiva en primera persona** ambientada en la noche del bosque.
 
 ```mermaid
 flowchart LR
@@ -90,7 +90,7 @@ Para eliminar la monotonía visual del cielo nocturno tanto en espera como en el
 
 ---
 
-## 2. Menú de Pausa In-Game (`escenas/menu_pausa.tscn` / `scripts/menu_pausa.gd`)
+## 2. Menú de Pausa In-Game (`escenas/menu_pausa.tscn` / `scripts/ui/menu_pausa.gd`)
 
 El menú de pausa permite interrumpir temporalmente la sesión de juego sin perder el estado actual ni romper la inmersión visual. Se implementa como una capa de interfaz desacoplada sobre `GestorEscenas` mediante un `CanvasLayer` con prioridad `layer = 50` (situado sobre el `HUD` con `layer = 10` y `EfectoNieblaMutacion` con `layer = 15`, pero por debajo de `Transicion` y `DebugMenu` con `layer = 100`).
 
@@ -141,7 +141,7 @@ Aparece tras el contacto mortal con el monstruo y orquesta la experiencia de der
 En lugar de animar propiedades imperativamente por código mediante `Tween` o temporizadores dispersos, [`escenas/game_over.tscn`](../../escenas/game_over.tscn) integra un **`AnimationPlayer`** que garantiza sincronización multicanal determinista sin asignación de memoria en tiempo de ejecución:
 
 ```text
-GameOver (Control) [scripts/game_over.gd]
+GameOver (Control) [scripts/ui/game_over.gd]
 ├── Fondo (ColorRect negro)
 ├── Impacto (ColorRect rojo de flash / viñeta)
 ├── JumpscareSprite (TextureRect con ilustración 512x512)

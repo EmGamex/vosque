@@ -1,6 +1,6 @@
 # Arquitectura de Partida y Director de Juego
 
-Este documento define la estructura y responsabilidades del Game Director (`scripts/maain.gd` en `escenas/maain.tscn`), la orquestación de señales entre subsistemas y la persistencia del récord de partida (*High Score*).
+Este documento define la estructura y responsabilidades del Game Director (`scripts/core/maain.gd` en `escenas/maain.tscn`), la orquestación de señales entre subsistemas y la persistencia del récord de partida (*High Score*).
 
 ---
 
@@ -9,7 +9,7 @@ Este documento define la estructura y responsabilidades del Game Director (`scri
 La escena `escenas/maain.tscn` contiene el mundo de juego activo y actúa como el **Director de Juego**. Es el encargado de inicializar las entidades, vincular los buses de señales y coordinar la dificultad en tiempo real sin acoplar directamente el script del jugador con el del monstruo o el escenario.
 
 ```text
-Maain (Node2D) [scripts/maain.gd]
+Maain (Node2D) [scripts/core/maain.gd]
 ├── Escenario (Node2D) [escenas/escenario.tscn]
 ├── Personaje (CharacterBody2D) [escenas/personaje.tscn]
 ├── Enemigo (CharacterBody2D) [escenas/enemigo.tscn]

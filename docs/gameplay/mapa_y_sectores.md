@@ -3,7 +3,7 @@
 Este documento detalla la topología espacial, la delimitación física/visual perimetral, la arquitectura modular de variantes y las reglas de diseño para la arena de **Vosque**.
 
 > 💻 **Escena maestra:** [`escenas/escenario.tscn`](../../escenas/escenario.tscn)  
-> 💻 **Script de orquestación:** [`scripts/escenario.gd`](../../scripts/escenario.gd)  
+> 💻 **Script de orquestación:** [`scripts/mundo/escenario.gd`](../../scripts/mundo/escenario.gd)  
 > 🌀 **Algoritmo de mutación y niebla:** [Sistema de Mutación y Niebla](sistema_de_mutacion_y_niebla.md)
 
 ---
@@ -102,7 +102,7 @@ Alrededor de los ejes divisores $X = 0$ e $Y = 0$, se mantiene una **franja desp
 
 ### 5.1. Árbol de la Escena Maestra (`escenas/escenario.tscn`)
 ```text
-Escenario (Node2D) [scripts/escenario.gd]
+Escenario (Node2D) [scripts/mundo/escenario.gd]
 ├── SueloContinuo (Polygon2D continuo de 4320x4320 px, z_index: -10)
 ├── VallaPerimetral (StaticBody2D, Capa 1: Mundo_Alto)
 │   ├── ColisionNorte / ColisionSur / ColisionOeste / ColisionEste
@@ -112,7 +112,7 @@ Escenario (Node2D) [scripts/escenario.gd]
 │   ├── SectorNE (Marker2D en [ 1080, -1080]) ──> Instancia de Variante activa
 │   ├── SectorSO (Marker2D en [-1080,  1080]) ──> Instancia de Variante activa
 │   └── SectorSE (Marker2D en [ 1080,  1080]) ──> Instancia de Variante activa
-└── EfectoNieblaMutacion (CanvasLayer, layer 15) [scripts/efecto_niebla_mutacion.gd]
+└── EfectoNieblaMutacion (CanvasLayer, layer 15) [scripts/mundo/efecto_niebla/efecto_niebla_mutacion.gd]
 ```
 
 ### 5.2. Estructura de Sub-Escena de Variante (`escenas/sectores/variantes/`)

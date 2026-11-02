@@ -15,7 +15,7 @@ En los juegos clásicos de recolección de notas, el jugador suele detenerse a l
 ## 2. Jerarquía de Escena (`escenas/nota.tscn`)
 
 ```text
-Nota (Area2D) [scripts/nota.gd, Capa 5: Interactuables]
+Nota (Area2D) [scripts/entidades/items/nota.gd, Capa 5: Interactuables]
 ├── VisualPapel (Sprite2D)              # Textura de papel antiguo arrugado (64x64 px)
 ├── CollisionShape2D                    # Círculo de colisión física (radio: 32 px)
 ├── LuzBaliza (PointLight2D)            # Resplandor radial ámbar (~256 px, 2ª luz permitida WebGL)

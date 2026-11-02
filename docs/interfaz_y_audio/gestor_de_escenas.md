@@ -2,7 +2,7 @@
 
 Este documento especifica la arquitectura de navegación, el patrón de diseño desacoplado, la gestión de estados de pausa y la guía para incorporar nuevas pantallas en **Vosque**.
 
-> 💻 **Script maestro:** [`scripts/gestor_escenas.gd`](../../scripts/gestor_escenas.gd)  
+> 💻 **Script maestro:** [`scripts/core/gestor_escenas.gd`](../../scripts/core/gestor_escenas.gd)  
 > 🎭 **Escenas y menús:** [Pantallas y Menús](pantallas_y_menus.md)  
 > 🕹️ **Game Director:** [Arquitectura de Partida y Director](../gameplay/arquitectura_de_partida_y_director.md)
 
@@ -78,17 +78,17 @@ El menú de pausa **no** se instancia como una pantalla exclusiva dentro de `$Co
 Para que la pausa congele absolutamente todo el gameplay (físicas, lógica, `SceneTreeTimer`, tweens y audio diegético) sin congelar la interfaz ni las transiciones, se define una jerarquía estricta de `process_mode`:
 
 ```text
-GestorEscenas (Node) [scripts/gestor_escenas.gd] [process_mode = PROCESS_MODE_ALWAYS]
+GestorEscenas (Node) [scripts/core/gestor_escenas.gd] [process_mode = PROCESS_MODE_ALWAYS]
 ├── Contenedor (Node)
-│   ├── MenuInicio (Control) [scripts/menu_inicio.gd] [inactivo: PROCESS_MODE_DISABLED]
+│   ├── MenuInicio (Control) [scripts/ui/menu_inicio.gd] [inactivo: PROCESS_MODE_DISABLED]
 │   ├── Maain (Node2D)       [Partida activa: PROCESS_MODE_PAUSABLE]
 │   │   ├── Escenario / EfectoNieblaMutacion (CanvasLayer 15)
 │   │   ├── Personaje / Linterna / IndicadorEstamina
 │   │   ├── Enemigo (CharacterBody2D)
 │   │   ├── Notas (Area2D)
 │   │   └── HUD (CanvasLayer 10)
-│   └── GameOver (Control)   [scripts/game_over.gd] [inactivo: PROCESS_MODE_DISABLED]
-├── MenuPausa (CanvasLayer, layer=50) [scripts/menu_pausa.gd] [process_mode = PROCESS_MODE_ALWAYS]
+│   └── GameOver (Control)   [scripts/ui/game_over.gd] [inactivo: PROCESS_MODE_DISABLED]
+├── MenuPausa (CanvasLayer, layer=50) [scripts/ui/menu_pausa.gd] [process_mode = PROCESS_MODE_ALWAYS]
 │   └── Control (anchors_preset=15)
 │       ├── Fondo (ColorRect - negro translúcido Color(0, 0, 0, 0.65))
 │       └── Layout (CenterContainer)
@@ -97,7 +97,7 @@ GestorEscenas (Node) [scripts/gestor_escenas.gd] [process_mode = PROCESS_MODE_AL
 │               ├── BotonContinuar
 │               ├── BotonReiniciar
 │               └── BotonMenu
-└── Transicion (CanvasLayer, layer=100) [scripts/transicion.gd] [process_mode = PROCESS_MODE_ALWAYS]
+└── Transicion (CanvasLayer, layer=100) [scripts/core/transicion.gd] [process_mode = PROCESS_MODE_ALWAYS]
     ├── Velo (ColorRect - negro opaco / shader iris)
     └── Anim (AnimationPlayer - fundidos)
 ```

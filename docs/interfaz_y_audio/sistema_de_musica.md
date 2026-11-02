@@ -73,7 +73,7 @@ El volumen de la música se modula dinámicamente mediante el bus `musica` en `A
 1. **Capa 1: Distancia Radial ($d < 800\text{ px}$):**
    $$\text{Vol}_{\text{prox}}(d) = \text{lerp}(-8.0\text{ dB}, -20.0\text{ dB}, \text{clamp}(1.0 - \frac{d}{800.0}, 0.0, 1.0))$$
 2. **Capa 2: Enfoque de Linterna con Visión Directa:**
-   Si la criatura está dentro del haz luminoso ([`ControladorLinterna._esta_enfocando_monstruo`](file:///c:/Proyectos/vosque/scripts/controlador_linterna.gd#L27)) **y** existe línea de visión sin muros intermedios ([`Enemigo.tiene_linea_vision`](file:///c:/Proyectos/vosque/scripts/enemigo.gd#L39)):
+   Si la criatura está dentro del haz luminoso ([`ControladorLinterna._esta_enfocando_monstruo`](file:///c:/Proyectos/vosque/scripts/entidades/personaje/controlador_linterna.gd#L27)) **y** existe línea de visión sin muros intermedios ([`Enemigo.tiene_linea_vision`](file:///c:/Proyectos/vosque/scripts/entidades/enemigo/enemigo.gd#L39)):
    $$\text{Vol}_{\text{objetivo}} = \text{Vol}_{\text{prox}}(d) - 8.0\text{ dB} \quad (\text{alcanzando hasta } -28.0\text{ dB})$$
 3. **Interpolación Temporal Suavizada:**
    Para prevenir chasquidos o cortes abruptos al girar la linterna, el volumen efectivo del bus se interpola en `_process(delta)` hacia `Vol_objetivo` a una tasa de $8.0\text{ dB/s}$.
