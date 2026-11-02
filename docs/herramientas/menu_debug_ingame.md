@@ -3,7 +3,7 @@
 Este documento detalla la arquitectura, controles, capas visuales y controladores del sistema de depuración in-game de **Vosque**.
 
 > 💻 **Escena maestra:** `escenas/debug_menu.tscn`  
-> 💻 **Fachada principal:** [`scripts/debug_menu/debug_menu.gd`](../../scripts/debug_menu/debug_menu.gd)  
+> 💻 **Fachada principal:** [`scripts/debug/debug_menu/debug_menu.gd`](../../scripts/debug/debug_menu/debug_menu.gd)  
 > 🛠️ **Plugins y monitores:** [Plugins de Editor y Monitores](plugins_editor_y_mcp.md)  
 > 🧪 **Guías de prueba:** [Protocolos de Prueba](protocolos_de_prueba.md)
 
@@ -13,7 +13,7 @@ Este documento detalla la arquitectura, controles, capas visuales y controladore
 
 1. **Inmediatez y Control Centralizado:** Todas las utilidades de diagnóstico convergen en un único punto de acceso mediante la tecla <kbd>F3</kbd>.
 2. **Arquitectura No Invasiva y Desacoplada:** El sistema de debug inspecciona nodos (`personaje`, `escenario`, `enemigo`) mediante verificaciones seguras (`has_method()`, variables condicionales y referencias nulas). Si un componente no está instanciado, se degrada elegantemente sin arrojar excepciones.
-3. **Persistencia Trans-Sesión (`DebugConfig` Autoload):** Los ajustes de depuración (toggles visuales, cheats, velocidades calibradas y time_scale) se conservan a través de `/root/DebugConfig` (`scripts/debug_config.gd`), impidiendo que se reinicien al recargar la escena o reiniciar tras un Game Over.
+3. **Persistencia Trans-Sesión (`DebugConfig` Autoload):** Los ajustes de depuración (toggles visuales, cheats, velocidades calibradas y time_scale) se conservan a través de `/root/DebugConfig` (`scripts/debug/debug_config.gd`), impidiendo que se reinicien al recargar la escena o reiniciar tras un Game Over.
 4. **Simulación en Tiempo Real:** Por defecto, abrir la consola de debug no pausa el motor, permitiendo observar cómo reaccionan las físicas y las mutaciones espaciales en vivo.
 5. **Cero Sobrecarga en Producción (`Release`):** Todas las rutinas de dibujo vectorial, captura de teclas <kbd>F3</kbd> y telemetría están blindadas bajo `if OS.is_debug_build():`. En compilaciones web de producción para itch.io y Newgrounds, el menú no procesa eventos ni reserva memoria (*zero overhead*).
 
@@ -41,12 +41,12 @@ El acceso al menú se gestiona mediante pulsaciones sucesivas de <kbd>F3</kbd>:
 
 ---
 
-## 3. Arquitectura Modular del Menú (`scripts/debug_menu/`)
+## 3. Arquitectura Modular del Menú (`scripts/debug/debug_menu/`)
 
 El menú se implementa en un `CanvasLayer` con prioridad alta (`layer = 100`) y se desglosa en controladores independientes:
 
 ```text
-DebugMenu (CanvasLayer, layer=100) [scripts/debug_menu/debug_menu.gd]
+DebugMenu (CanvasLayer, layer=100) [scripts/debug/debug_menu/debug_menu.gd]
 ├── MiniHUD (PanelContainer en esquina superior derecha)
 ├── ConsolaPrincipal (PanelContainer modal semi-transparente)
 │   ├── Encabezado (Título, FPS, Botón Cerrar, Toggle Pausa)

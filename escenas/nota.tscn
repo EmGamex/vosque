@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bkew8wnh4vhlu"]
 
-[ext_resource type="Script" uid="uid://cx8bnnbmuynox" path="res://scripts/nota.gd" id="1_3p1gy"]
+[ext_resource type="Script" uid="uid://cx8bnnbmuynox" path="res://scripts/entidades/items/nota.gd" id="1_3p1gy"]
 [ext_resource type="Texture2D" uid="uid://cfsys4vyiwpya" path="res://graficos/coleccionable_nota.svg" id="2_q2k08"]
 [ext_resource type="Texture2D" uid="uid://ckap2m8bjlqp5" path="res://escenas/luz_baliza_textura.tres" id="3_50qer"]
 

@@ -55,24 +55,41 @@ c:/Proyectos/vosque/
 │   ├── materiales/             # Shaders materials (mat_niebla_mutacion.tres, etc.)
 │   ├── temas/                  # Estilos visuales de UI y botones (StyleBoxFlat, fuentes)
 │   └── tilesets/               # Tileset de obstáculos y suelo (tileset_obstaculos.tres, etc.)
-├── scripts/                    # Código fuente GDScript (.gd)
-│   ├── debug_menu/             # Controladores modulares del menú F3 (cheats, física, escenario, etc.)
-│   ├── efecto_niebla/          # Módulo desacoplado del efecto visual de niebla geométrica
-│   │   ├── efecto_niebla_mutacion.gd # Fachada CanvasLayer y orquestador público
-│   │   ├── niebla_material_controller.gd # Duplicación en memoria y asignación de uniforms
-│   │   ├── niebla_foco_controller.gd # Seguimiento del jugador y proyección UV
-│   │   └── niebla_transicion_controller.gd # FSM, tweens y acumulación de fase
-│   ├── configuracion_niebla.gd # Recurso tipado de configuración de niebla
-│   ├── debug_config.gd         # Singleton/Autoload de persistencia de ajustes de debug
-│   ├── efecto_niebla_mutacion.gd # Stub de compatibilidad histórica hacia scripts/efecto_niebla/
-│   ├── enemigo.gd              # IA de persecución, rotación y anti-atascamiento
-│   ├── escenario.gd            # Mutación de sectores lejanos y reubicación segura
-│   ├── game_over.gd            # Lógica de fin de partida y récord
-│   ├── gestor_escenas.gd       # Máquina de estados de pantallas y transiciones
-│   ├── menu_inicio.gd          # Menú diegético de linterna 1ª persona, parallax relativo y señales
-│   ├── menu_pausa.gd           # Control de pausa en CanvasLayer 50
-│   ├── nota.gd                 # Recolección atómica de páginas
-│   └── personaje.gd            # FSM de locomoción, estamina, salto y plancha
+├── scripts/                    # Código fuente GDScript (.gd) estructurado por dominio
+│   ├── core/                   # Orquestación de ciclo de juego y escenas
+│   │   ├── gestor_escenas.gd   # Máquina de estados de pantallas y transiciones
+│   │   ├── maain.gd            # Escena principal de gameplay y orquestación
+│   │   └── transicion.gd       # Cortina de transición entre escenas
+│   ├── debug/                  # Herramientas de depuración y telemetría
+│   │   ├── debug_config.gd     # Singleton/Autoload de persistencia de ajustes de debug
+│   │   ├── debug_info.gd       # Panel de telemetría de depuración
+│   │   └── debug_menu/         # Controladores modulares del menú F3 (cheats, física, escenario, etc.)
+│   ├── entidades/              # Actores y objetos del mundo de juego
+│   │   ├── enemigo/
+│   │   │   └── enemigo.gd      # IA de persecución, rotación y anti-atascamiento
+│   │   ├── items/
+│   │   │   └── nota.gd         # Recolección atómica de páginas
+│   │   └── personaje/
+│   │       ├── controlador_linterna.gd # Manejo de batería, haz y oscilación de linterna
+│   │       └── personaje.gd    # FSM de locomoción, estamina, salto y plancha
+│   ├── mundo/                  # Entorno, iluminación y simulación de mapa
+│   │   ├── configuracion_iluminacion.gd # Recurso tipado de iluminación
+│   │   ├── configuracion_niebla.gd      # Recurso tipado de configuración de niebla
+│   │   ├── escenario.gd                 # Mutación de sectores lejanos y reubicación segura
+│   │   ├── generador_luz_cono.gd        # Generación procedimental de mallas de luz
+│   │   └── efecto_niebla/               # Módulo desacoplado del efecto visual de niebla geométrica
+│   │       ├── efecto_niebla_mutacion.gd      # Fachada CanvasLayer y orquestador público
+│   │       ├── niebla_material_controller.gd  # Duplicación en memoria y asignación de uniforms
+│   │       ├── niebla_foco_controller.gd      # Seguimiento del jugador y proyección UV
+│   │       └── niebla_transicion_controller.gd # FSM, tweens y acumulación de fase
+│   └── ui/                     # Interfaces gráficas y HUD
+│       ├── game_over.gd        # Lógica de fin de partida y récord
+│       ├── hud.gd              # HUD de telemetría y estado de linterna
+│       ├── indicador_estamina.gd # Indicador visual de estamina
+│       ├── menu_inicio.gd      # Menú diegético de linterna 1ª persona, parallax relativo y señales
+│       ├── menu_inicio/        # Componentes modulares del menú principal
+│       ├── menu_pausa.gd       # Control de pausa en CanvasLayer 50
+│       └── tutorial_cabeza/    # Controladores del tutorial de cabeza de pantalla
 ├── shaders/                    # Archivos de sombreadores en tiempo real (.gdshader)
 ├── tests/                      # Scripts y suites de pruebas automatizadas (McpTestSuite)
 │   ├── test_debug_menu.gd      # Pruebas de menú de depuración F3

@@ -13,7 +13,7 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 
 ## 1. Módulo: Personaje y Habilidades
 > 📄 **Especificación de referencia:** [`docs/gameplay/personaje_y_habilidades.md`](../gameplay/personaje_y_habilidades.md)  
-> 💻 **Archivos clave:** [`scripts/personaje.gd`](../../scripts/personaje.gd), [`escenas/personaje.tscn`](../../escenas/personaje.tscn)
+> 💻 **Archivos clave:** [`scripts/entidades/personaje/personaje.gd`](../../scripts/entidades/personaje/personaje.gd), [`escenas/personaje.tscn`](../../escenas/personaje.tscn)
 
 - [x] **Locomoción 8 Direcciones:** Movimiento con vector normalizado, aceleración (`5000 px/s²`), fricción y freno seco (`stop_threshold = 15.0 px/s`).
 - [x] **Telemetría F3 y Calibración:** Panel de depuración in-game y plugin de editor contextual [`addons/personaje_tools`](../../addons/personaje_tools).
@@ -31,10 +31,10 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
   - [x] Impulso horizontal aerodinámico a $1200\text{ px/s}$.
   - [x] Impacto contra el suelo y ventana de inmovilidad/recuperación de $0.6\text{ s}$ con arrastre (`dive_slide_friction = 2200 px/s²`).
 - [ ] **Animaciones de Salto y Recuperación en Motor:**
-  - [ ] Integrar poses estáticas y recuperación (`jugador_salto_aire`, `jugador_plancha_aire`, `jugador_suelo_recuperacion`) en `_actualizar_animacion()` de [`scripts/personaje.gd`](../../scripts/personaje.gd).
+  - [ ] Integrar poses estáticas y recuperación (`jugador_salto_aire`, `jugador_plancha_aire`, `jugador_suelo_recuperacion`) en `_actualizar_animacion()` de [`scripts/entidades/personaje/personaje.gd`](../../scripts/entidades/personaje/personaje.gd).
 - [x] **Sistema de Iluminación y Linterna Frontal Desacoplada:**
   - [x] Especificación canónica en [`docs/gameplay/sistema_de_iluminacion.md`](../gameplay/sistema_de_iluminacion.md) con presupuesto WebGL 2.0 (máximo 2 `PointLight2D`).
-  - [x] Recurso serializado `ConfiguracionIluminacion` (`scripts/configuracion_iluminacion.gd` y `.tres`).
+  - [x] Recurso serializado `ConfiguracionIluminacion` (`scripts/mundo/configuracion_iluminacion.gd` y `.tres`).
   - [x] `HaloCorporal`: PointLight2D aditivo centrado en el personaje.
   - [x] `LinternaFrontal`: PointLight2D con haz cónico procedural ($60^\circ$, $700\text{ px}$) desacoplado en $360^\circ$ (ratón / teclado).
   - [x] Detección analítica del monstruo (vector `dot` + distancia) y perturbación electromagnética (flicker $\pm 10\%$).
@@ -45,7 +45,7 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 
 ## 2. Módulo: Escenario y Topología 2x2
 > 📄 **Especificación de referencia:** [`docs/gameplay/mapa_y_sectores.md`](../gameplay/mapa_y_sectores.md), [`docs/gameplay/sistema_de_mutacion_y_niebla.md`](../gameplay/sistema_de_mutacion_y_niebla.md)  
-> 💻 **Archivos clave:** [`escenas/escenario.tscn`](../../escenas/escenario.tscn), [`scripts/escenario.gd`](../../scripts/escenario.gd)
+> 💻 **Archivos clave:** [`escenas/escenario.tscn`](../../escenas/escenario.tscn), [`scripts/mundo/escenario.gd`](../../scripts/mundo/escenario.gd)
 
 - [x] **Arena Base y Valla Perimetral:**
   - [x] Estructura fija de $4320 \times 4320\text{ px}$ en coordenadas $[-2160, 2160]$.
@@ -68,7 +68,7 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 
 ## 3. Módulo: Criatura (Monstruo) e IA
 > 📄 **Especificación de referencia:** [`docs/gameplay/monstruo_e_ia.md`](../gameplay/monstruo_e_ia.md), [`docs/gameplay/dificultad_y_balance.md`](../gameplay/dificultad_y_balance.md)  
-> 💻 **Archivos clave:** [`scripts/enemigo.gd`](../../scripts/enemigo.gd), [`escenas/enemigo.tscn`](../../escenas/enemigo.tscn)
+> 💻 **Archivos clave:** [`scripts/entidades/enemigo/enemigo.gd`](../../scripts/entidades/enemigo/enemigo.gd), [`escenas/enemigo.tscn`](../../escenas/enemigo.tscn)
 
 - [x] **Persecución Básica Vectorial:** Movimiento hacia el jugador con `move_and_slide()` y aceleración controlada (`3500 px/s²`).
 - [x] **Rotación Continua 360°:** El nodo visual orienta sus garras y cabeza siguiendo el vector instantáneo de velocidad (`velocity.angle()`).
@@ -86,7 +86,7 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 
 ## 4. Módulo: Coleccionables Arcade (Notas) y Spawner
 > 📄 **Especificación de referencia:** [`docs/gameplay/sistema_de_notas_y_spawner.md`](../gameplay/sistema_de_notas_y_spawner.md)  
-> 💻 **Archivos clave:** `escenas/nota.tscn`, `scripts/nota.gd`
+> 💻 **Archivos clave:** `escenas/nota.tscn`, `scripts/entidades/items/nota.gd`
 
 - [x] **Entidad Nota (`Area2D`):**
   - [x] Solo 1 nota activa en escena en todo momento en Capa 5 (`Interactuables`).
@@ -106,7 +106,7 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 
 ## 5. Módulo: Arquitectura de Partida y Director (Game Director)
 > 📄 **Especificación de referencia:** [`docs/gameplay/arquitectura_de_partida_y_director.md`](../gameplay/arquitectura_de_partida_y_director.md)  
-> 💻 **Archivos clave:** `scripts/maain.gd`, `escenas/maain.tscn`
+> 💻 **Archivos clave:** `scripts/core/maain.gd`, `escenas/maain.tscn`
 
 - [x] **Orquestador Principal de Partida (`maain.gd`):**
   - [x] Referenciación segura de jugador, monstruo y escenario.
@@ -134,7 +134,7 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 
 ## 7. Módulo: Interfaz, HUD y Menús
 > 📄 **Especificación de referencia:** [`docs/interfaz_y_audio/controles_y_hud.md`](../interfaz_y_audio/controles_y_hud.md), [`docs/interfaz_y_audio/pantallas_y_menus.md`](../interfaz_y_audio/pantallas_y_menus.md), [`docs/interfaz_y_audio/gestor_de_escenas.md`](../interfaz_y_audio/gestor_de_escenas.md)  
-> 💻 **Archivos clave:** [`scripts/gestor_escenas.gd`](../../scripts/gestor_escenas.gd), [`scripts/menu_inicio.gd`](../../scripts/menu_inicio.gd), [`scripts/game_over.gd`](../../scripts/game_over.gd)
+> 💻 **Archivos clave:** [`scripts/core/gestor_escenas.gd`](../../scripts/core/gestor_escenas.gd), [`scripts/ui/menu_inicio.gd`](../../scripts/ui/menu_inicio.gd), [`scripts/ui/game_over.gd`](../../scripts/ui/game_over.gd)
 
 - [x] **Gestor de Escenas y Fundidos:** Transiciones con velo negro entre Inicio, Partida y Game Over con patrón desacoplado *Call Down, Signal Up*.
 - [x] **Menú Principal Diegético (`MenuInicio`):**
@@ -247,9 +247,9 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 
 ## 11. Módulo: Herramientas de Depuración y Diagnóstico
 > 📄 **Especificación de referencia:** [`docs/herramientas/herramientas_de_debug.md`](../herramientas/herramientas_de_debug.md)  
-> 💻 **Archivos clave:** `escenas/debug_menu.tscn`, `scripts/debug_menu/`, `addons/personaje_tools/`
+> 💻 **Archivos clave:** `escenas/debug_menu.tscn`, `scripts/debug/debug_menu/`, `addons/personaje_tools/`
 
-- [x] **Singleton de Persistencia de Debug (`scripts/debug_config.gd`):** Autoload global `/root/DebugConfig` que preserva estado tri-estado, cheats, overlays, God View, niebla y sliders modificados tras reinicio de escena o muerte.
+- [x] **Singleton de Persistencia de Debug (`scripts/debug/debug_config.gd`):** Autoload global `/root/DebugConfig` que preserva estado tri-estado, cheats, overlays, God View, niebla y sliders modificados tras reinicio de escena o muerte.
 - [x] **Toolbar de Personaje en Editor:** Plugin contextual `addons/personaje_tools` para ajuste de velocidad, aceleración y fricción.
 - [x] **Menú Unificado de Debug In-Game (`escenas/debug_menu.tscn`):**
   - [x] Ciclo tri-estado con <kbd>F3</kbd>: Oculto ➔ Mini-HUD ➔ Menú Completo.
@@ -258,7 +258,7 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
   - [x] Pestaña Escenario (Issue #3): cuadrante activo, forzado manual de mutación, toggle de niebla, vista global (God View) y toggles visuales de corredores ($160\text{ px}$).
   - [x] Pestaña Monstruo: estado de persecución, anti-atascamiento, cálculo de velocidad y botón de reubicación segura.
   - [x] Pestaña Sistema: escala de tiempo (`Engine.time_scale`) y reinicio rápido de escena.
-- [x] **Monitores Personalizados Base en Depurador de Godot:** Registro automático en `Performance` de estamina, velocidad de jugador y enemigo, distancia y estado cinemático (`scripts/debug_menu/debug_custom_monitors.gd`).
+- [x] **Monitores Personalizados Base en Depurador de Godot:** Registro automático en `Performance` de estamina, velocidad de jugador y enemigo, distancia y estado cinemático (`scripts/debug/debug_menu/debug_custom_monitors.gd`).
 - [ ] **Ampliación de Herramientas para Semanas 3 y 4:**
   - [ ] Pestaña Escenario: Modo Fullbright (`[x] Sin Oscuridad`) y visualizador avanzado de filtros de spawner en `DebugOverlay` (verde = válido, rojo = excluido, dorado = activa).
   - [ ] Pestaña Monstruo: Casilla de congelación de IA y selector de fase de dificultad escalonada (Nota 0 a 10+).

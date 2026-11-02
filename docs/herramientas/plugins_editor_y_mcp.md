@@ -42,7 +42,7 @@ Servidor MCP (*Model Context Protocol*) integrado que habilita el soporte para a
 
 ## 4. Monitores Personalizados del Depurador (`Performance`)
 
-Al iniciar el proyecto en modo de desarrollo (`OS.is_debug_build()`), el script [`scripts/debug_menu/debug_custom_monitors.gd`](../../scripts/debug_menu/debug_custom_monitors.gd) registra métricas en el panel **Depurador > Monitores**:
+Al iniciar el proyecto en modo de desarrollo (`OS.is_debug_build()`), el script [`scripts/debug/debug_menu/debug_custom_monitors.gd`](../../scripts/debug/debug_menu/debug_custom_monitors.gd) registra métricas en el panel **Depurador > Monitores**:
 
 | Monitor | Tipo | Rango / Unidad | Propósito |
 | :--- | :---: | :---: | :--- |

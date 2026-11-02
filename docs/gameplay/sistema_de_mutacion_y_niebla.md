@@ -2,7 +2,7 @@
 
 Este documento detalla el algoritmo procedural, la sincronización de estados, los tiempos de transición visual y las optimizaciones de rendimiento del sistema de mutación de **Vosque**.
 
-> 💻 **Scripts en motor:** [`scripts/escenario.gd`](../../scripts/escenario.gd), [`scripts/efecto_niebla/efecto_niebla_mutacion.gd`](../../scripts/efecto_niebla/efecto_niebla_mutacion.gd), [`scripts/efecto_niebla/niebla_material_controller.gd`](../../scripts/efecto_niebla/niebla_material_controller.gd), [`scripts/efecto_niebla/niebla_foco_controller.gd`](../../scripts/efecto_niebla/niebla_foco_controller.gd), [`scripts/efecto_niebla/niebla_transicion_controller.gd`](../../scripts/efecto_niebla/niebla_transicion_controller.gd), [`scripts/configuracion_niebla.gd`](../../scripts/configuracion_niebla.gd)  
+> 💻 **Scripts en motor:** [`scripts/mundo/escenario.gd`](../../scripts/mundo/escenario.gd), [`scripts/mundo/efecto_niebla/efecto_niebla_mutacion.gd`](../../scripts/mundo/efecto_niebla/efecto_niebla_mutacion.gd), [`scripts/mundo/efecto_niebla/niebla_material_controller.gd`](../../scripts/mundo/efecto_niebla/niebla_material_controller.gd), [`scripts/mundo/efecto_niebla/niebla_foco_controller.gd`](../../scripts/mundo/efecto_niebla/niebla_foco_controller.gd), [`scripts/mundo/efecto_niebla/niebla_transicion_controller.gd`](../../scripts/mundo/efecto_niebla/niebla_transicion_controller.gd), [`scripts/mundo/configuracion_niebla.gd`](../../scripts/mundo/configuracion_niebla.gd)  
 > 🧪 **Suites de pruebas:** [`tests/test_niebla.gd`](../../tests/test_niebla.gd), [`tests/test_escenario.gd`](../../tests/test_escenario.gd)  
 > 🎨 **Shader y Materiales:** [`shaders/niebla_mutacion.gdshader`](../../shaders/niebla_mutacion.gdshader), [`recursos/config_niebla_defecto.tres`](../../recursos/config_niebla_defecto.tres), [`recursos/materiales/mat_niebla_mutacion.tres`](../../recursos/materiales/mat_niebla_mutacion.tres)  
 > 🗺️ **Topología de base:** [Mapa y Sectores](mapa_y_sectores.md)  
@@ -74,13 +74,13 @@ sequenceDiagram
 ## 3. Arquitectura del Sistema de Niebla
 
 ### 3.1. Desacoplamiento Modular y `ConfiguracionNiebla` (Resource)
-Para permitir *presets* reutilizables (niebla de tutorial, niebla densa de clímax, niebla de prueba rápida) y evitar un monolito con múltiples responsabilidades cruzadas, el subsistema se organiza bajo la carpeta modular `scripts/efecto_niebla/`:
+Para permitir *presets* reutilizables (niebla de tutorial, niebla densa de clímax, niebla de prueba rápida) y evitar un monolito con múltiples responsabilidades cruzadas, el subsistema se organiza bajo la carpeta modular `scripts/mundo/efecto_niebla/`:
 
 * **`EfectoNieblaMutacion` (`efecto_niebla_mutacion.gd`):** Fachada ligera del nodo `CanvasLayer`. Mantiene el ciclo de vida, señales públicas y delega las operaciones a los sub-controladores.
 * **`NieblaMaterialController` (`niebla_material_controller.gd`):** Aísla el `ShaderMaterial` mediante clonación en memoria (`duplicate()`) y sincroniza los uniforms estáticos y dinámicos (`radio_interno`, `densidad_global`, `suavizado`, etc.).
 * **`NieblaFocoController` (`niebla_foco_controller.gd`):** Resuelve el objetivo del jugador en el árbol y proyecta su posición mundial a coordenadas UV normalizadas de pantalla según la relación de aspecto del Viewport.
 * **`NieblaTransicionController` (`niebla_transicion_controller.gd`):** Gobierna la máquina de estados finita (`enum Fase`), orquesta los Tweens de cierre y apertura, integra la fase continua en CPU y gestiona los tokens de descarte asíncrono.
-* **`ConfiguracionNiebla` (`scripts/configuracion_niebla.gd`):** Recurso serializado (`.tres`) que centraliza:
+* **`ConfiguracionNiebla` (`scripts/mundo/configuracion_niebla.gd`):** Recurso serializado (`.tres`) que centraliza:
   * **Parámetros Geométricos:** `cantidad_filas`, `radio_capsula`, `largo_capsula`, `espaciado_horizontal`, `variacion_filas`.
   * **Movimiento y Dinámica:** `velocidad_desplazamiento`, `multiplicador_velocidad_transicion`, `alternar_sentido_filas`.
   * **Paleta y Halo de Visión:** `color_niebla`, `color_niebla_secundaria`, `opacidad_velo_fondo`, `difuminado_borde`, `radio_despejado`, `radio_cerrado`, `centro_pantalla`.

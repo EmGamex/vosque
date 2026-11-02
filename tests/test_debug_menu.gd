@@ -111,7 +111,7 @@ func test_desactivar_niebla_en_debug() -> void:
 	assert_true(check_niebla != null, "Debe existir CheckDesactivarNiebla en la pestaña Escenario")
 
 	# Probar activación y desactivación de la niebla en el scenario controller
-	var cfg = load("res://scripts/debug_config.gd").new()
+	var cfg = load("res://scripts/debug/debug_config.gd").new()
 	cfg.niebla_desactivada = false
 	menu.scenario.set_desactivar_niebla(true, menu.context, cfg)
 	assert_true(menu.scenario.niebla_desactivada, "La niebla debe quedar marcada como desactivada")

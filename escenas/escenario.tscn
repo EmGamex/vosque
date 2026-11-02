@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bkuxmlnw8klod"]
 
-[ext_resource type="Script" uid="uid://blo3enjwv62k0" path="res://scripts/escenario.gd" id="1_1uc0k"]
+[ext_resource type="Script" uid="uid://blo3enjwv62k0" path="res://scripts/mundo/escenario.gd" id="1_1uc0k"]
 [ext_resource type="PackedScene" uid="uid://m28wcu8ry61r" path="res://escenas/sectores/variantes/variante_claro_rocoso.tscn" id="2_3m15c"]
 [ext_resource type="PackedScene" uid="uid://clntbhmsji5os" path="res://escenas/sectores/variantes/variante_bosque_denso.tscn" id="3_a55de"]
 [ext_resource type="PackedScene" uid="uid://if7eayy3eh5f" path="res://escenas/sectores/variantes/variante_sendero_troncos.tscn" id="4_kkql1"]

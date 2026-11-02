@@ -2,7 +2,7 @@
 
 Este documento detalla la arquitectura, estados de comportamiento, cinemática, percepción sensorial y especificaciones técnicas de implementación en Godot 4 del antagonista de **Vosque**.
 
-> 💻 **Script en motor:** [`scripts/enemigo.gd`](../../scripts/enemigo.gd)  
+> 💻 **Script en motor:** [`scripts/entidades/enemigo/enemigo.gd`](../../scripts/entidades/enemigo/enemigo.gd)  
 > 🎭 **Escena:** [`escenas/enemigo.tscn`](../../escenas/enemigo.tscn)  
 > ⚖️ **Fórmulas y escalado:** [Dificultad y Balance](dificultad_y_balance.md)
 
@@ -47,7 +47,7 @@ stateDiagram-v2
   - Posición de espera en coordenadas fuera de mapa: `Vector2(-99999, -99999)`.
 
 ### 2.2. El Despertar (Nota 1)
-* Al recolectar la primera página, el `Game Director` (`scripts/maain.gd`):
+* Al recolectar la primera página, el `Game Director` (`scripts/core/maain.gd`):
   1. Identifica un punto de spawn seguro fuera de pantalla (cuadrante distante a $\ge 800\text{ px}$ del jugador).
   2. Reposiciona la entidad en ese punto.
   3. Restaura `visible = true` y `process_mode = Node.PROCESS_MODE_INHERIT`.

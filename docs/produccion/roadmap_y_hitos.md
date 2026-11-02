@@ -46,12 +46,12 @@ flowchart TD
 ### Semana 1 (04/10/2026 – 10/10/2026): Base Funcional (Graybox) — **[100% COMPLETADA]**
 * **Objetivo:** Establecer la base de físicas, cámara, ciclo de pantallas y herramientas del desarrollador.
 * **Entregables Concluidos:**
-  - [x] Movimiento fluido en 8 direcciones con aceleración (`5000 px/s²`), fricción y freno seco (`stop_threshold = 15.0 px/s`) en [`personaje.gd`](../../scripts/personaje.gd).
+  - [x] Movimiento fluido en 8 direcciones con aceleración (`5000 px/s²`), fricción y freno seco (`stop_threshold = 15.0 px/s`) en [`personaje.gd`](../../scripts/entidades/personaje/personaje.gd).
   - [x] Suavizado y centrado dinámico de [`camara.tscn`](../../escenas/camara.tscn).
-  - [x] HUD de telemetría en tiempo real [`debug_info.gd`](../../scripts/debug_info.gd) con alternancia vía tecla `F3`.
+  - [x] HUD de telemetría en tiempo real [`debug_info.gd`](../../scripts/debug/debug_info.gd) con alternancia vía tecla `F3`.
   - [x] Plugin de editor contextual [`addons/personaje_tools`](../../addons/personaje_tools) para calibración de presets (`Sigilo`, `Normal`, `Sprint`).
-  - [x] Arquitectura de ciclo de juego [`gestor_escenas.gd`](../../scripts/gestor_escenas.gd) con transiciones por fundido a negro entre [`menu_inicio.tscn`](../../escenas/menu_inicio.tscn), [`maain.tscn`](../../escenas/maain.tscn) y [`game_over.tscn`](../../escenas/game_over.tscn).
-  - [x] IA elemental de persecución con cálculo vectorial y rotación visual continua hacia el jugador en [`enemigo.gd`](../../scripts/enemigo.gd).
+  - [x] Arquitectura de ciclo de juego [`gestor_escenas.gd`](../../scripts/core/gestor_escenas.gd) con transiciones por fundido a negro entre [`menu_inicio.tscn`](../../escenas/menu_inicio.tscn), [`maain.tscn`](../../escenas/maain.tscn) y [`game_over.tscn`](../../escenas/game_over.tscn).
+  - [x] IA elemental de persecución con cálculo vectorial y rotación visual continua hacia el jugador en [`enemigo.gd`](../../scripts/entidades/enemigo/enemigo.gd).
 
 ---
 
@@ -73,13 +73,13 @@ flowchart TD
 ### Semana 3 (18/10/2026 – 24/10/2026): Integración en Motor, Mutación 2x2 y Web Base — **[100% COMPLETADA]**
 * **Objetivo:** Trasladar las mecánicas documentadas al código GDScript de Godot 4, habilitar la mutación continua de cuadrantes y validar la primera compilación funcional en navegador.
 * **Entregables Concluidos:**
-  - [x] Implementar la máquina de estados de Salto Libre, Plancha (*Dive*) y simulación de elevación en eje Z en [`personaje.gd`](../../scripts/personaje.gd).
-  - [x] Implementar la lógica de Estamina y fatiga en [`personaje.gd`](../../scripts/personaje.gd).
+  - [x] Implementar la máquina de estados de Salto Libre, Plancha (*Dive*) y simulación de elevación en eje Z en [`personaje.gd`](../../scripts/entidades/personaje/personaje.gd).
+  - [x] Implementar la lógica de Estamina y fatiga en [`personaje.gd`](../../scripts/entidades/personaje/personaje.gd).
   - [x] Crear la estructura modular de [`escenas/escenario.tscn`](../../escenas/escenario.tscn) con valla perimetral fija y las sub-escenas de variantes con corredores de paso seguros.
   - [x] Programar la lógica de mutación de los 3 sectores lejanos, niebla de transición (`EfectoNieblaMutacion`) vía shaders con fase continua y reposicionamiento anti-atascamiento del monstruo.
   - [x] Crear la entidad coleccionable [`escenas/nota.tscn`](../../escenas/nota.tscn) con baliza luminosa y recolección arcade instantánea.
-  - [x] Implementar el orquestador Game Director en [`scripts/maain.gd`](../../scripts/maain.gd) conectando las señales de recolección, mutación y el algoritmo de Spawner con exclusión espacial.
-  - [x] Implementar el escalado de velocidad del enemigo según el modelo cuantitativo acotado ($500 \to 920\text{ px/s}$) e hibernación en Nota 0 en [`enemigo.gd`](../../scripts/enemigo.gd).
+  - [x] Implementar el orquestador Game Director en [`scripts/core/maain.gd`](../../scripts/core/maain.gd) conectando las señales de recolección, mutación y el algoritmo de Spawner con exclusión espacial.
+  - [x] Implementar el escalado de velocidad del enemigo según el modelo cuantitativo acotado ($500 \to 920\text{ px/s}$) e hibernación en Nota 0 en [`enemigo.gd`](../../scripts/entidades/enemigo/enemigo.gd).
   - [x] Implementar suite de telemetría y menú unificado de diagnóstico in-game en [`escenas/debug_menu.tscn`](../../escenas/debug_menu.tscn) con persistencia vía Autoload `DebugConfig`.
   - [x] Configurar preset de exportación Web en [`export_presets.cfg`](../../export_presets.cfg) (`gl_compatibility`, `threads = false`).
 
@@ -113,7 +113,7 @@ flowchart TD
 * **Entregables Clave:**
   - [ ] Implementar persistencia de High Score en Web mediante `user://` (IndexedDB en Godot Web) y fallback a `JavaScriptBridge` (`localStorage`).
   - [ ] Presentar estadísticas de fin de partida (páginas recolectadas vs récord histórico) en la pantalla de Game Over.
-  - [ ] Programar vector de desatasco tangencial (*steering*) en [`scripts/enemigo.gd`](../../scripts/enemigo.gd) para sortear obstáculos convexos sin perder agresividad.
+  - [ ] Programar vector de desatasco tangencial (*steering*) en [`scripts/entidades/enemigo/enemigo.gd`](../../scripts/entidades/enemigo/enemigo.gd) para sortear obstáculos convexos sin perder agresividad.
   - [ ] Conectar las sub-pantallas de Opciones y Créditos a las señales de [`escenas/menu_inicio.tscn`](../../escenas/menu_inicio.tscn).
   - [ ] Añadir controles de calibración en vivo para linterna y trauma de cámara en [`escenas/debug_menu.tscn`](../../escenas/debug_menu.tscn).
 

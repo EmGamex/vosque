@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dte8iac0uavl"]
 
-[ext_resource type="Script" uid="uid://bgdclnvnftbib" path="res://scripts/tutorial_cabeza/tutorial_cabeza.gd" id="1_tq8vd"]
+[ext_resource type="Script" uid="uid://bgdclnvnftbib" path="res://scripts/ui/tutorial_cabeza/tutorial_cabeza.gd" id="1_tq8vd"]
 [ext_resource type="Texture2D" uid="uid://b6ijb42ds2xvn" path="res://graficos/ui/icono_raton.svg" id="2_6aqmr"]
 [ext_resource type="StyleBox" uid="uid://dfde8gogtxpu1" path="res://recursos/ui/tutorial/sb_tutorial_fondo.tres" id="2_vbe7r"]
 [ext_resource type="StyleBox" uid="uid://bm7amq753tifb" path="res://recursos/ui/tutorial/sb_badge_inactivo.tres" id="3_6tvjx"]
