@@ -219,14 +219,15 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
   - [ ] Expandir a 5 buses completos (`Master`, `Ambiente`, `sfx`, `Criatura`, `musica`).
   - [ ] Asignar `AudioEffectLowPassFilter` dinámico en `Master` durante estado `FATIGA`.
   - [ ] Asignar `AudioEffectReverb` (inactivo por defecto) en bus `musica` para efecto post-derrota (Game Over).
-- [ ] **Sistema de Música Interactiva (`scripts/gestor_musica.gd` y `res://sonido/musica/musica_interactiva.tres`):**
-  - [ ] Crear recurso `AudioStreamInteractive` con clips `menu_tutorial` y `supervivencia` configurados con transición en `NEXT_BEAT` sin fade (`FADE_DISABLED`).
-  - [ ] Implementar Singleton Autoload `/root/GestorMusica` con reproductor único sobre el bus `musica` y `PROCESS_MODE_ALWAYS`.
+- [ ] **Sistema de Música Interactiva (`scripts/core/gestor_musica.gd`, `escenas/gestor_musica.tscn` y `recursos/audio/config_musica_defecto.tres`):**
+  - [ ] Crear recurso `AudioStreamInteractive` (`res://sonido/musica/musica_interactiva.tres`) con clips `menu_tutorial` y `supervivencia` configurados con transición en `NEXT_BEAT` sin fade (`FADE_DISABLED`).
+  - [ ] Implementar recurso tipado editable en Inspector `@tool class_name ConfiguracionMusica extends Resource` (`scripts/core/configuracion_musica.gd`) y preset `recursos/audio/config_musica_defecto.tres` con grupos exportados (`Recurso y Clips`, `Volúmenes y Suavizado`, `Pausa y Game Over`).
+  - [ ] Implementar escena Autoload `/root/GestorMusica` (`escenas/gestor_musica.tscn`, script `scripts/core/gestor_musica.gd`) con reproductor único sobre el bus `&"musica"` y `PROCESS_MODE_ALWAYS`, reactivo a la señal `changed` de `config`.
   - [ ] Continuidad de `Night Crawling` entre Menú Principal y Tutorial sin reinicio.
   - [ ] Conmutación métrica instantánea a `Haunted Boardwalk` en el siguiente pulso al recolectar la Nota 1.
-  - [ ] Modulación dinámica de volumen (*audio ducking*) de doble capa: $-8\text{ dB} \to -20\text{ dB}$ ante proximidad ($< 800\text{ px}$) y hasta $-28\text{ dB}$ con linterna y línea de visión directa.
-  - [ ] Atenuación fija en menú de pausa a $-16\text{ dB}$ (offset de $-8\text{ dB}$) con loop musical continuo.
-  - [ ] Corte en seco a $0\text{ ms}$ en jumpscare y activación en Game Over de `pitch_scale = 0.65` con reverberación cavernosa.
+  - [ ] Atenuación aditiva en menú de pausa (`config.atenuacion_pausa_db`) con loop musical continuo y suavizado `move_toward`.
+  - [ ] Corte en seco a $0\text{ ms}$ en jumpscare y activación en Game Over de `pitch_scale = config.pitch_game_over` con reverberación cavernosa.
+  - [ ] Integración de telemetría, sliders en vivo y botones de prueba de clips en `TabSistema` del Menú de Debug in-game (<kbd>F3</kbd>).
   - [ ] Suite de pruebas automatizadas en `tests/test_gestor_musica.gd`.
 - [ ] **Efectos de Jugador:** Pasos sobre hojarasca seca con cadencia según velocidad, sonido de despegue de salto y golpe seco al caer en plancha con jadeo.
 - [ ] **Efectos de Criatura:** Radar sonoro mediante `AudioStreamPlayer2D` con atenuación logarítmica ($1400\text{ px}$) y zumbido de estática.

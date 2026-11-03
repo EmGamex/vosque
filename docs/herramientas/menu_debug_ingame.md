@@ -93,8 +93,12 @@ DebugMenu (CanvasLayer, layer=100) [scripts/debug/debug_menu/debug_menu.gd]
   - Botón "Reubicar Monstruo" a un cuadrante seguro.
 * **Visualización Táctica:** Muestra en pantalla el `AreaCaptura` ($56\text{ px}$), la colisión física ($42\text{ px}$), el rayo de visión y las estelas de desplazamiento (*breadcrumbs* de los últimos 2 segundos).
 
-### 4.4. Pestaña Sistema, Notas y Persistencia
+### 4.4. Pestaña Sistema, Notas, Persistencia y Audio
 * **Control de Tiempo (`Engine.time_scale`):** Botones de preajuste a `0.2x` (análisis de saltos en slow motion), `0.5x`, `1.0x` y `2.0x`.
+* **Audio y Música (Calibración en Vivo):**
+  - Telemetría en tiempo real: estado FSM (`SILENCIO`, `MENU_TUTORIAL`, `SUPERVIVENCIA`, `GAME_OVER`), clip activo y volumen del bus `&"musica"` en `dB`.
+  - Botones de conmutación directa: `Menú/Tutorial`, `Supervivencia (NEXT_BEAT)`, `Jumpscare (0 ms)` y `Game Over`.
+  - Sliders de live-tweaking vinculados a `ConfiguracionMusica`: ajuste de volumen base, atenuación en pausa y pitch de derrota.
 * **Coleccionables:** Contador en tiempo real, botón para simular recolección inmediata y botón para teletransportar al jugador hacia la nota activa.
 * **Game Feel y Cámara:** Inyectores manuales de trauma de cámara (`+0.20`, `+0.35`, `+1.00`).
 * **Persistencia:** Botón para resetear el récord guardado en disco y `LocalStorage`.

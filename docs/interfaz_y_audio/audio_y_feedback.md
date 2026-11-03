@@ -8,20 +8,20 @@ Este documento describe el paisaje sonoro, los efectos de audio (SFX), el sistem
 
 En *Vosque*, el audio es un pilar central de supervivencia. Dado que el rango de visión frontal es limitado y los 3 sectores lejanos mutan tras cada nota, **el paisaje sonoro actúa como un radar diegético**: el jugador debe aprender a escuchar la distancia, cadencia y posición del monstruo para no correr directamente hacia sus garras.
 
-Por esta razón, la **música nunca debe enmascarar ni opacar los SFX críticos de proximidad**. La música se comporta como un barómetro de tensión psicológica y se subordina dinámicamente (*audio ducking*) a la presencia de la criatura.
+Por esta razón, la mezcla está nivelada para que los SFX críticos de proximidad destaquen con nitidez sobre la música ambiental, la cual actúa como un barómetro de tensión psicológica.
 
 ---
 
 ## 2. Layout de Buses y Organización de Archivos (`res://audio/` y `res://sonido/`)
 
 Los recursos sonoros se organizan en las siguientes rutas del proyecto:
-* `res://sonido/musica/`: Pistas musicales en formato `.ogg` con metadatos de sincronización e importación.
+* `res://sonido/musica/`: Pistas musicales en formato `.ogg` con metadatos de sincronización e importación (`Pac Man World 2 Soundtrack - Night Crawling - BadBalloon.ogg` y `Pac Man World 2 Soundtrack - Haunted Boardwalk - BadBalloon.ogg`).
 * `res://sonido/sfx/` o `res://audio/`: Efectos de sonido agrupados por entidad:
   * `ambiente/`: Loops continuos de viento, susurros y ramas secas (`.ogg`).
   * `criatura/`: SFX del monstruo, zumbido de estática, pisadas pesadas y jumpscare (`.wav` y `.ogg`).
   * `jugador/`: Pasos en hojarasca, despegue de salto, impacto/arrastre de plancha y jadeos (`.wav`).
   * `interfaz/`: Rasgado seco de notas y clics/hovers de menú (`.wav`).
-* `res://audio/default_bus_layout.tres`: Configuración de los buses de audio en Godot.
+* `res://default_bus_layout.tres`: Configuración de los buses de audio en Godot (`Master`, `sfx`, `musica`).
 
 ```mermaid
 flowchart TD
@@ -29,17 +29,17 @@ flowchart TD
     Ambiente[Bus Ambiente / Viento] --> Master
     Efectos[Bus SFX / Jugador & Notas] --> Master
     Criatura[Bus Criatura / Hostil] --> Master
-    Musica[Bus Musica / OST] --> Master
+    Musica[Bus musica / OST] --> Master
 
     subgraph Modulaciones ["Efectos y Modulaciones en Tiempo Real"]
         FiltroFatiga["AudioEffectLowPassFilter<br/>(Bus Master - Activo en fatiga)"]
-        ReverbGameOver["AudioEffectReverb<br/>(Bus Musica - Activo en Game Over)"]
-        DuckingDobleCapa["Ducking Doble Capa & Pausa<br/>(Bus Musica: -8 dB a -20 dB / -28 dB / -16 dB)"]
+        ReverbGameOver["AudioEffectReverb<br/>(Bus musica - Activo en Game Over)"]
+        AtenuacionPausa["Atenuación en Pausa<br/>(Bus musica: -8 dB a -16 dB)"]
     end
 
     Master --- FiltroFatiga
     Musica --- ReverbGameOver
-    Criatura -.-> DuckingDobleCapa
+    Musica --- AtenuacionPausa
 ```
 
 | Bus de Audio | Volumen Base | Efectos Asignados | Propósito |
@@ -48,18 +48,18 @@ flowchart TD
 | **Ambiente** | $-6.0\text{ dB}$ | Pre-procesado (Bypass en motor) | Viento sibilante continuo y crujidos con reverberación horneada en el `.ogg`. |
 | **Efectos** | $-2.0\text{ dB}$ | Ninguno | Pasos en hojarasca, jadeos de recuperación, salto y rasgado de notas. |
 | **Criatura** | $+1.0\text{ dB}$ | Pre-procesado (Bypass en motor) | Sonidos guturales y estática con máxima prioridad auditiva. |
-| **Musica** | $-8.0\text{ dB}$ | `AudioEffectReverb` (bypass) | Pistas musicales interactivas; modula ducking por distancia/linterna, atenuación en pausa y efecto pesadilla en derrota. |
+| **musica** | $-8.0\text{ dB}$ | `AudioEffectReverb` (slot 0, bypass) | Pistas musicales interactivas; modula atenuación en pausa y efecto pesadilla en derrota. Configurable mediante `ConfiguracionMusica`. |
 
 ---
 
 ## 3. Sistema de Música Interactiva (`res://sonido/musica/`)
 
-> 📖 **Especificación completa:** Para consultar la máquina de estados detallada, diagramas de transición, arquitectura del Autoload `GestorMusica` y fórmulas matemáticas de atenuación, consulta [Sistema de Música Interactiva](sistema_de_musica.md).
+> 📖 **Especificación completa:** Para consultar la máquina de estados detallada, diagramas de transición, arquitectura del Autoload `GestorMusica` (`gestor_musica.tscn`), recurso editable `ConfiguracionMusica` (`.tres`) y calibración en vivo en el Menú Debug (F3), consulta [Sistema de Música Interactiva](sistema_de_musica.md).
 
 El diseño musical acompaña la evolución emocional del jugador desde la intriga inicial hasta la paranoia absoluta del bosque abierto mediante el recurso `AudioStreamInteractive`:
 * **Menú Principal + Tutorial (`Night Crawling`):** Mantiene continuidad fluida entre el menú con linterna y el aprendizaje seguro en el Sector Central sin cortes de reproducción.
 * **Supervivencia Activa (`Haunted Boardwalk`):** Conmutación instantánea pero rítmicamente alineada en el siguiente pulso (`NEXT_BEAT`) sin fade al recolectar la Nota 1.
-* **Audio Ducking de Doble Capa y Pausa:** Atenuación dinámica de $-8\text{ dB}$ a $-20\text{ dB}$ por cercanía ($< 800\text{ px}$), caída extra hasta $-28\text{ dB}$ si la linterna enfoca a la criatura con visión directa, y atenuación fija a $-16\text{ dB}$ al pausar.
+* **Atenuación en Pausa:** Atenuación de $-8\text{ dB}$ a $-16\text{ dB}$ al pausar de forma aditiva y configurable desde `config_musica_defecto.tres`.
 * **Game Over (Nightmare Decay):** Detención súbita a $0\text{ ms}$ en jumpscare seguida de reanudación con ralentización (`pitch_scale = 0.65`) y activación de `AudioEffectReverb` cavernoso en la pantalla de derrota.
 
 ---
