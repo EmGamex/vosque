@@ -112,7 +112,7 @@ func actualizar_tab_enemigo(labels: Dictionary, enemigo: CharacterBody2D, pos_ju
 		if lbl_atascado != null: lbl_atascado.text = "N/A"
 
 
-func actualizar_tab_sistema(labels: Dictionary, fps: int, mem_mb: float) -> void:
+func actualizar_tab_sistema(labels: Dictionary, fps: int, mem_mb: float, telemetria_musica: Dictionary = {}) -> void:
 	var lbl_fps: Label = labels.get("lbl_sys_fps")
 	var lbl_mem: Label = labels.get("lbl_sys_mem")
 	var lbl_ts: Label = labels.get("lbl_sys_timescale")
@@ -120,3 +120,17 @@ func actualizar_tab_sistema(labels: Dictionary, fps: int, mem_mb: float) -> void
 	if lbl_fps != null: lbl_fps.text = "%d FPS" % fps
 	if lbl_mem != null: lbl_mem.text = "%.2f MB" % mem_mb
 	if lbl_ts != null: lbl_ts.text = "%.2fx" % Engine.time_scale
+
+	var lbl_estado_musica: Label = labels.get("lbl_musica_estado")
+	var lbl_clip_musica: Label = labels.get("lbl_musica_clip")
+	var lbl_vol_musica: Label = labels.get("lbl_musica_volumen")
+
+	if not telemetria_musica.is_empty():
+		if lbl_estado_musica != null:
+			lbl_estado_musica.text = str(telemetria_musica.get("estado", "N/A"))
+		if lbl_clip_musica != null:
+			lbl_clip_musica.text = str(telemetria_musica.get("clip", "N/A"))
+		if lbl_vol_musica != null:
+			var vol: float = float(telemetria_musica.get("volumen_db", -8.0))
+			var pausa: bool = bool(telemetria_musica.get("en_pausa", false))
+			lbl_vol_musica.text = "%.1f dB %s" % [vol, "(Pausado)" if pausa else "(Normal)"]

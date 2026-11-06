@@ -254,6 +254,8 @@ func _intentar_capturar(body: Node2D) -> void:
 			return
 		_capturado = true
 		velocity = Vector2.ZERO
+		if has_node("/root/GestorMusica"):
+			get_node("/root/GestorMusica").detener_por_jumpscare()
 		jugador_capturado.emit(global_position)
 
 
@@ -266,5 +268,7 @@ func _comprobar_captura_continua() -> void:
 				continue
 			_capturado = true
 			velocity = Vector2.ZERO
+			if has_node("/root/GestorMusica"):
+				get_node("/root/GestorMusica").detener_por_jumpscare()
 			jugador_capturado.emit(global_position)
 			break

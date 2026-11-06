@@ -80,6 +80,8 @@ func pausar() -> void:
 	var tree: SceneTree = get_tree()
 	if tree != null:
 		tree.paused = true
+	if has_node("/root/GestorMusica"):
+		get_node("/root/GestorMusica").establecer_pausa(true)
 	if _menu_pausa != null:
 		_menu_pausa.mostrar()
 
@@ -88,6 +90,8 @@ func reanudar() -> void:
 	if not _pausado:
 		return
 	_pausado = false
+	if has_node("/root/GestorMusica"):
+		get_node("/root/GestorMusica").establecer_pausa(false)
 	if _menu_pausa != null:
 		_menu_pausa.ocultar()
 
@@ -116,6 +120,8 @@ func _limpiar_pausa_forzada() -> void:
 			_menu_pausa.ocultar_inmediato()
 		if tree != null:
 			tree.paused = false
+		if has_node("/root/GestorMusica"):
+			get_node("/root/GestorMusica").establecer_pausa(false)
 
 
 func _unhandled_input(evento: InputEvent) -> void:
@@ -134,6 +140,8 @@ func _unhandled_input(evento: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 	elif evento is InputEventKey and evento.pressed and not evento.echo and evento.keycode == KEY_G:
 		# Atajo de depuración: fuerza Game Over para pruebas rápidas de transición.
+		if has_node("/root/GestorMusica"):
+			get_node("/root/GestorMusica").detener_por_jumpscare()
 		ir_a(RUTA_GAME_OVER)
 		get_viewport().set_input_as_handled()
 
@@ -203,6 +211,8 @@ func _on_menu_solicitado() -> void:
 
 
 func _on_game_over_solicitado() -> void:
+	if has_node("/root/GestorMusica"):
+		get_node("/root/GestorMusica").detener_por_jumpscare()
 	ir_a(RUTA_GAME_OVER)
 
 

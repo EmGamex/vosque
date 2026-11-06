@@ -126,6 +126,24 @@ var god_view_activo: bool:
 @onready var lbl_sys_mem: Label = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridSistema/ValMemoria
 @onready var lbl_sys_timescale: Label = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridSistema/ValTimeScale
 
+# Nodos Audio y Música - Pestaña Sistema (Issue #28)
+@onready var lbl_musica_estado: Label = get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridMusica/ValEstadoMusica") as Label
+@onready var lbl_musica_clip: Label = get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridMusica/ValClipMusica") as Label
+@onready var lbl_musica_volumen: Label = get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridMusica/ValVolumenMusica") as Label
+
+@onready var btn_musica_menu: Button = get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/HBoxBotonesMusica/BtnMusicaMenu") as Button
+@onready var btn_musica_supervivencia: Button = get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/HBoxBotonesMusica/BtnMusicaSupervivencia") as Button
+@onready var btn_musica_jumpscare: Button = get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/HBoxBotonesMusica/BtnMusicaJumpscare") as Button
+@onready var btn_musica_game_over: Button = get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/HBoxBotonesMusica/BtnMusicaGameOver") as Button
+@onready var btn_musica_restaurar: Button = get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/HBoxBotonesMusica/BtnMusicaRestaurar") as Button
+
+@onready var slider_vol_base: HSlider = get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridSlidersMusica/SliderVolBase") as HSlider
+@onready var val_slider_vol_base: Label = get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridSlidersMusica/ValSliderVolBase") as Label
+@onready var slider_aten_pausa: HSlider = get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridSlidersMusica/SliderAtenPausa") as HSlider
+@onready var val_slider_aten_pausa: Label = get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridSlidersMusica/ValSliderAtenPausa") as Label
+@onready var slider_pitch_go: HSlider = get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridSlidersMusica/SliderPitchGO") as HSlider
+@onready var val_slider_pitch_go: Label = get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridSlidersMusica/ValSliderPitchGO") as Label
+
 # Visualizador de Direcciones
 @onready var flecha_up: Label = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/HBoxPad/GridPad/FlechaUp
 @onready var flecha_down: Label = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/HBoxPad/GridPad/FlechaDown
@@ -176,6 +194,7 @@ func _ready() -> void:
 	scenario.inicializar_camaras(context)
 	scenario.aplicar_estado_niebla(context)
 	monitors.registrar(context)
+	_inicializar_controles_musica()
 
 
 func _restaurar_estado_desde_config() -> void:
@@ -329,11 +348,15 @@ func _actualizar_telemetria() -> void:
 		if check_pausar != null:
 			check_pausar.set_pressed_no_signal(get_tree().paused)
 
+		var telem_musica: Dictionary = system_ctrl.obtener_telemetria_musica()
 		telemetry.actualizar_tab_sistema({
 			"lbl_sys_fps": lbl_sys_fps,
 			"lbl_sys_mem": lbl_sys_mem,
-			"lbl_sys_timescale": lbl_sys_timescale
-		}, fps, mem_mb)
+			"lbl_sys_timescale": lbl_sys_timescale,
+			"lbl_musica_estado": lbl_musica_estado,
+			"lbl_musica_clip": lbl_musica_clip,
+			"lbl_musica_volumen": lbl_musica_volumen
+		}, fps, mem_mb, telem_musica)
 
 	if overlay_draw != null:
 		overlay_draw.queue_redraw()
@@ -439,3 +462,78 @@ func _on_btn_timescale_20_pressed() -> void:
 
 func _on_btn_reiniciar_escena_pressed() -> void:
 	system_ctrl.reiniciar_escena(get_tree())
+
+
+# --- Controles de Audio y Música (Issue #28) ---
+
+func _inicializar_controles_musica() -> void:
+	if btn_musica_menu != null and not btn_musica_menu.pressed.is_connected(_on_btn_musica_menu_pressed):
+		btn_musica_menu.pressed.connect(_on_btn_musica_menu_pressed)
+	if btn_musica_supervivencia != null and not btn_musica_supervivencia.pressed.is_connected(_on_btn_musica_supervivencia_pressed):
+		btn_musica_supervivencia.pressed.connect(_on_btn_musica_supervivencia_pressed)
+	if btn_musica_jumpscare != null and not btn_musica_jumpscare.pressed.is_connected(_on_btn_musica_jumpscare_pressed):
+		btn_musica_jumpscare.pressed.connect(_on_btn_musica_jumpscare_pressed)
+	if btn_musica_game_over != null and not btn_musica_game_over.pressed.is_connected(_on_btn_musica_game_over_pressed):
+		btn_musica_game_over.pressed.connect(_on_btn_musica_game_over_pressed)
+	if btn_musica_restaurar != null and not btn_musica_restaurar.pressed.is_connected(_on_btn_musica_restaurar_pressed):
+		btn_musica_restaurar.pressed.connect(_on_btn_musica_restaurar_pressed)
+
+	var tree := get_tree()
+	var gm: Node = tree.root.get_node_or_null("GestorMusica") if (tree != null and tree.root != null) else null
+	var cfg_musica: ConfiguracionMusica = gm.config if (gm != null and "config" in gm and gm.config is ConfiguracionMusica) else null
+
+	if cfg_musica != null:
+		if slider_vol_base != null:
+			slider_vol_base.set_value_no_signal(cfg_musica.volumen_base_db)
+			if val_slider_vol_base != null: val_slider_vol_base.text = "%.1f dB" % cfg_musica.volumen_base_db
+		if slider_aten_pausa != null:
+			slider_aten_pausa.set_value_no_signal(cfg_musica.atenuacion_pausa_db)
+			if val_slider_aten_pausa != null: val_slider_aten_pausa.text = "%.1f dB" % cfg_musica.atenuacion_pausa_db
+		if slider_pitch_go != null:
+			slider_pitch_go.set_value_no_signal(cfg_musica.pitch_game_over)
+			if val_slider_pitch_go != null: val_slider_pitch_go.text = "%.2fx" % cfg_musica.pitch_game_over
+
+	if slider_vol_base != null and not slider_vol_base.value_changed.is_connected(_on_slider_vol_base_value_changed):
+		slider_vol_base.value_changed.connect(_on_slider_vol_base_value_changed)
+	if slider_aten_pausa != null and not slider_aten_pausa.value_changed.is_connected(_on_slider_aten_pausa_value_changed):
+		slider_aten_pausa.value_changed.connect(_on_slider_aten_pausa_value_changed)
+	if slider_pitch_go != null and not slider_pitch_go.value_changed.is_connected(_on_slider_pitch_go_value_changed):
+		slider_pitch_go.value_changed.connect(_on_slider_pitch_go_value_changed)
+
+
+func _on_btn_musica_menu_pressed() -> void:
+	system_ctrl.forzar_musica_menu()
+
+
+func _on_btn_musica_supervivencia_pressed() -> void:
+	system_ctrl.forzar_musica_supervivencia()
+
+
+func _on_btn_musica_jumpscare_pressed() -> void:
+	system_ctrl.forzar_corte_jumpscare()
+
+
+func _on_btn_musica_game_over_pressed() -> void:
+	system_ctrl.forzar_modo_game_over()
+
+
+func _on_btn_musica_restaurar_pressed() -> void:
+	system_ctrl.restaurar_audio_normal()
+
+
+func _on_slider_vol_base_value_changed(val: float) -> void:
+	system_ctrl.set_volumen_base(val)
+	if val_slider_vol_base != null:
+		val_slider_vol_base.text = "%.1f dB" % val
+
+
+func _on_slider_aten_pausa_value_changed(val: float) -> void:
+	system_ctrl.set_atenuacion_pausa(val)
+	if val_slider_aten_pausa != null:
+		val_slider_aten_pausa.text = "%.1f dB" % val
+
+
+func _on_slider_pitch_go_value_changed(val: float) -> void:
+	system_ctrl.set_pitch_game_over(val)
+	if val_slider_pitch_go != null:
+		val_slider_pitch_go.text = "%.2fx" % val
