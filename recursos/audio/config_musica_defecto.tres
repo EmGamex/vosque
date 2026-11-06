@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="ConfiguracionMusica" format=3 uid="uid://ik0e0vguor4y"]
+
+[ext_resource type="Script" uid="uid://dm0lsqmq2rlad" path="res://scripts/core/configuracion_musica.gd" id="1_s10u1"]
+[ext_resource type="AudioStream" uid="uid://inotobtqpfq4" path="res://sonido/musica/musica_interactiva.tres" id="2_orfsb"]
+
+[resource]
+script = ExtResource("1_s10u1")

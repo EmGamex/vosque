@@ -2,7 +2,8 @@
 class_name TestGestorMusica
 extends McpTestSuite
 
-## Suite de verificacion para los buses de audio y AudioStreamInteractive (Issue #26).
+## Suite de verificacion para los buses de audio, AudioStreamInteractive (Issue #26)
+## y el recurso ConfiguracionMusica con singleton GestorMusica (Issue #27).
 
 func suite_name() -> String:
 	return "gestor_musica"
@@ -86,3 +87,118 @@ func test_transiciones_metricas_interactivas() -> void:
 	assert_eq(asi.get_transition_to_time(AudioStreamInteractive.CLIP_ANY, 0), AudioStreamInteractive.TRANSITION_TO_TIME_START, "To time comodin debe ser START")
 	assert_eq(asi.get_transition_fade_mode(AudioStreamInteractive.CLIP_ANY, 0), AudioStreamInteractive.FADE_DISABLED, "Fade mode comodin debe ser FADE_DISABLED")
 	assert_true(is_equal_approx(asi.get_transition_fade_beats(AudioStreamInteractive.CLIP_ANY, 0), 0.0), "Fade beats comodin debe ser 0.0")
+
+
+# =========================================================================
+# Casos de prueba Issue #27: Recurso ConfiguracionMusica y Autoload GestorMusica
+# =========================================================================
+
+func test_recurso_configuracion_musica() -> void:
+	var config := ConfiguracionMusica.new()
+	assert_true(config != null, "ConfiguracionMusica debe instanciarse")
+	assert_eq(config.nombre_bus, &"musica", "El bus por defecto debe ser 'musica'")
+	assert_eq(config.clip_menu_tutorial, &"menu_tutorial", "Clip menu/tutorial por defecto")
+	assert_eq(config.clip_supervivencia, &"supervivencia", "Clip supervivencia por defecto")
+	assert_true(is_equal_approx(config.volumen_base_db, -8.0), "Volumen base por defecto debe ser -8.0 dB")
+	assert_true(is_equal_approx(config.velocidad_suavizado_db, 12.0), "Velocidad suavizado debe ser 12.0 dB/s")
+	assert_true(is_equal_approx(config.atenuacion_pausa_db, -8.0), "Atenuacion de pausa debe ser -8.0 dB")
+	assert_true(is_equal_approx(config.pitch_game_over, 0.65), "Pitch de game over debe ser 0.65")
+
+	# Verificación de reactividad (emit_changed)
+	var estado := {"signal_emitida": false}
+	config.changed.connect(func(): estado["signal_emitida"] = true)
+	config.volumen_base_db = -10.0
+	assert_true(estado["signal_emitida"], "Modificar una propiedad exportada debe emitir la señal 'changed'")
+
+
+func test_preset_config_musica_defecto() -> void:
+	var preset = load("res://recursos/audio/config_musica_defecto.tres")
+	assert_true(preset != null, "config_musica_defecto.tres debe existir")
+	assert_true(preset is ConfiguracionMusica, "El preset debe ser de tipo ConfiguracionMusica")
+
+	var config: ConfiguracionMusica = preset as ConfiguracionMusica
+	assert_eq(config.nombre_bus, &"musica")
+	assert_eq(config.clip_menu_tutorial, &"menu_tutorial")
+	assert_eq(config.clip_supervivencia, &"supervivencia")
+	assert_true(is_equal_approx(config.volumen_base_db, -8.0))
+	assert_true(is_equal_approx(config.atenuacion_pausa_db, -8.0))
+	assert_true(is_equal_approx(config.pitch_game_over, 0.65))
+	assert_true(config.stream_interactivo != null, "El preset debe tener stream_interactivo cargado")
+
+
+func test_escena_gestor_musica_estructura() -> void:
+	var escena: PackedScene = load("res://escenas/gestor_musica.tscn")
+	assert_true(escena != null, "La escena gestor_musica.tscn debe existir")
+
+	var instancia := escena.instantiate()
+	assert_true(instancia != null, "La escena debe poder instanciarse")
+	assert_true(instancia is ControladorMusica, "La raiz de gestor_musica.tscn debe tener script ControladorMusica")
+	assert_eq(instancia.process_mode, Node.PROCESS_MODE_ALWAYS, "process_mode debe ser PROCESS_MODE_ALWAYS")
+
+	var rep: AudioStreamPlayer = instancia.get_node_or_null("ReproductorInteractivo") as AudioStreamPlayer
+	assert_true(rep != null, "Debe existir el nodo hijo ReproductorInteractivo")
+	assert_eq(rep.bus, &"musica", "ReproductorInteractivo debe estar asignado al bus 'musica'")
+	assert_true(rep.stream != null, "ReproductorInteractivo debe tener stream interactivo asignado")
+
+	instancia.free()
+
+
+func test_autoload_registrado() -> void:
+	assert_true(ProjectSettings.has_setting("autoload/GestorMusica"), "GestorMusica debe estar registrado como Autoload")
+	var path_autoload: String = ProjectSettings.get_setting("autoload/GestorMusica")
+	assert_true(path_autoload.contains("res://escenas/gestor_musica.tscn"), "El Autoload GestorMusica debe apuntar a res://escenas/gestor_musica.tscn")
+
+
+func test_controlador_musica_maquina_estados_y_metodos() -> void:
+	var escena: PackedScene = load("res://escenas/gestor_musica.tscn")
+	var gestor: ControladorMusica = escena.instantiate() as ControladorMusica
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree != null and tree.root != null:
+		tree.root.add_child(gestor)
+
+	# 1. Menú o Tutorial
+	gestor.reproducir_menu_o_tutorial()
+	assert_eq(gestor.get_estado_actual(), ControladorMusica.EstadoMusical.MENU_TUTORIAL)
+	assert_eq(gestor.get_clip_activo(), &"menu_tutorial")
+
+	# Llamada no destructiva: debe mantenerse en MENU_TUTORIAL
+	gestor.reproducir_menu_o_tutorial()
+	assert_eq(gestor.get_estado_actual(), ControladorMusica.EstadoMusical.MENU_TUTORIAL)
+
+	# 2. Conmutar a Supervivencia
+	gestor.transicionar_a_supervivencia()
+	assert_eq(gestor.get_estado_actual(), ControladorMusica.EstadoMusical.SUPERVIVENCIA)
+	assert_eq(gestor.get_clip_activo(), &"supervivencia")
+
+	# 3. Pausa y suavizado de atenuación
+	gestor.establecer_pausa(true)
+	assert_true(gestor.is_en_pausa())
+	gestor._process(1.0)
+	var vol_en_pausa := gestor.get_volumen_actual_db()
+	assert_true(vol_en_pausa <= -8.0, "Durante la pausa el volumen debe atenuarse")
+
+	gestor.establecer_pausa(false)
+	assert_false(gestor.is_en_pausa())
+	gestor._process(1.0)
+	assert_true(gestor.get_volumen_actual_db() >= vol_en_pausa, "Al despausar el volumen debe restituirse gradualmente")
+
+	# 4. Detener por Jumpscare (0 ms instantaneo)
+	gestor.detener_por_jumpscare()
+	assert_eq(gestor.get_estado_actual(), ControladorMusica.EstadoMusical.SILENCIO)
+
+	# 5. Activar Game Over (Nightmare Decay)
+	gestor.activar_modo_game_over()
+	assert_eq(gestor.get_estado_actual(), ControladorMusica.EstadoMusical.GAME_OVER)
+	assert_true(is_equal_approx(gestor.reproductor.pitch_scale, 0.65), "En Game Over el pitch_scale debe ser 0.65")
+	var idx_musica := AudioServer.get_bus_index(&"musica")
+	assert_true(AudioServer.is_bus_effect_enabled(idx_musica, 0), "En Game Over el Reverb del bus 'musica' debe estar habilitado")
+
+	# 6. Restaurar parámetros normales
+	gestor.restaurar_parametros_normales()
+	assert_true(is_equal_approx(gestor.reproductor.pitch_scale, 1.0), "Al restaurar, el pitch_scale debe volver a 1.0")
+	assert_false(AudioServer.is_bus_effect_enabled(idx_musica, 0), "Al restaurar, el Reverb debe volver a deshabilitarse")
+	assert_eq(gestor.get_estado_actual(), ControladorMusica.EstadoMusical.MENU_TUTORIAL)
+
+	if tree != null and tree.root != null and gestor.get_parent() == tree.root:
+		tree.root.remove_child(gestor)
+	gestor.free()
