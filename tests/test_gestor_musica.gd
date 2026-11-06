@@ -202,3 +202,111 @@ func test_controlador_musica_maquina_estados_y_metodos() -> void:
 	if tree != null and tree.root != null and gestor.get_parent() == tree.root:
 		tree.root.remove_child(gestor)
 	gestor.free()
+
+
+# =========================================================================
+# Casos de prueba Issue #28: Conexión de eventos de gameplay, Nightmare Decay
+# y controles del Menú Debug (F3)
+# =========================================================================
+
+func test_debug_system_controller_audio() -> void:
+	var escena_gestor: PackedScene = load("res://escenas/gestor_musica.tscn")
+	var gestor: ControladorMusica = escena_gestor.instantiate() as ControladorMusica
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree != null and tree.root != null:
+		tree.root.add_child(gestor)
+
+	var ctrl := DebugSystemController.new()
+
+	# Probar forzar clips y estados
+	ctrl.forzar_musica_menu(gestor)
+	assert_eq(gestor.get_estado_actual(), ControladorMusica.EstadoMusical.MENU_TUTORIAL)
+
+	ctrl.forzar_musica_supervivencia(gestor)
+	assert_eq(gestor.get_estado_actual(), ControladorMusica.EstadoMusical.SUPERVIVENCIA)
+
+	ctrl.forzar_corte_jumpscare(gestor)
+	assert_eq(gestor.get_estado_actual(), ControladorMusica.EstadoMusical.SILENCIO)
+
+	ctrl.forzar_modo_game_over(gestor)
+	assert_eq(gestor.get_estado_actual(), ControladorMusica.EstadoMusical.GAME_OVER)
+
+	ctrl.restaurar_audio_normal(gestor)
+	assert_eq(gestor.get_estado_actual(), ControladorMusica.EstadoMusical.MENU_TUTORIAL)
+
+	# Probar telemetría
+	var telem := ctrl.obtener_telemetria_musica(gestor)
+	assert_eq(telem.get("estado"), "MENU_TUTORIAL")
+	assert_eq(telem.get("clip"), "menu_tutorial")
+
+	# Probar sliders de calibración
+	var cfg: ConfiguracionMusica = gestor.config
+	ctrl.set_volumen_base(-12.0, cfg, gestor)
+	assert_true(is_equal_approx(cfg.volumen_base_db, -12.0))
+
+	ctrl.set_atenuacion_pausa(-14.0, cfg, gestor)
+	assert_true(is_equal_approx(cfg.atenuacion_pausa_db, -14.0))
+
+	ctrl.set_pitch_game_over(0.55, cfg, gestor)
+	assert_true(is_equal_approx(cfg.pitch_game_over, 0.55))
+
+	# Restaurar valores por defecto para no contaminar tests
+	ctrl.set_volumen_base(-8.0, cfg, gestor)
+	ctrl.set_atenuacion_pausa(-8.0, cfg, gestor)
+	ctrl.set_pitch_game_over(0.65, cfg, gestor)
+
+	if tree != null and tree.root != null and gestor.get_parent() == tree.root:
+		tree.root.remove_child(gestor)
+	gestor.free()
+
+
+func test_gameplay_senales_e_integracion_audio() -> void:
+	var escena_gestor: PackedScene = load("res://escenas/gestor_musica.tscn")
+	var gestor: ControladorMusica = escena_gestor.instantiate() as ControladorMusica
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree != null and tree.root != null:
+		tree.root.add_child(gestor)
+
+	# 1. Menú Inicio: invoca reproducir_menu_o_tutorial()
+	gestor.detener_por_jumpscare()
+	assert_eq(gestor.get_estado_actual(), ControladorMusica.EstadoMusical.SILENCIO)
+	# Simulamos el callback que ejecuta MenuInicio
+	gestor.reproducir_menu_o_tutorial()
+	assert_eq(gestor.get_estado_actual(), ControladorMusica.EstadoMusical.MENU_TUTORIAL)
+	assert_eq(gestor.get_clip_activo(), &"menu_tutorial")
+
+	# 2. Maain._ready() no-destructivo
+	gestor.reproducir_menu_o_tutorial()
+	assert_eq(gestor.get_estado_actual(), ControladorMusica.EstadoMusical.MENU_TUTORIAL)
+
+	# 3. Nota 1 recolectada: transición a supervivencia
+	gestor.transicionar_a_supervivencia()
+	assert_eq(gestor.get_estado_actual(), ControladorMusica.EstadoMusical.SUPERVIVENCIA)
+	assert_eq(gestor.get_clip_activo(), &"supervivencia")
+
+	# 4. Pausa en GestorDeEscenas: atenuación aditiva
+	gestor.establecer_pausa(true)
+	assert_true(gestor.is_en_pausa())
+	gestor.establecer_pausa(false)
+	assert_false(gestor.is_en_pausa())
+
+	# 5. Jumpscare en Enemigo / Maain: corte seco a 0 ms
+	gestor.detener_por_jumpscare()
+	assert_eq(gestor.get_estado_actual(), ControladorMusica.EstadoMusical.SILENCIO)
+
+	# 6. Pantalla GameOver: modo Nightmare Decay
+	gestor.activar_modo_game_over()
+	assert_eq(gestor.get_estado_actual(), ControladorMusica.EstadoMusical.GAME_OVER)
+	assert_true(is_equal_approx(gestor.reproductor.pitch_scale, 0.65))
+	var idx_musica := AudioServer.get_bus_index(&"musica")
+	assert_true(AudioServer.is_bus_effect_enabled(idx_musica, 0))
+
+	# 7. GameOver Reintentar / Volver al Menú: restaurar_parametros_normales()
+	gestor.restaurar_parametros_normales()
+	assert_eq(gestor.get_estado_actual(), ControladorMusica.EstadoMusical.MENU_TUTORIAL)
+	assert_true(is_equal_approx(gestor.reproductor.pitch_scale, 1.0))
+	assert_false(AudioServer.is_bus_effect_enabled(idx_musica, 0))
+
+	if tree != null and tree.root != null and gestor.get_parent() == tree.root:
+		tree.root.remove_child(gestor)
+	gestor.free()

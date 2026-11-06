@@ -41,6 +41,8 @@ func _ready() -> void:
 		hud.actualizar_contador(notas_recolectadas, false)
 	if enemigo != null and is_instance_valid(enemigo):
 		enemigo.hibernar()
+	if has_node("/root/GestorMusica"):
+		get_node("/root/GestorMusica").reproducir_menu_o_tutorial()
 	call_deferred("spawn_nota_inicial")
 
 
@@ -88,6 +90,9 @@ func _on_jugador_capturado(_posicion_captura: Vector2) -> void:
 	if partida_terminada:
 		return
 	partida_terminada = true
+
+	if has_node("/root/GestorMusica"):
+		get_node("/root/GestorMusica").detener_por_jumpscare()
 
 	if jugador != null and is_instance_valid(jugador):
 		jugador.set("velocity", Vector2.ZERO)
@@ -191,6 +196,10 @@ func _on_nota_recolectada(pos_nota: Vector2) -> void:
 			despertar_monstruo()
 		else:
 			enemigo.actualizar_dificultad(notas_recolectadas)
+
+	if notas_recolectadas == 1:
+		if has_node("/root/GestorMusica"):
+			get_node("/root/GestorMusica").transicionar_a_supervivencia()
 
 	if escenario != null and is_instance_valid(escenario):
 		if escenario.has_method("actualizar_iluminacion_ambiental"):

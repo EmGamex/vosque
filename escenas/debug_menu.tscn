@@ -490,6 +490,113 @@ text = "2.0x (Rápido)"
 layout_mode = 2
 text = "Reiniciar Escena Actual"
 
+[node name="SeparadorAudio" type="HSeparator" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox" unique_id=1951170502]
+layout_mode = 2
+
+[node name="LblTituloAudio" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox" unique_id=2144735078]
+layout_mode = 2
+text = "Audio y Música Interactiva"
+
+[node name="GridMusica" type="GridContainer" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox" unique_id=1596076212]
+layout_mode = 2
+columns = 2
+
+[node name="LblEstadoMusica" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridMusica" unique_id=248315981]
+layout_mode = 2
+text = "Estado Musical:"
+
+[node name="ValEstadoMusica" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridMusica" unique_id=296313568]
+layout_mode = 2
+text = "SILENCIO"
+
+[node name="LblClipMusica" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridMusica" unique_id=1018425914]
+layout_mode = 2
+text = "Clip Activo:"
+
+[node name="ValClipMusica" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridMusica" unique_id=1379511145]
+layout_mode = 2
+text = "Ninguno"
+
+[node name="LblVolumenMusica" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridMusica" unique_id=1284143628]
+layout_mode = 2
+text = "Volumen / Bus:"
+
+[node name="ValVolumenMusica" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridMusica" unique_id=1429395999]
+layout_mode = 2
+text = "-8.0 dB (Normal)"
+
+[node name="HBoxBotonesMusica" type="HBoxContainer" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox" unique_id=941833621]
+layout_mode = 2
+
+[node name="BtnMusicaMenu" type="Button" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/HBoxBotonesMusica" unique_id=883487357]
+layout_mode = 2
+text = "Menú/Tutorial"
+
+[node name="BtnMusicaSupervivencia" type="Button" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/HBoxBotonesMusica" unique_id=1448271409]
+layout_mode = 2
+text = "Supervivencia"
+
+[node name="BtnMusicaJumpscare" type="Button" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/HBoxBotonesMusica" unique_id=338989320]
+layout_mode = 2
+text = "Jumpscare (0 ms)"
+
+[node name="BtnMusicaGameOver" type="Button" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/HBoxBotonesMusica" unique_id=950733662]
+layout_mode = 2
+text = "Game Over (Nightmare)"
+
+[node name="BtnMusicaRestaurar" type="Button" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/HBoxBotonesMusica" unique_id=41322466]
+layout_mode = 2
+text = "Restaurar Normal"
+
+[node name="GridSlidersMusica" type="GridContainer" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox" unique_id=1089826419]
+layout_mode = 2
+columns = 3
+
+[node name="LblSliderVolBase" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridSlidersMusica" unique_id=1025431061]
+layout_mode = 2
+text = "Volumen Base:"
+
+[node name="SliderVolBase" type="HSlider" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridSlidersMusica" unique_id=1665515755]
+layout_mode = 2
+min_value = -40.0
+max_value = 6.0
+step = 0.5
+value = -8.0
+
+[node name="ValSliderVolBase" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridSlidersMusica" unique_id=1332438641]
+layout_mode = 2
+text = "-8.0 dB"
+
+[node name="LblSliderAtenPausa" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridSlidersMusica" unique_id=1731274008]
+layout_mode = 2
+text = "Atenuación Pausa:"
+
+[node name="SliderAtenPausa" type="HSlider" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridSlidersMusica" unique_id=654659237]
+layout_mode = 2
+min_value = -30.0
+max_value = 0.0
+step = 0.5
+value = -8.0
+
+[node name="ValSliderAtenPausa" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridSlidersMusica" unique_id=636035147]
+layout_mode = 2
+text = "-8.0 dB"
+
+[node name="LblSliderPitchGO" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridSlidersMusica" unique_id=1913952187]
+layout_mode = 2
+text = "Pitch Game Over:"
+
+[node name="SliderPitchGO" type="HSlider" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridSlidersMusica" unique_id=739933212]
+layout_mode = 2
+min_value = 0.2
+max_value = 1.5
+step = 0.05
+value = 0.65
+
+[node name="ValSliderPitchGO" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridSlidersMusica" unique_id=1282963455]
+layout_mode = 2
+text = "0.65x"
+
 [connection signal="pressed" from="ControlRaiz/MiniHUD/Margin/VBox/BtnMiniExpandir" to="." method="_on_boton_mini_expandir_pressed"]
 [connection signal="toggled" from="ControlRaiz/PanelConsola/Margin/VBox/BarraSuperior/CheckPausar" to="." method="_on_check_pausar_toggled"]
 [connection signal="pressed" from="ControlRaiz/PanelConsola/Margin/VBox/BarraSuperior/BotonCerrar" to="." method="_on_boton_cerrar_pressed"]

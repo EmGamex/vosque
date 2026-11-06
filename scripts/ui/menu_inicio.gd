@@ -202,6 +202,10 @@ func _ready() -> void:
 	iniciar_presentacion()
 	_actualizar_seleccion(false)
 
+	if not Engine.is_editor_hint():
+		if has_node("/root/GestorMusica"):
+			get_node("/root/GestorMusica").reproducir_menu_o_tutorial()
+
 
 func _conectar_senales_submodulos() -> void:
 	if not seleccion.jugar_solicitado.is_connected(jugar_solicitado.emit):
@@ -270,6 +274,10 @@ func _on_animacion_terminada(nombre: StringName) -> void:
 func enfocar() -> void:
 	iniciar_presentacion()
 	_actualizar_seleccion(false)
+
+	if not Engine.is_editor_hint():
+		if has_node("/root/GestorMusica"):
+			get_node("/root/GestorMusica").reproducir_menu_o_tutorial()
 
 
 func _navegar(direccion: int) -> void:
