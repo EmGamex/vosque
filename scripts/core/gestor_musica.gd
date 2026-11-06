@@ -64,8 +64,11 @@ func reproducir_menu_o_tutorial() -> void:
 	if rep == null or config == null:
 		return
 
+	print("[DEBUG GestorMusica] reproducir_menu_o_tutorial() llamado. playing=", rep.playing, " paused=", rep.stream_paused, " pos=", rep.get_playback_position(), " estado=", estado_actual)
+
 	# Si ya está activo en menú/tutorial y reproduciendo sin pausa, no interrumpir ni reiniciar
 	if rep.playing and not rep.stream_paused and estado_actual == EstadoMusical.MENU_TUTORIAL:
+		print("[DEBUG GestorMusica] Ya en MENU_TUTORIAL, ignorando llamada.")
 		return
 
 	_asegurar_reproductor()
@@ -76,12 +79,15 @@ func reproducir_menu_o_tutorial() -> void:
 	_conmutar_clip(config.clip_menu_tutorial)
 	estado_actual = EstadoMusical.MENU_TUTORIAL
 	clip_actual = config.clip_menu_tutorial
+	print("[DEBUG GestorMusica] Conmutado a MENU_TUTORIAL.")
 
 
 func transicionar_a_supervivencia() -> void:
 	var rep := _obtener_reproductor()
 	if rep == null or config == null:
 		return
+
+	print("[DEBUG GestorMusica] transicionar_a_supervivencia() llamado. playing=", rep.playing, " paused=", rep.stream_paused, " pos=", rep.get_playback_position())
 
 	if estado_actual == EstadoMusical.SUPERVIVENCIA and rep.playing and not rep.stream_paused:
 		return
@@ -91,18 +97,23 @@ func transicionar_a_supervivencia() -> void:
 	_conmutar_clip(config.clip_supervivencia)
 	estado_actual = EstadoMusical.SUPERVIVENCIA
 	clip_actual = config.clip_supervivencia
+	print("[DEBUG GestorMusica] Conmutado a SUPERVIVENCIA.")
 
 
 func establecer_pausa(en_pausa: bool) -> void:
+	print("[DEBUG GestorMusica] establecer_pausa(", en_pausa, ")")
 	_en_pausa = en_pausa
 
 
 func detener_por_jumpscare() -> void:
 	var rep := _obtener_reproductor()
 	if rep != null:
+		print("[DEBUG GestorMusica] detener_por_jumpscare() llamado! playing=", rep.playing, " paused=", rep.stream_paused, " pos=", rep.get_playback_position())
 		if rep.playing:
 			rep.stream_paused = true
+			print("[DEBUG GestorMusica] Pausado exitosamente en pos=", rep.get_playback_position(), " stream_paused=", rep.stream_paused)
 		else:
+			print("[DEBUG GestorMusica] rep.playing era false, haciendo stop().")
 			rep.stop()
 	estado_actual = EstadoMusical.SILENCIO
 	clip_actual = &""
@@ -113,23 +124,28 @@ func activar_modo_game_over() -> void:
 	if rep == null or config == null:
 		return
 
+	print("[DEBUG GestorMusica] activar_modo_game_over() llamado! playing=", rep.playing, " paused=", rep.stream_paused, " pos=", rep.get_playback_position())
+
 	estado_actual = EstadoMusical.GAME_OVER
 	_asegurar_reproductor()
 	rep.pitch_scale = config.pitch_game_over
 	_set_reverb_enabled(true)
 
 	if rep.stream_paused:
-		# Si venía pausado del jumpscare, despausar en seco para continuar
-		# exactamente en el compás y segundo donde quedó, sin reiniciar el clip.
+		print("[DEBUG GestorMusica] Despausando stream_paused a false en pos=", rep.get_playback_position())
 		rep.stream_paused = false
+		print("[DEBUG GestorMusica] Despausado listo. Pos actual=", rep.get_playback_position(), " playing=", rep.playing)
 	elif not rep.playing:
-		# Fallback: si no estaba reproduciendo, iniciar supervivencia
+		print("[DEBUG GestorMusica] Fallback: rep.playing es false, iniciando clip_supervivencia con play().")
 		clip_actual = config.clip_supervivencia
 		rep.play()
 		rep.set(&"parameters/switch_to_clip", config.clip_supervivencia)
+	else:
+		print("[DEBUG GestorMusica] rep estaba playing y no stream_paused. Pos=", rep.get_playback_position())
 
 
 func restaurar_parametros_normales() -> void:
+	print("[DEBUG GestorMusica] restaurar_parametros_normales() llamado.")
 	_en_pausa = false
 	_set_reverb_enabled(false)
 	var rep := _obtener_reproductor()
