@@ -14,6 +14,8 @@ ejecutable/
 vosque-v2/
 
 # Audio
-sonido/musica/
+sonido/musica/*.ogg
+sonido/musica/*.ogg.import
+!sonido/musica/musica_interactiva.tres
 
 
