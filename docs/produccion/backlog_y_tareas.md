@@ -216,11 +216,11 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
   - [x] Configuración de carpetas de pistas bajo `res://sonido/musica/` con metadatos interactivos de BPM y compases.
 - [ ] **Configuración de Buses de Audio (`default_bus_layout.tres`):**
   - [x] Crear estructura base de buses (`Master`, `sfx`, `musica`).
-  - [ ] Expandir a 5 buses completos (`Master`, `Ambiente`, `sfx`, `Criatura`, `musica`).
+  - [x] Expandir a 5 buses completos (`Master`, `Ambiente`, `sfx`, `Criatura`, `musica`).
   - [ ] Asignar `AudioEffectLowPassFilter` dinámico en `Master` durante estado `FATIGA`.
-  - [ ] Asignar `AudioEffectReverb` (inactivo por defecto) en bus `musica` para efecto post-derrota (Game Over).
+  - [x] Asignar `AudioEffectReverb` (inactivo por defecto) en bus `musica` para efecto post-derrota (Game Over).
 - [ ] **Sistema de Música Interactiva (`scripts/core/gestor_musica.gd`, `escenas/gestor_musica.tscn` y `recursos/audio/config_musica_defecto.tres`):**
-  - [ ] Crear recurso `AudioStreamInteractive` (`res://sonido/musica/musica_interactiva.tres`) con clips `menu_tutorial` y `supervivencia` configurados con transición en `NEXT_BEAT` sin fade (`FADE_DISABLED`).
+  - [x] Crear recurso `AudioStreamInteractive` (`res://sonido/musica/musica_interactiva.tres`) con clips `menu_tutorial` y `supervivencia` configurados con transición en `NEXT_BEAT` sin fade (`FADE_DISABLED`).
   - [ ] Implementar recurso tipado editable en Inspector `@tool class_name ConfiguracionMusica extends Resource` (`scripts/core/configuracion_musica.gd`) y preset `recursos/audio/config_musica_defecto.tres` con grupos exportados (`Recurso y Clips`, `Volúmenes y Suavizado`, `Pausa y Game Over`).
   - [ ] Implementar escena Autoload `/root/GestorMusica` (`escenas/gestor_musica.tscn`, script `scripts/core/gestor_musica.gd`) con reproductor único sobre el bus `&"musica"` y `PROCESS_MODE_ALWAYS`, reactivo a la señal `changed` de `config`.
   - [ ] Continuidad de `Night Crawling` entre Menú Principal y Tutorial sin reinicio.
