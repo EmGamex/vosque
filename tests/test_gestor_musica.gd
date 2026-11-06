@@ -290,19 +290,23 @@ func test_gameplay_senales_e_integracion_audio() -> void:
 	gestor.establecer_pausa(false)
 	assert_false(gestor.is_en_pausa())
 
-	# 5. Jumpscare en Enemigo / Maain: corte seco a 0 ms
+	# 5. Jumpscare en Enemigo / Maain: corte seco / pausa en el frame exacto
 	gestor.detener_por_jumpscare()
 	assert_eq(gestor.get_estado_actual(), ControladorMusica.EstadoMusical.SILENCIO)
+	if gestor.reproductor.playing:
+		assert_true(gestor.reproductor.stream_paused, "El reproductor debe quedar pausado para congelar la posición")
 
-	# 6. Pantalla GameOver: modo Nightmare Decay
+	# 6. Pantalla GameOver: reanuda desde donde se pausó en modo Nightmare Decay
 	gestor.activar_modo_game_over()
 	assert_eq(gestor.get_estado_actual(), ControladorMusica.EstadoMusical.GAME_OVER)
+	assert_false(gestor.reproductor.stream_paused, "El reproductor debe despausarse para continuar la reproducción")
 	assert_true(is_equal_approx(gestor.reproductor.pitch_scale, 0.65))
 	var idx_musica := AudioServer.get_bus_index(&"musica")
 	assert_true(AudioServer.is_bus_effect_enabled(idx_musica, 0))
 
 	# 7. GameOver Reintentar / Volver al Menú: restaurar_parametros_normales()
 	gestor.restaurar_parametros_normales()
+	assert_false(gestor.reproductor.stream_paused, "stream_paused debe ser false al restaurar parámetros")
 	assert_eq(gestor.get_estado_actual(), ControladorMusica.EstadoMusical.MENU_TUTORIAL)
 	assert_true(is_equal_approx(gestor.reproductor.pitch_scale, 1.0))
 	assert_false(AudioServer.is_bus_effect_enabled(idx_musica, 0))

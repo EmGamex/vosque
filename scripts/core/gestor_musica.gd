@@ -64,11 +64,12 @@ func reproducir_menu_o_tutorial() -> void:
 	if rep == null or config == null:
 		return
 
-	# Si ya está activo en menú/tutorial, no interrumpir ni reiniciar
-	if rep.playing and estado_actual == EstadoMusical.MENU_TUTORIAL:
+	# Si ya está activo en menú/tutorial y reproduciendo sin pausa, no interrumpir ni reiniciar
+	if rep.playing and not rep.stream_paused and estado_actual == EstadoMusical.MENU_TUTORIAL:
 		return
 
 	_asegurar_reproductor()
+	rep.stream_paused = false
 	rep.pitch_scale = 1.0
 	_set_reverb_enabled(false)
 
@@ -82,10 +83,11 @@ func transicionar_a_supervivencia() -> void:
 	if rep == null or config == null:
 		return
 
-	if estado_actual == EstadoMusical.SUPERVIVENCIA:
+	if estado_actual == EstadoMusical.SUPERVIVENCIA and rep.playing and not rep.stream_paused:
 		return
 
 	_asegurar_reproductor()
+	rep.stream_paused = false
 	_conmutar_clip(config.clip_supervivencia)
 	estado_actual = EstadoMusical.SUPERVIVENCIA
 	clip_actual = config.clip_supervivencia
@@ -98,7 +100,10 @@ func establecer_pausa(en_pausa: bool) -> void:
 func detener_por_jumpscare() -> void:
 	var rep := _obtener_reproductor()
 	if rep != null:
-		rep.stop()
+		if rep.playing:
+			rep.stream_paused = true
+		else:
+			rep.stop()
 	estado_actual = EstadoMusical.SILENCIO
 	clip_actual = &""
 
@@ -113,7 +118,11 @@ func activar_modo_game_over() -> void:
 	_asegurar_reproductor()
 	rep.pitch_scale = config.pitch_game_over
 	_set_reverb_enabled(true)
-	_conmutar_clip(config.clip_supervivencia)
+	if rep.stream_paused:
+		rep.stream_paused = false
+	elif not rep.playing:
+		rep.play()
+	rep.set(&"parameters/switch_to_clip", config.clip_supervivencia)
 
 
 func restaurar_parametros_normales() -> void:
@@ -121,6 +130,7 @@ func restaurar_parametros_normales() -> void:
 	_set_reverb_enabled(false)
 	var rep := _obtener_reproductor()
 	if rep != null:
+		rep.stream_paused = false
 		rep.pitch_scale = 1.0
 	if config != null:
 		_volumen_actual_db = config.volumen_base_db
