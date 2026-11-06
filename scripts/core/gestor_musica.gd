@@ -114,15 +114,19 @@ func activar_modo_game_over() -> void:
 		return
 
 	estado_actual = EstadoMusical.GAME_OVER
-	clip_actual = config.clip_supervivencia
 	_asegurar_reproductor()
 	rep.pitch_scale = config.pitch_game_over
 	_set_reverb_enabled(true)
+
 	if rep.stream_paused:
+		# Si venía pausado del jumpscare, despausar en seco para continuar
+		# exactamente en el compás y segundo donde quedó, sin reiniciar el clip.
 		rep.stream_paused = false
 	elif not rep.playing:
+		# Fallback: si no estaba reproduciendo, iniciar supervivencia
+		clip_actual = config.clip_supervivencia
 		rep.play()
-	rep.set(&"parameters/switch_to_clip", config.clip_supervivencia)
+		rep.set(&"parameters/switch_to_clip", config.clip_supervivencia)
 
 
 func restaurar_parametros_normales() -> void:
