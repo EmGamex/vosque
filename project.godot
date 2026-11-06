@@ -17,9 +17,14 @@ config/features=PackedStringArray("4.7", "GL Compatibility")
 boot_splash/bg_color=Color(0.047058824, 0.11764706, 0.14509805, 1)
 config/icon="uid://dre3h4owcvqvh"
 
+[audio]
+
+buses/default_bus_layout="uid://d0jtrmn0hvqxr"
+
 [autoload]
 
 DebugConfig="*res://scripts/debug/debug_config.gd"
+GestorMusica="*res://escenas/gestor_musica.tscn"
 _mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
 
 [display]

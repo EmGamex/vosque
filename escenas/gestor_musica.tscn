@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://c7vnv0qwo71rx"]
+
+[ext_resource type="Script" uid="uid://jn7f6fqbh5mr" path="res://scripts/core/gestor_musica.gd" id="1_wvp68"]
+[ext_resource type="AudioStream" uid="uid://inotobtqpfq4" path="res://sonido/musica/musica_interactiva.tres" id="2_7iij6"]
+
+[node name="GestorMusica" type="Node" unique_id=1270721262]
+process_mode = 3
+script = ExtResource("1_wvp68")
+
+[node name="ReproductorInteractivo" type="AudioStreamPlayer" parent="." unique_id=1851908666]
+stream = ExtResource("2_7iij6")
+bus = &"musica"
