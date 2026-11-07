@@ -123,3 +123,29 @@ func _resolver_config_musica(cfg: ConfiguracionMusica = null, gm_nodo: Node = nu
 	if gm != null and "config" in gm and gm.config is ConfiguracionMusica:
 		return gm.config as ConfiguracionMusica
 	return null
+
+
+# ==========================================
+# Persistencia y High Score (Issue #35)
+# ==========================================
+
+func obtener_high_score(gestor_persistencia: Node = null) -> int:
+	var gp := _resolver_gestor_persistencia(gestor_persistencia)
+	if gp != null and gp.has_method("obtener_high_score"):
+		return gp.obtener_high_score()
+	return 0
+
+
+func resetear_high_score(gestor_persistencia: Node = null) -> void:
+	var gp := _resolver_gestor_persistencia(gestor_persistencia)
+	if gp != null and gp.has_method("resetear_high_score"):
+		gp.resetear_high_score()
+
+
+func _resolver_gestor_persistencia(nodo: Node = null) -> Node:
+	if nodo != null:
+		return nodo
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree != null and tree.root != null and tree.root.has_node("GestorPersistencia"):
+		return tree.root.get_node("GestorPersistencia")
+	return null

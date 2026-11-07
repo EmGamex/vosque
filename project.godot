@@ -26,6 +26,7 @@ buses/default_bus_layout="uid://d0jtrmn0hvqxr"
 DebugConfig="*res://scripts/debug/debug_config.gd"
 GestorMusica="*res://escenas/gestor_musica.tscn"
 GestorAudioUI="*res://escenas/gestor_audio_ui.tscn"
+GestorPersistencia="*res://scripts/core/gestor_persistencia.gd"
 _mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
 
 [display]

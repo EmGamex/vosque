@@ -109,6 +109,10 @@ func _on_jugador_capturado(_posicion_captura: Vector2) -> void:
 	if musica != null and musica.has_method("detener_por_jumpscare"):
 		musica.detener_por_jumpscare()
 
+	var persistencia := _obtener_gestor_persistencia()
+	if persistencia != null and persistencia.has_method("guardar_high_score"):
+		persistencia.guardar_high_score(notas_recolectadas)
+
 	if jugador != null and is_instance_valid(jugador):
 		if jugador.has_method("detener_por_captura"):
 			jugador.detener_por_captura()
@@ -201,6 +205,17 @@ func _obtener_gestor_musica() -> Node:
 		return null
 	if tree.root.has_node("GestorMusica"):
 		return tree.root.get_node("GestorMusica")
+	return null
+
+
+func _obtener_gestor_persistencia() -> Node:
+	if not is_inside_tree():
+		return null
+	var tree := get_tree()
+	if tree == null or tree.root == null:
+		return null
+	if tree.root.has_node("GestorPersistencia"):
+		return tree.root.get_node("GestorPersistencia")
 	return null
 
 
