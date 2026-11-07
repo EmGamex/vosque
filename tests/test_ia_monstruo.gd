@@ -205,3 +205,30 @@ func test_director_orquestacion_captura_y_game_over() -> void:
 	mock_jugador.free()
 	mock_enemigo.free()
 	maain.free()
+
+
+func test_indicador_fuera_pantalla() -> void:
+	var componente := IndicadorFueraPantalla.new()
+	assert_true(componente.habilitar, "El componente debe estar habilitado por defecto")
+	assert_not_null(componente.textura, "Debe tener una textura asignada por defecto")
+	assert_eq(componente.color_modulacion, Color.WHITE, "El color por defecto debe ser blanco puro sin tinte")
+	assert_eq(componente.escala, Vector2.ONE, "La escala por defecto debe ser 1.0 (tamaño original)")
+	assert_false(componente.rotar_hacia_objetivo, "Por defecto no debe rotar (orientación vertical)")
+
+	# Comprobar comportamiento ante enemigo padre
+	var enemigo := Enemigo.new()
+	enemigo.add_to_group("modo_test")
+	enemigo.hibernar_al_iniciar = false
+	enemigo.add_child(componente)
+	enemigo._ready()
+	componente._ready()
+
+	assert_true(componente._debe_estar_activo(), "Debe poder estar activo si el enemigo está despierto")
+
+	enemigo.hibernar()
+	assert_false(componente._debe_estar_activo(), "No debe estar activo cuando el enemigo hiberna")
+
+	enemigo.despertar(500.0)
+	assert_true(componente._debe_estar_activo(), "Debe reactivarse cuando el enemigo despierta")
+
+	enemigo.free()
