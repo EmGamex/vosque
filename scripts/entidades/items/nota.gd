@@ -22,6 +22,10 @@ var _recolectada: bool = false
 @onready var _particulas_recogida: CPUParticles2D = get_node_or_null("ParticulasRecogida") as CPUParticles2D
 
 
+func esta_recolectada() -> bool:
+	return _recolectada
+
+
 func _ready() -> void:
 	if not body_entered.is_connected(_on_body_entered):
 		body_entered.connect(_on_body_entered)
