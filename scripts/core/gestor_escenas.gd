@@ -82,6 +82,8 @@ func pausar() -> void:
 		tree.paused = true
 	if has_node("/root/GestorMusica"):
 		get_node("/root/GestorMusica").establecer_pausa(true)
+	if has_node("/root/GestorAudioUI"):
+		get_node("/root/GestorAudioUI").reproducir_pausa_abrir()
 	if _menu_pausa != null:
 		_menu_pausa.mostrar()
 
@@ -92,6 +94,8 @@ func reanudar() -> void:
 	_pausado = false
 	if has_node("/root/GestorMusica"):
 		get_node("/root/GestorMusica").establecer_pausa(false)
+	if has_node("/root/GestorAudioUI"):
+		get_node("/root/GestorAudioUI").reproducir_pausa_cerrar()
 	if _menu_pausa != null:
 		_menu_pausa.ocultar()
 

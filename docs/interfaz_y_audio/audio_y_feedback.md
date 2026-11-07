@@ -20,7 +20,7 @@ Los recursos sonoros se organizan en las siguientes rutas del proyecto:
   * `ambiente/`: Loops continuos de viento, susurros y ramas secas (`.ogg`).
   * `criatura/`: SFX del monstruo, zumbido de estática, pisadas pesadas y jumpscare (`.wav` y `.ogg`).
   * `jugador/`: Pasos en hojarasca, despegue de salto, impacto/arrastre de plancha y jadeos (`.wav`).
-  * `interfaz/`: Rasgado seco de notas y clics/hovers de menú (`.wav`).
+  * `interfaz/`: Rasgado seco de notas y clics/hovers de menú (`.wav`). Ver especificación completa de menús en [Sistema de Audio de los Menús](audio_de_menus.md).
 * `res://default_bus_layout.tres`: Configuración de los buses de audio en Godot (`Master`, `sfx`, `musica`).
 
 ```mermaid

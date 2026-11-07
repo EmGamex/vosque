@@ -3,7 +3,8 @@
 Este documento detalla la estética visual, comportamiento cinematográfico, fórmulas de animación y flujos de usuario para el Menú Principal, el Menú de Pausa y la Pantalla de Game Over de **Vosque**.
 
 > 🎮 **Controles y HUD:** [Controles y HUD](controles_y_hud.md)  
-> 🏛️ **Arquitectura de orquestación:** [Gestor de Escenas](gestor_de_escenas.md)
+> 🏛️ **Arquitectura de orquestación:** [Gestor de Escenas](gestor_de_escenas.md)  
+> 🔊 **Audio de Menús:** [Sistema de Audio de los Menús](audio_de_menus.md)
 
 ---
 

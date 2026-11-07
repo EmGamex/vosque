@@ -34,6 +34,7 @@ var _instancias_sectores: Dictionary = {
 }
 
 var _mutacion_en_progreso: bool = false
+var _mutacion_pendiente: bool = false
 var ultimo_marcador_desatasco: Vector2 = Vector2.INF
 
 @onready var _efecto_niebla: EfectoNieblaMutacion = get_node_or_null("EfectoNieblaMutacion") as EfectoNieblaMutacion
@@ -194,6 +195,7 @@ func mutar_con_neblina(
 	pausa_oscuridad: float = -1.0
 ) -> void:
 	if _mutacion_en_progreso:
+		_mutacion_pendiente = true
 		return
 	_mutacion_en_progreso = true
 
@@ -213,6 +215,9 @@ func mutar_con_neblina(
 		mutar_sectores_lejanos()
 
 	_mutacion_en_progreso = false
+	if _mutacion_pendiente:
+		_mutacion_pendiente = false
+		call_deferred("mutar_con_neblina", duracion_cierre, duracion_apertura, pausa_oscuridad)
 
 
 func mutar_sectores_lejanos() -> void:

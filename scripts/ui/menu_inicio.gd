@@ -244,12 +244,16 @@ func iniciar_presentacion() -> void:
 
 
 func iniciar_descenso() -> void:
+	if not Engine.is_editor_hint() and has_node("/root/GestorAudioUI"):
+		get_node("/root/GestorAudioUI").reproducir_menu_aceptar()
 	cinematica.iniciar_descenso(_on_animacion_terminada)
 
 
 func regresar_a_presentacion() -> void:
 	if estado != EstadoMenu.MENU_ACTIVO or bloqueado:
 		return
+	if not Engine.is_editor_hint() and has_node("/root/GestorAudioUI"):
+		get_node("/root/GestorAudioUI").reproducir_menu_retroceder()
 	seleccion.bloqueado = true
 	seleccion.opcion_actual = Opcion.JUGAR
 	_actualizar_seleccion(true)

@@ -79,6 +79,9 @@ func navegar(direccion: int) -> void:
 	if nueva_opcion != opcion_actual:
 		opcion_actual = nueva_opcion
 		actualizar_seleccion(true)
+		if host_control != null and host_control.is_inside_tree() and not Engine.is_editor_hint():
+			if host_control.has_node("/root/GestorAudioUI"):
+				host_control.get_node("/root/GestorAudioUI").reproducir_menu_seleccionar()
 
 
 func actualizar_seleccion(animar: bool) -> void:
@@ -147,6 +150,10 @@ func actualizar_seleccion(animar: bool) -> void:
 
 
 func confirmar_opcion() -> void:
+	if host_control != null and host_control.is_inside_tree() and not Engine.is_editor_hint():
+		if host_control.has_node("/root/GestorAudioUI"):
+			host_control.get_node("/root/GestorAudioUI").reproducir_menu_aceptar()
+
 	match opcion_actual:
 		MenuConstantes.Opcion.JUGAR:
 			bloqueado = true

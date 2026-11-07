@@ -87,6 +87,9 @@ func _navegar_vertical(direccion: int) -> void:
 	_indice_foco = posmod(_indice_foco + direccion, _botones.size())
 	_botones[_indice_foco].grab_focus()
 
+	if not Engine.is_editor_hint() and has_node("/root/GestorAudioUI"):
+		get_node("/root/GestorAudioUI").reproducir_pausa_navegar()
+
 
 func _activar_boton_actual() -> void:
 	if _botones.is_empty():
@@ -125,6 +128,8 @@ func _on_reiniciar_pulsado() -> void:
 	if _bloqueado:
 		return
 	_bloqueado = true
+	if not Engine.is_editor_hint() and has_node("/root/GestorAudioUI"):
+		get_node("/root/GestorAudioUI").reproducir_pausa_aceptar()
 	reiniciar_solicitado.emit()
 
 
@@ -132,4 +137,6 @@ func _on_menu_pulsado() -> void:
 	if _bloqueado:
 		return
 	_bloqueado = true
+	if not Engine.is_editor_hint() and has_node("/root/GestorAudioUI"):
+		get_node("/root/GestorAudioUI").reproducir_pausa_aceptar()
 	menu_solicitado.emit()
