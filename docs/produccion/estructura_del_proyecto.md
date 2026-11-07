@@ -58,7 +58,10 @@ c:/Proyectos/vosque/
 ├── scripts/                    # Código fuente GDScript (.gd) estructurado por dominio
 │   ├── core/                   # Orquestación de ciclo de juego y escenas
 │   │   ├── gestor_escenas.gd   # Máquina de estados de pantallas y transiciones
-│   │   ├── maain.gd            # Escena principal de gameplay y orquestación
+│   │   ├── maain/              # Módulo orquestador de gameplay y sub-controladores
+│   │   │   ├── maain.gd        # Game Director y fachada pública de la partida
+│   │   │   ├── spawner_notas.gd # Sub-controlador de ciclo e instanciación de notas
+│   │   │   └── controlador_amenaza_monstruo.gd # Sub-controlador de amenaza y despertar
 │   │   └── transicion.gd       # Cortina de transición entre escenas
 │   ├── debug/                  # Herramientas de depuración y telemetría
 │   │   ├── debug_config.gd     # Singleton/Autoload de persistencia de ajustes de debug

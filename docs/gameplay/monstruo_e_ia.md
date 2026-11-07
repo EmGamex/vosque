@@ -46,12 +46,13 @@ stateDiagram-v2
   - `process_mode = Node.PROCESS_MODE_DISABLED`.
   - Posición de espera en coordenadas fuera de mapa: `Vector2(-99999, -99999)`.
 
-### 2.2. El Despertar (Nota 1)
-* Al recolectar la primera página, el `Game Director` (`scripts/core/maain.gd`):
-  1. Identifica un punto de spawn seguro fuera de pantalla (cuadrante distante a $\ge 800\text{ px}$ del jugador).
+### 2.2. El Despertar (Nota 1) y Escalado de Amenaza
+* Al recolectar la primera página, el `Game Director` (`scripts/core/maain/maain.gd`) delega en el sub-controlador `ControladorAmenazaMonstruo` ([`scripts/core/maain/controlador_amenaza_monstruo.gd`](../../scripts/core/maain/controlador_amenaza_monstruo.gd)):
+  1. Identifica un punto de spawn seguro fuera de pantalla (cuadrante distante a $\ge 800\text{ px}$ del jugador mediante `seleccionar_posicion_spawn_monstruo`).
   2. Reposiciona la entidad en ese punto.
-  3. Restaura `visible = true` y `process_mode = Node.PROCESS_MODE_INHERIT`.
-  4. Inicia la persecución a la velocidad base de $500.0\text{ px/s}$.
+  3. Despierta al enemigo invocando `enemigo.despertar(Enemigo.VELOCIDAD_DESPERTAR_DEFECTO)`, restaurando `visible = true`, `process_mode = PROCESS_MODE_INHERIT` y fijando la velocidad inicial de $500.0\text{ px/s}$.
+  4. En las Notas 2+, el sub-controlador actualiza la dificultad llamando a `enemigo.actualizar_dificultad(notas_recogidas)`.
+  5. Fallbacks geométricos protegidos: si no hay candidatos disponibles, el sub-controlador ubica a la criatura en `POSICION_FALLBACK_ORIGEN` (`Vector2(1080.0, 1080.0)`) o a un mínimo de `DISTANCIA_MINIMA_FALLBACK` (`1000.0 px`) en el vector opuesto al jugador.
 
 ---
 

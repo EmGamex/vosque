@@ -50,43 +50,57 @@ Al hacer contacto con el cuerpo del jugador (`body_entered`):
    ```gdscript
    $CollisionShape2D.set_deferred("disabled", true)
    ```
-2. **Emisión de Señales:** Se notifica al Game Director (`maain.gd`):
+2. **Registro de Estado y Consulta Pública:** La nota marca internamente `_recolectada = true` y expone el método público:
+   ```gdscript
+   func esta_recolectada() -> bool:
+       return _recolectada
+   ```
+   Esto permite que subsistemas como `SpawnerNotas` verifiquen la validez de la nota sin violar la privacidad de atributos internos.
+3. **Emisión de Señales:** Se notifica al Game Director (`scripts/core/maain/maain.gd`):
    ```gdscript
    signal recolectada(posicion_global: Vector2)
    ```
-3. **Efectos Locales:**
+4. **Efectos Locales:**
    * Se reproduce el SFX de rasgado de papel seco mediante un nodo de audio independiente.
    * Se activa el nodo `ParticulasRecogida` (emisión de 8 partículas doradas que se disuelven en $0.4\text{ s}$).
    * El sprite y la luz se ocultan inmediatamente.
-4. **Liberación del Nodo:** Se invoca `queue_free()` tras expirar las partículas.
+5. **Liberación del Nodo:** Se invoca `queue_free()` tras expirar las partículas.
 
 ---
 
-## 4. Algoritmo del Spawner Espacial de Notas
+## 4. Algoritmo del Spawner Espacial de Notas (`SpawnerNotas`)
 
-El spawner está gestionado por el Game Director en coordinación con `Escenario`.
+El spawner está desacoplado del Game Director y reside como clase independiente `SpawnerNotas` en [`scripts/core/maain/spawner_notas.gd`](../../scripts/core/maain/spawner_notas.gd). Funciona en coordinación con `Escenario`.
 
 ```mermaid
 flowchart TD
     A[Señal nota_recolectada recibida] --> B[Identificar Cuadrante Activo del Jugador]
     B --> C[Disparar mutar_con_neblina en Escenario]
-    C --> D[Obtener todos los Marker2D en grupo 'puntos_nota' de los 3 sectores mutados]
-    D --> E[Filtrar candidatos por Distancia de Seguridad]
+    C --> D[Obtener todos los Marker2D de los sectores mutados]
+    D --> E[Filtrar candidatos por Distancia de Seguridad en SpawnerNotas]
     E --> F{¿Candidatos válidos > 0?}
     F -- Sí --> G[Elegir aleatoriamente entre candidatos válidos]
-    F -- No --> H[Fallback: Elegir el marcador más lejano al jugador]
+    F -- No --> H[Fallback: Elegir marcador con distancia máxima al jugador]
     G --> I[Instanciar escena nota.tscn en marcador seleccionado]
     H --> I
-    I --> J[Conectar señal recolectada al Game Director]
+    I --> J[Conectar señal recolectada a Maain]
 ```
 
 ### 4.1. Filtros Matemáticos de Validación
 Un marcador candidato $M$ es válido si y solo si cumple simultáneamente:
 1. **Pertenece a un sector mutado:** $\text{Sector}(M) \ne \text{CuadranteActivo}(\text{Jugador})$.
 2. **Distancia mínima al Jugador:**
-   $$\|\mathbf{p}_M - \mathbf{p}_{\text{jugador}}\| \ge 600\text{ px}$$
+   $$\|\mathbf{p}_M - \mathbf{p}_{\text{jugador}}\| \ge \text{DISTANCIA\_SEGURA\_JUGADOR\_DEFECTO } (600\text{ px})$$
 3. **Distancia mínima al Monstruo:**
-   $$\|\mathbf{p}_M - \mathbf{p}_{\text{monstruo}}\| \ge 800\text{ px}$$
-4. **Exclusión de Reubicación:** $\mathbf{p}_M \ne \mathbf{p}_{\text{desatasco\_enemigo}}$.
+   $$\|\mathbf{p}_M - \mathbf{p}_{\text{monstruo}}\| \ge \text{DISTANCIA\_SEGURA\_MONSTRUO\_DEFECTO } (800\text{ px})$$
+4. **Exclusión de Reubicación (Anti-atascamiento):**
+   $$\|\mathbf{p}_M - \mathbf{p}_{\text{desatasco\_enemigo}}\|^2 \ge \text{TOLERANCIA\_DESATASCO\_SQ } (1.0\text{ px}^2)$$
 
 Este filtrado asegura que el jugador nunca tenga la nota servida en bandeja en su sector actual ni sufra una emboscada inmediata al momento de aparecer la nueva nota.
+
+### 4.2. API de `SpawnerNotas`
+* `hay_nota_activa() -> bool`: Comprueba el estado de la instancia activa (`is_instance_valid()`, `not is_queued_for_deletion()` y `not esta_recolectada()`).
+* `generar_nota(contenedor, escena_nota, escenario, jugador, enemigo, ...) -> Nota`: Valida el invariante de nota única, ejecuta la selección espacial e instancia la nueva nota.
+* `filtrar_candidatos_espaciales(...) -> Array[Marker2D]`: Algoritmo matemático estático de exclusión.
+* `elegir_marcador(...) -> Marker2D`: Algoritmo estático con fallback de distancia máxima en sectores mutados.
+* `calcular_cuadrante_estatico(pos: Vector2) -> String`: Función utilitaria pura de orientación cardinal.
