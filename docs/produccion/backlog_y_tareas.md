@@ -114,9 +114,9 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 - [x] **Progresión y Fin de Partida:**
   - [x] Escalado dinámico de velocidad del enemigo según notas recolectadas (`actualizar_dificultad` y `VELOCIDADES_MONSTRUO` en `enemigo.gd`).
   - [x] Manejo de condición de derrota y salto a Game Over al capturar al jugador (`jugador_capturado` y llamada al gestor).
-- [ ] **Persistencia de High Score:**
-  - [ ] Guardado en archivo local `user://highscore.save` (IndexedDB en navegador).
-  - [ ] Fallback web directo a `JavaScriptBridge` con `localStorage`.
+- [x] **Persistencia de High Score (Ver Issue #35: [`docs/produccion/issues/issue_persistencia_web.md`](issues/issue_persistencia_web.md)):**
+  - [x] Guardado en archivo local `user://highscore.save` (IndexedDB en navegador).
+  - [x] Fallback web directo a `JavaScriptBridge` con `localStorage`.
 
 ---
 
@@ -241,7 +241,7 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 - [x] **Configuración de Preset Web:**
   - [x] Renderer `gl_compatibility` y `threads = false`.
   - [x] Captura de foco de canvas y anulación de scroll de página en Espacio/Flechas.
-- [ ] **Persistencia de High Score:** Guardado de récord histórico mediante `user://` (IndexedDB en navegador) con fallback a `localStorage`.
+- [x] **Persistencia de High Score (Ver Issue #35: [`docs/produccion/issues/issue_persistencia_web.md`](issues/issue_persistencia_web.md)):** Guardado de récord histórico mediante `user://` (IndexedDB en navegador) con fallback a `localStorage`.
 - [ ] **Validación en Plataformas:** Pruebas de empaquetado `.zip` y ejecución en itch.io y Newgrounds.
 
 ---

@@ -7,6 +7,8 @@ layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_5bjgx")
 
 [node name="Fondo" type="ColorRect" parent="." unique_id=1828619794]
@@ -54,7 +56,14 @@ horizontal_alignment = 1
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
 theme_override_font_sizes/font_size = 28
-text = "Récord: 0"
+text = "Récord: 2"
+horizontal_alignment = 1
+
+[node name="NuevoRecordLabel" type="Label" parent="Layout/Columna/Stats" unique_id=150304990]
+visible = false
+modulate = Color(1, 0.84, 0, 1)
+layout_mode = 2
+text = "¡NUEVO RÉCORD CABRA!"
 horizontal_alignment = 1
 
 [node name="BotonReintentar" type="Button" parent="Layout/Columna" unique_id=564060499]

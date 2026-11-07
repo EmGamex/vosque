@@ -144,6 +144,10 @@ var god_view_activo: bool:
 @onready var slider_pitch_go: HSlider = get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridSlidersMusica/SliderPitchGO") as HSlider
 @onready var val_slider_pitch_go: Label = get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridSlidersMusica/ValSliderPitchGO") as Label
 
+# High Score y Persistencia - Pestaña Sistema (Issue #35)
+@onready var val_high_score: Label = get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/HBoxPersistencia/ValHighScore") as Label
+@onready var btn_reset_high_score: Button = get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/BtnResetearHighScore") as Button
+
 # Visualizador de Direcciones
 @onready var flecha_up: Label = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/HBoxPad/GridPad/FlechaUp
 @onready var flecha_down: Label = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/HBoxPad/GridPad/FlechaDown
@@ -195,6 +199,7 @@ func _ready() -> void:
 	scenario.aplicar_estado_niebla(context)
 	monitors.registrar(context)
 	_inicializar_controles_musica()
+	_inicializar_controles_persistencia()
 
 
 func _restaurar_estado_desde_config() -> void:
@@ -349,14 +354,16 @@ func _actualizar_telemetria() -> void:
 			check_pausar.set_pressed_no_signal(get_tree().paused)
 
 		var telem_musica: Dictionary = system_ctrl.obtener_telemetria_musica()
+		var record_actual: int = system_ctrl.obtener_high_score()
 		telemetry.actualizar_tab_sistema({
 			"lbl_sys_fps": lbl_sys_fps,
 			"lbl_sys_mem": lbl_sys_mem,
 			"lbl_sys_timescale": lbl_sys_timescale,
 			"lbl_musica_estado": lbl_musica_estado,
 			"lbl_musica_clip": lbl_musica_clip,
-			"lbl_musica_volumen": lbl_musica_volumen
-		}, fps, mem_mb, telem_musica)
+			"lbl_musica_volumen": lbl_musica_volumen,
+			"val_high_score": val_high_score
+		}, fps, mem_mb, telem_musica, record_actual)
 
 	if overlay_draw != null:
 		overlay_draw.queue_redraw()
@@ -537,3 +544,14 @@ func _on_slider_pitch_go_value_changed(val: float) -> void:
 	system_ctrl.set_pitch_game_over(val)
 	if val_slider_pitch_go != null:
 		val_slider_pitch_go.text = "%.2fx" % val
+
+
+func _inicializar_controles_persistencia() -> void:
+	if btn_reset_high_score != null and not btn_reset_high_score.pressed.is_connected(_on_btn_reset_high_score_pressed):
+		btn_reset_high_score.pressed.connect(_on_btn_reset_high_score_pressed)
+
+
+func _on_btn_reset_high_score_pressed() -> void:
+	system_ctrl.resetear_high_score()
+	if val_high_score != null:
+		val_high_score.text = str(system_ctrl.obtener_high_score())

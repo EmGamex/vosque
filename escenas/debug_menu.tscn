@@ -597,6 +597,28 @@ value = 0.65
 layout_mode = 2
 text = "0.65x"
 
+[node name="SeparadorPersistencia" type="HSeparator" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox" unique_id=564466151]
+layout_mode = 2
+
+[node name="LblTituloPersistencia" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox" unique_id=1522563711]
+layout_mode = 2
+text = "Persistencia y Récord"
+
+[node name="HBoxPersistencia" type="HBoxContainer" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox" unique_id=278009462]
+layout_mode = 2
+
+[node name="LblHighScore" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/HBoxPersistencia" unique_id=1308014299]
+layout_mode = 2
+text = "Récord Actual: "
+
+[node name="ValHighScore" type="Label" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/HBoxPersistencia" unique_id=442981004]
+layout_mode = 2
+text = "0"
+
+[node name="BtnResetearHighScore" type="Button" parent="ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox" unique_id=1793381882]
+layout_mode = 2
+text = "Resetear High Score"
+
 [connection signal="pressed" from="ControlRaiz/MiniHUD/Margin/VBox/BtnMiniExpandir" to="." method="_on_boton_mini_expandir_pressed"]
 [connection signal="toggled" from="ControlRaiz/PanelConsola/Margin/VBox/BarraSuperior/CheckPausar" to="." method="_on_check_pausar_toggled"]
 [connection signal="pressed" from="ControlRaiz/PanelConsola/Margin/VBox/BarraSuperior/BotonCerrar" to="." method="_on_boton_cerrar_pressed"]
