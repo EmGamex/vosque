@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://d06kyix0uov6k"]
+
+[ext_resource type="Script" uid="uid://dvh76qcxge1jx" path="res://scripts/core/gestor_audio_ui.gd" id="1_nfbd0"]
+
+[node name="GestorAudioUI" type="Node" unique_id=686047634]
+process_mode = 3
+script = ExtResource("1_nfbd0")
+
+[node name="PlayerCursor" type="AudioStreamPlayer" parent="." unique_id=327393252]
+process_mode = 3
+bus = &"sfx"
+
+[node name="PlayerAccion" type="AudioStreamPlayer" parent="." unique_id=2002236186]
+process_mode = 3
+bus = &"sfx"
+
+[node name="PlayerAccionAux" type="AudioStreamPlayer" parent="." unique_id=448279783]
+process_mode = 3
+bus = &"sfx"
