@@ -1,0 +1,87 @@
+[gd_scene format=3 uid="uid://do1neuuypwhjh"]
+
+[ext_resource type="Script" uid="uid://xkpm1ugs2260" path="res://scripts/debug/debug_menu/debug_window.gd" id="1_4yfnp"]
+
+[node name="ventana_debug_enemigo" type="PanelContainer" unique_id=1005097035]
+script = ExtResource("1_4yfnp")
+window_id = "enemigo"
+window_title = "👾 Monstruo & IA"
+
+[node name="Margin" type="MarginContainer" parent="." unique_id=726454966]
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="Margin" unique_id=628249330]
+layout_mode = 2
+
+[node name="BarraTitulo" type="HBoxContainer" parent="Margin/VBox" unique_id=1050404762]
+layout_mode = 2
+
+[node name="LblTitulo" type="Label" parent="Margin/VBox/BarraTitulo" unique_id=1802077522]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "👾 Monstruo & IA"
+
+[node name="BtnFijar" type="Button" parent="Margin/VBox/BarraTitulo" unique_id=1564709922]
+layout_mode = 2
+text = "📍"
+
+[node name="BtnColapsar" type="Button" parent="Margin/VBox/BarraTitulo" unique_id=1285677504]
+layout_mode = 2
+text = "_"
+
+[node name="BtnCerrar" type="Button" parent="Margin/VBox/BarraTitulo" unique_id=221871809]
+layout_mode = 2
+text = "✕"
+
+[node name="Contenido" type="MarginContainer" parent="Margin/VBox" unique_id=699860223]
+layout_mode = 2
+
+[node name="VBoxEnemigo" type="VBoxContainer" parent="Margin/VBox/Contenido" unique_id=848261590]
+layout_mode = 2
+
+[node name="GridEnemigo" type="GridContainer" parent="Margin/VBox/Contenido/VBoxEnemigo" unique_id=1199325515]
+layout_mode = 2
+columns = 2
+
+[node name="@Label@21236" type="Label" parent="Margin/VBox/Contenido/VBoxEnemigo/GridEnemigo" unique_id=625729637]
+layout_mode = 2
+text = "Estado IA:"
+
+[node name="ValEstadoIA" type="Label" parent="Margin/VBox/Contenido/VBoxEnemigo/GridEnemigo" unique_id=1751016262]
+layout_mode = 2
+
+[node name="@Label@21237" type="Label" parent="Margin/VBox/Contenido/VBoxEnemigo/GridEnemigo" unique_id=1823567681]
+layout_mode = 2
+text = "Posición:"
+
+[node name="ValPosEnemigo" type="Label" parent="Margin/VBox/Contenido/VBoxEnemigo/GridEnemigo" unique_id=1718982978]
+layout_mode = 2
+
+[node name="@Label@21238" type="Label" parent="Margin/VBox/Contenido/VBoxEnemigo/GridEnemigo" unique_id=1122091873]
+layout_mode = 2
+text = "Distancia al Jugador:"
+
+[node name="ValDistancia" type="Label" parent="Margin/VBox/Contenido/VBoxEnemigo/GridEnemigo" unique_id=1636436873]
+layout_mode = 2
+
+[node name="@Label@21239" type="Label" parent="Margin/VBox/Contenido/VBoxEnemigo/GridEnemigo" unique_id=149607051]
+layout_mode = 2
+text = "Velocidad Instantánea:"
+
+[node name="ValVelEnemigo" type="Label" parent="Margin/VBox/Contenido/VBoxEnemigo/GridEnemigo" unique_id=657788154]
+layout_mode = 2
+
+[node name="@Label@21240" type="Label" parent="Margin/VBox/Contenido/VBoxEnemigo/GridEnemigo" unique_id=1398848260]
+layout_mode = 2
+text = "Anti-Atascamiento:"
+
+[node name="ValAtascamiento" type="Label" parent="Margin/VBox/Contenido/VBoxEnemigo/GridEnemigo" unique_id=580404509]
+layout_mode = 2
+
+[node name="BtnTeleportEnemigo" type="Button" parent="Margin/VBox/Contenido/VBoxEnemigo" unique_id=897347917]
+layout_mode = 2
+text = "Reubicar Monstruo a Cuadrante Opuesto"
+
+[node name="CheckVisualDebug" type="CheckBox" parent="Margin/VBox/Contenido/VBoxEnemigo" unique_id=1111291267]
+layout_mode = 2
+text = "Línea de Visión / Vector IA (Raycast)"

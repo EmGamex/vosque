@@ -1,0 +1,98 @@
+[gd_scene format=3 uid="uid://bn1f2v2ue7bdc"]
+
+[ext_resource type="Script" uid="uid://xkpm1ugs2260" path="res://scripts/debug/debug_menu/debug_window.gd" id="1_mp6ra"]
+
+[node name="ventana_debug_sistema" type="PanelContainer" unique_id=890852000]
+script = ExtResource("1_mp6ra")
+window_id = "sistema"
+window_title = "📊 Sistema & Rendimiento"
+
+[node name="Margin" type="MarginContainer" parent="." unique_id=537407644]
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="Margin" unique_id=732470973]
+layout_mode = 2
+
+[node name="BarraTitulo" type="HBoxContainer" parent="Margin/VBox" unique_id=828029209]
+layout_mode = 2
+
+[node name="LblTitulo" type="Label" parent="Margin/VBox/BarraTitulo" unique_id=649606608]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "📊 Sistema & Rendimiento"
+
+[node name="BtnFijar" type="Button" parent="Margin/VBox/BarraTitulo" unique_id=1737902146]
+layout_mode = 2
+text = "📍"
+
+[node name="BtnColapsar" type="Button" parent="Margin/VBox/BarraTitulo" unique_id=470142281]
+layout_mode = 2
+text = "_"
+
+[node name="BtnCerrar" type="Button" parent="Margin/VBox/BarraTitulo" unique_id=1682270197]
+layout_mode = 2
+text = "✕"
+
+[node name="Contenido" type="MarginContainer" parent="Margin/VBox" unique_id=890646041]
+layout_mode = 2
+
+[node name="VBoxSistema" type="VBoxContainer" parent="Margin/VBox/Contenido" unique_id=1817654827]
+layout_mode = 2
+
+[node name="GridSistema" type="GridContainer" parent="Margin/VBox/Contenido/VBoxSistema" unique_id=987966850]
+layout_mode = 2
+columns = 2
+
+[node name="@Label@21264" type="Label" parent="Margin/VBox/Contenido/VBoxSistema/GridSistema" unique_id=841247563]
+layout_mode = 2
+text = "FPS:"
+
+[node name="ValFPS" type="Label" parent="Margin/VBox/Contenido/VBoxSistema/GridSistema" unique_id=514663420]
+layout_mode = 2
+
+[node name="@Label@21265" type="Label" parent="Margin/VBox/Contenido/VBoxSistema/GridSistema" unique_id=1752591225]
+layout_mode = 2
+text = "Memoria RAM:"
+
+[node name="ValMemoria" type="Label" parent="Margin/VBox/Contenido/VBoxSistema/GridSistema" unique_id=2062524664]
+layout_mode = 2
+
+[node name="@Label@21266" type="Label" parent="Margin/VBox/Contenido/VBoxSistema/GridSistema" unique_id=1180075834]
+layout_mode = 2
+text = "Time Scale:"
+
+[node name="ValTimeScale" type="Label" parent="Margin/VBox/Contenido/VBoxSistema/GridSistema" unique_id=849172514]
+layout_mode = 2
+
+[node name="HBoxTimeButtons" type="HBoxContainer" parent="Margin/VBox/Contenido/VBoxSistema" unique_id=2085718767]
+layout_mode = 2
+
+[node name="BtnTime05" type="Button" parent="Margin/VBox/Contenido/VBoxSistema/HBoxTimeButtons" unique_id=1142274867]
+layout_mode = 2
+text = "0.5x"
+
+[node name="BtnTime10" type="Button" parent="Margin/VBox/Contenido/VBoxSistema/HBoxTimeButtons" unique_id=511587310]
+layout_mode = 2
+text = "1.0x"
+
+[node name="BtnTime20" type="Button" parent="Margin/VBox/Contenido/VBoxSistema/HBoxTimeButtons" unique_id=1976471137]
+layout_mode = 2
+text = "2.0x"
+
+[node name="BtnReloadScene" type="Button" parent="Margin/VBox/Contenido/VBoxSistema" unique_id=395404695]
+layout_mode = 2
+text = "Reiniciar Escena"
+
+[node name="HBoxPersistencia" type="HBoxContainer" parent="Margin/VBox/Contenido/VBoxSistema" unique_id=1217062910]
+layout_mode = 2
+
+[node name="@Label@21267" type="Label" parent="Margin/VBox/Contenido/VBoxSistema/HBoxPersistencia" unique_id=2051967685]
+layout_mode = 2
+text = "High Score:"
+
+[node name="ValHighScore" type="Label" parent="Margin/VBox/Contenido/VBoxSistema/HBoxPersistencia" unique_id=843966974]
+layout_mode = 2
+
+[node name="BtnResetearHighScore" type="Button" parent="Margin/VBox/Contenido/VBoxSistema" unique_id=1837397280]
+layout_mode = 2
+text = "Resetear High Score"

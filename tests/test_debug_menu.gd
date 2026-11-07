@@ -107,8 +107,8 @@ func test_desactivar_niebla_en_debug() -> void:
 	var menu: DebugMenu = escena_debug.instantiate() as DebugMenu
 	assert_true(menu != null, "DebugMenu debe instanciarse")
 
-	var check_niebla = menu.get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario/VBox/CheckDesactivarNiebla") as CheckBox
-	assert_true(check_niebla != null, "Debe existir CheckDesactivarNiebla en la pestaña Escenario")
+	var check_niebla = menu.get_node_or_null("ControlRaiz/ContenedorVentanas/VentanaEscenario/Margin/VBox/Contenido/VBoxEscenario/CheckDesactivarNiebla") as CheckBox
+	assert_true(check_niebla != null, "Debe existir CheckDesactivarNiebla en la ventana Escenario")
 
 	# Probar activación y desactivación de la niebla en el scenario controller
 	var cfg = load("res://scripts/debug/debug_config.gd").new()
@@ -122,4 +122,32 @@ func test_desactivar_niebla_en_debug() -> void:
 	assert_false(cfg.niebla_desactivada, "Debe persistirse falso en cfg")
 
 	cfg.free()
+	menu.free()
+
+
+func test_gestor_ventanas_y_presets() -> void:
+	var escena_debug: PackedScene = load("res://escenas/debug_menu.tscn")
+	assert_true(escena_debug != null, "debug_menu.tscn debe cargar")
+	var menu: DebugMenu = escena_debug.instantiate() as DebugMenu
+	assert_true(menu != null, "DebugMenu debe instanciarse")
+
+	assert_true(menu.win_jugador != null, "Ventana jugador debe existir")
+	assert_true(menu.win_fisicas != null, "Ventana fisicas debe existir")
+	assert_true(menu.win_escenario != null, "Ventana escenario debe existir")
+	assert_true(menu.win_enemigo != null, "Ventana enemigo debe existir")
+	assert_true(menu.win_audio != null, "Ventana audio debe existir")
+	assert_true(menu.win_sistema != null, "Ventana sistema debe existir")
+
+	# Probar selección de preset 1 (Locomoción)
+	menu._on_preset_selected(1)
+	assert_true(menu.win_jugador.abierta, "Ventana jugador debe abrirse en preset locomoción")
+	assert_true(menu.win_fisicas.abierta, "Ventana físicas debe abrirse en preset locomoción")
+	assert_true(menu.win_fisicas.fijada, "Ventana físicas debe estar fijada en preset locomoción")
+	assert_false(menu.win_enemigo.abierta, "Ventana enemigo debe estar cerrada en preset locomoción")
+
+	# Probar selección de preset 5 (Cerrar todas)
+	menu._on_preset_selected(5)
+	assert_false(menu.win_jugador.abierta, "Ventana jugador debe cerrarse")
+	assert_false(menu.win_fisicas.abierta, "Ventana físicas debe cerrarse")
+
 	menu.free()

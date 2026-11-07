@@ -32,6 +32,30 @@ var dive_vel: float = 1200.0
 var escalado_proporcional_activo: bool = true
 var time_scale: float = 1.0
 
+# Persistencia de estado de las ventanas del DebugWindowManager
+# Formato: { "window_id": { "abierta": bool, "fijada": bool, "colapsada": bool, "posicion": Vector2 } }
+var ventanas_estado: Dictionary = {}
+
+
+func guardar_estado_ventana(window_id: String, abierta: bool, fijada: bool, colapsada: bool, posicion: Vector2) -> void:
+	ventanas_estado[window_id] = {
+		"abierta": abierta,
+		"fijada": fijada,
+		"colapsada": colapsada,
+		"posicion": posicion
+	}
+
+
+func obtener_estado_ventana(window_id: String, defecto_abierta: bool = false, defecto_pos: Vector2 = Vector2.ZERO) -> Dictionary:
+	if ventanas_estado.has(window_id):
+		return ventanas_estado[window_id]
+	return {
+		"abierta": defecto_abierta,
+		"fijada": false,
+		"colapsada": false,
+		"posicion": defecto_pos
+	}
+
 
 func resetear_velocidades(vel_n: float, vel_s: float, ac: float, fr: float, dive: float) -> void:
 	fisicas_personalizadas = false

@@ -1,0 +1,96 @@
+[gd_scene format=3 uid="uid://dcssjfy1ohfyd"]
+
+[ext_resource type="Script" uid="uid://xkpm1ugs2260" path="res://scripts/debug/debug_menu/debug_window.gd" id="1_5u2d3"]
+
+[node name="ventana_debug_escenario" type="PanelContainer" unique_id=1681743073]
+script = ExtResource("1_5u2d3")
+window_id = "escenario"
+window_title = "🌲 Escenario & Mutación"
+
+[node name="Margin" type="MarginContainer" parent="." unique_id=390835124]
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="Margin" unique_id=447827076]
+layout_mode = 2
+
+[node name="BarraTitulo" type="HBoxContainer" parent="Margin/VBox" unique_id=765333881]
+layout_mode = 2
+
+[node name="LblTitulo" type="Label" parent="Margin/VBox/BarraTitulo" unique_id=703958947]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "🌲 Escenario & Mutación"
+
+[node name="BtnFijar" type="Button" parent="Margin/VBox/BarraTitulo" unique_id=1039440166]
+layout_mode = 2
+text = "📍"
+
+[node name="BtnColapsar" type="Button" parent="Margin/VBox/BarraTitulo" unique_id=1187443619]
+layout_mode = 2
+text = "_"
+
+[node name="BtnCerrar" type="Button" parent="Margin/VBox/BarraTitulo" unique_id=1894700536]
+layout_mode = 2
+text = "✕"
+
+[node name="Contenido" type="MarginContainer" parent="Margin/VBox" unique_id=1211797561]
+layout_mode = 2
+
+[node name="VBoxEscenario" type="VBoxContainer" parent="Margin/VBox/Contenido" unique_id=1401250543]
+layout_mode = 2
+
+[node name="LblEstadoEscenario" type="Label" parent="Margin/VBox/Contenido/VBoxEscenario" unique_id=2096902628]
+layout_mode = 2
+text = "Escenario: Activo"
+
+[node name="GridSectores" type="GridContainer" parent="Margin/VBox/Contenido/VBoxEscenario" unique_id=2009367575]
+layout_mode = 2
+columns = 2
+
+[node name="@Label@21227" type="Label" parent="Margin/VBox/Contenido/VBoxEscenario/GridSectores" unique_id=1822629491]
+layout_mode = 2
+text = "Sector NO:"
+
+[node name="ValNO" type="Label" parent="Margin/VBox/Contenido/VBoxEscenario/GridSectores" unique_id=343090394]
+layout_mode = 2
+
+[node name="@Label@21228" type="Label" parent="Margin/VBox/Contenido/VBoxEscenario/GridSectores" unique_id=1853367616]
+layout_mode = 2
+text = "Sector NE:"
+
+[node name="ValNE" type="Label" parent="Margin/VBox/Contenido/VBoxEscenario/GridSectores" unique_id=790624642]
+layout_mode = 2
+
+[node name="@Label@21229" type="Label" parent="Margin/VBox/Contenido/VBoxEscenario/GridSectores" unique_id=493422566]
+layout_mode = 2
+text = "Sector SO:"
+
+[node name="ValSO" type="Label" parent="Margin/VBox/Contenido/VBoxEscenario/GridSectores" unique_id=631538257]
+layout_mode = 2
+
+[node name="@Label@21230" type="Label" parent="Margin/VBox/Contenido/VBoxEscenario/GridSectores" unique_id=178599154]
+layout_mode = 2
+text = "Sector SE:"
+
+[node name="ValSE" type="Label" parent="Margin/VBox/Contenido/VBoxEscenario/GridSectores" unique_id=69669486]
+layout_mode = 2
+
+[node name="BtnMutar" type="Button" parent="Margin/VBox/Contenido/VBoxEscenario" unique_id=1264506520]
+layout_mode = 2
+text = "Forzar Mutación de Escenario"
+
+[node name="CheckDesactivarNiebla" type="CheckBox" parent="Margin/VBox/Contenido/VBoxEscenario" unique_id=1096469488]
+layout_mode = 2
+text = "Desactivar Niebla de Mutación"
+
+[node name="CheckGodView" type="CheckBox" parent="Margin/VBox/Contenido/VBoxEscenario" unique_id=1537531341]
+layout_mode = 2
+text = "Cámara Global (God View)"
+
+[node name="CheckCorredores" type="CheckBox" parent="Margin/VBox/Contenido/VBoxEscenario" unique_id=780899269]
+layout_mode = 2
+text = "Mostrar Corredores de Seguridad"
+
+[node name="CheckCuadrantes" type="CheckBox" parent="Margin/VBox/Contenido/VBoxEscenario" unique_id=493422147]
+layout_mode = 2
+text = "Mostrar División de Cuadrantes"

@@ -1,0 +1,136 @@
+[gd_scene format=3 uid="uid://pmmbvha30odb"]
+
+[ext_resource type="Script" uid="uid://xkpm1ugs2260" path="res://scripts/debug/debug_menu/debug_window.gd" id="1_rovog"]
+
+[node name="ventana_debug_fisicas" type="PanelContainer" unique_id=2002481559]
+script = ExtResource("1_rovog")
+window_id = "fisicas"
+window_title = "⚙️ Calibrador de Físicas"
+
+[node name="Margin" type="MarginContainer" parent="." unique_id=619765787]
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="Margin" unique_id=1254772654]
+layout_mode = 2
+
+[node name="BarraTitulo" type="HBoxContainer" parent="Margin/VBox" unique_id=869416722]
+layout_mode = 2
+
+[node name="LblTitulo" type="Label" parent="Margin/VBox/BarraTitulo" unique_id=757107344]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "⚙️ Calibrador de Físicas"
+
+[node name="BtnFijar" type="Button" parent="Margin/VBox/BarraTitulo" unique_id=1883214321]
+layout_mode = 2
+text = "📍"
+
+[node name="BtnColapsar" type="Button" parent="Margin/VBox/BarraTitulo" unique_id=1434201074]
+layout_mode = 2
+text = "_"
+
+[node name="BtnCerrar" type="Button" parent="Margin/VBox/BarraTitulo" unique_id=1473337301]
+layout_mode = 2
+text = "✕"
+
+[node name="Contenido" type="MarginContainer" parent="Margin/VBox" unique_id=1947192621]
+layout_mode = 2
+
+[node name="VBoxFisicas" type="VBoxContainer" parent="Margin/VBox/Contenido" unique_id=1329231202]
+layout_mode = 2
+
+[node name="HBoxOpciones" type="HBoxContainer" parent="Margin/VBox/Contenido/VBoxFisicas" unique_id=463792476]
+layout_mode = 2
+
+[node name="CheckProporcional" type="CheckBox" parent="Margin/VBox/Contenido/VBoxFisicas/HBoxOpciones" unique_id=575133979]
+layout_mode = 2
+button_pressed = true
+text = "Escalado Proporcional"
+
+[node name="BtnResetFisicas" type="Button" parent="Margin/VBox/Contenido/VBoxFisicas/HBoxOpciones" unique_id=1060235982]
+layout_mode = 2
+text = "Restaurar Defecto"
+
+[node name="GridVelocidades" type="GridContainer" parent="Margin/VBox/Contenido/VBoxFisicas" unique_id=464595839]
+layout_mode = 2
+columns = 3
+
+[node name="@Label@21217" type="Label" parent="Margin/VBox/Contenido/VBoxFisicas/GridVelocidades" unique_id=857354012]
+layout_mode = 2
+text = "Velocidad Base:"
+
+[node name="SliderVelNormal" type="HSlider" parent="Margin/VBox/Contenido/VBoxFisicas/GridVelocidades" unique_id=1938208044]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 100.0
+max_value = 2000.0
+step = 25.0
+value = 800.0
+
+[node name="ValSliderVelNormal" type="Label" parent="Margin/VBox/Contenido/VBoxFisicas/GridVelocidades" unique_id=585733304]
+layout_mode = 2
+text = "800 px/s"
+
+[node name="@Label@21218" type="Label" parent="Margin/VBox/Contenido/VBoxFisicas/GridVelocidades" unique_id=480095924]
+layout_mode = 2
+text = "Sprint:"
+
+[node name="SliderVelSprint" type="HSlider" parent="Margin/VBox/Contenido/VBoxFisicas/GridVelocidades" unique_id=1944667195]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 200.0
+max_value = 3000.0
+step = 25.0
+value = 1000.0
+
+[node name="ValSliderVelSprint" type="Label" parent="Margin/VBox/Contenido/VBoxFisicas/GridVelocidades" unique_id=372989807]
+layout_mode = 2
+text = "1000 px/s"
+
+[node name="@Label@21219" type="Label" parent="Margin/VBox/Contenido/VBoxFisicas/GridVelocidades" unique_id=1504044537]
+layout_mode = 2
+text = "Aceleración:"
+
+[node name="SliderAcel" type="HSlider" parent="Margin/VBox/Contenido/VBoxFisicas/GridVelocidades" unique_id=1627911542]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 500.0
+max_value = 15000.0
+step = 100.0
+value = 5000.0
+
+[node name="ValSliderAcel" type="Label" parent="Margin/VBox/Contenido/VBoxFisicas/GridVelocidades" unique_id=766034763]
+layout_mode = 2
+text = "5000 px/s²"
+
+[node name="@Label@21220" type="Label" parent="Margin/VBox/Contenido/VBoxFisicas/GridVelocidades" unique_id=1569322023]
+layout_mode = 2
+text = "Fricción:"
+
+[node name="SliderFric" type="HSlider" parent="Margin/VBox/Contenido/VBoxFisicas/GridVelocidades" unique_id=1980213805]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 500.0
+max_value = 15000.0
+step = 100.0
+value = 5000.0
+
+[node name="ValSliderFric" type="Label" parent="Margin/VBox/Contenido/VBoxFisicas/GridVelocidades" unique_id=2143162886]
+layout_mode = 2
+text = "5000 px/s²"
+
+[node name="@Label@21221" type="Label" parent="Margin/VBox/Contenido/VBoxFisicas/GridVelocidades" unique_id=1664538386]
+layout_mode = 2
+text = "Salto / Dive:"
+
+[node name="SliderDiveVel" type="HSlider" parent="Margin/VBox/Contenido/VBoxFisicas/GridVelocidades" unique_id=911972697]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 300.0
+max_value = 3000.0
+step = 25.0
+value = 1200.0
+
+[node name="ValSliderDiveVel" type="Label" parent="Margin/VBox/Contenido/VBoxFisicas/GridVelocidades" unique_id=864667340]
+layout_mode = 2
+text = "1200 px/s"
