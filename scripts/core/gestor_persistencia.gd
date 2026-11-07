@@ -40,22 +40,18 @@ func guardar_high_score(nuevo_score: int) -> bool:
 	return false
 
 
-## Devuelve el record historico actual.
 func obtener_high_score() -> int:
 	return _record_actual
 
 
-## Devuelve el numero de notas recolectadas en la ultima partida registrada.
 func obtener_ultimo_score() -> int:
 	return _ultimo_score
 
 
-## Indica si la ultima partida registrada establecio un nuevo record.
 func es_ultimo_score_record() -> bool:
 	return _es_nuevo_record_partida
 
 
-## Comprobacion rapida sin mutar estado.
 func es_nuevo_record(puntuacion: int) -> bool:
 	return puntuacion > _record_actual
 
