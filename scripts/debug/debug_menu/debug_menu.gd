@@ -538,28 +538,113 @@ func _actualizar_visibilidad() -> void:
 
 
 func _process(_delta: float) -> void:
+	if Engine.is_editor_hint():
+		return
+
+	_buscar_nodos_objetivo()
+	enemy_ctrl.sincronizar_en_process(context.target_enemigo)
+	cheats.aplicar_en_process(context.target_character)
+
+	if (scenario.debug_dibujar_cuadrantes or scenario.debug_dibujar_corredores) and overlay_draw != null:
+		overlay_draw.queue_redraw()
+
 	if not visible:
 		return
 
-	if not is_instance_valid(context.target_character) or not is_instance_valid(context.target_camara):
-		_buscar_nodos_objetivo()
+	_actualizar_telemetria()
 
-	# Solo actualizar telemetría si las ventanas correspondientes están abiertas
+
+func _actualizar_telemetria() -> void:
+	var fps: int = int(Engine.get_frames_per_second())
+	var mem_mb: float = float(OS.get_static_memory_usage()) / (1024.0 * 1024.0)
+
+	var pos_jugador: Vector2 = Vector2.ZERO
+	var cuadrante_jugador: String = "N/A"
+	var vel_actual: float = 0.0
+	var vel_max: float = 0.0
+	var acel: float = 0.0
+	var fric: float = 0.0
+	var estamina_txt: String = "N/A"
+	var estado_txt: String = "REPOSO"
+
+	if context.target_character != null:
+		pos_jugador = context.target_character.global_position
+		cuadrante_jugador = context.calcular_cuadrante(pos_jugador)
+		var vel_vec: Vector2 = context.target_character.velocity
+		vel_actual = vel_vec.length()
+		vel_max = context.target_character.get("speed") if "speed" in context.target_character else 0.0
+		acel = context.target_character.get("acceleration") if "acceleration" in context.target_character else 0.0
+		fric = context.target_character.get("friction") if "friction" in context.target_character else 0.0
+
+		if context.target_character.has_method("obtener_nombre_estado"):
+			estado_txt = context.target_character.obtener_nombre_estado()
+		elif "estado_actual" in context.target_character:
+			estado_txt = str(context.target_character.get("estado_actual"))
+
+		if "stamina" in context.target_character:
+			var max_st: float = float(context.target_character.get("max_stamina")) if "max_stamina" in context.target_character else 100.0
+			estamina_txt = "%.1f / %.1f" % [float(context.target_character.get("stamina")), max_st]
+		elif "estamina" in context.target_character:
+			estamina_txt = "%.1f / 100.0" % float(context.target_character.get("estamina"))
+		elif "estamina_actual" in context.target_character:
+			estamina_txt = "%.1f / 100.0" % float(context.target_character.get("estamina_actual"))
+
+	# Actualizar Ventana Jugador y Pad
 	if win_jugador != null and win_jugador.visible and not win_jugador.colapsada:
-		telemetry.actualizar_jugador(context, lbl_vel, lbl_vel_max, lbl_acel, lbl_fric, lbl_estado, lbl_estamina, lbl_pos_jugador, lbl_cuadrante_jugador)
-		telemetry.actualizar_pad(flecha_up, flecha_down, flecha_left, flecha_right)
+		telemetry.actualizar_tab_jugador({
+			"lbl_vel": lbl_vel,
+			"lbl_vel_max": lbl_vel_max,
+			"lbl_acel": lbl_acel,
+			"lbl_fric": lbl_fric,
+			"lbl_estado": lbl_estado,
+			"lbl_estamina": lbl_estamina,
+			"lbl_pos_jugador": lbl_pos_jugador,
+			"lbl_cuadrante_jugador": lbl_cuadrante_jugador
+		}, context.target_character, context, vel_actual, vel_max, acel, fric, estado_txt, estamina_txt, pos_jugador, cuadrante_jugador)
 
+		var dir_input := Input.get_vector("personaje-izquierda", "personaje-derecha", "personaje-arriba", "personaje-abajo")
+		if dir_input == Vector2.ZERO:
+			dir_input = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
+		telemetry.actualizar_pad_direccional({
+			"flecha_up": flecha_up,
+			"flecha_down": flecha_down,
+			"flecha_left": flecha_left,
+			"flecha_right": flecha_right
+		}, dir_input)
+
+	# Actualizar Ventana Escenario
 	if win_escenario != null and win_escenario.visible and not win_escenario.colapsada:
-		telemetry.actualizar_escenario(context, lbl_escenario_estado, lbl_escenario_no, lbl_escenario_ne, lbl_escenario_so, lbl_escenario_se)
+		telemetry.actualizar_tab_escenario({
+			"lbl_escenario_estado": lbl_escenario_estado,
+			"lbl_escenario_no": lbl_escenario_no,
+			"lbl_escenario_ne": lbl_escenario_ne,
+			"lbl_escenario_so": lbl_escenario_so,
+			"lbl_escenario_se": lbl_escenario_se
+		}, context.target_escenario, cuadrante_jugador)
 
+	# Actualizar Ventana Enemigo
 	if win_enemigo != null and win_enemigo.visible and not win_enemigo.colapsada:
-		telemetry.actualizar_enemigo(context, lbl_enemigo_estado, lbl_enemigo_pos, lbl_enemigo_dist, lbl_enemigo_vel, lbl_enemigo_atascado)
+		telemetry.actualizar_tab_enemigo({
+			"lbl_enemigo_estado": lbl_enemigo_estado,
+			"lbl_enemigo_pos": lbl_enemigo_pos,
+			"lbl_enemigo_dist": lbl_enemigo_dist,
+			"lbl_enemigo_vel": lbl_enemigo_vel,
+			"lbl_enemigo_atascado": lbl_enemigo_atascado
+		}, context.target_enemigo, pos_jugador, context, enemy_ctrl.debug_dibujar_vectores_ia)
 
-	if win_audio != null and win_audio.visible and not win_audio.colapsada:
-		telemetry.actualizar_audio(get_tree(), lbl_musica_estado, lbl_musica_clip, lbl_musica_volumen)
-
-	if win_sistema != null and win_sistema.visible and not win_sistema.colapsada:
-		telemetry.actualizar_sistema(lbl_sys_fps, lbl_sys_mem, lbl_sys_timescale)
+	# Actualizar Ventana Audio y Sistema
+	if (win_audio != null and win_audio.visible and not win_audio.colapsada) or (win_sistema != null and win_sistema.visible and not win_sistema.colapsada):
+		var telem_musica: Dictionary = system_ctrl.obtener_telemetria_musica()
+		var record_actual: int = system_ctrl.obtener_high_score()
+		telemetry.actualizar_tab_sistema({
+			"lbl_sys_fps": lbl_sys_fps,
+			"lbl_sys_mem": lbl_sys_mem,
+			"lbl_sys_timescale": lbl_sys_timescale,
+			"lbl_musica_estado": lbl_musica_estado,
+			"lbl_musica_clip": lbl_musica_clip,
+			"lbl_musica_volumen": lbl_musica_volumen,
+			"val_high_score": val_high_score
+		}, fps, mem_mb, telem_musica, record_actual)
 
 
 func _buscar_nodos_objetivo() -> void:
