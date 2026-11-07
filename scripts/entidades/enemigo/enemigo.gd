@@ -58,17 +58,17 @@ var _capturado: bool = false
 var tiene_linea_vision: bool = true
 var punto_impacto_local: Vector2 = Vector2.ZERO
 
-var debug_dibujar_rayo: bool = false
-var debug_dibujar_trail: bool = true
-var debug_dibujar_radios: bool = true
-var debug_dibujar_vector_vel: bool = true
-
-var _estela_puntos: Array[Vector2] = []
-var _timer_muestreo_estela: float = 0.0
+var debug_dibujar_rayo: bool:
+	get:
+		return _depurador_visual.dibujar_activo if _depurador_visual != null else false
+	set(val):
+		if _depurador_visual != null:
+			_depurador_visual.dibujar_activo = val
 
 @onready var _area_captura: Area2D = get_node_or_null("AreaCaptura") as Area2D
 @onready var _contenedor_visual: Node2D = get_node_or_null("BocetoVisual") as Node2D
 @onready var _raycast_vision: RayCast2D = get_node_or_null("RayCastVision") as RayCast2D
+@onready var _depurador_visual: DepuradorVisualEnemigo = get_node_or_null("DepuradorVisualEnemigo") as DepuradorVisualEnemigo
 
 
 func _ready() -> void:
@@ -162,17 +162,6 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 	_comprobar_captura_continua()
 
-	if debug_dibujar_rayo:
-		_timer_muestreo_estela += delta
-		if _timer_muestreo_estela >= INTERVALO_MUESTREO_ESTELA:
-			_timer_muestreo_estela = 0.0
-			_estela_puntos.append(global_position)
-			if _estela_puntos.size() > MAX_PUNTOS_ESTELA:
-				_estela_puntos.pop_front()
-		queue_redraw()
-	elif not _estela_puntos.is_empty():
-		_estela_puntos.clear()
-
 
 func _actualizar_linea_vision() -> void:
 	if _raycast_vision == null or objetivo == null or not is_instance_valid(objetivo):
@@ -195,74 +184,6 @@ func _actualizar_linea_vision() -> void:
 	else:
 		tiene_linea_vision = true
 		punto_impacto_local = posicion_objetivo_local
-
-
-func _draw() -> void:
-	if hibernando or not debug_dibujar_rayo:
-		return
-
-	var camara_activa := get_viewport().get_camera_2d()
-	var factor_zoom: float = camara_activa.zoom.x if (camara_activa != null and camara_activa.zoom.x > 0.01) else 1.0
-	var grosor_base: float = maxf(2.0, 3.5 / factor_zoom)
-	var radio_punto: float = maxf(4.0, 7.0 / factor_zoom)
-
-	# 1. Estela de Trayectoria (Breadcrumbs con degradado alfa)
-	if debug_dibujar_trail and _estela_puntos.size() >= 2:
-		var total_puntos: int = _estela_puntos.size()
-		for i in range(total_puntos - 1):
-			var p1: Vector2 = to_local(_estela_puntos[i])
-			var p2: Vector2 = to_local(_estela_puntos[i + 1])
-			var factor_t: float = float(i + 1) / float(total_puntos)
-			var alfa: float = clampf(factor_t * 0.75, 0.08, 0.8)
-			var color_tramo := Color(0.95, 0.45 * (1.0 - factor_t), 0.2, alfa)
-			var ancho_tramo: float = maxf(1.5, (grosor_base * 0.85) * factor_t)
-			draw_line(p1, p2, color_tramo, ancho_tramo)
-		var ultimo_p: Vector2 = to_local(_estela_puntos[total_puntos - 1])
-		draw_line(ultimo_p, Vector2.ZERO, Color(0.95, 0.2, 0.2, 0.8), grosor_base)
-
-	# 2. Radios Concéntricos: Captura Letal y Colisión Sólida
-	if debug_dibujar_radios:
-		var color_captura_fill := Color(0.9, 0.2, 0.2, 0.12)
-		var color_captura_borde := Color(0.95, 0.25, 0.25, 0.75)
-		draw_circle(Vector2.ZERO, RADIO_AREA_CAPTURA, color_captura_fill)
-		draw_arc(Vector2.ZERO, RADIO_AREA_CAPTURA, 0.0, TAU, 32, color_captura_borde, maxf(1.5, 2.5 / factor_zoom))
-
-		var color_colision_borde := Color(1.0, 0.8, 0.2, 0.6)
-		draw_arc(Vector2.ZERO, RADIO_COLISION_CUERPO, 0.0, TAU, 32, color_colision_borde, maxf(1.0, 2.0 / factor_zoom))
-
-	# 3. Vector de Velocidad Instantánea
-	if debug_dibujar_vector_vel and velocity.length_squared() > UMBRAL_VELOCIDAD_FLECHA_SQ:
-		var direccion_velocidad: Vector2 = velocity.normalized()
-		var longitud_flecha: float = clampf(
-			velocity.length() * FACTOR_LONGITUD_FLECHA_VELOCIDAD,
-			LONGITUD_MIN_FLECHA_VELOCIDAD,
-			LONGITUD_MAX_FLECHA_VELOCIDAD
-		)
-		var fin_vector: Vector2 = direccion_velocidad * longitud_flecha
-		var color_vector := Color(0.3, 0.8, 1.0, 0.9)
-		draw_line(Vector2.ZERO, fin_vector, color_vector, grosor_base)
-		var angulo_flecha: float = direccion_velocidad.angle()
-		var ala_izquierda: Vector2 = fin_vector - Vector2.from_angle(angulo_flecha + 0.5) * (8.0 / factor_zoom)
-		var ala_derecha: Vector2 = fin_vector - Vector2.from_angle(angulo_flecha - 0.5) * (8.0 / factor_zoom)
-		draw_line(fin_vector, ala_izquierda, color_vector, grosor_base)
-		draw_line(fin_vector, ala_derecha, color_vector, grosor_base)
-
-	# 4. Línea de Visión (RayCast hacia el objetivo)
-	if objetivo != null and is_instance_valid(objetivo):
-		var objetivo_local: Vector2 = to_local(objetivo.global_position)
-		if tiene_linea_vision:
-			draw_line(Vector2.ZERO, objetivo_local, Color(0.25, 0.95, 0.45, 0.85), grosor_base)
-			draw_circle(objetivo_local, radio_punto, Color(0.25, 0.95, 0.45, 0.85))
-		else:
-			draw_line(Vector2.ZERO, punto_impacto_local, Color(0.95, 0.3, 0.3, 0.9), grosor_base)
-			draw_circle(punto_impacto_local, radio_punto, Color(1.0, 0.25, 0.25, 1.0))
-			draw_dashed_line(
-				punto_impacto_local,
-				objetivo_local,
-				Color(0.8, 0.4, 0.4, 0.45),
-				maxf(1.0, 2.0 / factor_zoom),
-				8.0 / factor_zoom
-			)
 
 
 func _on_body_entered(body: Node2D) -> void:
