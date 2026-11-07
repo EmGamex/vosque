@@ -205,3 +205,24 @@ func test_director_orquestacion_captura_y_game_over() -> void:
 	mock_jugador.free()
 	mock_enemigo.free()
 	maain.free()
+
+
+func test_indicador_fuera_pantalla() -> void:
+	var enemigo := Enemigo.new()
+	enemigo.add_to_group("modo_test")
+	enemigo.hibernar_al_iniciar = false
+	enemigo._ready()
+
+	assert_true(enemigo.habilitar_indicador, "El indicador debe estar habilitado por defecto")
+	assert_not_null(enemigo.textura_indicador, "Debe tener una textura asignada por defecto")
+	assert_not_null(enemigo._screen_notifier, "Debe existir un VisibleOnScreenNotifier2D")
+
+	# En hibernación debe forzar ocultar el indicador
+	enemigo.hibernar()
+	assert_false(enemigo._indicador_visible, "Durante hibernación el indicador no debe estar visible")
+
+	# Al despertar sin estar capturado
+	enemigo.despertar(500.0)
+	assert_false(enemigo.hibernando, "No debe estar hibernando tras despertar")
+
+	enemigo.free()

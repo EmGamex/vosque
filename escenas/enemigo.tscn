@@ -41,3 +41,6 @@ shape = SubResource("CircleShape2D_743j8")
 
 [node name="RayCastVision" type="RayCast2D" parent="." unique_id=1806219836]
 target_position = Vector2(0, 0)
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="." unique_id=1517005535]
+rect = Rect2(-60, -60, 120, 120)
