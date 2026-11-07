@@ -16,25 +16,25 @@ enum EventoUI {
 	PAUSA_CERRAR,
 }
 
-# Constantes de rutas históricas para compatibilidad
-const RUTA_MENU_SELECCIONAR := "res://sonido/sfx/menus/seleccionar_menu_main.wav"
-const RUTA_MENU_ACEPTAR := "res://sonido/sfx/menus/aceptar_menu_pincial.wav"
-const RUTA_MENU_RETROCEDER := "res://sonido/sfx/menus/retroceder_menu_main.wav"
+const RUTA_CONFIG_DEFECTO: String = "res://recursos/audio/config_audio_ui_defecto.tres"
+const NOMBRE_AUTOLOAD: StringName = &"GestorAudioUI"
+const NOMBRE_BUS_DEFECTO: StringName = &"sfx"
 
-const RUTA_PAUSA_ABRIR := "res://sonido/sfx/menus/abrir_pausa.wav"
-const RUTA_PAUSA_NAVEGAR := "res://sonido/sfx/menus/JA_SE_SYS_CURS_MOVE.wav"
-const RUTA_PAUSA_ACEPTAR := "res://sonido/sfx/menus/presionar_pausa.wav"
-const RUTA_PAUSA_CERRAR := "res://sonido/sfx/menus/cerrar_pausa_01.wav"
+const NOMBRE_PLAYER_CURSOR: StringName = &"PlayerCursor"
+const NOMBRE_PLAYER_ACCION: StringName = &"PlayerAccion"
+const NOMBRE_PLAYER_ACCION_AUX: StringName = &"PlayerAccionAux"
 
-const NOMBRE_BUS := &"sfx"
+const VOLUMEN_SILENCIO_FALLBACK_DB: float = 0.0
+const PITCH_DEFECTO: float = 1.0
 
-@export var config: ConfiguracionAudioUI = preload("res://recursos/audio/config_audio_ui_defecto.tres"):
+@export var config: ConfiguracionAudioUI = preload(RUTA_CONFIG_DEFECTO):
 	set(val):
 		if config != null and config.changed.is_connected(_on_config_changed):
 			config.changed.disconnect(_on_config_changed)
 		config = val
 		if config != null and not config.changed.is_connected(_on_config_changed):
 			config.changed.connect(_on_config_changed)
+		_cargar_streams_desde_config()
 		_aplicar_configuracion_en_vivo()
 
 @onready var _player_cursor: AudioStreamPlayer = $PlayerCursor
@@ -45,12 +45,10 @@ const NOMBRE_BUS := &"sfx"
 var _stream_menu_seleccionar: AudioStream
 var _stream_menu_aceptar: AudioStream
 var _stream_menu_retroceder: AudioStream
-
 var _stream_pausa_abrir: AudioStream
 var _stream_pausa_navegar: AudioStream
 var _stream_pausa_aceptar: AudioStream
 var _stream_pausa_cerrar: AudioStream
-
 
 var _accion_en_curso: bool = false
 
@@ -64,64 +62,46 @@ func _ready() -> void:
 	_aplicar_configuracion_en_vivo()
 
 
+func _obtener_config_segura() -> ConfiguracionAudioUI:
+	if config == null:
+		config = ConfiguracionAudioUI.new()
+	return config
+
+
+func _obtener_o_crear_player(player_ref: AudioStreamPlayer, nombre_nodo: StringName) -> AudioStreamPlayer:
+	if player_ref != null:
+		return player_ref
+	var existente := get_node_or_null(NodePath(nombre_nodo)) as AudioStreamPlayer
+	if existente != null:
+		return existente
+	var nuevo := AudioStreamPlayer.new()
+	nuevo.name = nombre_nodo
+	nuevo.process_mode = Node.PROCESS_MODE_ALWAYS
+	nuevo.bus = _obtener_bus()
+	add_child(nuevo)
+	return nuevo
+
+
 func _asegurar_reproductores() -> void:
-	if _player_cursor == null:
-		_player_cursor = get_node_or_null("PlayerCursor") as AudioStreamPlayer
-	if _player_cursor == null:
-		_player_cursor = AudioStreamPlayer.new()
-		_player_cursor.name = "PlayerCursor"
-		_player_cursor.process_mode = Node.PROCESS_MODE_ALWAYS
-		_player_cursor.bus = NOMBRE_BUS
-		add_child(_player_cursor)
+	_player_cursor = _obtener_o_crear_player(_player_cursor, NOMBRE_PLAYER_CURSOR)
+	_player_accion = _obtener_o_crear_player(_player_accion, NOMBRE_PLAYER_ACCION)
+	_player_accion_aux = _obtener_o_crear_player(_player_accion_aux, NOMBRE_PLAYER_ACCION_AUX)
 
-	if _player_accion == null:
-		_player_accion = get_node_or_null("PlayerAccion") as AudioStreamPlayer
-	if _player_accion == null:
-		_player_accion = AudioStreamPlayer.new()
-		_player_accion.name = "PlayerAccion"
-		_player_accion.process_mode = Node.PROCESS_MODE_ALWAYS
-		_player_accion.bus = NOMBRE_BUS
-		add_child(_player_accion)
 
-	if _player_accion_aux == null:
-		_player_accion_aux = get_node_or_null("PlayerAccionAux") as AudioStreamPlayer
-	if _player_accion_aux == null:
-		_player_accion_aux = AudioStreamPlayer.new()
-		_player_accion_aux.name = "PlayerAccionAux"
-		_player_accion_aux.process_mode = Node.PROCESS_MODE_ALWAYS
-		_player_accion_aux.bus = NOMBRE_BUS
-		add_child(_player_accion_aux)
+func _obtener_bus() -> StringName:
+	var cfg := _obtener_config_segura()
+	return cfg.nombre_bus if not cfg.nombre_bus.is_empty() else NOMBRE_BUS_DEFECTO
 
 
 func _cargar_streams_desde_config() -> void:
-	if config != null:
-		_stream_menu_seleccionar = config.stream_menu_seleccionar
-		_stream_menu_aceptar = config.stream_menu_aceptar
-		_stream_menu_retroceder = config.stream_menu_retroceder
-		_stream_pausa_abrir = config.stream_pausa_abrir
-		_stream_pausa_navegar = config.stream_pausa_navegar
-		_stream_pausa_aceptar = config.stream_pausa_aceptar
-		_stream_pausa_cerrar = config.stream_pausa_cerrar
-	else:
-		_cargar_streams_fallback()
-
-
-func _cargar_streams_fallback() -> void:
-	if ResourceLoader.exists(RUTA_MENU_SELECCIONAR):
-		_stream_menu_seleccionar = load(RUTA_MENU_SELECCIONAR)
-	if ResourceLoader.exists(RUTA_MENU_ACEPTAR):
-		_stream_menu_aceptar = load(RUTA_MENU_ACEPTAR)
-	if ResourceLoader.exists(RUTA_MENU_RETROCEDER):
-		_stream_menu_retroceder = load(RUTA_MENU_RETROCEDER)
-
-	if ResourceLoader.exists(RUTA_PAUSA_ABRIR):
-		_stream_pausa_abrir = load(RUTA_PAUSA_ABRIR)
-	if ResourceLoader.exists(RUTA_PAUSA_NAVEGAR):
-		_stream_pausa_navegar = load(RUTA_PAUSA_NAVEGAR)
-	if ResourceLoader.exists(RUTA_PAUSA_ACEPTAR):
-		_stream_pausa_aceptar = load(RUTA_PAUSA_ACEPTAR)
-	if ResourceLoader.exists(RUTA_PAUSA_CERRAR):
-		_stream_pausa_cerrar = load(RUTA_PAUSA_CERRAR)
+	var cfg := _obtener_config_segura()
+	_stream_menu_seleccionar = cfg.stream_menu_seleccionar
+	_stream_menu_aceptar = cfg.stream_menu_aceptar
+	_stream_menu_retroceder = cfg.stream_menu_retroceder
+	_stream_pausa_abrir = cfg.stream_pausa_abrir
+	_stream_pausa_navegar = cfg.stream_pausa_navegar
+	_stream_pausa_aceptar = cfg.stream_pausa_aceptar
+	_stream_pausa_cerrar = cfg.stream_pausa_cerrar
 
 
 func _on_config_changed() -> void:
@@ -131,20 +111,18 @@ func _on_config_changed() -> void:
 
 func _aplicar_configuracion_en_vivo() -> void:
 	_asegurar_reproductores()
-	var bus_nombre: StringName = config.nombre_bus if config != null and not config.nombre_bus.is_empty() else NOMBRE_BUS
-	var vol_general: float = config.volumen_general_db if config != null else 0.0
-	var vol_cursor: float = config.volumen_cursor_db if config != null else 0.0
-	var vol_accion: float = config.volumen_accion_db if config != null else 0.0
+	var cfg := _obtener_config_segura()
+	var bus_nombre := _obtener_bus()
+	var vol_general := cfg.volumen_general_db
 
-	if _player_cursor != null:
-		_player_cursor.bus = bus_nombre
-		_player_cursor.volume_db = vol_general + vol_cursor
-	if _player_accion != null:
-		_player_accion.bus = bus_nombre
-		_player_accion.volume_db = vol_general + vol_accion
-	if _player_accion_aux != null:
-		_player_accion_aux.bus = bus_nombre
-		_player_accion_aux.volume_db = vol_general + vol_accion
+	_player_cursor.bus = bus_nombre
+	_player_cursor.volume_db = vol_general + cfg.volumen_cursor_db
+
+	_player_accion.bus = bus_nombre
+	_player_accion.volume_db = vol_general + cfg.volumen_accion_db
+
+	_player_accion_aux.bus = bus_nombre
+	_player_accion_aux.volume_db = vol_general + cfg.volumen_accion_db
 
 
 # ==========================================
@@ -170,9 +148,10 @@ func reproducir_evento(evento: EventoUI) -> void:
 
 
 func reproducir_extra(id_evento: StringName, es_accion: bool = true) -> void:
-	if config == null or not config.eventos_extra.has(id_evento):
+	var cfg := _obtener_config_segura()
+	if not cfg.eventos_extra.has(id_evento):
 		return
-	var stream: AudioStream = config.eventos_extra[id_evento] as AudioStream
+	var stream := cfg.eventos_extra[id_evento] as AudioStream
 	if stream == null:
 		return
 	if es_accion:
@@ -236,31 +215,29 @@ func reproducir_pausa_cerrar() -> void:
 # ==========================================
 
 func _reproducir_en_cursor(stream: AudioStream) -> void:
-	_asegurar_reproductores()
-	if stream == null or _player_cursor == null:
+	if stream == null:
 		return
-
-	if config != null and config.habilitar_variacion_pitch_cursor:
-		_player_cursor.pitch_scale = randf_range(config.pitch_cursor_min, config.pitch_cursor_max)
+	_asegurar_reproductores()
+	var cfg := _obtener_config_segura()
+	if cfg.habilitar_variacion_pitch_cursor:
+		_player_cursor.pitch_scale = randf_range(cfg.pitch_cursor_min, cfg.pitch_cursor_max)
 	else:
-		_player_cursor.pitch_scale = 1.0
+		_player_cursor.pitch_scale = PITCH_DEFECTO
 
 	_player_cursor.stream = stream
 	_player_cursor.play()
 
 
 func _reproducir_en_accion(stream: AudioStream) -> void:
-	_asegurar_reproductores()
-	if stream == null or _player_accion == null:
+	if stream == null:
 		return
+	_asegurar_reproductores()
+	var cfg := _obtener_config_segura()
+	var pitch_base: float = cfg.pitch_accion_base
 
-	var pitch_base: float = config.pitch_accion_base if config != null else 1.0
-
-	# Conectamos finished para resetear el flag de acción en curso
 	if not _player_accion.finished.is_connected(_on_accion_finished):
 		_player_accion.finished.connect(_on_accion_finished)
 
-	# Zero-cutoff: si _player_accion ya está reproduciendo o marcado en curso, usamos canal auxiliar
 	if (_player_accion.playing or _accion_en_curso) and _player_accion_aux != null:
 		_player_accion_aux.stream = stream
 		_player_accion_aux.pitch_scale = pitch_base
@@ -281,9 +258,8 @@ func _on_accion_finished() -> void:
 # ==========================================
 
 static func emitir_seguro(nodo_contexto: Node, evento: EventoUI) -> void:
-	if Engine.is_editor_hint() or nodo_contexto == null:
+	if Engine.is_editor_hint() or nodo_contexto == null or not nodo_contexto.is_inside_tree():
 		return
-	if nodo_contexto.has_node("/root/GestorAudioUI"):
-		var gestor = nodo_contexto.get_node("/root/GestorAudioUI")
-		if gestor != null and gestor.has_method("reproducir_evento"):
-			gestor.reproducir_evento(evento)
+	var gestor := nodo_contexto.get_tree().root.get_node_or_null(NodePath(NOMBRE_AUTOLOAD)) as ControladorAudioUI
+	if gestor != null:
+		gestor.reproducir_evento(evento)
