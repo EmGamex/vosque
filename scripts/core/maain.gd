@@ -49,6 +49,9 @@ func _ready() -> void:
 func _on_visibility_changed() -> void:
 	if hud != null and is_instance_valid(hud):
 		hud.visible = is_visible_in_tree()
+	if not is_visible_in_tree():
+		if escenario != null and is_instance_valid(escenario) and escenario.has_method("abortar_mutacion"):
+			escenario.abortar_mutacion()
 
 
 func _resolver_referencias() -> void:

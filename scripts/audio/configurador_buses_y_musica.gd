@@ -93,11 +93,11 @@ static func configurar_musica_interactiva() -> Error:
 	interactivo.set_clip_stream(1, stream_supervivencia)
 	interactivo.set_clip_auto_advance(1, AudioStreamInteractive.AUTO_ADVANCE_DISABLED)
 
-	# Transicion 1: menu_tutorial -> supervivencia (NEXT_BEAT, START, FADE_DISABLED, 0.0)
+	# Transicion 1: menu_tutorial -> supervivencia (IMMEDIATE, START, FADE_DISABLED, 0.0)
 	interactivo.add_transition(
 		0,
 		1,
-		AudioStreamInteractive.TRANSITION_FROM_TIME_NEXT_BEAT,
+		AudioStreamInteractive.TRANSITION_FROM_TIME_IMMEDIATE,
 		AudioStreamInteractive.TRANSITION_TO_TIME_START,
 		AudioStreamInteractive.FADE_DISABLED,
 		0.0

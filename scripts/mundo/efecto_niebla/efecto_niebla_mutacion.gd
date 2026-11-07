@@ -183,6 +183,21 @@ func _abortar_y_limpiar() -> void:
 	)
 
 
+## Aborta cualquier transición o efecto en curso y restaura la niebla a reposo despejado sin emitir señales de mutación diferidas.
+func abortar_inmediato() -> void:
+	visible = false
+	set_process(false)
+	transicion_ctrl.token_transicion += 1
+	transicion_ctrl.animando = false
+	transicion_ctrl.fase_actual = NieblaTransicionController.Fase.DESPEJADO
+	if transicion_ctrl._tween != null and transicion_ctrl._tween.is_valid():
+		transicion_ctrl._tween.kill()
+		transicion_ctrl._tween = null
+	if material_ctrl != null:
+		material_ctrl.actualizar_densidad(0.0)
+		material_ctrl.actualizar_radio_interno(radio_despejado)
+
+
 ## Cubre la pantalla proyectando las cápsulas geométricas de niebla.
 func cubrir(duracion: float = -1.0) -> void:
 	transicion_ctrl.cubrir(

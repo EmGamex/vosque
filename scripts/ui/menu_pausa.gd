@@ -127,6 +127,8 @@ func _on_reiniciar_pulsado() -> void:
 	if _bloqueado:
 		return
 	_bloqueado = true
+	Input.action_release("personaje-salto")
+	Input.action_release("ui_accept")
 	ControladorAudioUI.emitir_seguro(self, ControladorAudioUI.EventoUI.PAUSA_ACEPTAR)
 	reiniciar_solicitado.emit()
 
@@ -135,5 +137,7 @@ func _on_menu_pulsado() -> void:
 	if _bloqueado:
 		return
 	_bloqueado = true
+	Input.action_release("personaje-salto")
+	Input.action_release("ui_accept")
 	ControladorAudioUI.emitir_seguro(self, ControladorAudioUI.EventoUI.PAUSA_ACEPTAR)
 	menu_solicitado.emit()

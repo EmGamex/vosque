@@ -3,7 +3,7 @@ class_name ControladorMusica
 extends Node
 
 ## Singleton Autoload GestorMusica (res://escenas/gestor_musica.tscn).
-## Administra la máquina de estados musicales, transiciones NEXT_BEAT con
+## Administra la máquina de estados musicales, transiciones inmediatas con
 ## AudioStreamInteractive, atenuación aditiva en pausa y efecto Nightmare Decay.
 
 enum EstadoMusical {

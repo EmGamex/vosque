@@ -76,7 +76,7 @@ func test_transiciones_metricas_interactivas() -> void:
 
 	# Transicion 0 -> 1 (menu_tutorial a supervivencia)
 	assert_true(asi.has_transition(0, 1), "Debe existir transicion de clip 0 a clip 1")
-	assert_eq(asi.get_transition_from_time(0, 1), AudioStreamInteractive.TRANSITION_FROM_TIME_NEXT_BEAT, "From time debe ser NEXT_BEAT")
+	assert_eq(asi.get_transition_from_time(0, 1), AudioStreamInteractive.TRANSITION_FROM_TIME_IMMEDIATE, "From time debe ser IMMEDIATE")
 	assert_eq(asi.get_transition_to_time(0, 1), AudioStreamInteractive.TRANSITION_TO_TIME_START, "To time debe ser START")
 	assert_eq(asi.get_transition_fade_mode(0, 1), AudioStreamInteractive.FADE_DISABLED, "Fade mode debe ser FADE_DISABLED")
 	assert_true(is_equal_approx(asi.get_transition_fade_beats(0, 1), 0.0), "Fade beats debe ser 0.0")

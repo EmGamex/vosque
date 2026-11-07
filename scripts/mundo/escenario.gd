@@ -189,6 +189,17 @@ func forzar_mutacion() -> void:
 	mutar_con_neblina()
 
 
+## Cancela cualquier mutación o efecto de niebla pendiente o en curso y devuelve el escenario a estado estable.
+func abortar_mutacion() -> void:
+	_mutacion_pendiente = false
+	_mutacion_en_progreso = false
+	if _efecto_niebla != null and is_instance_valid(_efecto_niebla):
+		if _efecto_niebla.has_method("abortar_inmediato"):
+			_efecto_niebla.abortar_inmediato()
+	if objetivo_enemigo != null and is_instance_valid(objetivo_enemigo) and objetivo_enemigo.has_method("modular_velocidad_niebla"):
+		objetivo_enemigo.modular_velocidad_niebla(false)
+
+
 func mutar_con_neblina(
 	duracion_cierre: float = -1.0,
 	duracion_apertura: float = -1.0,
