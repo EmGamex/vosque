@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://ccr00dcd1n8h6" path="res://scripts/entidades/enemigo/enemigo.gd" id="1_sms58"]
 [ext_resource type="Material" uid="uid://c1pvk48d3mcik" path="res://recursos/iluminacion/mat_ojos_monstruo.tres" id="2_uhebs"]
+[ext_resource type="Script" uid="uid://h4hect76vhd8" path="res://scripts/entidades/enemigo/indicador_fuera_pantalla.gd" id="4_hpq8b"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_uhebs"]
 radius = 42.0
@@ -42,5 +43,8 @@ shape = SubResource("CircleShape2D_743j8")
 [node name="RayCastVision" type="RayCast2D" parent="." unique_id=1806219836]
 target_position = Vector2(0, 0)
 
-[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="." unique_id=1517005535]
+[node name="IndicadorFueraPantalla" type="Node2D" parent="." unique_id=431340089]
+script = ExtResource("4_hpq8b")
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="IndicadorFueraPantalla" unique_id=1517005535]
 rect = Rect2(-60, -60, 120, 120)

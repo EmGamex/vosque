@@ -33,15 +33,6 @@ const VELOCIDADES_MONSTRUO: Array[float] = [
 @export_range(50.0, 3000.0, 10.0, "suffix:px/s") var speed: float = 500.0
 @export_range(0.0, 10000.0, 50.0, "suffix:px/s²") var acceleration: float = 3500.0
 
-@export_group("Indicador Fuera de Pantalla")
-@export var habilitar_indicador: bool = true
-@export var textura_indicador: Texture2D = preload("res://icon.svg")
-@export var rotar_indicador: bool = false
-@export var margen_pantalla: float = 36.0
-@export var escala_indicador: Vector2 = Vector2(0.35, 0.35)
-@export var color_indicador: Color = Color(1.0, 0.3, 0.3, 0.9)
-@export var duracion_fade: float = 0.2
-
 var hibernando: bool = false
 var modulador_velocidad_niebla: float = 1.0
 var _capturado: bool = false
@@ -60,12 +51,6 @@ const MAX_TRAIL_PUNTOS: int = 45
 @onready var _area_captura: Area2D = get_node_or_null("AreaCaptura") as Area2D
 @onready var _visual: Node2D = get_node_or_null("BocetoVisual") as Node2D
 @onready var _raycast_vision: RayCast2D = get_node_or_null("RayCastVision") as RayCast2D
-@onready var _screen_notifier: VisibleOnScreenNotifier2D = get_node_or_null("VisibleOnScreenNotifier2D") as VisibleOnScreenNotifier2D
-
-var _capa_indicador: CanvasLayer = null
-var _sprite_indicador: Sprite2D = null
-var _indicador_visible: bool = false
-var _indicador_tween: Tween = null
 
 
 func _ready() -> void:
@@ -93,163 +78,6 @@ func _ready() -> void:
 	if (not Engine.is_editor_hint() or is_in_group("modo_test")) and hibernar_al_iniciar:
 		hibernar()
 
-	_inicializar_indicador_pantalla()
-
-
-func _exit_tree() -> void:
-	if _capa_indicador != null and is_instance_valid(_capa_indicador):
-		_capa_indicador.queue_free()
-		_capa_indicador = null
-
-
-func _inicializar_indicador_pantalla() -> void:
-	if Engine.is_editor_hint():
-		return
-
-	if _screen_notifier == null:
-		_screen_notifier = get_node_or_null("VisibleOnScreenNotifier2D") as VisibleOnScreenNotifier2D
-		if _screen_notifier == null:
-			_screen_notifier = VisibleOnScreenNotifier2D.new()
-			_screen_notifier.name = "VisibleOnScreenNotifier2D"
-			_screen_notifier.rect = Rect2(-60.0, -60.0, 120.0, 120.0)
-			add_child(_screen_notifier)
-
-	if not _screen_notifier.screen_entered.is_connected(_on_screen_entered):
-		_screen_notifier.screen_entered.connect(_on_screen_entered)
-	if not _screen_notifier.screen_exited.is_connected(_on_screen_exited):
-		_screen_notifier.screen_exited.connect(_on_screen_exited)
-
-	if _capa_indicador == null:
-		_capa_indicador = CanvasLayer.new()
-		_capa_indicador.name = "CapaIndicadorEnemigo"
-		_capa_indicador.layer = 15
-		add_child(_capa_indicador)
-
-		_sprite_indicador = Sprite2D.new()
-		_sprite_indicador.name = "SpriteIndicador"
-		_sprite_indicador.texture = textura_indicador
-		_sprite_indicador.scale = escala_indicador
-		_sprite_indicador.modulate = Color(color_indicador.r, color_indicador.g, color_indicador.b, 0.0)
-		_sprite_indicador.visible = false
-		_capa_indicador.add_child(_sprite_indicador)
-
-
-func _on_screen_entered() -> void:
-	_ocultar_indicador_fade()
-
-
-func _on_screen_exited() -> void:
-	if not hibernando and habilitar_indicador and not _capturado:
-		_mostrar_indicador_fade()
-
-
-func _mostrar_indicador_fade() -> void:
-	if _sprite_indicador == null or not is_instance_valid(_sprite_indicador):
-		return
-	_indicador_visible = true
-	_sprite_indicador.visible = true
-	if _indicador_tween != null and _indicador_tween.is_valid():
-		_indicador_tween.kill()
-	_indicador_tween = create_tween().set_parallel(true)
-	var color_target := color_indicador
-	_indicador_tween.tween_property(_sprite_indicador, "modulate:a", color_target.a, duracion_fade)
-	_indicador_tween.tween_property(_sprite_indicador, "scale", escala_indicador, duracion_fade).from(escala_indicador * 0.7)
-
-
-func _ocultar_indicador_fade(instantaneo: bool = false) -> void:
-	if _sprite_indicador == null or not is_instance_valid(_sprite_indicador):
-		return
-	_indicador_visible = false
-	if _indicador_tween != null and _indicador_tween.is_valid():
-		_indicador_tween.kill()
-
-	if instantaneo or duracion_fade <= 0.0:
-		_sprite_indicador.modulate.a = 0.0
-		_sprite_indicador.visible = false
-		return
-
-	_indicador_tween = create_tween()
-	_indicador_tween.tween_property(_sprite_indicador, "modulate:a", 0.0, duracion_fade)
-	_indicador_tween.tween_callback(func():
-		if not _indicador_visible and _sprite_indicador != null:
-			_sprite_indicador.visible = false
-	)
-
-
-func _process(_delta: float) -> void:
-	if Engine.is_editor_hint():
-		return
-	_actualizar_indicador_pantalla()
-
-
-func _actualizar_indicador_pantalla() -> void:
-	if not habilitar_indicador or hibernando or _capturado:
-		if _indicador_visible or (_sprite_indicador != null and _sprite_indicador.visible):
-			_ocultar_indicador_fade(true)
-		return
-
-	var esta_en_pantalla: bool = _screen_notifier != null and _screen_notifier.is_on_screen()
-	if esta_en_pantalla:
-		if _indicador_visible:
-			_ocultar_indicador_fade()
-		return
-	else:
-		if not _indicador_visible:
-			_mostrar_indicador_fade()
-
-	if _sprite_indicador == null or not is_instance_valid(_sprite_indicador) or not _sprite_indicador.visible:
-		return
-
-	if _sprite_indicador.texture != textura_indicador:
-		_sprite_indicador.texture = textura_indicador
-
-	var viewport := get_viewport()
-	if viewport == null:
-		return
-
-	var camara := viewport.get_camera_2d()
-	var rect_vp := viewport.get_visible_rect()
-	var centro_vp: Vector2 = rect_vp.size * 0.5
-
-	# Calcular posición del enemigo proyectada a coordenadas de pantalla
-	var pos_pantalla: Vector2
-	if camara != null:
-		pos_pantalla = (global_position - camara.get_screen_center_position()) * camara.zoom + centro_vp
-	else:
-		pos_pantalla = viewport.get_canvas_transform() * global_position
-
-	var delta_pos: Vector2 = pos_pantalla - centro_vp
-	if delta_pos.length_squared() < 0.001:
-		delta_pos = Vector2.UP
-
-	var dir: Vector2 = delta_pos.normalized()
-
-	# Intersección de rayo con bordes rectangulares con margen
-	var limite_min := Vector2(margen_pantalla, margen_pantalla)
-	var limite_max := rect_vp.size - Vector2(margen_pantalla, margen_pantalla)
-
-	var escala_t: float = INF
-	if dir.x > 0.0001:
-		escala_t = minf(escala_t, (limite_max.x - centro_vp.x) / dir.x)
-	elif dir.x < -0.0001:
-		escala_t = minf(escala_t, (limite_min.x - centro_vp.x) / dir.x)
-
-	if dir.y > 0.0001:
-		escala_t = minf(escala_t, (limite_max.y - centro_vp.y) / dir.y)
-	elif dir.y < -0.0001:
-		escala_t = minf(escala_t, (limite_min.y - centro_vp.y) / dir.y)
-
-	var pos_borde := centro_vp + dir * escala_t
-	pos_borde.x = clampf(pos_borde.x, limite_min.x, limite_max.x)
-	pos_borde.y = clampf(pos_borde.y, limite_min.y, limite_max.y)
-
-	_sprite_indicador.position = pos_borde
-
-	if rotar_indicador:
-		_sprite_indicador.rotation = dir.angle()
-	else:
-		_sprite_indicador.rotation = 0.0
-
 
 func hibernar() -> void:
 	hibernando = true
@@ -259,7 +87,6 @@ func hibernar() -> void:
 	velocity = Vector2.ZERO
 	speed = VELOCIDADES_MONSTRUO[0]
 	acceleration = ACELERACION_CONSTANTE
-	_ocultar_indicador_fade(true)
 	hibernado.emit()
 
 
