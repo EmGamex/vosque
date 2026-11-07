@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ConfiguracionAudioUI" format=3 uid="uid://cmgydxjnff8vy"]
+
+[ext_resource type="Script" uid="uid://bw5838hdukkri" path="res://scripts/core/configuracion_audio_ui.gd" id="1_bjgov"]
+[ext_resource type="AudioStream" uid="uid://dtkhjsd23c6ea" path="res://sonido/sfx/menus/aceptar_menu_pincial.wav" id="2_jd52d"]
+[ext_resource type="AudioStream" uid="uid://qfs136kn1pd2" path="res://sonido/sfx/menus/retroceder_menu_main.wav" id="3_61ooy"]
+[ext_resource type="AudioStream" uid="uid://caqhrel131vse" path="res://sonido/sfx/menus/seleccionar_menu_main.wav" id="4_t1nh0"]
+[ext_resource type="AudioStream" uid="uid://hrine60iwj47" path="res://sonido/sfx/menus/abrir_pausa.wav" id="5_nxcnp"]
+[ext_resource type="AudioStream" uid="uid://511sn4oog4gv" path="res://sonido/sfx/menus/presionar_pausa.wav" id="6_5i7l7"]
+[ext_resource type="AudioStream" uid="uid://bytondnesbvjf" path="res://sonido/sfx/menus/cerrar_pausa_01.wav" id="7_q2y7a"]
+[ext_resource type="AudioStream" uid="uid://cnfy72a4n6byx" path="res://sonido/sfx/menus/JA_SE_SYS_CURS_MOVE.wav" id="8_iktnk"]
+
+[resource]
+script = ExtResource("1_bjgov")

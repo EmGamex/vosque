@@ -17,8 +17,13 @@ func _ready() -> void:
 	enfocar()
 	if has_node("/root/GestorMusica"):
 		get_node("/root/GestorMusica").activar_modo_game_over()
-	_boton_reintentar.pressed.connect(_on_reintentar_pulsado)
-	_boton_menu.pressed.connect(_on_menu_pulsado)
+
+	if _boton_reintentar != null:
+		_boton_reintentar.pressed.connect(_on_reintentar_pulsado)
+		_boton_reintentar.focus_entered.connect(_on_boton_enfocado)
+	if _boton_menu != null:
+		_boton_menu.pressed.connect(_on_menu_pulsado)
+		_boton_menu.focus_entered.connect(_on_boton_enfocado)
 
 
 ## Da el foco a "Reintentar". El gestor lo llama al mostrar la pantalla.
@@ -29,7 +34,12 @@ func enfocar() -> void:
 		_boton_reintentar.grab_focus()
 
 
+func _on_boton_enfocado() -> void:
+	ControladorAudioUI.emitir_seguro(self, ControladorAudioUI.EventoUI.PAUSA_NAVEGAR)
+
+
 func _on_reintentar_pulsado() -> void:
+	ControladorAudioUI.emitir_seguro(self, ControladorAudioUI.EventoUI.PAUSA_ACEPTAR)
 	if has_node("/root/GestorMusica"):
 		var gestor_musica = get_node("/root/GestorMusica")
 		gestor_musica.restaurar_parametros_normales()
@@ -40,6 +50,7 @@ func _on_reintentar_pulsado() -> void:
 
 
 func _on_menu_pulsado() -> void:
+	ControladorAudioUI.emitir_seguro(self, ControladorAudioUI.EventoUI.PAUSA_ACEPTAR)
 	if has_node("/root/GestorMusica"):
 		var gestor_musica = get_node("/root/GestorMusica")
 		gestor_musica.restaurar_parametros_normales()
