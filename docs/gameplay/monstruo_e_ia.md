@@ -149,11 +149,10 @@ if velocity.length_squared() > 1.0:
 ## 7. Telemetría y Controles de Depuración
 
 A través del **Menú de Debug F3** ([`docs/herramientas/menu_debug_ingame.md`](../herramientas/menu_debug_ingame.md)):
-* **Casilla `[x] Congelar IA / Inactivo`:** Anula la velocidad y desactiva el `AreaCaptura` para probar movimiento y saltos libremente.
-* **Selector de Fase (Notas 0 a 10+):** Permite calibrar en caliente cualquier escalón de velocidad sin recolectar notas manualmente.
-* **Visualización Táctica en Mundo (`DebugOverlay`):**
-  - Círculo rojo de $56\text{ px}$ (`AreaCaptura`).
-  - Círculo ámbar de $42\text{ px}$ (Colisión física).
-  - Rayo de visión en tiempo real (Verde: directo, Rojo: obstruido).
-  - Vector directriz de velocidad y estela de desplazamiento (*breadcrumbs* de 2 segundos).
-* **Botón "Reubicar Monstruo":** Teletransporta a la criatura a un cuadrante seguro.
+* **Telemetría en Vivo:** Posición global, cuadrante actual, distancia euclidiana al jugador, velocidad instantánea, línea de visión (`Visión directa` vs `Obstruido`) y diagnóstico de anti-atascamiento (`is_on_wall()`).
+* **Botón "Reubicar Monstruo a Cuadrante Opuesto":** Teletransporta a la criatura al cuadrante simétrico opuesto al jugador, garantizando una distancia de seguridad mínima de $300\text{ px}$.
+* **Visualización Táctica (`CheckVisualDebug` / `DepuradorVisualEnemigo`):**
+  - Círculo rojo de $56\text{ px}$ (`RADIO_AREA_CAPTURA`).
+  - Arco ámbar de $42\text{ px}$ (`RADIO_COLISION_CUERPO`).
+  - Rayo de visión en tiempo real (Verde: directo, Rojo: obstruido con punto de impacto).
+  - Vector directriz de velocidad y estela de desplazamiento (*breadcrumbs* de 45 muestras con degradado alfa).

@@ -15,7 +15,7 @@ Este documento detalla la arquitectura, controles, capas visuales y controladore
 2. **Arquitectura No Invasiva y Desacoplada:** El sistema de debug inspecciona nodos (`personaje`, `escenario`, `enemigo`) mediante verificaciones seguras (`has_method()`, variables condicionales y referencias nulas). Si un componente no está instanciado, se degrada elegantemente sin arrojar excepciones.
 3. **Persistencia Trans-Sesión (`DebugConfig` Autoload):** Los ajustes de depuración (toggles visuales, cheats, velocidades calibradas y time_scale) se conservan a través de `/root/DebugConfig` (`scripts/debug/debug_config.gd`), impidiendo que se reinicien al recargar la escena o reiniciar tras un Game Over.
 4. **Simulación en Tiempo Real:** Por defecto, abrir la consola de debug no pausa el motor, permitiendo observar cómo reaccionan las físicas y las mutaciones espaciales en vivo.
-5. **Cero Sobrecarga en Producción (`Release`):** Todas las rutinas de dibujo vectorial, captura de teclas <kbd>F3</kbd> y telemetría están blindadas bajo `if OS.is_debug_build():`. En compilaciones web de producción para itch.io y Newgrounds, el menú no procesa eventos ni reserva memoria (*zero overhead*).
+5. **Desacoplamiento de Entornos:** Los componentes de debug discriminan la ejecución entre editor y juego activo (`Engine.is_editor_hint()`), mientras que la telemetría pesada y el registro de monitores nativos de `Performance` están blindados bajo `OS.is_debug_build()`. En estado oculto, el menú apaga su visibilidad eliminando cualquier sobrecarga de dibujo.
 
 ---
 
@@ -43,19 +43,24 @@ El acceso al menú se gestiona mediante pulsaciones sucesivas de <kbd>F3</kbd>:
 
 ## 3. Arquitectura Modular del Menú (`scripts/debug/debug_menu/`)
 
-El menú se implementa en un `CanvasLayer` con prioridad alta (`layer = 100`) y se desglosa en controladores independientes:
+El menú se implementa en un `CanvasLayer` con prioridad alta (`layer = 100`) y desacopla la lógica mediante controladores especializados coordinados por `DebugMenu`:
 
 ```text
 DebugMenu (CanvasLayer, layer=100) [scripts/debug/debug_menu/debug_menu.gd]
-├── MiniHUD (PanelContainer en esquina superior derecha)
-├── ConsolaPrincipal (PanelContainer modal semi-transparente)
-│   ├── Encabezado (Título, FPS, Botón Cerrar, Toggle Pausa)
-│   └── TabContainer
-│       ├── TabJugador   ──> debug_cheats_controller.gd / debug_physics_controller.gd
-│       ├── TabEscenario ──> debug_scenario_controller.gd
-│       ├── TabEnemigo   ──> debug_enemy_controller.gd
-│       └── TabSistema   ──> debug_system_controller.gd
-└── DebugOverlay (Node2D) ──> debug_overlay.gd (Dibujo vectorial en mundo)
+├── DebugContext [debug_context.gd] (Resolución de nodos objetivo, fallback de cámaras y cuadrantes)
+├── DebugTelemetryPresenter [debug_telemetry_presenter.gd] (Formateo y presentación desacoplada a la UI)
+├── DebugCustomMonitors [debug_custom_monitors.gd] (Monitores nativos en depurador Performance de Godot)
+├── ControlRaiz (Control que contiene la UI)
+│   ├── MiniHUD (PanelContainer en esquina superior derecha)
+│   │   └── BtnMiniExpandir (Botón rápido para abrir Menú Completo)
+│   └── PanelConsola (PanelContainer modal semi-transparente)
+│       ├── BarraSuperior (Título, CheckPausar, BotonCerrar)
+│       └── TabContainer
+│           ├── Jugador   ──> debug_cheats_controller.gd / debug_physics_controller.gd
+│           ├── Escenario ──> debug_scenario_controller.gd
+│           ├── Enemigo   ──> debug_enemy_controller.gd (conecta a DepuradorVisualEnemigo)
+│           └── Sistema   ──> debug_system_controller.gd
+└── DebugOverlay (Node2D) ──> debug_overlay.gd (Dibujo vectorial perimetral y espacial en mundo)
 ```
 
 ---
@@ -63,43 +68,54 @@ DebugMenu (CanvasLayer, layer=100) [scripts/debug/debug_menu/debug_menu.gd]
 ## 4. Desglose de Pestañas y Controladores
 
 ### 4.1. Pestaña Jugador y Físicas
-* **Telemetría en Vivo:** Velocidad escalar y vectorial $(X, Y)$, estado de la FSM, estamina actual vs. máxima.
-* **Pad Direccional Visual:** Matriz de 8 direcciones que resalta las entradas recibidas por el `InputServer`.
+* **Telemetría en Vivo:** Velocidad escalar y vectorial $(X, Y)$, velocidad máxima, aceleración, fricción, estado de la FSM, posición global, cuadrante y coordenadas de su centro, y estamina actual vs. máxima (compatible con esquemas `stamina`/`max_stamina`, `estamina` o `estamina_actual`).
+* **Pad Direccional Visual:** Matriz visual que resalta en tiempo real las direcciones recibidas por el mapeo de entrada (`personaje-izquierda`, `personaje-derecha`, etc., con fallback a `ui_*`).
 * **Cheats:**
-  - `Estamina Infinita`: Permite pruebas de sprint continuo.
-  - `Invencibilidad (God Mode)`: Ignora el contacto letal con el monstruo.
-* **Sliders de Live Tweaking:**
-  - Control de velocidad base (`speed`), sprint (`sprint_speed`), aceleración, fricción y plancha (`dive_speed`).
-  - Modo automático proporcional: escala armónicamente todas las físicas al mover la velocidad base.
-  - Botón para restaurar valores predeterminados.
+  - `Estamina Infinita`: Activa `sin_gasto_estamina` o recarga continuamente la estamina y elimina la fatiga.
+  - `Invencibilidad (God Mode)`: Activa la propiedad `god_mode` en el personaje y desactiva la máscara de colisión contra el monstruo (capa 4).
+* **Panel Desplegable de Live Tweaking (`BtnDesplegarFisicas`):**
+  - Panel plegable con controles deslizantes para calibrar en caliente la velocidad base (`speed`), sprint (`sprint_speed`), aceleración (`acceleration`), fricción (`friction`) y salto/plancha (`dive_speed`).
+  - `[x] Escalado Proporcional`: Al mover la velocidad normal, ajusta armónicamente y en cadena el sprint, la aceleración, la fricción y la plancha manteniendo las proporciones de diseño.
+  - Botón para restaurar los valores predeterminados originales del personaje o de la configuración persistida.
 
 ### 4.2. Pestaña Escenario y Mutación
-* **Telemetría de Cuadrante:** Indica el cuadrante del jugador (`NO`, `NE`, `SO`, `SE`) y las variantes activas en cada sector.
-* **Forzar Mutación:** Botón que muta instantáneamente los 3 cuadrantes lejanos sin requerir la recolección física de una nota.
-* **Controles Visuales:**
-  - `[x] Desactivar Niebla`: Anula la niebla de transición para inspeccionar la carga de variantes en vivo.
-  - `[x] Modo Fullbright`: Desactiva la oscuridad ambiental para inspección global.
-  - `[x] Vista Global (God View)`: Desancla la cámara y aplica zoom panorámico exterior $0.225\times$.
+* **Telemetría de Cuadrante:** Indica el estado del escenario, el cuadrante activo del jugador (`NO`, `NE`, `SO`, `SE`) y la variante procedural activa en cada uno de los cuatro sectores. En modo standalone sin escenario instanciado, muestra los rangos de coordenadas de cada cuadrante.
+* **Forzar Mutación:** Botón que ejecuta inmediatamente `mutar_con_neblina()` o `mutar_sectores_lejanos()` sin requerir la recolección física de una nota.
+* **Controles Visuales y de Cámara:**
+  - `[x] Desactivar Niebla de Mutación`: Modifica `target_efecto_niebla.desactivado` en caliente para inspeccionar visualmente la carga y reemplazo de variantes de fondo.
+  - `[x] Cámara Global (God View - 4320x4320)`: Desancla la cámara del jugador conmutando a la `CamaraDios` dedicada (zoom $0.225\times$) presente en `maain.tscn` (o adaptando el zoom y smoothing de `target_camara` en escenas aisladas).
+  - Persistencia y soporte en backend para control de parpadeo (`flicker_forzado`) en `ControladorLinterna`.
 * **Capas de Depuración en Mundo (`DebugOverlay`):**
-  - Ejes divisores $X=0, Y=0$.
-  - Corredores de seguridad de $160\text{ px}$ en verde (rojo si hay invasión).
-  - Puntos de nota y filtros del spawner (Verde: válidos, Rojo: descartados, Dorado: nota activa).
+  - Ejes cartesianos divisores $X=0, Y=0$ y marco perimetral de la arena ($4320\times 4320$) con etiquetas identificadoras de cada sector.
+  - Corredores de seguridad de $160\text{ px}$ ($80\text{ px}$ a cada lado de los ejes divisores) renderizados en franjas verdes translúcidas con bordes marcados.
+  - Puntos de nota registrados en el grupo `"puntos_nota"` dibujados con círculos y arcos dorados cuya escala se adapta automáticamente al nivel de zoom de la cámara.
 
 ### 4.3. Pestaña Monstruo e IA
-* **Telemetría de Caza:** Posición, cuadrante, distancia euclidiana al jugador y estado de la línea de visión (`Directa` vs `Obstruida`).
+* **Telemetría de Caza:**
+  - Estado del comportamiento (`Persiguiendo objetivo` con sufijo de visión vs `Sin objetivo` o `No encontrado`).
+  - Posición global y cuadrante actual del enemigo.
+  - Distancia euclidiana en píxeles al jugador.
+  - Velocidad escalar instantánea en $\text{px/s}$.
+  - Diagnóstico de anti-atascamiento: reporta `Colisión activa` (si `is_on_wall()` es verdadero) o `Libre / Transitable`.
 * **Acciones:**
-  - `[x] Congelar IA`: Desactiva la persecución para pruebas libres de obstáculos y saltos.
-  - Selector de Fase (Nota 0 a 10+): Salto directo a cualquier escalón de velocidad de persecución ($500 \to 920\text{ px/s}$).
-  - Botón "Reubicar Monstruo" a un cuadrante seguro.
-* **Visualización Táctica:** Muestra en pantalla el `AreaCaptura` ($56\text{ px}$), la colisión física ($42\text{ px}$), el rayo de visión y las estelas de desplazamiento (*breadcrumbs* de los últimos 2 segundos).
+  - Botón **"Reubicar Monstruo a Cuadrante Opuesto"**: Teletransporta instantáneamente al monstruo hacia el cuadrante simétrico opuesto a la posición actual del jugador, garantizando una distancia de seguridad mínima de $300\text{ px}$.
+  - `[x] Línea de Visión / Vector IA (Raycast)`: Conmuta `debug_dibujar_rayo` en el monstruo, activando en tiempo real el componente táctico [`DepuradorVisualEnemigo`](../../scripts/entidades/enemigo/depurador_visual_enemigo.gd):
+    - Círculo de área de captura letal (`Enemigo.RADIO_AREA_CAPTURA` = $56\text{ px}$).
+    - Arco de colisión física sólida (`Enemigo.RADIO_COLISION_CUERPO` = $42\text{ px}$).
+    - Vector flecha de velocidad instantánea escalado según la magnitud de movimiento.
+    - RayCast de línea de visión hacia el jugador (verde si la visión es directa, rojo con punto de impacto si está obstruida).
+    - Estela de trayectoria con degradado alfa (*breadcrumbs* dinámicos de las últimas 45 muestras de posición).
 
-### 4.4. Pestaña Sistema, Notas, Persistencia y Audio
-* **Control de Tiempo (`Engine.time_scale`):** Botones de preajuste a `0.2x` (análisis de saltos en slow motion), `0.5x`, `1.0x` y `2.0x`.
-* **Audio y Música (Calibración en Vivo):**
-  - Telemetría en tiempo real: estado FSM (`SILENCIO`, `MENU_TUTORIAL`, `SUPERVIVENCIA`, `GAME_OVER`), clip activo y volumen del bus `&"musica"` en `dB`.
-  - Botones de conmutación directa: `Menú/Tutorial`, `Supervivencia (NEXT_BEAT)`, `Jumpscare (0 ms)` y `Game Over`.
-  - Sliders de live-tweaking vinculados a `ConfiguracionMusica`: ajuste de volumen base, atenuación en pausa y pitch de derrota.
-* **Coleccionables:** Contador en tiempo real, botón para simular recolección inmediata y botón para teletransportar al jugador hacia la nota activa.
-* **Game Feel y Cámara:** Inyectores manuales de trauma de cámara (`+0.20`, `+0.35`, `+1.00`).
-* **Persistencia:** Botón para resetear el récord guardado en disco y `LocalStorage`.
-* **Reinicio Rápido:** Recarga atómica de partida mediante `GestorEscenas.iniciar_partida()`.
+### 4.4. Pestaña Sistema, Audio y Persistencia
+* **Rendimiento y Control de Tiempo:**
+  - Telemetría en vivo de tasa de refresco (`FPS`) y consumo de memoria estática en megabytes (`MB`).
+  - Indicador de escala temporal (`Engine.time_scale`).
+  - Botones de preajuste de velocidad de simulación: `0.5x`, `1.0x` y `2.0x`.
+  - Botón **"Reiniciar Escena"**: Recarga atómica de la escena actual (`get_tree().reload_current_scene()`) asegurando restablecer `paused = false`.
+* **Audio y Música Interactiva (Issue #28):**
+  - Telemetría en tiempo real: estado FSM (`SILENCIO`, `MENU_TUTORIAL`, `SUPERVIVENCIA`, `GAME_OVER`), clip interactivo activo y volumen del bus `&"musica"` en `dB` (con indicador de atenuación si el juego está en pausa).
+  - Botones de conmutación directa: `Menú/Tutorial`, `Supervivencia (NEXT_BEAT)`, `Jumpscare (0 ms)`, `Game Over` y `Restaurar Parámetros` para recuperar los niveles base.
+  - Sliders de live-tweaking vinculados a `ConfiguracionMusica`: ajuste de volumen base en `dB`, atenuación por pausa en `dB` y factor de pitch en Game Over.
+* **Persistencia y Récord (Issue #35):**
+  - Lectura en vivo del High Score (máximo de notas) desde `GestorPersistencia`.
+  - Botón **"Resetear High Score"**: Borra el récord acumulado tanto en disco (`user://progreso.json`) como en la API de persistencia web (`LocalStorage`).

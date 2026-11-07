@@ -227,7 +227,7 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
   - [ ] Conmutación métrica instantánea a `Haunted Boardwalk` en el siguiente pulso al recolectar la Nota 1.
   - [x] Atenuación aditiva en menú de pausa (`config.atenuacion_pausa_db`) con loop musical continuo y suavizado `move_toward`.
   - [ ] Corte en seco a $0\text{ ms}$ en jumpscare y activación en Game Over de `pitch_scale = config.pitch_game_over` con reverberación cavernosa.
-  - [ ] Integración de telemetría, sliders en vivo y botones de prueba de clips en `TabSistema` del Menú de Debug in-game (<kbd>F3</kbd>).
+  - [x] Integración de telemetría, sliders en vivo y botones de prueba de clips en `TabSistema` del Menú de Debug in-game (<kbd>F3</kbd>).
   - [x] Suite de pruebas automatizadas en `tests/test_gestor_musica.gd`.
 - [ ] **Efectos de Jugador:** Pasos sobre hojarasca seca con cadencia según velocidad, sonido de despegue de salto y golpe seco al caer en plancha con jadeo.
 - [ ] **Efectos de Criatura:** Radar sonoro mediante `AudioStreamPlayer2D` con atenuación logarítmica ($1400\text{ px}$) y zumbido de estática.
