@@ -75,6 +75,12 @@ func consumir_buffer_salto() -> void:
 	Input.action_release("ui_accept")
 
 
+## Detiene el movimiento y procesamiento del personaje al ser capturado.
+func detener_por_captura() -> void:
+	velocity = Vector2.ZERO
+	set_physics_process(false)
+
+
 func _ready() -> void:
 	add_to_group("jugador")
 	motion_mode = CharacterBody2D.MOTION_MODE_FLOATING

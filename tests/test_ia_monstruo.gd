@@ -210,7 +210,7 @@ func test_director_orquestacion_captura_y_game_over() -> void:
 func test_indicador_fuera_pantalla() -> void:
 	var componente := IndicadorFueraPantalla.new()
 	assert_true(componente.habilitar, "El componente debe estar habilitado por defecto")
-	assert_not_null(componente.textura, "Debe tener una textura asignada por defecto")
+	assert_true(componente.textura != null, "Debe tener una textura asignada por defecto")
 	assert_eq(componente.color_modulacion, Color.WHITE, "El color por defecto debe ser blanco puro sin tinte")
 	assert_eq(componente.escala, Vector2.ONE, "La escala por defecto debe ser 1.0 (tamaño original)")
 	assert_false(componente.rotar_hacia_objetivo, "Por defecto no debe rotar (orientación vertical)")
