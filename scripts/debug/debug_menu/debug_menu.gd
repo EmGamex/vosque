@@ -563,7 +563,11 @@ func _process(_delta: float) -> void:
 
 
 func _buscar_nodos_objetivo() -> void:
-	context.buscar_nodos(self, physics, _obtener_ui_fisicas())
+	var escena_actual: Node = get_tree().current_scene if get_tree() != null else null
+	if escena_actual == null:
+		escena_actual = get_parent()
+	context.buscar_nodos(escena_actual, scenario.god_view_activo)
+	physics.inicializar_valores(context.target_character, get_node_or_null("/root/DebugConfig"), _obtener_ui_fisicas())
 
 
 func _obtener_ui_fisicas() -> Dictionary:
