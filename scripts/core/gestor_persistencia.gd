@@ -16,6 +16,15 @@ const CLAVE_LOCAL_STORAGE: String = "vosque_high_score"
 const RUTA_CONFIG_DEFECTO: String = "user://configuracion.cfg"
 const CLAVE_LOCAL_STORAGE_CONFIG: String = "vosque_configuracion_audio"
 
+const SECCION_AUDIO: String = "audio"
+const SECCION_VIDEO: String = "video"
+const CLAVE_MASTER: String = "master"
+const CLAVE_MUSICA: String = "musica"
+const CLAVE_SFX: String = "sfx"
+const CLAVE_PANTALLA_COMPLETA: String = "pantalla_completa"
+const VOLUMEN_LINEAL_MAX: float = 100.0
+const VOLUMEN_LINEAL_MIN: float = 0.0001
+
 var ruta_guardado: String = RUTA_GUARDADO_DEFECTO
 var ruta_config: String = RUTA_CONFIG_DEFECTO
 
@@ -142,26 +151,26 @@ func _resetear_record_web() -> void:
 
 func guardar_configuracion_audio(master_vol: float, musica_vol: float, sfx_vol: float, pantalla_completa: bool) -> void:
 	var cfg := ConfigFile.new()
-	cfg.set_value("audio", "master", master_vol)
-	cfg.set_value("audio", "musica", musica_vol)
-	cfg.set_value("audio", "sfx", sfx_vol)
-	cfg.set_value("video", "pantalla_completa", pantalla_completa)
+	cfg.set_value(SECCION_AUDIO, CLAVE_MASTER, master_vol)
+	cfg.set_value(SECCION_AUDIO, CLAVE_MUSICA, musica_vol)
+	cfg.set_value(SECCION_AUDIO, CLAVE_SFX, sfx_vol)
+	cfg.set_value(SECCION_VIDEO, CLAVE_PANTALLA_COMPLETA, pantalla_completa)
 	cfg.save(ruta_config)
 
 	if OS.has_feature("web"):
 		var datos_json := JSON.stringify({
-			"master": master_vol,
-			"musica": musica_vol,
-			"sfx": sfx_vol,
-			"pantalla_completa": pantalla_completa
+			CLAVE_MASTER: master_vol,
+			CLAVE_MUSICA: musica_vol,
+			CLAVE_SFX: sfx_vol,
+			CLAVE_PANTALLA_COMPLETA: pantalla_completa
 		})
 		JavaScriptBridge.eval("localStorage.setItem('%s', '%s');" % [CLAVE_LOCAL_STORAGE_CONFIG, datos_json])
 
 	configuracion_audio_actualizada.emit({
-		"master": master_vol,
-		"musica": musica_vol,
-		"sfx": sfx_vol,
-		"pantalla_completa": pantalla_completa
+		CLAVE_MASTER: master_vol,
+		CLAVE_MUSICA: musica_vol,
+		CLAVE_SFX: sfx_vol,
+		CLAVE_PANTALLA_COMPLETA: pantalla_completa
 	})
 
 
@@ -169,14 +178,14 @@ func cargar_configuracion_audio() -> Dictionary:
 	var datos: Dictionary = {}
 	var cfg := ConfigFile.new()
 	if cfg.load(ruta_config) == OK:
-		if cfg.has_section_key("audio", "master"):
-			datos["master"] = float(cfg.get_value("audio", "master"))
-		if cfg.has_section_key("audio", "musica"):
-			datos["musica"] = float(cfg.get_value("audio", "musica"))
-		if cfg.has_section_key("audio", "sfx"):
-			datos["sfx"] = float(cfg.get_value("audio", "sfx"))
-		if cfg.has_section_key("video", "pantalla_completa"):
-			datos["pantalla_completa"] = bool(cfg.get_value("video", "pantalla_completa"))
+		if cfg.has_section_key(SECCION_AUDIO, CLAVE_MASTER):
+			datos[CLAVE_MASTER] = float(cfg.get_value(SECCION_AUDIO, CLAVE_MASTER))
+		if cfg.has_section_key(SECCION_AUDIO, CLAVE_MUSICA):
+			datos[CLAVE_MUSICA] = float(cfg.get_value(SECCION_AUDIO, CLAVE_MUSICA))
+		if cfg.has_section_key(SECCION_AUDIO, CLAVE_SFX):
+			datos[CLAVE_SFX] = float(cfg.get_value(SECCION_AUDIO, CLAVE_SFX))
+		if cfg.has_section_key(SECCION_VIDEO, CLAVE_PANTALLA_COMPLETA):
+			datos[CLAVE_PANTALLA_COMPLETA] = bool(cfg.get_value(SECCION_VIDEO, CLAVE_PANTALLA_COMPLETA))
 
 	if OS.has_feature("web") and datos.is_empty():
 		var val = JavaScriptBridge.eval("localStorage.getItem('%s');" % CLAVE_LOCAL_STORAGE_CONFIG)
@@ -193,15 +202,15 @@ func aplicar_configuracion_audio() -> void:
 	if config.is_empty():
 		return
 
-	if config.has("master"):
+	if config.has(CLAVE_MASTER):
 		var idx_master := AudioServer.get_bus_index(&"Master")
 		if idx_master >= 0:
-			var db := linear_to_db(max(float(config["master"]) / 100.0, 0.0001))
+			var db := linear_to_db(max(float(config[CLAVE_MASTER]) / VOLUMEN_LINEAL_MAX, VOLUMEN_LINEAL_MIN))
 			AudioServer.set_bus_volume_db(idx_master, db)
 
-	if config.has("musica"):
-		var val_musica: float = float(config["musica"])
-		var db_musica := linear_to_db(max(val_musica / 100.0, 0.0001))
+	if config.has(CLAVE_MUSICA):
+		var val_musica: float = float(config[CLAVE_MUSICA])
+		var db_musica := linear_to_db(max(val_musica / VOLUMEN_LINEAL_MAX, VOLUMEN_LINEAL_MIN))
 		var idx_musica := AudioServer.get_bus_index(&"musica")
 		if idx_musica >= 0:
 			AudioServer.set_bus_volume_db(idx_musica, db_musica)
@@ -212,16 +221,16 @@ func aplicar_configuracion_audio() -> void:
 			elif "config" in gm and gm.config is ConfiguracionMusica:
 				gm.config.volumen_base_db = db_musica
 
-	if config.has("sfx"):
-		var val_sfx: float = float(config["sfx"])
-		var db_sfx := linear_to_db(max(val_sfx / 100.0, 0.0001))
+	if config.has(CLAVE_SFX):
+		var val_sfx: float = float(config[CLAVE_SFX])
+		var db_sfx := linear_to_db(max(val_sfx / VOLUMEN_LINEAL_MAX, VOLUMEN_LINEAL_MIN))
 		for bus_name in [&"ui", &"sfx"]:
 			var idx_sfx := AudioServer.get_bus_index(bus_name)
 			if idx_sfx >= 0:
 				AudioServer.set_bus_volume_db(idx_sfx, db_sfx)
 
-	if config.has("pantalla_completa") and not Engine.is_editor_hint():
-		if bool(config["pantalla_completa"]):
+	if config.has(CLAVE_PANTALLA_COMPLETA) and not Engine.is_editor_hint():
+		if bool(config[CLAVE_PANTALLA_COMPLETA]):
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 		else:
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)

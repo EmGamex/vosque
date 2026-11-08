@@ -22,6 +22,9 @@ signal volver_solicitado
 @onready var boton_volver: Button = $Layout/PanelOpciones/Margen/Columna/BotonVolver
 
 const RUTA_BUS_LAYOUT_DEFECTO: String = "res://default_bus_layout.tres"
+const PASO_SLIDER: float = 5.0
+const VOLUMEN_LINEAL_MIN: float = 0.0001
+const VOLUMEN_LINEAL_MAX: float = 100.0
 
 var _elementos_foco: Array[Control] = []
 var _indice_foco: int = 0
@@ -59,17 +62,17 @@ func _cargar_valores_actuales() -> void:
 	var idx_master := AudioServer.get_bus_index(&"Master")
 	if idx_master >= 0:
 		var db := AudioServer.get_bus_volume_db(idx_master)
-		var lineal := db_to_linear(db) * 100.0
+		var lineal := db_to_linear(db) * VOLUMEN_LINEAL_MAX
 		if slider_master:
-			slider_master.value = clamp(lineal, 0.0, 100.0)
+			slider_master.value = clamp(lineal, 0.0, VOLUMEN_LINEAL_MAX)
 			_actualizar_label_porcentaje(label_val_master, slider_master.value)
 
 	var idx_musica := AudioServer.get_bus_index(&"musica")
 	if idx_musica >= 0:
 		var db := AudioServer.get_bus_volume_db(idx_musica)
-		var lineal := db_to_linear(db) * 100.0
+		var lineal := db_to_linear(db) * VOLUMEN_LINEAL_MAX
 		if slider_musica:
-			slider_musica.value = clamp(lineal, 0.0, 100.0)
+			slider_musica.value = clamp(lineal, 0.0, VOLUMEN_LINEAL_MAX)
 			_actualizar_label_porcentaje(label_val_musica, slider_musica.value)
 
 	var idx_sfx := AudioServer.get_bus_index(&"ui")
@@ -77,9 +80,9 @@ func _cargar_valores_actuales() -> void:
 		idx_sfx = AudioServer.get_bus_index(&"sfx")
 	if idx_sfx >= 0:
 		var db := AudioServer.get_bus_volume_db(idx_sfx)
-		var lineal := db_to_linear(db) * 100.0
+		var lineal := db_to_linear(db) * VOLUMEN_LINEAL_MAX
 		if slider_sfx:
-			slider_sfx.value = clamp(lineal, 0.0, 100.0)
+			slider_sfx.value = clamp(lineal, 0.0, VOLUMEN_LINEAL_MAX)
 			_actualizar_label_porcentaje(label_val_sfx, slider_sfx.value)
 
 	if check_pantalla_completa and not Engine.is_editor_hint():
@@ -107,9 +110,9 @@ func _guardar_ajustes() -> void:
 	if has_node("/root/GestorPersistencia"):
 		var gp = get_node("/root/GestorPersistencia")
 		if gp.has_method("guardar_configuracion_audio"):
-			var master_v: float = slider_master.value if slider_master else 100.0
-			var musica_v: float = slider_musica.value if slider_musica else 100.0
-			var sfx_v: float = slider_sfx.value if slider_sfx else 100.0
+			var master_v: float = slider_master.value if slider_master else VOLUMEN_LINEAL_MAX
+			var musica_v: float = slider_musica.value if slider_musica else VOLUMEN_LINEAL_MAX
+			var sfx_v: float = slider_sfx.value if slider_sfx else VOLUMEN_LINEAL_MAX
 			var pantalla_c: bool = check_pantalla_completa.button_pressed if check_pantalla_completa else false
 			gp.guardar_configuracion_audio(master_v, musica_v, sfx_v, pantalla_c)
 
@@ -123,13 +126,13 @@ func _on_slider_master_changed(val: float) -> void:
 	_actualizar_label_porcentaje(label_val_master, val)
 	var idx := AudioServer.get_bus_index(&"Master")
 	if idx >= 0:
-		var db := linear_to_db(max(val / 100.0, 0.0001))
+		var db := linear_to_db(max(val / VOLUMEN_LINEAL_MAX, VOLUMEN_LINEAL_MIN))
 		AudioServer.set_bus_volume_db(idx, db)
 
 
 func _on_slider_musica_changed(val: float) -> void:
 	_actualizar_label_porcentaje(label_val_musica, val)
-	var db := linear_to_db(max(val / 100.0, 0.0001))
+	var db := linear_to_db(max(val / VOLUMEN_LINEAL_MAX, VOLUMEN_LINEAL_MIN))
 	var idx := AudioServer.get_bus_index(&"musica")
 	if idx >= 0:
 		AudioServer.set_bus_volume_db(idx, db)
@@ -143,7 +146,7 @@ func _on_slider_musica_changed(val: float) -> void:
 
 func _on_slider_sfx_changed(val: float) -> void:
 	_actualizar_label_porcentaje(label_val_sfx, val)
-	var db := linear_to_db(max(val / 100.0, 0.0001))
+	var db := linear_to_db(max(val / VOLUMEN_LINEAL_MAX, VOLUMEN_LINEAL_MIN))
 	for nombre_bus in [&"ui", &"sfx"]:
 		var idx := AudioServer.get_bus_index(nombre_bus)
 		if idx >= 0:
@@ -252,7 +255,7 @@ func _modificar_control_actual(dir: int) -> void:
 	var control := _elementos_foco[_indice_foco]
 	if control is HSlider:
 		var slider := control as HSlider
-		slider.value = clamp(slider.value + (dir * 5.0), slider.min_value, slider.max_value)
+		slider.value = clamp(slider.value + (dir * PASO_SLIDER), slider.min_value, slider.max_value)
 		ControladorAudioUI.emitir_seguro(self, ControladorAudioUI.EventoUI.MENU_SELECCIONAR)
 	elif control is CheckBox:
 		var check := control as CheckBox
