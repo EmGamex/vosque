@@ -100,6 +100,18 @@ func desactivar() -> void:
 	for elem in _elementos_foco:
 		if elem and elem.has_focus():
 			elem.release_focus()
+	_guardar_ajustes()
+
+
+func _guardar_ajustes() -> void:
+	if has_node("/root/GestorPersistencia"):
+		var gp = get_node("/root/GestorPersistencia")
+		if gp.has_method("guardar_configuracion_audio"):
+			var master_v: float = slider_master.value if slider_master else 100.0
+			var musica_v: float = slider_musica.value if slider_musica else 100.0
+			var sfx_v: float = slider_sfx.value if slider_sfx else 100.0
+			var pantalla_c: bool = check_pantalla_completa.button_pressed if check_pantalla_completa else false
+			gp.guardar_configuracion_audio(master_v, musica_v, sfx_v, pantalla_c)
 
 
 func _actualizar_label_porcentaje(lbl: Label, val: float) -> void:
@@ -111,22 +123,31 @@ func _on_slider_master_changed(val: float) -> void:
 	_actualizar_label_porcentaje(label_val_master, val)
 	var idx := AudioServer.get_bus_index(&"Master")
 	if idx >= 0:
-		AudioServer.set_bus_volume_db(idx, linear_to_db(max(val / 100.0, 0.0001)))
+		var db := linear_to_db(max(val / 100.0, 0.0001))
+		AudioServer.set_bus_volume_db(idx, db)
 
 
 func _on_slider_musica_changed(val: float) -> void:
 	_actualizar_label_porcentaje(label_val_musica, val)
+	var db := linear_to_db(max(val / 100.0, 0.0001))
 	var idx := AudioServer.get_bus_index(&"musica")
 	if idx >= 0:
-		AudioServer.set_bus_volume_db(idx, linear_to_db(max(val / 100.0, 0.0001)))
+		AudioServer.set_bus_volume_db(idx, db)
+	if has_node("/root/GestorMusica"):
+		var gm = get_node("/root/GestorMusica")
+		if gm.has_method("establecer_volumen_base"):
+			gm.establecer_volumen_base(db)
+		elif "config" in gm and gm.config is ConfiguracionMusica:
+			gm.config.volumen_base_db = db
 
 
 func _on_slider_sfx_changed(val: float) -> void:
 	_actualizar_label_porcentaje(label_val_sfx, val)
+	var db := linear_to_db(max(val / 100.0, 0.0001))
 	for nombre_bus in [&"ui", &"sfx"]:
 		var idx := AudioServer.get_bus_index(nombre_bus)
 		if idx >= 0:
-			AudioServer.set_bus_volume_db(idx, linear_to_db(max(val / 100.0, 0.0001)))
+			AudioServer.set_bus_volume_db(idx, db)
 
 
 func _on_pantalla_completa_toggled(activado: bool) -> void:
@@ -165,10 +186,23 @@ func restablecer_valores_por_defecto() -> void:
 
 	_cargar_valores_actuales()
 
+	var idx_musica := AudioServer.get_bus_index(&"musica")
+	if idx_musica >= 0:
+		var db := AudioServer.get_bus_volume_db(idx_musica)
+		if has_node("/root/GestorMusica"):
+			var gm = get_node("/root/GestorMusica")
+			if gm.has_method("establecer_volumen_base"):
+				gm.establecer_volumen_base(db)
+			elif "config" in gm and gm.config is ConfiguracionMusica:
+				gm.config.volumen_base_db = db
+
+	_guardar_ajustes()
+
 
 func _on_boton_volver_pressed() -> void:
 	if not _activo:
 		return
+	_guardar_ajustes()
 	ControladorAudioUI.emitir_seguro(self, ControladorAudioUI.EventoUI.MENU_RETROCEDER)
 	volver_solicitado.emit()
 

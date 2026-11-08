@@ -108,6 +108,14 @@ func establecer_pausa(en_pausa: bool) -> void:
 	_en_pausa = en_pausa
 
 
+func establecer_volumen_base(vol_db: float, inmediato: bool = false) -> void:
+	if config != null:
+		config.volumen_base_db = vol_db
+	if inmediato or not _en_pausa:
+		_volumen_actual_db = vol_db
+		_aplicar_volumen_bus(_volumen_actual_db)
+
+
 func detener_por_jumpscare() -> void:
 	var reproductor_audio := _obtener_reproductor()
 	if reproductor_audio != null and not reproductor_audio.stream_paused:

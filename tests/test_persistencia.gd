@@ -5,6 +5,7 @@ extends McpTestSuite
 ## Suite de pruebas automatizadas para el sistema de persistencia y High Score (Issue #35).
 
 const RUTA_TEST_SAVE: String = "user://test_highscore_suite.save"
+const RUTA_TEST_CONFIG: String = "user://test_config_suite.cfg"
 const GestorPersistenciaScript: GDScript = preload("res://scripts/core/gestor_persistencia.gd")
 
 
@@ -15,6 +16,8 @@ func suite_name() -> String:
 func _limpiar_archivo_test() -> void:
 	if FileAccess.file_exists(RUTA_TEST_SAVE):
 		DirAccess.remove_absolute(RUTA_TEST_SAVE)
+	if FileAccess.file_exists(RUTA_TEST_CONFIG):
+		DirAccess.remove_absolute(RUTA_TEST_CONFIG)
 
 
 func test_guardado_y_lectura_basica() -> void:
@@ -161,4 +164,30 @@ func test_integracion_debug_system_controller() -> void:
 	assert_eq(ctrl.obtener_high_score(gestor), 0, "DebugSystemController debe resetear a 0")
 
 	gestor.free()
+	_limpiar_archivo_test()
+
+
+func test_persistencia_configuracion_audio() -> void:
+	_limpiar_archivo_test()
+	var gestor: Node = GestorPersistenciaScript.new()
+	gestor.ruta_guardado = RUTA_TEST_SAVE
+	gestor.ruta_config = RUTA_TEST_CONFIG
+	gestor._ready()
+
+	# Guardar valores de configuración
+	gestor.guardar_configuracion_audio(75.0, 60.0, 85.0, true)
+
+	# Instancia nueva para comprobar lectura física
+	var gestor_reinicio: Node = GestorPersistenciaScript.new()
+	gestor_reinicio.ruta_guardado = RUTA_TEST_SAVE
+	gestor_reinicio.ruta_config = RUTA_TEST_CONFIG
+	var cfg: Dictionary = gestor_reinicio.cargar_configuracion_audio()
+
+	assert_eq(cfg.get("master"), 75.0, "Volumen master guardado debe ser 75%")
+	assert_eq(cfg.get("musica"), 60.0, "Volumen musica guardado debe ser 60%")
+	assert_eq(cfg.get("sfx"), 85.0, "Volumen sfx guardado debe ser 85%")
+	assert_eq(cfg.get("pantalla_completa"), true, "Pantalla completa guardada debe ser true")
+
+	gestor.free()
+	gestor_reinicio.free()
 	_limpiar_archivo_test()
