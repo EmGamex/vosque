@@ -184,6 +184,30 @@ var estado: EstadoMenu:
 @onready var _texto_opciones: Label = $Textos/TextoOpciones
 @onready var _texto_jugar: Label = $Textos/TextoJugar
 @onready var _texto_creditos: Label = $Textos/TextoCreditos
+@onready var _icono_opciones: Sprite2D = _obtener_nodo_icono([
+	"Textos/Iconos/IconoConfiguracion",
+	"Textos/IconoConfiguracion",
+	"IconoConfiguracion",
+	"Textos/Iconos/IconoOpciones",
+	"Textos/IconoOpciones"
+])
+@onready var _icono_jugar: Sprite2D = _obtener_nodo_icono([
+	"Textos/Iconos/IconoJugar",
+	"Textos/IconoJugar",
+	"IconoJugar"
+])
+@onready var _icono_creditos: Sprite2D = _obtener_nodo_icono([
+	"Textos/Iconos/IconoCreditos",
+	"Textos/IconoCreditos",
+	"IconoCreditos"
+])
+
+
+func _obtener_nodo_icono(rutas: Array) -> Sprite2D:
+	for r: String in rutas:
+		if has_node(r):
+			return get_node(r) as Sprite2D
+	return null
 
 
 func _ready() -> void:
@@ -195,7 +219,16 @@ func _ready() -> void:
 	parallax.inicializar_nodos(_fondos, _fondo_degradado, _montana_2, _montana_1, _arboles_tercera, _arboles_segunda, _arboles_nodo, _textos_nodo)
 	parallax.capturar_posiciones_iniciales(particulas.obtener_particulas_estrellas(), particulas.obtener_particulas_nubes())
 
-	seleccion.inicializar_nodos(self, _arbol_visual, _texto_opciones, _texto_jugar, _texto_creditos)
+	seleccion.inicializar_nodos(
+		self,
+		_arbol_visual,
+		_texto_opciones,
+		_texto_jugar,
+		_texto_creditos,
+		_icono_opciones,
+		_icono_jugar,
+		_icono_creditos
+	)
 	_conectar_senales_submodulos()
 	_conectar_animador()
 

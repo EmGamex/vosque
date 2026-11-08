@@ -16,6 +16,9 @@
 [ext_resource type="Material" uid="uid://dfcf4xfct740f" path="res://shaders/material_motion_blur.tres" id="9_q78gw"]
 [ext_resource type="Material" uid="uid://yb1fvvp7sowg" path="res://shaders/material_crossfade_arboles.tres" id="12_xbcmh"]
 [ext_resource type="Texture2D" uid="uid://dtddin3bi5hb2" path="res://graficos/vosque logotipo.png" id="16_883rq"]
+[ext_resource type="Texture2D" uid="uid://b7jp2hmn6jme4" path="res://graficos/menu principal/icono jugar.png" id="17_5s2e3"]
+[ext_resource type="Texture2D" uid="uid://cw18h3vi7dn7x" path="res://graficos/menu principal/icono creditos.png" id="18_51ctf"]
+[ext_resource type="Texture2D" uid="uid://bs4r1bfk5ofji" path="res://graficos/menu principal/icono configuracion.png" id="19_46wig"]
 
 [sub_resource type="Animation" id="Animation_q78gw"]
 length = 0.001
@@ -395,6 +398,27 @@ theme_override_fonts/font = ExtResource("9_f3do1")
 theme_override_font_sizes/font_size = 44
 text = "Créditos"
 horizontal_alignment = 1
+
+[node name="Iconos" type="Control" parent="Textos" unique_id=14314117]
+anchors_preset = 0
+mouse_filter = 2
+
+[node name="IconoConfiguracion" type="Sprite2D" parent="Textos/Iconos" unique_id=741170136]
+self_modulate = Color(1, 1, 1, 0.16)
+position = Vector2(-374, 81)
+scale = Vector2(0.21096174, 0.21096168)
+texture = ExtResource("19_46wig")
+
+[node name="IconoJugar" type="Sprite2D" parent="Textos/Iconos" unique_id=869196332]
+position = Vector2(-12, -48)
+scale = Vector2(0.22716056, 0.2271605)
+texture = ExtResource("17_5s2e3")
+
+[node name="IconoCreditos" type="Sprite2D" parent="Textos/Iconos" unique_id=254819263]
+self_modulate = Color(1, 1, 1, 0.16)
+position = Vector2(341, 82)
+scale = Vector2(0.23913044, 0.23913038)
+texture = ExtResource("18_51ctf")
 
 [node name="CamaraMenu" type="Camera2D" parent="." unique_id=1121498657]
 position = Vector2(540, -540)

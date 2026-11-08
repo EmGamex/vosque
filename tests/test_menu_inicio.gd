@@ -278,3 +278,37 @@ func test_transicion_shader_crossfade() -> void:
 	if root != null and menu.get_parent() == root:
 		root.remove_child(menu)
 	menu.free()
+
+
+func test_iconos_menu_opacidad_y_organizacion() -> void:
+	var menu: Control = _crear_instancia_menu()
+	menu._ready()
+
+	# 1. Comprobar que los nodos de iconos existen reorganizados bajo Textos/Iconos
+	var icono_conf: Sprite2D = menu.get_node_or_null("Textos/Iconos/IconoConfiguracion") as Sprite2D
+	var icono_jugar: Sprite2D = menu.get_node_or_null("Textos/Iconos/IconoJugar") as Sprite2D
+	var icono_cred: Sprite2D = menu.get_node_or_null("Textos/Iconos/IconoCreditos") as Sprite2D
+
+	assert_true(icono_conf != null, "Debe existir Textos/Iconos/IconoConfiguracion")
+	assert_true(icono_jugar != null, "Debe existir Textos/Iconos/IconoJugar")
+	assert_true(icono_cred != null, "Debe existir Textos/Iconos/IconoCreditos")
+
+	# 2. Inicialmente la opción es JUGAR: JUGAR debe tener alpha 1.0, y las no seleccionadas alpha 0.16
+	assert_true(is_equal_approx(icono_jugar.self_modulate.a, 1.0), "IconoJugar debe tener alpha 1.0 al estar seleccionado")
+	assert_true(is_equal_approx(icono_conf.self_modulate.a, 0.16), "IconoConfiguracion debe tener alpha 0.16 al no estar seleccionado")
+	assert_true(is_equal_approx(icono_cred.self_modulate.a, 0.16), "IconoCreditos debe tener alpha 0.16 al no estar seleccionado")
+
+	# 3. Navegar a CREDITOS (+1)
+	menu._navegar(1)
+	assert_true(is_equal_approx(icono_cred.self_modulate.a, 1.0), "IconoCreditos debe tener alpha 1.0 al seleccionarse")
+	assert_true(is_equal_approx(icono_jugar.self_modulate.a, 0.16), "IconoJugar debe pasar a alpha 0.16 al deseleccionarse")
+	assert_true(is_equal_approx(icono_conf.self_modulate.a, 0.16), "IconoConfiguracion debe permanecer en alpha 0.16")
+
+	# 4. Navegar a OPCIONES (+1 cíclico)
+	menu._navegar(1)
+	assert_true(is_equal_approx(icono_conf.self_modulate.a, 1.0), "IconoConfiguracion debe tener alpha 1.0 al seleccionarse")
+	assert_true(is_equal_approx(icono_cred.self_modulate.a, 0.16), "IconoCreditos debe pasar a alpha 0.16 al deseleccionarse")
+	assert_true(is_equal_approx(icono_jugar.self_modulate.a, 0.16), "IconoJugar debe permanecer en alpha 0.16")
+
+	menu.free()
+

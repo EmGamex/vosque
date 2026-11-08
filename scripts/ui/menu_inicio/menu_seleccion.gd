@@ -19,7 +19,11 @@ var material_arbol: ShaderMaterial
 var texto_opciones: Label
 var texto_jugar: Label
 var texto_creditos: Label
+var icono_opciones: Sprite2D
+var icono_jugar: Sprite2D
+var icono_creditos: Sprite2D
 
+var _escalas_base_iconos: Dictionary = {}
 var _tween: Tween
 
 
@@ -28,13 +32,19 @@ func inicializar_nodos(
 	p_arbol_visual: Sprite2D,
 	p_texto_opciones: Label,
 	p_texto_jugar: Label,
-	p_texto_creditos: Label
+	p_texto_creditos: Label,
+	p_icono_opciones: Sprite2D = null,
+	p_icono_jugar: Sprite2D = null,
+	p_icono_creditos: Sprite2D = null
 ) -> void:
 	host_control = p_host
 	arbol_visual = p_arbol_visual
 	texto_opciones = p_texto_opciones
 	texto_jugar = p_texto_jugar
 	texto_creditos = p_texto_creditos
+	icono_opciones = p_icono_opciones
+	icono_jugar = p_icono_jugar
+	icono_creditos = p_icono_creditos
 
 	if arbol_visual != null and arbol_visual.material is ShaderMaterial:
 		material_arbol = arbol_visual.material as ShaderMaterial
@@ -43,11 +53,19 @@ func inicializar_nodos(
 
 
 func _inicializar_datos_opciones() -> void:
+	if not _escalas_base_iconos.has(MenuConstantes.Opcion.OPCIONES) and icono_opciones != null:
+		_escalas_base_iconos[MenuConstantes.Opcion.OPCIONES] = icono_opciones.scale
+	if not _escalas_base_iconos.has(MenuConstantes.Opcion.JUGAR) and icono_jugar != null:
+		_escalas_base_iconos[MenuConstantes.Opcion.JUGAR] = icono_jugar.scale
+	if not _escalas_base_iconos.has(MenuConstantes.Opcion.CREDITOS) and icono_creditos != null:
+		_escalas_base_iconos[MenuConstantes.Opcion.CREDITOS] = icono_creditos.scale
+
 	datos_opciones = {
 		MenuConstantes.Opcion.OPCIONES: {
 			"arbol": arbol_visual,
 			"textura": MenuConstantes.TEXTURAS_OPCIONES[MenuConstantes.Opcion.OPCIONES],
 			"texto": texto_opciones,
+			"icono": icono_opciones,
 			"offset": Vector2(95.0, 0.0),
 			"rotacion": deg_to_rad(1.2),
 		},
@@ -55,6 +73,7 @@ func _inicializar_datos_opciones() -> void:
 			"arbol": arbol_visual,
 			"textura": MenuConstantes.TEXTURAS_OPCIONES[MenuConstantes.Opcion.JUGAR],
 			"texto": texto_jugar,
+			"icono": icono_jugar,
 			"offset": Vector2.ZERO,
 			"rotacion": 0.0,
 		},
@@ -62,6 +81,7 @@ func _inicializar_datos_opciones() -> void:
 			"arbol": arbol_visual,
 			"textura": MenuConstantes.TEXTURAS_OPCIONES[MenuConstantes.Opcion.CREDITOS],
 			"texto": texto_creditos,
+			"icono": icono_creditos,
 			"offset": Vector2(-95.0, 0.0),
 			"rotacion": deg_to_rad(-1.2),
 		},
@@ -101,7 +121,7 @@ func actualizar_seleccion(animar: bool) -> void:
 	else:
 		offset_rotacion_cambiado.emit(target_pos, target_rot, false)
 
-	# Actualización tipográfica (escala y alpha de labels)
+	# Actualización tipográfica e iconográfica (escala y alpha de labels e iconos)
 	for opcion_clave: MenuConstantes.Opcion in datos_opciones:
 		var config: Dictionary = datos_opciones[opcion_clave]
 		var seleccionado: bool = (opcion_clave == opcion_actual)
@@ -117,6 +137,20 @@ func actualizar_seleccion(animar: bool) -> void:
 			else:
 				texto.self_modulate.a = alpha_texto
 				texto.scale = escala_texto
+
+		var icono: Sprite2D = config.get("icono")
+		if icono != null:
+			var alpha_icono: float = MenuConstantes.COLOR_SELECCIONADO.a if seleccionado else MenuConstantes.COLOR_NO_SELECCIONADO.a
+			var escala_base: Vector2 = _escalas_base_iconos.get(opcion_clave, icono.scale)
+			var escala_icono: Vector2 = escala_base * 1.08 if seleccionado else escala_base
+			if animar and host_control != null and host_control.is_inside_tree() and _tween != null:
+				_tween.tween_property(icono, "self_modulate:a", alpha_icono, MenuConstantes.DURACION_TRANSICION)\
+					.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+				_tween.tween_property(icono, "scale", escala_icono, MenuConstantes.DURACION_TRANSICION)\
+					.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+			else:
+				icono.self_modulate.a = alpha_icono
+				icono.scale = escala_icono
 
 	if arbol_visual == null:
 		return
