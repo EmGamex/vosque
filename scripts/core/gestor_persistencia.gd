@@ -1,18 +1,32 @@
 @tool
 extends Node
 
-## Autoload Singleton para la persistencia del High Score en Web y Desktop (Issue #35).
+## Autoload Singleton para la persistencia del High Score y Configuración de Usuario (Issue #35, Issue #40).
 ##
 ## Implementa una estrategia dual:
-## 1. user://highscore.save mediante FileAccess (mapeado a IndexedDB en Godot Web).
+## 1. user://highscore.save y user://configuracion.cfg mediante FileAccess/ConfigFile (mapeado a IndexedDB en Godot Web).
 ## 2. Fallback de contingencia a LocalStorage via JavaScriptBridge para entornos iframes (itch.io, Newgrounds).
 
 signal record_actualizado(nuevo_record: int)
+signal configuracion_audio_actualizada(config: Dictionary)
 
 const RUTA_GUARDADO_DEFECTO: String = "user://highscore.save"
 const CLAVE_LOCAL_STORAGE: String = "vosque_high_score"
 
+const RUTA_CONFIG_DEFECTO: String = "user://configuracion.cfg"
+const CLAVE_LOCAL_STORAGE_CONFIG: String = "vosque_configuracion_audio"
+
+const SECCION_AUDIO: String = "audio"
+const SECCION_VIDEO: String = "video"
+const CLAVE_MASTER: String = "master"
+const CLAVE_MUSICA: String = "musica"
+const CLAVE_SFX: String = "sfx"
+const CLAVE_PANTALLA_COMPLETA: String = "pantalla_completa"
+const VOLUMEN_LINEAL_MAX: float = 100.0
+const VOLUMEN_LINEAL_MIN: float = 0.0001
+
 var ruta_guardado: String = RUTA_GUARDADO_DEFECTO
+var ruta_config: String = RUTA_CONFIG_DEFECTO
 
 var _record_actual: int = 0
 var _ultimo_score: int = 0
@@ -21,6 +35,7 @@ var _es_nuevo_record_partida: bool = false
 
 func _ready() -> void:
 	_record_actual = _cargar_record()
+	aplicar_configuracion_audio()
 
 
 ## Guarda un puntaje si supera el record historico actual.
@@ -128,3 +143,94 @@ func _cargar_record_web() -> int:
 func _resetear_record_web() -> void:
 	if OS.has_feature("web"):
 		JavaScriptBridge.eval("localStorage.removeItem('%s');" % CLAVE_LOCAL_STORAGE)
+
+
+# ==========================================
+# Persistencia de Opciones y Audio
+# ==========================================
+
+func guardar_configuracion_audio(master_vol: float, musica_vol: float, sfx_vol: float, pantalla_completa: bool) -> void:
+	var cfg := ConfigFile.new()
+	cfg.set_value(SECCION_AUDIO, CLAVE_MASTER, master_vol)
+	cfg.set_value(SECCION_AUDIO, CLAVE_MUSICA, musica_vol)
+	cfg.set_value(SECCION_AUDIO, CLAVE_SFX, sfx_vol)
+	cfg.set_value(SECCION_VIDEO, CLAVE_PANTALLA_COMPLETA, pantalla_completa)
+	cfg.save(ruta_config)
+
+	if OS.has_feature("web"):
+		var datos_json := JSON.stringify({
+			CLAVE_MASTER: master_vol,
+			CLAVE_MUSICA: musica_vol,
+			CLAVE_SFX: sfx_vol,
+			CLAVE_PANTALLA_COMPLETA: pantalla_completa
+		})
+		JavaScriptBridge.eval("localStorage.setItem('%s', '%s');" % [CLAVE_LOCAL_STORAGE_CONFIG, datos_json])
+
+	configuracion_audio_actualizada.emit({
+		CLAVE_MASTER: master_vol,
+		CLAVE_MUSICA: musica_vol,
+		CLAVE_SFX: sfx_vol,
+		CLAVE_PANTALLA_COMPLETA: pantalla_completa
+	})
+
+
+func cargar_configuracion_audio() -> Dictionary:
+	var datos: Dictionary = {}
+	var cfg := ConfigFile.new()
+	if cfg.load(ruta_config) == OK:
+		if cfg.has_section_key(SECCION_AUDIO, CLAVE_MASTER):
+			datos[CLAVE_MASTER] = float(cfg.get_value(SECCION_AUDIO, CLAVE_MASTER))
+		if cfg.has_section_key(SECCION_AUDIO, CLAVE_MUSICA):
+			datos[CLAVE_MUSICA] = float(cfg.get_value(SECCION_AUDIO, CLAVE_MUSICA))
+		if cfg.has_section_key(SECCION_AUDIO, CLAVE_SFX):
+			datos[CLAVE_SFX] = float(cfg.get_value(SECCION_AUDIO, CLAVE_SFX))
+		if cfg.has_section_key(SECCION_VIDEO, CLAVE_PANTALLA_COMPLETA):
+			datos[CLAVE_PANTALLA_COMPLETA] = bool(cfg.get_value(SECCION_VIDEO, CLAVE_PANTALLA_COMPLETA))
+
+	if OS.has_feature("web") and datos.is_empty():
+		var val = JavaScriptBridge.eval("localStorage.getItem('%s');" % CLAVE_LOCAL_STORAGE_CONFIG)
+		if val != null and not str(val).is_empty():
+			var parsed = JSON.parse_string(str(val))
+			if parsed is Dictionary:
+				datos = parsed
+
+	return datos
+
+
+func aplicar_configuracion_audio() -> void:
+	var config := cargar_configuracion_audio()
+	if config.is_empty():
+		return
+
+	if config.has(CLAVE_MASTER):
+		var idx_master := AudioServer.get_bus_index(&"Master")
+		if idx_master >= 0:
+			var db := linear_to_db(max(float(config[CLAVE_MASTER]) / VOLUMEN_LINEAL_MAX, VOLUMEN_LINEAL_MIN))
+			AudioServer.set_bus_volume_db(idx_master, db)
+
+	if config.has(CLAVE_MUSICA):
+		var val_musica: float = float(config[CLAVE_MUSICA])
+		var db_musica := linear_to_db(max(val_musica / VOLUMEN_LINEAL_MAX, VOLUMEN_LINEAL_MIN))
+		var idx_musica := AudioServer.get_bus_index(&"musica")
+		if idx_musica >= 0:
+			AudioServer.set_bus_volume_db(idx_musica, db_musica)
+		if has_node("/root/GestorMusica"):
+			var gm: Node = get_node("/root/GestorMusica")
+			if gm.has_method("establecer_volumen_base"):
+				gm.establecer_volumen_base(db_musica)
+			elif "config" in gm and gm.config is ConfiguracionMusica:
+				gm.config.volumen_base_db = db_musica
+
+	if config.has(CLAVE_SFX):
+		var val_sfx: float = float(config[CLAVE_SFX])
+		var db_sfx := linear_to_db(max(val_sfx / VOLUMEN_LINEAL_MAX, VOLUMEN_LINEAL_MIN))
+		for bus_name in [&"ui", &"sfx"]:
+			var idx_sfx := AudioServer.get_bus_index(bus_name)
+			if idx_sfx >= 0:
+				AudioServer.set_bus_volume_db(idx_sfx, db_sfx)
+
+	if config.has(CLAVE_PANTALLA_COMPLETA) and not Engine.is_editor_hint():
+		if bool(config[CLAVE_PANTALLA_COMPLETA]):
+			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+		else:
+			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
