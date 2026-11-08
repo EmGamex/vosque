@@ -3,11 +3,13 @@ class_name Escenario
 extends Node2D
 
 ## Gestor del escenario principal 2x2 de Vosque con mutación espacial y anti-atascamiento.
+## Actúa como fachada orquestadora delegando en subcontroladores especializados:
+## GestorSectores, MutadorSectores, ResolutorAtascamiento, GestorIluminacionAmbiental y PrecargaRecursosWeb.
 
 signal sectores_mutados(cuadrante_jugador: String, variantes: Dictionary)
 signal enemigo_reubicado(posicion_anterior: Vector2, posicion_nueva: Vector2, sector: String)
 
-const SECTORES: Array[String] = ["NO", "NE", "SO", "SE"]
+const SECTORES: Array[String] = GestorSectores.SECTORES
 const RUTAS_VARIANTES_DEFECTO: Array[String] = [
 	"res://escenas/sectores/variantes/variante_claro_rocoso.tscn",
 	"res://escenas/sectores/variantes/variante_bosque_denso.tscn",
@@ -19,25 +21,11 @@ const RUTAS_VARIANTES_DEFECTO: Array[String] = [
 @export var catalogo_variantes: Array[PackedScene] = []
 @export var config_iluminacion: ConfiguracionIluminacion
 
-var variantes_activas: Dictionary = {
-	"NO": "",
-	"NE": "",
-	"SO": "",
-	"SE": ""
-}
-
-var _instancias_sectores: Dictionary = {
-	"NO": null,
-	"NE": null,
-	"SO": null,
-	"SE": null
-}
-
-var _mutacion_en_progreso: bool = false
-var _mutacion_pendiente: bool = false
-var _tween_fade_sectores: Tween = null
-var _swap_ejecutado_en_ciclo: bool = false
-var ultimo_marcador_desatasco: Vector2 = Vector2.INF
+var gestor_sectores: GestorSectores = GestorSectores.new()
+var mutador_sectores: MutadorSectores = MutadorSectores.new()
+var resolutor_atascamiento: ResolutorAtascamiento = ResolutorAtascamiento.new()
+var gestor_iluminacion: GestorIluminacionAmbiental = GestorIluminacionAmbiental.new()
+var precarga_web: PrecargaRecursosWeb = PrecargaRecursosWeb.new()
 
 @onready var _efecto_niebla: EfectoNieblaMutacion = get_node_or_null("EfectoNieblaMutacion") as EfectoNieblaMutacion
 @onready var _modulador_ambiental: CanvasModulate = get_node_or_null("CanvasModulate") as CanvasModulate
@@ -46,68 +34,80 @@ var ultimo_marcador_desatasco: Vector2 = Vector2.INF
 @onready var _nodo_so: Node2D = get_node_or_null("Sectores/SectorSO") as Node2D
 @onready var _nodo_se: Node2D = get_node_or_null("Sectores/SectorSE") as Node2D
 
+var variantes_activas: Dictionary:
+	get: return gestor_sectores.variantes_activas
+	set(v): gestor_sectores.variantes_activas = v
+
+var _instancias_sectores: Dictionary:
+	get: return gestor_sectores.instancias_sectores
+	set(v): gestor_sectores.instancias_sectores = v
+
+var _mutacion_en_progreso: bool:
+	get: return mutador_sectores.mutacion_en_progreso
+	set(v): mutador_sectores.mutacion_en_progreso = v
+
+var _mutacion_pendiente: bool:
+	get: return mutador_sectores.mutacion_pendiente
+	set(v): mutador_sectores.mutacion_pendiente = v
+
+var _swap_ejecutado_en_ciclo: bool:
+	get: return mutador_sectores.swap_ejecutado_en_ciclo
+	set(v): mutador_sectores.swap_ejecutado_en_ciclo = v
+
+var _tween_fade_sectores: Tween:
+	get: return mutador_sectores.tween_fade_sectores
+	set(v): mutador_sectores.tween_fade_sectores = v
+
+var ultimo_marcador_desatasco: Vector2:
+	get: return resolutor_atascamiento.ultimo_marcador_desatasco
+	set(v): resolutor_atascamiento.ultimo_marcador_desatasco = v
+
 
 func _ready() -> void:
 	y_sort_enabled = true
+	_inicializar_subcontroladores()
 	_resolver_referencias_objetivos()
 	_inicializar_catalogo()
-	_instanciar_sectores_iniciales()
+	gestor_sectores.inicializar_sectores_por_defecto(catalogo_variantes)
 	_inicializar_iluminacion_ambiental()
 	if not Engine.is_editor_hint():
 		call_deferred("_precalentar_recursos_web")
 
 
+func _inicializar_subcontroladores() -> void:
+	if _nodo_no == null:
+		_nodo_no = get_node_or_null("Sectores/SectorNO") as Node2D
+		_nodo_ne = get_node_or_null("Sectores/SectorNE") as Node2D
+		_nodo_so = get_node_or_null("Sectores/SectorSO") as Node2D
+		_nodo_se = get_node_or_null("Sectores/SectorSE") as Node2D
+
+	gestor_sectores.inicializar_nodos(_nodo_no, _nodo_ne, _nodo_so, _nodo_se)
+
+	if _efecto_niebla == null:
+		_efecto_niebla = get_node_or_null("EfectoNieblaMutacion") as EfectoNieblaMutacion
+
+	mutador_sectores.nodo_raiz = self
+	mutador_sectores.gestor_sectores = gestor_sectores
+	mutador_sectores.efecto_niebla = _efecto_niebla
+
+	resolutor_atascamiento.gestor_sectores = gestor_sectores
+
+
 func _precalentar_recursos_web() -> void:
-	# Calentar shaders de variantes de sector fuera de pantalla
-	if not is_inside_tree():
-		return
-	var contenedor_warmup := Node2D.new()
-	contenedor_warmup.name = "WarmupSectores"
-	contenedor_warmup.visible = false
-	contenedor_warmup.process_mode = Node.PROCESS_MODE_DISABLED
-	add_child(contenedor_warmup)
-
-	for variante in catalogo_variantes:
-		if variante != null:
-			var inst := variante.instantiate() as Node2D
-			if inst != null:
-				contenedor_warmup.add_child(inst)
-
-	# Dejar que el backend gráfico/WebGL registre y compile los recursos, luego liberar
-	var arbol := get_tree()
-	if arbol != null:
-		await arbol.process_frame
-	if is_instance_valid(contenedor_warmup):
-		contenedor_warmup.queue_free()
+	precarga_web.precalentar_recursos_web(self, catalogo_variantes)
 
 
 func _inicializar_iluminacion_ambiental() -> void:
 	if _modulador_ambiental == null:
 		_modulador_ambiental = get_node_or_null("CanvasModulate") as CanvasModulate
-
-	if config_iluminacion == null:
-		if ResourceLoader.exists("res://recursos/iluminacion/config_iluminacion_defecto.tres"):
-			config_iluminacion = load("res://recursos/iluminacion/config_iluminacion_defecto.tres") as ConfiguracionIluminacion
-		else:
-			config_iluminacion = ConfiguracionIluminacion.new()
-
-	if _modulador_ambiental != null and config_iluminacion != null:
-		_modulador_ambiental.color = config_iluminacion.calcular_color_ambiente(0)
+	config_iluminacion = gestor_iluminacion.inicializar_iluminacion(_modulador_ambiental, config_iluminacion)
 
 
 ## Modula suavemente la penumbra ambiental (CanvasModulate) conforme se recolectan notas.
 func actualizar_iluminacion_ambiental(notas_recolectadas: int, duracion_transicion: float = 1.0) -> void:
 	if _modulador_ambiental == null:
 		_modulador_ambiental = get_node_or_null("CanvasModulate") as CanvasModulate
-	if _modulador_ambiental == null or config_iluminacion == null:
-		return
-
-	var color_objetivo: Color = config_iluminacion.calcular_color_ambiente(notas_recolectadas)
-	if duracion_transicion > 0.0 and is_inside_tree():
-		var tween := create_tween()
-		tween.tween_property(_modulador_ambiental, "color", color_objetivo, duracion_transicion)
-	else:
-		_modulador_ambiental.color = color_objetivo
+	gestor_iluminacion.actualizar_iluminacion_ambiental(self, _modulador_ambiental, config_iluminacion, notas_recolectadas, duracion_transicion)
 
 
 func _resolver_referencias_objetivos() -> void:
@@ -125,6 +125,7 @@ func _resolver_referencias_objetivos() -> void:
 	if _efecto_niebla != null:
 		if _efecto_niebla.objetivo_jugador == null:
 			_efecto_niebla.objetivo_jugador = objetivo_jugador
+		mutador_sectores.efecto_niebla = _efecto_niebla
 		_conectar_senales_niebla()
 
 
@@ -156,87 +157,39 @@ func _inicializar_catalogo() -> void:
 
 
 func _instanciar_sectores_iniciales() -> void:
-	if catalogo_variantes.is_empty():
-		return
-
-	for i in range(SECTORES.size()):
-		var sector: String = SECTORES[i]
-		var escena: PackedScene = catalogo_variantes[i % catalogo_variantes.size()]
-		_instanciar_variante_en_sector(sector, escena)
+	gestor_sectores.inicializar_sectores_por_defecto(catalogo_variantes)
 
 
 func _obtener_nodo_sector(sector: String) -> Node2D:
-	if _nodo_no == null:
-		_nodo_no = get_node_or_null("Sectores/SectorNO") as Node2D
-		_nodo_ne = get_node_or_null("Sectores/SectorNE") as Node2D
-		_nodo_so = get_node_or_null("Sectores/SectorSO") as Node2D
-		_nodo_se = get_node_or_null("Sectores/SectorSE") as Node2D
-
-	match sector:
-		"NO": return _nodo_no
-		"NE": return _nodo_ne
-		"SO": return _nodo_so
-		"SE": return _nodo_se
-	return null
+	if gestor_sectores.nodo_no == null:
+		_inicializar_subcontroladores()
+	return gestor_sectores.obtener_nodo_sector(sector)
 
 
 func _instanciar_variante_en_sector(sector: String, escena: PackedScene) -> void:
-	var nodo_padre: Node2D = _obtener_nodo_sector(sector)
-	if nodo_padre == null or escena == null:
-		return
-
-	# Limpiar instancia previa
-	var anterior = _instancias_sectores.get(sector)
-	if anterior != null and is_instance_valid(anterior):
-		nodo_padre.remove_child(anterior)
-		anterior.queue_free()
-
-	# Instanciar nueva variante
-	var nueva_instancia: Node2D = escena.instantiate() as Node2D
-	nodo_padre.add_child(nueva_instancia)
-	_instancias_sectores[sector] = nueva_instancia
-
-	# Guardar nombre descriptivo de la variante
-	var nombre_variante: String = escena.resource_path.get_file().get_basename()
-	if nombre_variante.is_empty():
-		nombre_variante = nueva_instancia.name
-	variantes_activas[sector] = nombre_variante
+	gestor_sectores.instanciar_variante_en_sector(sector, escena)
 
 
 func obtener_cuadrante_jugador(pos_global: Vector2) -> String:
-	var x_str: String = "E" if pos_global.x >= 0.0 else "O"
-	var y_str: String = "S" if pos_global.y >= 0.0 else "N"
-	return y_str + x_str
+	return gestor_sectores.obtener_cuadrante(pos_global)
 
 
 func calcular_cuadrante(pos_global: Vector2) -> String:
-	return obtener_cuadrante_jugador(pos_global)
+	return gestor_sectores.obtener_cuadrante(pos_global)
 
 
 func forzar_mutacion() -> void:
 	mutar_con_neblina()
 
 
-## Cancela cualquier mutación o efecto de niebla pendiente o en curso y devuelve el escenario a estado estable.
 func abortar_mutacion() -> void:
-	_mutacion_pendiente = false
-	_mutacion_en_progreso = false
-	_restaurar_opacidad_sectores()
-	if _efecto_niebla != null and is_instance_valid(_efecto_niebla):
-		if _efecto_niebla.has_method("abortar_inmediato"):
-			_efecto_niebla.abortar_inmediato()
+	mutador_sectores.abortar_mutacion()
 	if objetivo_enemigo != null and is_instance_valid(objetivo_enemigo) and objetivo_enemigo.has_method("modular_velocidad_niebla"):
 		objetivo_enemigo.modular_velocidad_niebla(false)
 
 
 func _restaurar_opacidad_sectores() -> void:
-	if _tween_fade_sectores != null and _tween_fade_sectores.is_valid():
-		_tween_fade_sectores.kill()
-		_tween_fade_sectores = null
-	for sector in SECTORES:
-		var nodo_sector: Node2D = _obtener_nodo_sector(sector)
-		if nodo_sector != null:
-			nodo_sector.modulate.a = 1.0
+	mutador_sectores.restaurar_opacidad_sectores()
 
 
 func mutar_con_neblina(
@@ -244,274 +197,75 @@ func mutar_con_neblina(
 	duracion_apertura: float = -1.0,
 	pausa_oscuridad: float = -1.0
 ) -> void:
-	if _mutacion_en_progreso:
-		_mutacion_pendiente = true
-		return
-	_mutacion_en_progreso = true
-	_swap_ejecutado_en_ciclo = false
+	_resolver_referencias_objetivos()
+	_inicializar_catalogo()
+	var pos_jug: Vector2 = objetivo_jugador.global_position if (objetivo_jugador != null and is_instance_valid(objetivo_jugador)) else Vector2.ZERO
 
-	if _efecto_niebla == null:
-		_efecto_niebla = get_node_or_null("EfectoNieblaMutacion") as EfectoNieblaMutacion
-	if _efecto_niebla != null and _efecto_niebla.objetivo_jugador == null:
-		_efecto_niebla.objetivo_jugador = objetivo_jugador
+	await mutador_sectores.mutar_con_neblina(
+		pos_jug,
+		catalogo_variantes,
+		Callable(self, "_on_post_swap"),
+		duracion_cierre,
+		duracion_apertura,
+		pausa_oscuridad
+	)
 
-	var dur_pausa_efectiva: float = pausa_oscuridad
-	if dur_pausa_efectiva < 0.0 and _efecto_niebla != null:
-		dur_pausa_efectiva = _efecto_niebla.pausa_oscuridad
 
-	if _efecto_niebla != null:
-		await _efecto_niebla.ejecutar_transicion(
-			Callable(self, "_ejecutar_mutacion_con_fade").bind(dur_pausa_efectiva),
-			duracion_cierre,
-			duracion_apertura,
-			pausa_oscuridad
-		)
-		if not _swap_ejecutado_en_ciclo:
-			mutar_sectores_lejanos()
-	else:
-		mutar_sectores_lejanos()
-
-	_restaurar_opacidad_sectores()
-	_mutacion_en_progreso = false
-	if _mutacion_pendiente:
-		_mutacion_pendiente = false
-		call_deferred("mutar_con_neblina", duracion_cierre, duracion_apertura, pausa_oscuridad)
+func _on_post_swap() -> void:
+	validar_y_reubicar_enemigo()
+	var pos_jug: Vector2 = objetivo_jugador.global_position if (objetivo_jugador != null and is_instance_valid(objetivo_jugador)) else Vector2.ZERO
+	var cuadrante_activo: String = gestor_sectores.obtener_cuadrante(pos_jug)
+	sectores_mutados.emit(cuadrante_activo, gestor_sectores.variantes_activas)
 
 
 func _ejecutar_mutacion_con_fade(duracion_pausa: float) -> void:
-	if duracion_pausa <= 0.0 or _efecto_niebla == null or _efecto_niebla.desactivado or not is_inside_tree():
-		_swap_ejecutado_en_ciclo = true
-		mutar_sectores_lejanos()
-		return
-
-	if _tween_fade_sectores != null and _tween_fade_sectores.is_valid():
-		_tween_fade_sectores.kill()
-		_tween_fade_sectores = null
-
-	var pos_jugador: Vector2 = objetivo_jugador.global_position if (objetivo_jugador != null and is_instance_valid(objetivo_jugador)) else Vector2.ZERO
-	var cuadrante_actual: String = obtener_cuadrante_jugador(pos_jugador)
-
-	var sectores_a_mutar: Array[String] = []
-	var nodos_a_mutar: Array[Node2D] = []
-	for sector in SECTORES:
-		if sector != cuadrante_actual:
-			sectores_a_mutar.append(sector)
-			var nodo_sec: Node2D = _obtener_nodo_sector(sector)
-			if nodo_sec != null:
-				nodos_a_mutar.append(nodo_sec)
-
-	var mitad_pausa: float = duracion_pausa * 0.5
-	_tween_fade_sectores = create_tween()
-	_tween_fade_sectores.set_parallel(true)
-	_tween_fade_sectores.set_trans(Tween.TRANS_SINE)
-	_tween_fade_sectores.set_ease(Tween.EASE_IN_OUT)
-
-	for nodo_sec in nodos_a_mutar:
-		_tween_fade_sectores.tween_property(nodo_sec, "modulate:a", 0.0, mitad_pausa)
-
-	_tween_fade_sectores.chain().tween_callback(func():
-		_swap_ejecutado_en_ciclo = true
-		if OS.has_feature("web") or OS.get_name() == "Web":
-			mutar_sectores_lejanos_progresivo(sectores_a_mutar)
-		else:
-			mutar_sectores_lejanos(sectores_a_mutar)
-	)
-
-	for nodo_sec in nodos_a_mutar:
-		_tween_fade_sectores.parallel().tween_property(nodo_sec, "modulate:a", 1.0, mitad_pausa)
+	_inicializar_catalogo()
+	var pos_jug: Vector2 = objetivo_jugador.global_position if (objetivo_jugador != null and is_instance_valid(objetivo_jugador)) else Vector2.ZERO
+	mutador_sectores.ejecutar_mutacion_con_fade(duracion_pausa, pos_jug, catalogo_variantes, Callable(self, "_on_post_swap"))
 
 
 func mutar_sectores_lejanos(sectores_permitidos: Array[String] = []) -> void:
 	_inicializar_catalogo()
-	if catalogo_variantes.is_empty():
-		return
-
 	_resolver_referencias_objetivos()
+	var pos_jug: Vector2 = objetivo_jugador.global_position if (objetivo_jugador != null and is_instance_valid(objetivo_jugador)) else Vector2.ZERO
 
-	var pos_jugador: Vector2 = objetivo_jugador.global_position if (objetivo_jugador != null and is_instance_valid(objetivo_jugador)) else Vector2.ZERO
-	var cuadrante_activo: String = obtener_cuadrante_jugador(pos_jugador)
-
-	for sector in SECTORES:
-		if sector == cuadrante_activo:
-			continue # El sector donde está el jugador NO muta
-
-		if not sectores_permitidos.is_empty() and not sectores_permitidos.has(sector):
-			continue
-
-		# Seleccionar una variante aleatoria distinta a la actual si hay opciones disponibles
-		var variante_actual_nombre: String = variantes_activas.get(sector, "")
-		var candidatos: Array[PackedScene] = []
-		for var_scene in catalogo_variantes:
-			if var_scene.resource_path.get_file().get_basename() != variante_actual_nombre:
-				candidatos.append(var_scene)
-
-		var elegida: PackedScene
-		if not candidatos.is_empty():
-			elegida = candidatos[randi() % candidatos.size()]
-		else:
-			elegida = catalogo_variantes[randi() % catalogo_variantes.size()]
-
-		_instanciar_variante_en_sector(sector, elegida)
-
+	var cuadrante_activo: String = mutador_sectores.mutar_sectores_lejanos(pos_jug, catalogo_variantes, sectores_permitidos)
 	validar_y_reubicar_enemigo()
-	sectores_mutados.emit(cuadrante_activo, variantes_activas)
+	sectores_mutados.emit(cuadrante_activo, gestor_sectores.variantes_activas)
 
 
-## Variante asíncrona para repartir la instanciación de sectores en múltiples fotogramas (Web optimization)
 func mutar_sectores_lejanos_progresivo(sectores_permitidos: Array[String] = []) -> void:
 	_inicializar_catalogo()
-	if catalogo_variantes.is_empty():
-		return
-
 	_resolver_referencias_objetivos()
+	var pos_jug: Vector2 = objetivo_jugador.global_position if (objetivo_jugador != null and is_instance_valid(objetivo_jugador)) else Vector2.ZERO
 
-	var pos_jugador: Vector2 = objetivo_jugador.global_position if (objetivo_jugador != null and is_instance_valid(objetivo_jugador)) else Vector2.ZERO
-	var cuadrante_activo: String = obtener_cuadrante_jugador(pos_jugador)
-	var arbol := get_tree()
-
-	for sector in SECTORES:
-		if sector == cuadrante_activo:
-			continue
-
-		if not sectores_permitidos.is_empty() and not sectores_permitidos.has(sector):
-			continue
-
-		var variante_actual_nombre: String = variantes_activas.get(sector, "")
-		var candidatos: Array[PackedScene] = []
-		for var_scene in catalogo_variantes:
-			if var_scene.resource_path.get_file().get_basename() != variante_actual_nombre:
-				candidatos.append(var_scene)
-
-		var elegida: PackedScene
-		if not candidatos.is_empty():
-			elegida = candidatos[randi() % candidatos.size()]
-		else:
-			elegida = catalogo_variantes[randi() % catalogo_variantes.size()]
-
-		_instanciar_variante_en_sector(sector, elegida)
-
-		# Repartir la carga de instanciación y física en el siguiente cuadro si estamos en runtime
-		if arbol != null and not Engine.is_editor_hint():
-			await arbol.process_frame
-
+	var cuadrante_activo: String = await mutador_sectores.mutar_sectores_lejanos_progresivo(pos_jug, catalogo_variantes, sectores_permitidos)
 	validar_y_reubicar_enemigo()
-	sectores_mutados.emit(cuadrante_activo, variantes_activas)
+	sectores_mutados.emit(cuadrante_activo, gestor_sectores.variantes_activas)
 
 
 func validar_y_reubicar_enemigo() -> void:
-	if objetivo_enemigo == null or not is_instance_valid(objetivo_enemigo):
-		return
-
-	# Si el enemigo está hibernando o inactivo fuera de mapa, no se reubica
-	if objetivo_enemigo.get("hibernando") == true or objetivo_enemigo.process_mode == Node.PROCESS_MODE_DISABLED:
-		return
-
-	var pos_enemigo: Vector2 = objetivo_enemigo.global_position
-	var sector_enemigo: String = calcular_cuadrante(pos_enemigo)
-
-	# Comprobar si el enemigo está solapando con obstáculos sólidos
-	var necesita_reubicacion: bool = _verificar_solapamiento_solido(objetivo_enemigo)
-
-	if necesita_reubicacion:
-		var punto_seguro: Vector2 = _obtener_punto_seguro_en_sector(sector_enemigo, pos_enemigo)
-		if punto_seguro != pos_enemigo:
-			var pos_anterior: Vector2 = objetivo_enemigo.global_position
-			objetivo_enemigo.global_position = punto_seguro
-			objetivo_enemigo.velocity = Vector2.ZERO
-			ultimo_marcador_desatasco = punto_seguro
-			enemigo_reubicado.emit(pos_anterior, punto_seguro, sector_enemigo)
-	else:
-		ultimo_marcador_desatasco = Vector2.INF
+	var pos_jug: Vector2 = objetivo_jugador.global_position if (objetivo_jugador != null and is_instance_valid(objetivo_jugador)) else Vector2.INF
+	var res: Dictionary = resolutor_atascamiento.validar_y_reubicar_enemigo(objetivo_enemigo, pos_jug)
+	if res.get("reubicado", false):
+		enemigo_reubicado.emit(res["pos_anterior"], res["pos_nueva"], res["sector"])
 
 
 func _verificar_solapamiento_solido(enemigo: CharacterBody2D) -> bool:
-	# 1. Comprobación física directa mediante test_move
-	if enemigo.test_move(enemigo.global_transform, Vector2.ZERO):
-		return true
-
-	# 2. Comprobación geométrica en el sector activo mediante consulta de espacio físico
-	var world := enemigo.get_world_2d()
-	if world != null:
-		var space_state := world.direct_space_state
-		if space_state != null:
-			var params := PhysicsPointQueryParameters2D.new()
-			params.position = enemigo.global_position
-			params.collision_mask = 3 # Capas 1 (Mundo_Alto) y 2 (Obstaculos_Bajos)
-			params.collide_with_bodies = true
-			params.collide_with_areas = false
-			params.exclude = [enemigo.get_rid()]
-
-			var resultados := space_state.intersect_point(params, 4)
-			if not resultados.is_empty():
-				return true
-
-	return false
+	return resolutor_atascamiento.verificar_solapamiento_solido(enemigo)
 
 
 func _obtener_punto_seguro_en_sector(sector: String, pos_referencia: Vector2) -> Vector2:
-	var instancia: Node2D = _instancias_sectores.get(sector)
-	if instancia == null or not is_instance_valid(instancia):
-		return pos_referencia
-
-	var marcadores: Array[Node] = instancia.find_children("", "Marker2D", true, false)
-	var candidatos_puntos: Array[Vector2] = []
-
-	for m in marcadores:
-		if m.is_in_group("puntos_nota"):
-			var p: Vector2 = (m as Marker2D).global_position
-			# Filtro de seguridad: descartar marcadores a < 600 px del jugador si es posible
-			if objetivo_jugador != null and is_instance_valid(objetivo_jugador):
-				if p.distance_to(objetivo_jugador.global_position) < 600.0:
-					continue
-			candidatos_puntos.append(p)
-
-	if candidatos_puntos.is_empty():
-		# Fallback sin filtro de distancia al jugador si todos estaban a < 600 px
-		for m in marcadores:
-			if m.is_in_group("puntos_nota"):
-				candidatos_puntos.append((m as Marker2D).global_position)
-
-	if candidatos_puntos.is_empty():
-		# Fallback al centro del sector si no hay marcadores
-		var nodo_sector: Node2D = _obtener_nodo_sector(sector)
-		return nodo_sector.global_position if nodo_sector != null else pos_referencia
-
-	# Seleccionar el marcador más cercano a la posición donde estaba el enemigo
-	var punto_optimo: Vector2 = candidatos_puntos[0]
-	var dist_min: float = pos_referencia.distance_squared_to(punto_optimo)
-
-	for p in candidatos_puntos:
-		var d: float = pos_referencia.distance_squared_to(p)
-		if d < dist_min:
-			dist_min = d
-			punto_optimo = p
-
-	return punto_optimo
+	var pos_jug: Vector2 = objetivo_jugador.global_position if (objetivo_jugador != null and is_instance_valid(objetivo_jugador)) else Vector2.INF
+	return resolutor_atascamiento.obtener_punto_seguro_en_sector(sector, pos_referencia, pos_jug)
 
 
 func obtener_marcadores_nota_sectores_mutados(cuadrante_jugador: String = "") -> Array[Marker2D]:
 	if cuadrante_jugador.is_empty():
 		var pos_jug: Vector2 = objetivo_jugador.global_position if (objetivo_jugador != null and is_instance_valid(objetivo_jugador)) else Vector2.ZERO
-		cuadrante_jugador = obtener_cuadrante_jugador(pos_jug)
-
-	var resultado: Array[Marker2D] = []
-	for sector in SECTORES:
-		if sector == cuadrante_jugador:
-			continue
-		var instancia: Node2D = _instancias_sectores.get(sector)
-		if instancia != null and is_instance_valid(instancia):
-			for child in instancia.find_children("", "Marker2D", true, false):
-				if child.is_in_group("puntos_nota") and child is Marker2D:
-					resultado.append(child as Marker2D)
-	return resultado
+		cuadrante_jugador = gestor_sectores.obtener_cuadrante(pos_jug)
+	return gestor_sectores.obtener_marcadores_nota_sectores_mutados(cuadrante_jugador)
 
 
 func obtener_todos_marcadores_nota() -> Array[Marker2D]:
-	var resultado: Array[Marker2D] = []
-	for sector in SECTORES:
-		var instancia: Node2D = _instancias_sectores.get(sector)
-		if instancia != null and is_instance_valid(instancia):
-			for child in instancia.find_children("", "Marker2D", true, false):
-				if child.is_in_group("puntos_nota") and child is Marker2D:
-					resultado.append(child as Marker2D)
-	return resultado
+	return gestor_sectores.obtener_todos_marcadores_nota()
