@@ -6,6 +6,7 @@ extends Control
 ## Dispone de dos lienzos espaciales continuos en el espacio 2D:
 ## - Zona superior (Cielo/Presentación): Logotipo y aviso "Presiona ENTER para comenzar".
 ## - Zona inferior (Bosque/Menú): Tres árboles iluminados por linterna (Opciones, Jugar, Créditos).
+## - Zona lateral izquierda (Opciones): Panel de ajustes encuadrado con paneo de cámara.
 ## Orquestador/Fachada modular que delega en controladores especializados bajo res://scripts/menu_inicio/.
 
 signal jugar_solicitado
@@ -202,6 +203,7 @@ var estado: EstadoMenu:
 	"Textos/IconoCreditos",
 	"IconoCreditos"
 ])
+@onready var _menu_opciones: MenuOpciones = get_node_or_null("MenuOpciones") as MenuOpciones
 
 
 func _obtener_nodo_icono(rutas: Array) -> Sprite2D:
@@ -215,7 +217,7 @@ func _ready() -> void:
 	if _textos_nodo != null:
 		_textos_nodo.z_index = 10
 
-	cinematica.inicializar_nodos(_camara, _animador, _presentacion, _fondo_presentacion, _textos_nodo, _efecto_motion_blur)
+	cinematica.inicializar_nodos(_camara, _animador, _presentacion, _fondo_presentacion, _textos_nodo, _efecto_motion_blur, _menu_opciones)
 	particulas.inicializar(self, _particulas_estrellas, _particulas_nubes)
 	parallax.inicializar_nodos(_fondos, _fondo_degradado, _montana_2, _montana_1, _arboles_tercera, _arboles_segunda, _arboles_nodo, _textos_nodo)
 	parallax.capturar_posiciones_iniciales(particulas.obtener_particulas_estrellas(), particulas.obtener_particulas_nubes())
@@ -232,6 +234,7 @@ func _ready() -> void:
 	)
 	_conectar_senales_submodulos()
 	_conectar_animador()
+	_conectar_menu_opciones()
 
 	iniciar_presentacion()
 	_actualizar_seleccion(false)
@@ -244,8 +247,8 @@ func _ready() -> void:
 func _conectar_senales_submodulos() -> void:
 	if not seleccion.jugar_solicitado.is_connected(jugar_solicitado.emit):
 		seleccion.jugar_solicitado.connect(jugar_solicitado.emit)
-	if not seleccion.opciones_solicitado.is_connected(opciones_solicitado.emit):
-		seleccion.opciones_solicitado.connect(opciones_solicitado.emit)
+	if not seleccion.opciones_solicitado.is_connected(_on_opciones_solicitado):
+		seleccion.opciones_solicitado.connect(_on_opciones_solicitado)
 	if not seleccion.creditos_solicitado.is_connected(creditos_solicitado.emit):
 		seleccion.creditos_solicitado.connect(creditos_solicitado.emit)
 	if not seleccion.offset_rotacion_cambiado.is_connected(_on_offset_rotacion_cambiado):
@@ -255,6 +258,11 @@ func _conectar_senales_submodulos() -> void:
 func _conectar_animador() -> void:
 	if _animador != null and not _animador.animation_finished.is_connected(_on_animacion_terminada):
 		_animador.animation_finished.connect(_on_animacion_terminada)
+
+
+func _conectar_menu_opciones() -> void:
+	if _menu_opciones != null and not _menu_opciones.volver_solicitado.is_connected(_on_volver_de_opciones):
+		_menu_opciones.volver_solicitado.connect(_on_volver_de_opciones)
 
 
 func _on_offset_rotacion_cambiado(nuevo_offset: Vector2, nueva_rotacion: float, animar: bool) -> void:
@@ -292,6 +300,20 @@ func regresar_a_presentacion() -> void:
 	cinematica.regresar_a_presentacion(_on_animacion_terminada)
 
 
+func _on_opciones_solicitado() -> void:
+	opciones_solicitado.emit()
+	if estado != EstadoMenu.MENU_ACTIVO:
+		return
+	seleccion.bloqueado = true
+	cinematica.ir_a_opciones(_on_animacion_terminada)
+
+
+func _on_volver_de_opciones() -> void:
+	if estado != EstadoMenu.EN_OPCIONES:
+		return
+	cinematica.regresar_de_opciones(_on_animacion_terminada)
+
+
 func skipear_cinematica() -> void:
 	cinematica.skipear_cinematica()
 
@@ -304,6 +326,10 @@ func _on_animacion_terminada(nombre: StringName) -> void:
 			seleccion.opcion_actual = Opcion.JUGAR
 			_actualizar_seleccion(false)
 		else:
+			_actualizar_seleccion(false)
+	elif nombre == &"ir_a_opciones":
+		if estado == EstadoMenu.MENU_ACTIVO:
+			seleccion.bloqueado = false
 			_actualizar_seleccion(false)
 
 
@@ -352,7 +378,7 @@ func _unhandled_input(evento: InputEvent) -> void:
 				iniciar_descenso()
 				get_viewport().set_input_as_handled()
 
-		EstadoMenu.CINEMATICA_BAJANDO, EstadoMenu.CINEMATICA_SUBIENDO:
+		EstadoMenu.CINEMATICA_BAJANDO, EstadoMenu.CINEMATICA_SUBIENDO, EstadoMenu.TRANSICION_OPCIONES:
 			if evento.is_action_pressed("ui_accept") or evento.is_action_pressed("ui_cancel") or evento.is_action_pressed("personaje-salto"):
 				skipear_cinematica()
 				get_viewport().set_input_as_handled()

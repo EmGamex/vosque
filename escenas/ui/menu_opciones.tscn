@@ -1,0 +1,153 @@
+[gd_scene format=3 uid="uid://boxk202uflaub"]
+
+[ext_resource type="Script" uid="uid://88lhfuagchqp" path="res://scripts/ui/menu_opciones.gd" id="1_be8ok"]
+[ext_resource type="FontVariation" uid="uid://0htusin8b5jm" path="res://fuentes/raleway_bold.tres" id="2_yrh4g"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_2xd7x"]
+
+[node name="MenuOpciones" type="Control" unique_id=1280938452]
+custom_minimum_size = Vector2(1080, 1080)
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_be8ok")
+
+[node name="Layout" type="CenterContainer" parent="." unique_id=869476734]
+custom_minimum_size = Vector2(1080, 1080)
+layout_mode = 0
+
+[node name="PanelOpciones" type="PanelContainer" parent="Layout" unique_id=523848650]
+custom_minimum_size = Vector2(960, 900)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_2xd7x")
+
+[node name="Margen" type="MarginContainer" parent="Layout/PanelOpciones" unique_id=1855498444]
+layout_mode = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 50
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 50
+
+[node name="Columna" type="VBoxContainer" parent="Layout/PanelOpciones/Margen" unique_id=431503121]
+layout_mode = 2
+theme_override_constants/separation = 36
+
+[node name="Titulo" type="Label" parent="Layout/PanelOpciones/Margen/Columna" unique_id=2009223433]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9019608, 1, 0.7019608, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.6)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 3
+theme_override_constants/shadow_outline_size = 4
+theme_override_fonts/font = ExtResource("2_yrh4g")
+theme_override_font_sizes/font_size = 64
+text = "AJUSTES"
+
+[node name="Separador1" type="HSeparator" parent="Layout/PanelOpciones/Margen/Columna" unique_id=740718736]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="FilaMaster" type="HBoxContainer" parent="Layout/PanelOpciones/Margen/Columna" unique_id=1932381229]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="LblMaster" type="Label" parent="Layout/PanelOpciones/Margen/Columna/FilaMaster" unique_id=1410770116]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_yrh4g")
+theme_override_font_sizes/font_size = 36
+text = "Volumen General:"
+
+[node name="SliderMaster" type="HSlider" parent="Layout/PanelOpciones/Margen/Columna/FilaMaster" unique_id=403348967]
+custom_minimum_size = Vector2(420, 44)
+layout_mode = 2
+value = 100.0
+
+[node name="ValMaster" type="Label" parent="Layout/PanelOpciones/Margen/Columna/FilaMaster" unique_id=385040778]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_yrh4g")
+theme_override_font_sizes/font_size = 36
+text = "100%"
+
+[node name="FilaMusica" type="HBoxContainer" parent="Layout/PanelOpciones/Margen/Columna" unique_id=1434912404]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="LblMusica" type="Label" parent="Layout/PanelOpciones/Margen/Columna/FilaMusica" unique_id=515776559]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_yrh4g")
+theme_override_font_sizes/font_size = 36
+text = "Música:"
+
+[node name="SliderMusica" type="HSlider" parent="Layout/PanelOpciones/Margen/Columna/FilaMusica" unique_id=998250085]
+custom_minimum_size = Vector2(420, 44)
+layout_mode = 2
+value = 40.0
+
+[node name="ValMusica" type="Label" parent="Layout/PanelOpciones/Margen/Columna/FilaMusica" unique_id=1363035107]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_yrh4g")
+theme_override_font_sizes/font_size = 36
+text = "40%"
+
+[node name="FilaSFX" type="HBoxContainer" parent="Layout/PanelOpciones/Margen/Columna" unique_id=856386891]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="LblSFX" type="Label" parent="Layout/PanelOpciones/Margen/Columna/FilaSFX" unique_id=877879512]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_yrh4g")
+theme_override_font_sizes/font_size = 36
+text = "Efectos (SFX):"
+
+[node name="SliderSFX" type="HSlider" parent="Layout/PanelOpciones/Margen/Columna/FilaSFX" unique_id=1359696408]
+custom_minimum_size = Vector2(420, 44)
+layout_mode = 2
+value = 79.0
+
+[node name="ValSFX" type="Label" parent="Layout/PanelOpciones/Margen/Columna/FilaSFX" unique_id=121746443]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_yrh4g")
+theme_override_font_sizes/font_size = 36
+text = "79%"
+
+[node name="FilaPantalla" type="HBoxContainer" parent="Layout/PanelOpciones/Margen/Columna" unique_id=1033751110]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="LblPantalla" type="Label" parent="Layout/PanelOpciones/Margen/Columna/FilaPantalla" unique_id=2128248128]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_yrh4g")
+theme_override_font_sizes/font_size = 36
+text = "Pantalla Completa:"
+
+[node name="CheckPantalla" type="CheckBox" parent="Layout/PanelOpciones/Margen/Columna/FilaPantalla" unique_id=1984721454]
+layout_mode = 2
+
+[node name="Separador2" type="HSeparator" parent="Layout/PanelOpciones/Margen/Columna" unique_id=1617394617]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="BotonRestablecer" type="Button" parent="Layout/PanelOpciones/Margen/Columna" unique_id=71742772]
+custom_minimum_size = Vector2(400, 72)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_colors/font_focus_color = Color(0.9019608, 1, 0.7019608, 1)
+theme_override_colors/font_hover_color = Color(0.9019608, 1, 0.7019608, 1)
+theme_override_fonts/font = ExtResource("2_yrh4g")
+theme_override_font_sizes/font_size = 40
+text = "RESTABLECER VALORES"
+alignment = 0
+
+[node name="BotonVolver" type="Button" parent="Layout/PanelOpciones/Margen/Columna" unique_id=616833155]
+custom_minimum_size = Vector2(400, 72)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_colors/font_focus_color = Color(0.9019608, 1, 0.7019608, 1)
+theme_override_colors/font_hover_color = Color(0.9019608, 1, 0.7019608, 1)
+theme_override_fonts/font = ExtResource("2_yrh4g")
+theme_override_font_sizes/font_size = 40
+text = "VOLVER AL MENÚ"
+alignment = 0

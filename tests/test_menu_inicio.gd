@@ -312,3 +312,30 @@ func test_iconos_menu_opacidad_y_organizacion() -> void:
 
 	menu.free()
 
+
+func test_animacion_ir_a_opciones_estira_fondos_y_no_arboles() -> void:
+	var menu: Control = _crear_instancia_menu()
+	var animador: AnimationPlayer = menu.get_node_or_null("AnimadorCinematica") as AnimationPlayer
+	assert_true(animador != null, "Debe existir AnimadorCinematica")
+	assert_true(animador.has_animation("ir_a_opciones"), "Debe existir la animación ir_a_opciones")
+
+	var anim: Animation = animador.get_animation("ir_a_opciones")
+	var pistas_scale_fondos: Array[String] = []
+	var pistas_arboles: Array[String] = []
+
+	for i in range(anim.get_track_count()):
+		var ruta: String = str(anim.track_get_path(i))
+		if "scale" in ruta:
+			if "Fondos" in ruta:
+				pistas_scale_fondos.append(ruta)
+			if "Arbol" in ruta or "arbol" in ruta:
+				pistas_arboles.append(ruta)
+
+	assert_true(pistas_scale_fondos.has("Fondos/FondoDegradado:scale:x"), "FondoDegradado debe tener pista de escala X")
+	assert_true(pistas_scale_fondos.has("Fondos/Montaña2:scale:x"), "Montaña2 debe tener pista de escala X")
+	assert_true(pistas_scale_fondos.has("Fondos/Montaña1:scale:x"), "Montaña1 debe tener pista de escala X")
+	assert_eq(pistas_arboles.size(), 0, "No debe estirarse ningún nodo relacionado a los árboles")
+
+	menu.free()
+
+
