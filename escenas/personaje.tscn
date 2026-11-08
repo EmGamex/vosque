@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://b3dierpagcaih"]
 
 [ext_resource type="Script" uid="uid://bm561vv7tuxt4" path="res://scripts/entidades/personaje/personaje.gd" id="1_5nfxw"]
-[ext_resource type="Texture2D" uid="uid://ddjl04k42w54l" path="res://icon.svg" id="1_v023a"]
 [ext_resource type="Texture2D" uid="uid://y5a2ch4xeco4" path="res://graficos/abajo boceto.png" id="2_im2y8"]
 [ext_resource type="Texture2D" uid="uid://uew6f7q372am" path="res://graficos/arriba boceto.png" id="2_jt8tj"]
 [ext_resource type="Texture2D" uid="uid://c8532ifckormt" path="res://graficos/lsdo abajo boceto.png" id="3_im2y8"]
@@ -10,6 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://23tsn8fcifgs" path="res://graficos/lado boceto.png" id="6_57ngn"]
 [ext_resource type="Script" uid="uid://c1t6h1dv5pmy0" path="res://scripts/entidades/personaje/controlador_linterna.gd" id="8_kmopf"]
 [ext_resource type="Resource" uid="uid://cqqirq3y7pg12" path="res://recursos/iluminacion/config_iluminacion_defecto.tres" id="9_8xrj8"]
+[ext_resource type="Texture2D" uid="uid://beu3gvyi64xbp" path="res://graficos/emgamex idle sprite.png" id="10_tbkpf"]
 [ext_resource type="Texture2D" uid="uid://b8duj3viyr6eg" path="res://recursos/iluminacion/textura_halo_corporal.tres" id="11_41mom"]
 [ext_resource type="PackedScene" uid="uid://bosn1xlpgwiqr" path="res://escenas/ui/indicador_estamina.tscn" id="11_kmopf"]
 [ext_resource type="PackedScene" uid="uid://dte8iac0uavl" path="res://escenas/ui/tutorial_cabeza.tscn" id="12_8xrj8"]
@@ -63,7 +63,7 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("1_v023a")
+"texture": ExtResource("10_tbkpf")
 }],
 "loop": 1,
 "name": &"idle-arriba",
@@ -119,7 +119,7 @@ texture_scale = 1.09375
 position = Vector2(0, 7.9999995)
 scale = Vector2(0.075, 0.074999996)
 sprite_frames = SubResource("SpriteFrames_g4v7s")
-animation = &"arriba"
+animation = &"idle-arriba"
 autoplay = "idle-arriba"
 
 [node name="Sombra" type="Polygon2D" parent="Visual" unique_id=1928397469]
