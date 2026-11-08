@@ -56,7 +56,6 @@ func _conectar_senales() -> void:
 
 
 func _cargar_valores_actuales() -> void:
-	# 1. Audio Master
 	var idx_master := AudioServer.get_bus_index(&"Master")
 	if idx_master >= 0:
 		var db := AudioServer.get_bus_volume_db(idx_master)
@@ -65,7 +64,6 @@ func _cargar_valores_actuales() -> void:
 			slider_master.value = clamp(lineal, 0.0, 100.0)
 			_actualizar_label_porcentaje(label_val_master, slider_master.value)
 
-	# 2. Audio Música
 	var idx_musica := AudioServer.get_bus_index(&"musica")
 	if idx_musica >= 0:
 		var db := AudioServer.get_bus_volume_db(idx_musica)
@@ -74,7 +72,6 @@ func _cargar_valores_actuales() -> void:
 			slider_musica.value = clamp(lineal, 0.0, 100.0)
 			_actualizar_label_porcentaje(label_val_musica, slider_musica.value)
 
-	# 3. Audio SFX / UI
 	var idx_sfx := AudioServer.get_bus_index(&"ui")
 	if idx_sfx < 0:
 		idx_sfx = AudioServer.get_bus_index(&"sfx")
@@ -85,7 +82,6 @@ func _cargar_valores_actuales() -> void:
 			slider_sfx.value = clamp(lineal, 0.0, 100.0)
 			_actualizar_label_porcentaje(label_val_sfx, slider_sfx.value)
 
-	# 4. Pantalla Completa
 	if check_pantalla_completa and not Engine.is_editor_hint():
 		var modo := DisplayServer.window_get_mode()
 		check_pantalla_completa.button_pressed = (modo == DisplayServer.WINDOW_MODE_FULLSCREEN or modo == DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN)
@@ -150,13 +146,11 @@ func _on_boton_restablecer_pressed() -> void:
 
 
 func restablecer_valores_por_defecto() -> void:
-	# Cargar y restaurar el layout de buses por defecto oficial de disco
 	if ResourceLoader.exists(RUTA_BUS_LAYOUT_DEFECTO):
 		var layout_defecto: AudioBusLayout = load(RUTA_BUS_LAYOUT_DEFECTO)
 		if layout_defecto:
 			AudioServer.set_bus_layout(layout_defecto)
 
-	# Modo de pantalla por defecto de la configuración del proyecto
 	var modo_defecto_config: int = ProjectSettings.get_setting("display/window/size/mode", DisplayServer.WINDOW_MODE_WINDOWED)
 	var es_pantalla_completa: bool = (
 		modo_defecto_config == DisplayServer.WINDOW_MODE_FULLSCREEN
@@ -169,7 +163,6 @@ func restablecer_valores_por_defecto() -> void:
 	if check_pantalla_completa:
 		check_pantalla_completa.button_pressed = es_pantalla_completa
 
-	# Sincronizar todos los sliders y labels con los buses ya restaurados
 	_cargar_valores_actuales()
 
 
