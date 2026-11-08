@@ -357,3 +357,66 @@ func test_marcadores_sectores_mutados() -> void:
 	assert_true(todos.size() >= 8, "Debe haber al menos 8 marcadores en los 4 cuadrantes")
 
 	root.free()
+
+
+func test_fade_in_fade_out_sectores_en_mutacion() -> void:
+	var escena_escenario: PackedScene = load("res://escenas/escenario.tscn")
+	var esc: Escenario = escena_escenario.instantiate() as Escenario
+	var dummy_jugador := MockPersonajeParaEscenario.new()
+	dummy_jugador.global_position = Vector2(-500, -500) # Sector NO
+	esc.objetivo_jugador = dummy_jugador
+
+	var root := Node2D.new()
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree != null and tree.root != null:
+		tree.root.add_child(root)
+	root.add_child(dummy_jugador)
+	root.add_child(esc)
+	esc._ready()
+
+	var nodo_no: Node2D = esc._obtener_nodo_sector("NO")
+	var nodo_ne: Node2D = esc._obtener_nodo_sector("NE")
+	var nodo_so: Node2D = esc._obtener_nodo_sector("SO")
+	var nodo_se: Node2D = esc._obtener_nodo_sector("SE")
+
+	assert_eq(nodo_no.modulate.a, 1.0, "Sector NO debe iniciar en opacidad 1.0")
+	assert_eq(nodo_ne.modulate.a, 1.0, "Sector NE debe iniciar en opacidad 1.0")
+	assert_eq(nodo_so.modulate.a, 1.0, "Sector SO debe iniciar en opacidad 1.0")
+	assert_eq(nodo_se.modulate.a, 1.0, "Sector SE debe iniciar en opacidad 1.0")
+
+	# Probar _ejecutar_mutacion_con_fade y el ciclo de Tween
+	esc._ejecutar_mutacion_con_fade(1.0)
+	assert_true(esc._tween_fade_sectores != null, "Debe crear el tween de fade")
+
+	# Avanzar el tween manualmente en el primer tramo (fade out a 0.25s)
+	esc._tween_fade_sectores.custom_step(0.25)
+	assert_eq(nodo_no.modulate.a, 1.0, "El sector del jugador NO no debe desvanecerse")
+	assert_true(nodo_ne.modulate.a < 1.0, "El sector NE debe estar reduciendo opacidad")
+	assert_true(nodo_so.modulate.a < 1.0, "El sector SO debe estar reduciendo opacidad")
+	assert_true(nodo_se.modulate.a < 1.0, "El sector SE debe estar reduciendo opacidad")
+
+	# Avanzar hasta completar el fade out y ejecutar el swap (a 0.5s)
+	esc._tween_fade_sectores.custom_step(0.26)
+	assert_true(esc._swap_ejecutado_en_ciclo, "Al llegar al punto medio debe ejecutarse el swap de variantes")
+
+	# Avanzar hasta finalizar el fade in (segundo tramo de 0.5s)
+	esc._tween_fade_sectores.custom_step(0.5)
+	assert_eq(nodo_ne.modulate.a, 1.0, "Sector NE debe retornar a opacidad 1.0")
+	assert_eq(nodo_so.modulate.a, 1.0, "Sector SO debe retornar a opacidad 1.0")
+	assert_eq(nodo_se.modulate.a, 1.0, "Sector SE debe retornar a opacidad 1.0")
+
+	# Probar abortar_mutacion durante un fade out
+	esc._ejecutar_mutacion_con_fade(1.0)
+	esc._tween_fade_sectores.custom_step(0.25)
+	assert_true(nodo_ne.modulate.a < 1.0, "Sector NE debe estar a media opacidad antes de abortar")
+	esc.abortar_mutacion()
+	assert_eq(nodo_ne.modulate.a, 1.0, "Tras abortar_mutacion, NE debe restaurarse a opacidad 1.0")
+	assert_eq(nodo_so.modulate.a, 1.0, "Tras abortar_mutacion, SO debe restaurarse a opacidad 1.0")
+	assert_eq(nodo_se.modulate.a, 1.0, "Tras abortar_mutacion, SE debe restaurarse a opacidad 1.0")
+	assert_eq(nodo_no.modulate.a, 1.0, "Sector NO debe mantenerse en 1.0")
+
+	if tree != null and tree.root != null and root.get_parent() == tree.root:
+		tree.root.remove_child(root)
+	root.free()
+
+

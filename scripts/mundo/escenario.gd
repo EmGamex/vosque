@@ -35,6 +35,8 @@ var _instancias_sectores: Dictionary = {
 
 var _mutacion_en_progreso: bool = false
 var _mutacion_pendiente: bool = false
+var _tween_fade_sectores: Tween = null
+var _swap_ejecutado_en_ciclo: bool = false
 var ultimo_marcador_desatasco: Vector2 = Vector2.INF
 
 @onready var _efecto_niebla: EfectoNieblaMutacion = get_node_or_null("EfectoNieblaMutacion") as EfectoNieblaMutacion
@@ -193,11 +195,22 @@ func forzar_mutacion() -> void:
 func abortar_mutacion() -> void:
 	_mutacion_pendiente = false
 	_mutacion_en_progreso = false
+	_restaurar_opacidad_sectores()
 	if _efecto_niebla != null and is_instance_valid(_efecto_niebla):
 		if _efecto_niebla.has_method("abortar_inmediato"):
 			_efecto_niebla.abortar_inmediato()
 	if objetivo_enemigo != null and is_instance_valid(objetivo_enemigo) and objetivo_enemigo.has_method("modular_velocidad_niebla"):
 		objetivo_enemigo.modular_velocidad_niebla(false)
+
+
+func _restaurar_opacidad_sectores() -> void:
+	if _tween_fade_sectores != null and _tween_fade_sectores.is_valid():
+		_tween_fade_sectores.kill()
+		_tween_fade_sectores = null
+	for sector in SECTORES:
+		var nodo_sector: Node2D = _obtener_nodo_sector(sector)
+		if nodo_sector != null:
+			nodo_sector.modulate.a = 1.0
 
 
 func mutar_con_neblina(
@@ -209,41 +222,92 @@ func mutar_con_neblina(
 		_mutacion_pendiente = true
 		return
 	_mutacion_en_progreso = true
+	_swap_ejecutado_en_ciclo = false
 
 	if _efecto_niebla == null:
 		_efecto_niebla = get_node_or_null("EfectoNieblaMutacion") as EfectoNieblaMutacion
 	if _efecto_niebla != null and _efecto_niebla.objetivo_jugador == null:
 		_efecto_niebla.objetivo_jugador = objetivo_jugador
 
+	var dur_pausa_efectiva: float = pausa_oscuridad
+	if dur_pausa_efectiva < 0.0 and _efecto_niebla != null:
+		dur_pausa_efectiva = _efecto_niebla.pausa_oscuridad
+
 	if _efecto_niebla != null:
 		await _efecto_niebla.ejecutar_transicion(
-			Callable(self, "mutar_sectores_lejanos"),
+			Callable(self, "_ejecutar_mutacion_con_fade").bind(dur_pausa_efectiva),
 			duracion_cierre,
 			duracion_apertura,
 			pausa_oscuridad
 		)
+		if not _swap_ejecutado_en_ciclo:
+			mutar_sectores_lejanos()
 	else:
 		mutar_sectores_lejanos()
 
+	_restaurar_opacidad_sectores()
 	_mutacion_en_progreso = false
 	if _mutacion_pendiente:
 		_mutacion_pendiente = false
 		call_deferred("mutar_con_neblina", duracion_cierre, duracion_apertura, pausa_oscuridad)
 
 
-func mutar_sectores_lejanos() -> void:
+func _ejecutar_mutacion_con_fade(duracion_pausa: float) -> void:
+	if duracion_pausa <= 0.0 or _efecto_niebla == null or _efecto_niebla.desactivado or not is_inside_tree():
+		_swap_ejecutado_en_ciclo = true
+		mutar_sectores_lejanos()
+		return
+
+	if _tween_fade_sectores != null and _tween_fade_sectores.is_valid():
+		_tween_fade_sectores.kill()
+		_tween_fade_sectores = null
+
+	var pos_jugador: Vector2 = objetivo_jugador.global_position if (objetivo_jugador != null and is_instance_valid(objetivo_jugador)) else Vector2.ZERO
+	var cuadrante_actual: String = obtener_cuadrante_jugador(pos_jugador)
+
+	var sectores_a_mutar: Array[String] = []
+	var nodos_a_mutar: Array[Node2D] = []
+	for sector in SECTORES:
+		if sector != cuadrante_actual:
+			sectores_a_mutar.append(sector)
+			var nodo_sec: Node2D = _obtener_nodo_sector(sector)
+			if nodo_sec != null:
+				nodos_a_mutar.append(nodo_sec)
+
+	var mitad_pausa: float = duracion_pausa * 0.5
+	_tween_fade_sectores = create_tween()
+	_tween_fade_sectores.set_parallel(true)
+	_tween_fade_sectores.set_trans(Tween.TRANS_SINE)
+	_tween_fade_sectores.set_ease(Tween.EASE_IN_OUT)
+
+	for nodo_sec in nodos_a_mutar:
+		_tween_fade_sectores.tween_property(nodo_sec, "modulate:a", 0.0, mitad_pausa)
+
+	_tween_fade_sectores.chain().tween_callback(func():
+		_swap_ejecutado_en_ciclo = true
+		mutar_sectores_lejanos(sectores_a_mutar)
+	)
+
+	for nodo_sec in nodos_a_mutar:
+		_tween_fade_sectores.parallel().tween_property(nodo_sec, "modulate:a", 1.0, mitad_pausa)
+
+
+func mutar_sectores_lejanos(sectores_permitidos: Array[String] = []) -> void:
 	_inicializar_catalogo()
 	if catalogo_variantes.is_empty():
 		return
 
 	_resolver_referencias_objetivos()
 
-	var pos_jugador: Vector2 = objetivo_jugador.global_position if objetivo_jugador != null else Vector2.ZERO
+	var pos_jugador: Vector2 = objetivo_jugador.global_position if (objetivo_jugador != null and is_instance_valid(objetivo_jugador)) else Vector2.ZERO
 	var cuadrante_activo: String = obtener_cuadrante_jugador(pos_jugador)
 
 	for sector in SECTORES:
 		if sector == cuadrante_activo:
 			continue # El sector donde está el jugador NO muta
+
+		if not sectores_permitidos.is_empty() and not sectores_permitidos.has(sector):
+			continue
 
 		# Seleccionar una variante aleatoria distinta a la actual si hay opciones disponibles
 		var variante_actual_nombre: String = variantes_activas.get(sector, "")
