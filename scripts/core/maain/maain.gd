@@ -175,14 +175,18 @@ func _on_nota_recolectada(pos_nota: Vector2) -> void:
 	)
 
 	if notas_recolectadas == 1:
-		var musica := _obtener_gestor_musica()
-		if musica != null and musica.has_method("transicionar_a_supervivencia"):
-			musica.transicionar_a_supervivencia()
+		call_deferred("_transicionar_musica_supervivencia_diferida")
 
 	if escenario != null and is_instance_valid(escenario):
 		if escenario.has_method("actualizar_iluminacion_ambiental"):
 			escenario.actualizar_iluminacion_ambiental(notas_recolectadas)
 		escenario.call_deferred("mutar_con_neblina")
+
+
+func _transicionar_musica_supervivencia_diferida() -> void:
+	var musica := _obtener_gestor_musica()
+	if musica != null and musica.has_method("transicionar_a_supervivencia"):
+		musica.transicionar_a_supervivencia()
 
 
 func despertar_monstruo() -> void:

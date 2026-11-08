@@ -65,11 +65,15 @@ func _process(delta: float) -> void:
 
 func reproducir_menu_o_tutorial() -> void:
 	var reproductor_audio := _obtener_reproductor()
+	var ya_reproduciendo: bool = reproductor_audio.playing if reproductor_audio else false
+	print("[DEBUG-MUSICA %d ms] reproducir_menu_o_tutorial() | estado=%s | playing=%s" % [
+		Time.get_ticks_msec(), estado_actual, ya_reproduciendo
+	])
 	if reproductor_audio == null or config == null:
 		return
 
 	# Si ya está activo en menú/tutorial y reproduciendo sin pausa, no interrumpir ni reiniciar
-	if reproductor_audio.playing and not reproductor_audio.stream_paused and estado_actual == EstadoMusical.MENU_TUTORIAL:
+	if reproductor_audio.playing and not reproductor_audio.stream_paused and (estado_actual == EstadoMusical.MENU_TUTORIAL or clip_actual == config.clip_menu_tutorial):
 		return
 
 	_asegurar_reproductor()
@@ -83,6 +87,7 @@ func reproducir_menu_o_tutorial() -> void:
 
 
 func transicionar_a_supervivencia() -> void:
+	print("[DEBUG-MUSICA %d ms] transicionar_a_supervivencia() invocado" % Time.get_ticks_msec())
 	var reproductor_audio := _obtener_reproductor()
 	if reproductor_audio == null or config == null:
 		return
@@ -225,7 +230,8 @@ func _conmutar_clip(nombre_clip: StringName) -> void:
 		return
 	if not reproductor_audio.playing:
 		reproductor_audio.play()
-	reproductor_audio.set(PARAM_SWITCH_TO_CLIP, nombre_clip)
+	if clip_actual != nombre_clip:
+		reproductor_audio.set(PARAM_SWITCH_TO_CLIP, nombre_clip)
 
 
 func _on_config_changed() -> void:
