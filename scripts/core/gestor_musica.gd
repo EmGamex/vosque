@@ -65,10 +65,6 @@ func _process(delta: float) -> void:
 
 func reproducir_menu_o_tutorial() -> void:
 	var reproductor_audio := _obtener_reproductor()
-	var ya_reproduciendo: bool = reproductor_audio.playing if reproductor_audio else false
-	print("[DEBUG-MUSICA %d ms] reproducir_menu_o_tutorial() | estado=%s | playing=%s" % [
-		Time.get_ticks_msec(), estado_actual, ya_reproduciendo
-	])
 	if reproductor_audio == null or config == null:
 		return
 
@@ -94,7 +90,6 @@ func reproducir_menu_o_tutorial() -> void:
 
 
 func transicionar_a_supervivencia() -> void:
-	print("[DEBUG-MUSICA %d ms] transicionar_a_supervivencia() invocado" % Time.get_ticks_msec())
 	var reproductor_audio := _obtener_reproductor()
 	if reproductor_audio == null or config == null:
 		return
