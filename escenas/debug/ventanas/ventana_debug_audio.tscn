@@ -1,0 +1,139 @@
+[gd_scene format=3 uid="uid://c1gxhgrnbgwfl"]
+
+[ext_resource type="Script" uid="uid://xkpm1ugs2260" path="res://scripts/debug/debug_menu/debug_window.gd" id="1_bwt0w"]
+
+[node name="ventana_debug_audio" type="PanelContainer" unique_id=416456706]
+script = ExtResource("1_bwt0w")
+window_id = "audio"
+window_title = "🎵 Audio & Música"
+
+[node name="Margin" type="MarginContainer" parent="." unique_id=771160583]
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="Margin" unique_id=121943033]
+layout_mode = 2
+
+[node name="BarraTitulo" type="HBoxContainer" parent="Margin/VBox" unique_id=758505928]
+layout_mode = 2
+
+[node name="LblTitulo" type="Label" parent="Margin/VBox/BarraTitulo" unique_id=469446398]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "🎵 Audio & Música"
+
+[node name="BtnFijar" type="Button" parent="Margin/VBox/BarraTitulo" unique_id=579907736]
+layout_mode = 2
+text = "📍"
+
+[node name="BtnColapsar" type="Button" parent="Margin/VBox/BarraTitulo" unique_id=1131792766]
+layout_mode = 2
+text = "_"
+
+[node name="BtnCerrar" type="Button" parent="Margin/VBox/BarraTitulo" unique_id=772373687]
+layout_mode = 2
+text = "✕"
+
+[node name="Contenido" type="MarginContainer" parent="Margin/VBox" unique_id=1510433571]
+layout_mode = 2
+
+[node name="VBoxAudio" type="VBoxContainer" parent="Margin/VBox/Contenido" unique_id=849646291]
+layout_mode = 2
+
+[node name="GridMusica" type="GridContainer" parent="Margin/VBox/Contenido/VBoxAudio" unique_id=1746586891]
+layout_mode = 2
+columns = 2
+
+[node name="@Label@21253" type="Label" parent="Margin/VBox/Contenido/VBoxAudio/GridMusica" unique_id=68999525]
+layout_mode = 2
+text = "Estado Música:"
+
+[node name="ValEstadoMusica" type="Label" parent="Margin/VBox/Contenido/VBoxAudio/GridMusica" unique_id=1198919960]
+layout_mode = 2
+
+[node name="@Label@21254" type="Label" parent="Margin/VBox/Contenido/VBoxAudio/GridMusica" unique_id=783061494]
+layout_mode = 2
+text = "Clip Activo:"
+
+[node name="ValClipMusica" type="Label" parent="Margin/VBox/Contenido/VBoxAudio/GridMusica" unique_id=321543601]
+layout_mode = 2
+
+[node name="@Label@21255" type="Label" parent="Margin/VBox/Contenido/VBoxAudio/GridMusica" unique_id=1487605180]
+layout_mode = 2
+text = "Volumen Bus:"
+
+[node name="ValVolumenMusica" type="Label" parent="Margin/VBox/Contenido/VBoxAudio/GridMusica" unique_id=843170961]
+layout_mode = 2
+
+[node name="HBoxBotonesMusica" type="HBoxContainer" parent="Margin/VBox/Contenido/VBoxAudio" unique_id=1267635672]
+layout_mode = 2
+
+[node name="BtnMusicaMenu" type="Button" parent="Margin/VBox/Contenido/VBoxAudio/HBoxBotonesMusica" unique_id=497261622]
+layout_mode = 2
+text = "Menú"
+
+[node name="BtnMusicaSupervivencia" type="Button" parent="Margin/VBox/Contenido/VBoxAudio/HBoxBotonesMusica" unique_id=1956786444]
+layout_mode = 2
+text = "Supervivencia"
+
+[node name="BtnMusicaJumpscare" type="Button" parent="Margin/VBox/Contenido/VBoxAudio/HBoxBotonesMusica" unique_id=2138427924]
+layout_mode = 2
+text = "Jumpscare"
+
+[node name="BtnMusicaGameOver" type="Button" parent="Margin/VBox/Contenido/VBoxAudio/HBoxBotonesMusica" unique_id=1136779403]
+layout_mode = 2
+text = "Game Over"
+
+[node name="BtnMusicaRestaurar" type="Button" parent="Margin/VBox/Contenido/VBoxAudio/HBoxBotonesMusica" unique_id=804961984]
+layout_mode = 2
+text = "Restaurar"
+
+[node name="GridSlidersMusica" type="GridContainer" parent="Margin/VBox/Contenido/VBoxAudio" unique_id=1133405717]
+layout_mode = 2
+columns = 3
+
+[node name="@Label@21256" type="Label" parent="Margin/VBox/Contenido/VBoxAudio/GridSlidersMusica" unique_id=391635145]
+layout_mode = 2
+text = "Volumen Base:"
+
+[node name="SliderVolBase" type="HSlider" parent="Margin/VBox/Contenido/VBoxAudio/GridSlidersMusica" unique_id=1382160217]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -40.0
+max_value = 6.0
+step = 0.5
+
+[node name="ValSliderVolBase" type="Label" parent="Margin/VBox/Contenido/VBoxAudio/GridSlidersMusica" unique_id=382746564]
+layout_mode = 2
+text = "0 dB"
+
+[node name="@Label@21257" type="Label" parent="Margin/VBox/Contenido/VBoxAudio/GridSlidersMusica" unique_id=1376874534]
+layout_mode = 2
+text = "Atenuación Pausa:"
+
+[node name="SliderAtenPausa" type="HSlider" parent="Margin/VBox/Contenido/VBoxAudio/GridSlidersMusica" unique_id=962699733]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -30.0
+max_value = 0.0
+step = 0.5
+value = -10.0
+
+[node name="ValSliderAtenPausa" type="Label" parent="Margin/VBox/Contenido/VBoxAudio/GridSlidersMusica" unique_id=1784422708]
+layout_mode = 2
+text = "-10 dB"
+
+[node name="@Label@21258" type="Label" parent="Margin/VBox/Contenido/VBoxAudio/GridSlidersMusica" unique_id=1937825904]
+layout_mode = 2
+text = "Pitch Game Over:"
+
+[node name="SliderPitchGO" type="HSlider" parent="Margin/VBox/Contenido/VBoxAudio/GridSlidersMusica" unique_id=1024144962]
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.2
+max_value = 1.5
+step = 0.05
+value = 0.6000000000000001
+
+[node name="ValSliderPitchGO" type="Label" parent="Margin/VBox/Contenido/VBoxAudio/GridSlidersMusica" unique_id=289740088]
+layout_mode = 2
+text = "0.6x"

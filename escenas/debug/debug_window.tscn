@@ -1,0 +1,35 @@
+[gd_scene format=3 uid="uid://cro6lqydxioft"]
+
+[ext_resource type="Script" uid="uid://xkpm1ugs2260" path="res://scripts/debug/debug_menu/debug_window.gd" id="1_e3335"]
+
+[node name="debug_window" type="PanelContainer" unique_id=1354089817]
+script = ExtResource("1_e3335")
+
+[node name="Margin" type="MarginContainer" parent="." unique_id=521099066]
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="Margin" unique_id=1041851260]
+layout_mode = 2
+
+[node name="BarraTitulo" type="HBoxContainer" parent="Margin/VBox" unique_id=293310005]
+layout_mode = 2
+
+[node name="LblTitulo" type="Label" parent="Margin/VBox/BarraTitulo" unique_id=1332538185]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Ventana Debug"
+
+[node name="BtnFijar" type="Button" parent="Margin/VBox/BarraTitulo" unique_id=1228359114]
+layout_mode = 2
+text = "📍"
+
+[node name="BtnColapsar" type="Button" parent="Margin/VBox/BarraTitulo" unique_id=496586372]
+layout_mode = 2
+text = "_"
+
+[node name="BtnCerrar" type="Button" parent="Margin/VBox/BarraTitulo" unique_id=1931624553]
+layout_mode = 2
+text = "✕"
+
+[node name="Contenido" type="MarginContainer" parent="Margin/VBox" unique_id=354738570]
+layout_mode = 2

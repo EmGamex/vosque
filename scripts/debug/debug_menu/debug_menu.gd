@@ -2,7 +2,10 @@
 extends CanvasLayer
 class_name DebugMenu
 
-## Modos de visualización tri-estado
+## Modos de visualización del sistema de debug
+## OCULTO: Solo visible si hay overlays en mundo o ventanas fijadas (📌).
+## EDICION (o COMPLETO): Barra Dock abierta + todas las ventanas activas para configurar.
+## MINI_HUD: Mantenido por retrocompatibilidad (se comporta como modo edición).
 enum ModoVisual {
 	OCULTO = 0,
 	MINI_HUD = 1,
@@ -13,43 +16,28 @@ enum ModoVisual {
 	set(value):
 		modo_actual = value
 		_actualizar_visibilidad()
-		var cfg = get_node_or_null("/root/DebugConfig")
+		var cfg = _get_debug_config()
 		if cfg != null:
 			cfg.modo_actual = int(modo_actual)
 
 @export_group("Nodos de Referencia")
 @export var target_character: CharacterBody2D:
-	get:
-		return context.target_character if context != null else null
-	set(val):
-		if context != null:
-			context.target_character = val
+	get: return context.target_character if context != null else null
+	set(val): if context != null: context.target_character = val
 @export var target_enemigo: CharacterBody2D:
-	get:
-		return context.target_enemigo if context != null else null
-	set(val):
-		if context != null:
-			context.target_enemigo = val
+	get: return context.target_enemigo if context != null else null
+	set(val): if context != null: context.target_enemigo = val
 @export var target_camara: Camera2D:
-	get:
-		return context.target_camara if context != null else null
-	set(val):
-		if context != null:
-			context.target_camara = val
+	get: return context.target_camara if context != null else null
+	set(val): if context != null: context.target_camara = val
 @export var target_camara_dios: Camera2D:
-	get:
-		return context.target_camara_dios if context != null else null
-	set(val):
-		if context != null:
-			context.target_camara_dios = val
+	get: return context.target_camara_dios if context != null else null
+	set(val): if context != null: context.target_camara_dios = val
 @export var target_escenario: Node2D:
-	get:
-		return context.target_escenario if context != null else null
-	set(val):
-		if context != null:
-			context.target_escenario = val
+	get: return context.target_escenario if context != null else null
+	set(val): if context != null: context.target_escenario = val
 
-# Sub-controladores modulares
+# Sub-controladores modulares de lógica
 var context: DebugContext
 var cheats: DebugCheatsController
 var physics: DebugPhysicsController
@@ -58,6 +46,20 @@ var enemy_ctrl: DebugEnemyController
 var system_ctrl: DebugSystemController
 var telemetry: DebugTelemetryPresenter
 var monitors: DebugCustomMonitors
+
+# Gestores de interfaz y ventanas
+var window_manager: DebugWindowManager
+var dock_controller: DebugDockController
+var external_window: DebugExternalWindow
+var esta_desacoplada: bool = false
+
+# Paneles de contenido para cada ventana
+var panel_jugador: DebugPlayerPanel
+var panel_fisicas: DebugPhysicsPanel
+var panel_escenario: DebugScenarioPanel
+var panel_enemigo: DebugEnemyPanel
+var panel_audio: DebugAudioPanel
+var panel_sistema: DebugSystemPanel
 
 # Acceso rápido a propiedades de estado para compatibilidad con DebugOverlay
 var debug_dibujar_cuadrantes: bool:
@@ -79,97 +81,63 @@ var cheat_god_mode: bool:
 var god_view_activo: bool:
 	get: return scenario.god_view_activo if scenario != null else false
 
-# Nodos de interfaz (asignados en _ready)
-@onready var mini_hud: PanelContainer = $ControlRaiz/MiniHUD
-@onready var label_mini_fps: Label = $ControlRaiz/MiniHUD/Margin/VBox/LabelMiniFPS
-@onready var label_mini_cuadrante: Label = $ControlRaiz/MiniHUD/Margin/VBox/LabelMiniCuadrante
-@onready var label_mini_vel: Label = $ControlRaiz/MiniHUD/Margin/VBox/LabelMiniVel
-@onready var label_mini_estamina: Label = $ControlRaiz/MiniHUD/Margin/VBox/LabelMiniEstamina
-
-@onready var panel_consola: PanelContainer = $ControlRaiz/PanelConsola
-@onready var tab_container: TabContainer = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer
-@onready var check_pausar: CheckBox = $ControlRaiz/PanelConsola/Margin/VBox/BarraSuperior/CheckPausar
-@onready var check_estamina_infinita: CheckBox = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/HBoxCheats/CheckEstaminaInfinita
-@onready var check_god_mode: CheckBox = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/HBoxCheats/CheckGodMode
-@onready var check_god_view: CheckBox = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario/VBox/CheckGodView
-@onready var check_corredores: CheckBox = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario/VBox/CheckCorredores
-@onready var check_cuadrantes: CheckBox = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario/VBox/CheckCuadrantes
-@onready var check_desactivar_niebla: CheckBox = get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario/VBox/CheckDesactivarNiebla") as CheckBox
-@onready var check_visual_debug: CheckBox = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Enemigo/VBox/CheckVisualDebug
-
-# Labels - Pestaña Jugador
-@onready var lbl_vel: Label = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/GridTelemetria/ValVel
-@onready var lbl_vel_max: Label = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/GridTelemetria/ValVelMax
-@onready var lbl_acel: Label = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/GridTelemetria/ValAcel
-@onready var lbl_fric: Label = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/GridTelemetria/ValFric
-@onready var lbl_estado: Label = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/GridTelemetria/ValEstado
-@onready var lbl_estamina: Label = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/GridTelemetria/ValEstamina
-@onready var lbl_pos_jugador: Label = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/GridTelemetria/ValPosicion
-@onready var lbl_cuadrante_jugador: Label = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/GridTelemetria/ValCuadrante
-
-# Labels - Pestaña Escenario
-@onready var lbl_escenario_estado: Label = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario/VBox/LblEstadoEscenario
-@onready var lbl_escenario_no: Label = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario/VBox/GridSectores/ValNO
-@onready var lbl_escenario_ne: Label = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario/VBox/GridSectores/ValNE
-@onready var lbl_escenario_so: Label = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario/VBox/GridSectores/ValSO
-@onready var lbl_escenario_se: Label = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Escenario/VBox/GridSectores/ValSE
-
-# Labels - Pestaña Enemigo
-@onready var lbl_enemigo_estado: Label = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Enemigo/VBox/GridEnemigo/ValEstadoIA
-@onready var lbl_enemigo_pos: Label = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Enemigo/VBox/GridEnemigo/ValPosEnemigo
-@onready var lbl_enemigo_dist: Label = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Enemigo/VBox/GridEnemigo/ValDistancia
-@onready var lbl_enemigo_vel: Label = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Enemigo/VBox/GridEnemigo/ValVelEnemigo
-@onready var lbl_enemigo_atascado: Label = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Enemigo/VBox/GridEnemigo/ValAtascamiento
-
-# Labels - Pestaña Sistema
-@onready var lbl_sys_fps: Label = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridSistema/ValFPS
-@onready var lbl_sys_mem: Label = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridSistema/ValMemoria
-@onready var lbl_sys_timescale: Label = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridSistema/ValTimeScale
-
-# Nodos Audio y Música - Pestaña Sistema (Issue #28)
-@onready var lbl_musica_estado: Label = get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridMusica/ValEstadoMusica") as Label
-@onready var lbl_musica_clip: Label = get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridMusica/ValClipMusica") as Label
-@onready var lbl_musica_volumen: Label = get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridMusica/ValVolumenMusica") as Label
-
-@onready var btn_musica_menu: Button = get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/HBoxBotonesMusica/BtnMusicaMenu") as Button
-@onready var btn_musica_supervivencia: Button = get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/HBoxBotonesMusica/BtnMusicaSupervivencia") as Button
-@onready var btn_musica_jumpscare: Button = get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/HBoxBotonesMusica/BtnMusicaJumpscare") as Button
-@onready var btn_musica_game_over: Button = get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/HBoxBotonesMusica/BtnMusicaGameOver") as Button
-@onready var btn_musica_restaurar: Button = get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/HBoxBotonesMusica/BtnMusicaRestaurar") as Button
-
-@onready var slider_vol_base: HSlider = get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridSlidersMusica/SliderVolBase") as HSlider
-@onready var val_slider_vol_base: Label = get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridSlidersMusica/ValSliderVolBase") as Label
-@onready var slider_aten_pausa: HSlider = get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridSlidersMusica/SliderAtenPausa") as HSlider
-@onready var val_slider_aten_pausa: Label = get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridSlidersMusica/ValSliderAtenPausa") as Label
-@onready var slider_pitch_go: HSlider = get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridSlidersMusica/SliderPitchGO") as HSlider
-@onready var val_slider_pitch_go: Label = get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/GridSlidersMusica/ValSliderPitchGO") as Label
-
-# High Score y Persistencia - Pestaña Sistema (Issue #35)
-@onready var val_high_score: Label = get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/HBoxPersistencia/ValHighScore") as Label
-@onready var btn_reset_high_score: Button = get_node_or_null("ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Sistema/VBox/BtnResetearHighScore") as Button
-
-# Visualizador de Direcciones
-@onready var flecha_up: Label = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/HBoxPad/GridPad/FlechaUp
-@onready var flecha_down: Label = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/HBoxPad/GridPad/FlechaDown
-@onready var flecha_left: Label = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/HBoxPad/GridPad/FlechaLeft
-@onready var flecha_right: Label = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/HBoxPad/GridPad/FlechaRight
-
-# Panel Desplegable de Velocidad y Físicas
-@onready var btn_desplegar_fisicas: Button = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/BtnDesplegarFisicas
-@onready var panel_desplegable_fisicas: PanelContainer = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas
-@onready var check_proporcional: CheckBox = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas/HBoxOpciones/CheckProporcional
-@onready var slider_vel_normal: HSlider = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas/GridVelocidades/SliderVelNormal
-@onready var val_slider_vel_normal: Label = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas/GridVelocidades/ValSliderVelNormal
-@onready var slider_vel_sprint: HSlider = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas/GridVelocidades/SliderVelSprint
-@onready var val_slider_vel_sprint: Label = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas/GridVelocidades/ValSliderVelSprint
-@onready var slider_acel: HSlider = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas/GridVelocidades/SliderAcel
-@onready var val_slider_acel: Label = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas/GridVelocidades/ValSliderAcel
-@onready var slider_fric: HSlider = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas/GridVelocidades/SliderFric
-@onready var val_slider_fric: Label = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas/GridVelocidades/ValSliderFric
-@onready var slider_dive_vel: HSlider = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas/GridVelocidades/SliderDiveVel
-@onready var val_slider_dive_vel: Label = $ControlRaiz/PanelConsola/Margin/VBox/TabContainer/Jugador/VBox/PanelDesplegableFisicas/MarginFisicas/ContenidoFisicas/GridVelocidades/ValSliderDiveVel
-
+# Nodos raíz
+@onready var control_raiz: Control = $ControlRaiz
+@onready var barra_dock: PanelContainer = get_node_or_null("ControlRaiz/BarraDock") as PanelContainer
+@onready var contenedor_ventanas: Control = get_node_or_null("ControlRaiz/ContenedorVentanas") as Control
 @onready var overlay_draw: Node2D = $DebugOverlay
+
+# Propiedades de ventanas con resolución perezosa (soporta instanciación fuera del árbol en tests)
+var _win_jugador: DebugWindow
+var win_jugador: DebugWindow:
+	get:
+		if _win_jugador == null: _win_jugador = get_node_or_null("ControlRaiz/ContenedorVentanas/VentanaJugador") as DebugWindow
+		return _win_jugador
+	set(v): _win_jugador = v
+
+var _win_fisicas: DebugWindow
+var win_fisicas: DebugWindow:
+	get:
+		if _win_fisicas == null: _win_fisicas = get_node_or_null("ControlRaiz/ContenedorVentanas/VentanaFisicas") as DebugWindow
+		return _win_fisicas
+	set(v): _win_fisicas = v
+
+var _win_escenario: DebugWindow
+var win_escenario: DebugWindow:
+	get:
+		if _win_escenario == null: _win_escenario = get_node_or_null("ControlRaiz/ContenedorVentanas/VentanaEscenario") as DebugWindow
+		return _win_escenario
+	set(v): _win_escenario = v
+
+var _win_enemigo: DebugWindow
+var win_enemigo: DebugWindow:
+	get:
+		if _win_enemigo == null: _win_enemigo = get_node_or_null("ControlRaiz/ContenedorVentanas/VentanaEnemigo") as DebugWindow
+		return _win_enemigo
+	set(v): _win_enemigo = v
+
+var _win_audio: DebugWindow
+var win_audio: DebugWindow:
+	get:
+		if _win_audio == null: _win_audio = get_node_or_null("ControlRaiz/ContenedorVentanas/VentanaAudio") as DebugWindow
+		return _win_audio
+	set(v): _win_audio = v
+
+var _win_sistema: DebugWindow
+var win_sistema: DebugWindow:
+	get:
+		if _win_sistema == null: _win_sistema = get_node_or_null("ControlRaiz/ContenedorVentanas/VentanaSistema") as DebugWindow
+		return _win_sistema
+	set(v): _win_sistema = v
+
+var option_presets: OptionButton:
+	get:
+		if dock_controller != null and dock_controller.option_presets != null:
+			return dock_controller.option_presets
+		return get_node_or_null("ControlRaiz/BarraDock/HBoxDock/OptionPresets") as OptionButton
+
+var todas_las_ventanas: Array[DebugWindow]:
+	get: return window_manager.todas_las_ventanas if window_manager != null else []
 
 
 func _init() -> void:
@@ -182,9 +150,21 @@ func _init() -> void:
 	telemetry = DebugTelemetryPresenter.new()
 	monitors = DebugCustomMonitors.new()
 
+	window_manager = DebugWindowManager.new()
+	dock_controller = DebugDockController.new()
+
+	panel_jugador = DebugPlayerPanel.new()
+	panel_fisicas = DebugPhysicsPanel.new()
+	panel_escenario = DebugScenarioPanel.new()
+	panel_enemigo = DebugEnemyPanel.new()
+	panel_audio = DebugAudioPanel.new()
+	panel_sistema = DebugSystemPanel.new()
+
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+
+	_inicializar_gestores_y_paneles()
 
 	if not Engine.is_editor_hint():
 		_restaurar_estado_desde_config()
@@ -198,23 +178,70 @@ func _ready() -> void:
 	scenario.inicializar_camaras(context)
 	scenario.aplicar_estado_niebla(context)
 	monitors.registrar(context)
-	_inicializar_controles_musica()
-	_inicializar_controles_persistencia()
+	panel_audio.inicializar_controles_musica(get_tree(), system_ctrl)
+
+
+func _inicializar_gestores_y_paneles() -> void:
+	var lista_ventanas: Array[DebugWindow] = []
+	for w in [win_jugador, win_fisicas, win_escenario, win_enemigo, win_audio, win_sistema]:
+		if w != null:
+			lista_ventanas.append(w)
+
+	window_manager.inicializar(lista_ventanas)
+	window_manager.conectar_eventos_ventanas(_on_ventana_estado_modificado)
+
+	dock_controller.vincular_nodos(barra_dock)
+	dock_controller.inicializar_presets()
+	dock_controller.conectar_eventos(window_manager, system_ctrl, get_tree())
+	dock_controller.modo_ocultar_solicitado.connect(func(): modo_actual = ModoVisual.OCULTO)
+	dock_controller.ordenar_mosaico_solicitado.connect(ordenar_ventanas_en_mosaico)
+	dock_controller.desacoplar_toggled.connect(set_desacoplada)
+
+	external_window = DebugExternalWindow.new()
+	external_window.cierre_solicitado.connect(func(): modo_actual = ModoVisual.OCULTO)
+	add_child(external_window)
+
+	panel_jugador.vincular_nodos(win_jugador)
+	panel_jugador.conectar_eventos(cheats, context, _get_debug_config)
+
+	panel_fisicas.vincular_nodos(win_fisicas)
+	panel_fisicas.conectar_eventos(physics, context, _get_debug_config)
+
+	panel_escenario.vincular_nodos(win_escenario)
+	panel_escenario.conectar_eventos(scenario, context, _get_debug_config)
+	panel_escenario.overlay_modificado.connect(_actualizar_visibilidad)
+
+	panel_enemigo.vincular_nodos(win_enemigo)
+	panel_enemigo.conectar_eventos(enemy_ctrl, context, _get_debug_config)
+
+	panel_audio.vincular_nodos(win_audio)
+	panel_sistema.vincular_nodos(win_sistema)
+	panel_sistema.conectar_eventos(system_ctrl, get_tree(), _get_debug_config)
+
+
+func _on_ventana_estado_modificado(win_id: String) -> void:
+	window_manager.guardar_estado_ventana(win_id, _get_debug_config())
 
 
 func _restaurar_estado_desde_config() -> void:
-	var cfg = get_node_or_null("/root/DebugConfig")
+	var cfg = _get_debug_config()
 	if cfg == null:
 		return
 
 	modo_actual = cfg.modo_actual as ModoVisual
-	cheats.restaurar_desde_config(cfg, check_estamina_infinita, check_god_mode)
-	scenario.restaurar_desde_config(cfg, check_god_view, check_corredores, check_cuadrantes, check_desactivar_niebla)
-	enemy_ctrl.restaurar_desde_config(cfg, check_visual_debug)
-	physics.set_proporcional(cfg.escalado_proporcional_activo, cfg)
-	if check_proporcional != null:
-		check_proporcional.set_pressed_no_signal(physics.escalado_proporcional_activo)
+	panel_jugador.restaurar_desde_config(cheats, cfg)
+	panel_escenario.restaurar_desde_config(scenario, cfg)
+	panel_enemigo.restaurar_desde_config(enemy_ctrl, cfg)
+	panel_fisicas.restaurar_desde_config(physics, cfg)
 	Engine.time_scale = cfg.time_scale
+
+	window_manager.restaurar_desde_config(cfg)
+
+	if external_window != null:
+		external_window.inicializar_geometria(cfg)
+
+	if "ventana_desacoplada" in cfg and cfg.ventana_desacoplada and DisplayServer.has_feature(DisplayServer.FEATURE_SUBWINDOWS):
+		set_desacoplada(true)
 
 
 func _exit_tree() -> void:
@@ -227,7 +254,10 @@ func _unhandled_input(event: InputEvent) -> void:
 
 	if event is InputEventKey and event.pressed and not event.echo:
 		if event.keycode == KEY_F3:
-			modo_actual = ((int(modo_actual) + 1) % 3) as ModoVisual
+			if modo_actual == ModoVisual.COMPLETO:
+				modo_actual = ModoVisual.OCULTO
+			else:
+				modo_actual = ModoVisual.COMPLETO
 			get_viewport().set_input_as_handled()
 		elif modo_actual == ModoVisual.COMPLETO and (event.keycode == KEY_ESCAPE or event.is_action_pressed("pausa") or event.is_action_pressed("ui_cancel")):
 			modo_actual = ModoVisual.OCULTO
@@ -235,13 +265,26 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _actualizar_visibilidad() -> void:
-	var hay_overlays_activos: bool = scenario.debug_dibujar_cuadrantes or scenario.debug_dibujar_corredores
-	visible = (modo_actual != ModoVisual.OCULTO) or hay_overlays_activos
+	var hay_overlays: bool = scenario != null and (scenario.debug_dibujar_cuadrantes or scenario.debug_dibujar_corredores)
+	var en_edicion: bool = (modo_actual == ModoVisual.COMPLETO or modo_actual == ModoVisual.MINI_HUD)
 
-	if mini_hud != null:
-		mini_hud.visible = (modo_actual == ModoVisual.MINI_HUD)
-	if panel_consola != null:
-		panel_consola.visible = (modo_actual == ModoVisual.COMPLETO)
+	var visible_interior: bool = window_manager.actualizar_visibilidad(en_edicion, hay_overlays, barra_dock)
+
+	if esta_desacoplada and external_window != null:
+		# En modo desacoplado, la ventana externa muestra la UI si estamos en edición o si hay ventanas fijadas
+		var hay_fijadas: bool = false
+		for win in window_manager.todas_las_ventanas:
+			if win != null and win.abierta and win.fijada:
+				hay_fijadas = true
+				break
+		external_window.visible = en_edicion or hay_fijadas
+		# El CanvasLayer principal solo debe estar visible si hay overlays de dibujo sobre el juego
+		visible = hay_overlays
+	else:
+		if external_window != null:
+			external_window.visible = false
+		visible = visible_interior
+
 	if overlay_draw != null:
 		overlay_draw.queue_redraw()
 	if context != null and context.target_enemigo != null and is_instance_valid(context.target_enemigo):
@@ -260,22 +303,13 @@ func _process(_delta: float) -> void:
 	if (scenario.debug_dibujar_cuadrantes or scenario.debug_dibujar_corredores) and overlay_draw != null:
 		overlay_draw.queue_redraw()
 
-	if modo_actual == ModoVisual.OCULTO:
+	if not visible:
 		return
 
 	_actualizar_telemetria()
 
 
-func _buscar_nodos_objetivo() -> void:
-	var escena_actual: Node = get_tree().current_scene
-	context.buscar_nodos(escena_actual, scenario.god_view_activo)
-	physics.inicializar_valores(context.target_character, get_node_or_null("/root/DebugConfig"), _obtener_ui_fisicas())
-
-
 func _actualizar_telemetria() -> void:
-	var fps: int = int(Engine.get_frames_per_second())
-	var mem_mb: float = float(OS.get_static_memory_usage()) / (1024.0 * 1024.0)
-
 	var pos_jugador: Vector2 = Vector2.ZERO
 	var cuadrante_jugador: String = "N/A"
 	var vel_actual: float = 0.0
@@ -307,251 +341,84 @@ func _actualizar_telemetria() -> void:
 		elif "estamina_actual" in context.target_character:
 			estamina_txt = "%.1f / 100.0" % float(context.target_character.get("estamina_actual"))
 
-		cheats.aplicar_en_process(context.target_character)
+	# Actualizar Ventana Jugador
+	if win_jugador != null and win_jugador.visible and not win_jugador.colapsada:
+		panel_jugador.actualizar_telemetria(telemetry, context, vel_actual, vel_max, acel, fric, estado_txt, estamina_txt, pos_jugador, cuadrante_jugador)
 
-		var dir_input: Vector2 = Input.get_vector("personaje-izquierda", "personaje-derecha", "personaje-arriba", "personaje-abajo")
-		if dir_input == Vector2.ZERO:
-			dir_input = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
-		telemetry.actualizar_pad_direccional(_obtener_ui_flechas(), dir_input)
+	# Actualizar Ventana Escenario
+	if win_escenario != null and win_escenario.visible and not win_escenario.colapsada:
+		panel_escenario.actualizar_telemetria(telemetry, context.target_escenario, cuadrante_jugador)
 
-	if mini_hud != null and mini_hud.visible:
-		telemetry.actualizar_mini_hud({
-			"label_mini_fps": label_mini_fps,
-			"label_mini_cuadrante": label_mini_cuadrante,
-			"label_mini_vel": label_mini_vel,
-			"label_mini_estamina": label_mini_estamina
-		}, fps, mem_mb, cuadrante_jugador, vel_actual, estamina_txt)
+	# Actualizar Ventana Enemigo
+	if win_enemigo != null and win_enemigo.visible and not win_enemigo.colapsada:
+		panel_enemigo.actualizar_telemetria(telemetry, context, pos_jugador, enemy_ctrl.debug_dibujar_vectores_ia)
 
-	if panel_consola != null and panel_consola.visible:
-		telemetry.actualizar_tab_jugador({
-			"lbl_vel": lbl_vel,
-			"lbl_vel_max": lbl_vel_max,
-			"lbl_acel": lbl_acel,
-			"lbl_fric": lbl_fric,
-			"lbl_estado": lbl_estado,
-			"lbl_estamina": lbl_estamina,
-			"lbl_pos_jugador": lbl_pos_jugador,
-			"lbl_cuadrante_jugador": lbl_cuadrante_jugador
-		}, context.target_character, context, vel_actual, vel_max, acel, fric, estado_txt, estamina_txt, pos_jugador, cuadrante_jugador)
-
-		telemetry.actualizar_tab_escenario({
-			"lbl_escenario_estado": lbl_escenario_estado,
-			"lbl_escenario_no": lbl_escenario_no,
-			"lbl_escenario_ne": lbl_escenario_ne,
-			"lbl_escenario_so": lbl_escenario_so,
-			"lbl_escenario_se": lbl_escenario_se
-		}, context.target_escenario, cuadrante_jugador)
-
-		telemetry.actualizar_tab_enemigo({
-			"lbl_enemigo_estado": lbl_enemigo_estado,
-			"lbl_enemigo_pos": lbl_enemigo_pos,
-			"lbl_enemigo_dist": lbl_enemigo_dist,
-			"lbl_enemigo_vel": lbl_enemigo_vel,
-			"lbl_enemigo_atascado": lbl_enemigo_atascado
-		}, context.target_enemigo, pos_jugador, context, enemy_ctrl.debug_dibujar_vectores_ia)
-
-		if check_pausar != null:
-			check_pausar.set_pressed_no_signal(get_tree().paused)
-
+	# Actualizar Ventana Audio y Sistema
+	if (win_audio != null and win_audio.visible and not win_audio.colapsada) or (win_sistema != null and win_sistema.visible and not win_sistema.colapsada):
+		var fps: int = int(Engine.get_frames_per_second())
+		var mem_mb: float = float(OS.get_static_memory_usage()) / (1024.0 * 1024.0)
 		var telem_musica: Dictionary = system_ctrl.obtener_telemetria_musica()
 		var record_actual: int = system_ctrl.obtener_high_score()
-		telemetry.actualizar_tab_sistema({
-			"lbl_sys_fps": lbl_sys_fps,
-			"lbl_sys_mem": lbl_sys_mem,
-			"lbl_sys_timescale": lbl_sys_timescale,
-			"lbl_musica_estado": lbl_musica_estado,
-			"lbl_musica_clip": lbl_musica_clip,
-			"lbl_musica_volumen": lbl_musica_volumen,
-			"val_high_score": val_high_score
-		}, fps, mem_mb, telem_musica, record_actual)
-
-	if overlay_draw != null:
-		overlay_draw.queue_redraw()
+		panel_sistema.actualizar_telemetria(telemetry, fps, mem_mb, telem_musica, record_actual, panel_audio.lbl_musica_estado, panel_audio.lbl_musica_clip, panel_audio.lbl_musica_volumen)
 
 
-func _obtener_ui_fisicas() -> Dictionary:
-	return {
-		"check_proporcional": check_proporcional,
-		"slider_vel_normal": slider_vel_normal,
-		"val_slider_vel_normal": val_slider_vel_normal,
-		"slider_vel_sprint": slider_vel_sprint,
-		"val_slider_vel_sprint": val_slider_vel_sprint,
-		"slider_acel": slider_acel,
-		"val_slider_acel": val_slider_acel,
-		"slider_fric": slider_fric,
-		"val_slider_fric": val_slider_fric,
-		"slider_dive_vel": slider_dive_vel,
-		"val_slider_dive_vel": val_slider_dive_vel
-	}
+func _buscar_nodos_objetivo() -> void:
+	var escena_actual: Node = get_tree().current_scene if get_tree() != null else null
+	if escena_actual == null:
+		escena_actual = get_parent()
+	context.buscar_nodos(escena_actual, scenario.god_view_activo)
+	physics.inicializar_valores(context.target_character, _get_debug_config(), panel_fisicas.obtener_ui_fisicas())
 
 
-func _obtener_ui_flechas() -> Dictionary:
-	return {
-		"flecha_up": flecha_up,
-		"flecha_down": flecha_down,
-		"flecha_left": flecha_left,
-		"flecha_right": flecha_right
-	}
+func _get_debug_config() -> Node:
+	return get_node_or_null("/root/DebugConfig")
 
 
-# --- Delegación de Señales de la UI ---
+# Métodos de delegación para compatibilidad hacia atrás
+func set_desacoplada(desacoplar: bool) -> void:
+	if desacoplar == esta_desacoplada:
+		return
+	if desacoplar and not DisplayServer.has_feature(DisplayServer.FEATURE_SUBWINDOWS):
+		return
 
-func _on_boton_cerrar_pressed() -> void:
-	modo_actual = ModoVisual.OCULTO
+	esta_desacoplada = desacoplar
+	var cfg = _get_debug_config()
+	if cfg != null:
+		cfg.ventana_desacoplada = esta_desacoplada
 
-func _on_boton_mini_expandir_pressed() -> void:
-	modo_actual = ModoVisual.COMPLETO
+	dock_controller.actualizar_estado_desacople(esta_desacoplada)
 
-func _on_check_pausar_toggled(toggled_on: bool) -> void:
-	system_ctrl.toggle_pausa(get_tree(), toggled_on)
+	if control_raiz != null:
+		if esta_desacoplada and external_window != null:
+			control_raiz.reparent(external_window)
+			control_raiz.set_anchors_preset(Control.PRESET_FULL_RECT)
+		elif not esta_desacoplada:
+			control_raiz.reparent(self)
+			control_raiz.set_anchors_preset(Control.PRESET_FULL_RECT)
 
-func _on_check_estamina_infinita_toggled(toggled_on: bool) -> void:
-	cheats.set_estamina_infinita(toggled_on, context.target_character, get_node_or_null("/root/DebugConfig"))
-
-func _on_check_god_mode_toggled(toggled_on: bool) -> void:
-	cheats.set_god_mode(toggled_on, context.target_character, get_node_or_null("/root/DebugConfig"))
-
-func _on_btn_desplegar_fisicas_pressed() -> void:
-	physics.toggle_desplegar(btn_desplegar_fisicas, panel_desplegable_fisicas)
-
-func _on_check_proporcional_toggled(toggled_on: bool) -> void:
-	physics.set_proporcional(toggled_on, get_node_or_null("/root/DebugConfig"))
-
-func _on_slider_vel_normal_value_changed(value: float) -> void:
-	physics.on_vel_normal_changed(value, context.target_character, get_node_or_null("/root/DebugConfig"), _obtener_ui_fisicas())
-
-func _on_slider_vel_sprint_value_changed(value: float) -> void:
-	physics.on_vel_sprint_changed(value, context.target_character, get_node_or_null("/root/DebugConfig"), _obtener_ui_fisicas())
-
-func _on_slider_acel_value_changed(value: float) -> void:
-	physics.on_acel_changed(value, context.target_character, get_node_or_null("/root/DebugConfig"), _obtener_ui_fisicas())
-
-func _on_slider_fric_value_changed(value: float) -> void:
-	physics.on_fric_changed(value, context.target_character, get_node_or_null("/root/DebugConfig"), _obtener_ui_fisicas())
-
-func _on_slider_dive_vel_value_changed(value: float) -> void:
-	physics.on_dive_vel_changed(value, context.target_character, get_node_or_null("/root/DebugConfig"), _obtener_ui_fisicas())
-
-func _on_btn_reset_velocidades_pressed() -> void:
-	physics.reset_velocidades(context.target_character, get_node_or_null("/root/DebugConfig"), _obtener_ui_fisicas())
-
-func _on_check_god_view_toggled(toggled_on: bool) -> void:
-	scenario.set_god_view(toggled_on, context, get_node_or_null("/root/DebugConfig"))
-
-func _on_btn_forzar_mutacion_pressed() -> void:
-	scenario.forzar_mutacion(context.target_escenario)
-
-func _on_check_corredores_toggled(toggled_on: bool) -> void:
-	scenario.set_dibujar_corredores(toggled_on, get_node_or_null("/root/DebugConfig"))
 	_actualizar_visibilidad()
 
-func _on_check_cuadrantes_toggled(toggled_on: bool) -> void:
-	scenario.set_dibujar_cuadrantes(toggled_on, get_node_or_null("/root/DebugConfig"))
-	_actualizar_visibilidad()
 
-func _on_check_desactivar_niebla_toggled(toggled_on: bool) -> void:
-	scenario.set_desactivar_niebla(toggled_on, context, get_node_or_null("/root/DebugConfig"))
-
-func _on_check_visual_debug_enemigo_toggled(toggled_on: bool) -> void:
-	enemy_ctrl.set_visual_debug(toggled_on, context.target_enemigo, get_node_or_null("/root/DebugConfig"))
-
-func _on_btn_reubicar_enemigo_pressed() -> void:
-	enemy_ctrl.reubicar_enemigo(context.target_enemigo, context.target_character)
-
-func _on_btn_timescale_05_pressed() -> void:
-	system_ctrl.set_time_scale(0.5, get_node_or_null("/root/DebugConfig"))
-
-func _on_btn_timescale_10_pressed() -> void:
-	system_ctrl.set_time_scale(1.0, get_node_or_null("/root/DebugConfig"))
-
-func _on_btn_timescale_20_pressed() -> void:
-	system_ctrl.set_time_scale(2.0, get_node_or_null("/root/DebugConfig"))
-
-func _on_btn_reiniciar_escena_pressed() -> void:
-	system_ctrl.reiniciar_escena(get_tree())
+func ordenar_ventanas_en_mosaico() -> void:
+	var ancho: float = 1280.0
+	if esta_desacoplada and external_window != null:
+		ancho = float(external_window.size.x)
+	elif get_viewport() != null:
+		ancho = get_viewport().get_visible_rect().size.x
+	window_manager.ordenar_ventanas_en_mosaico(ancho)
 
 
-# --- Controles de Audio y Música (Issue #28) ---
-
-func _inicializar_controles_musica() -> void:
-	if btn_musica_menu != null and not btn_musica_menu.pressed.is_connected(_on_btn_musica_menu_pressed):
-		btn_musica_menu.pressed.connect(_on_btn_musica_menu_pressed)
-	if btn_musica_supervivencia != null and not btn_musica_supervivencia.pressed.is_connected(_on_btn_musica_supervivencia_pressed):
-		btn_musica_supervivencia.pressed.connect(_on_btn_musica_supervivencia_pressed)
-	if btn_musica_jumpscare != null and not btn_musica_jumpscare.pressed.is_connected(_on_btn_musica_jumpscare_pressed):
-		btn_musica_jumpscare.pressed.connect(_on_btn_musica_jumpscare_pressed)
-	if btn_musica_game_over != null and not btn_musica_game_over.pressed.is_connected(_on_btn_musica_game_over_pressed):
-		btn_musica_game_over.pressed.connect(_on_btn_musica_game_over_pressed)
-	if btn_musica_restaurar != null and not btn_musica_restaurar.pressed.is_connected(_on_btn_musica_restaurar_pressed):
-		btn_musica_restaurar.pressed.connect(_on_btn_musica_restaurar_pressed)
-
-	var tree := get_tree()
-	var gm: Node = tree.root.get_node_or_null("GestorMusica") if (tree != null and tree.root != null) else null
-	var cfg_musica: ConfiguracionMusica = gm.config if (gm != null and "config" in gm and gm.config is ConfiguracionMusica) else null
-
-	if cfg_musica != null:
-		if slider_vol_base != null:
-			slider_vol_base.set_value_no_signal(cfg_musica.volumen_base_db)
-			if val_slider_vol_base != null: val_slider_vol_base.text = "%.1f dB" % cfg_musica.volumen_base_db
-		if slider_aten_pausa != null:
-			slider_aten_pausa.set_value_no_signal(cfg_musica.atenuacion_pausa_db)
-			if val_slider_aten_pausa != null: val_slider_aten_pausa.text = "%.1f dB" % cfg_musica.atenuacion_pausa_db
-		if slider_pitch_go != null:
-			slider_pitch_go.set_value_no_signal(cfg_musica.pitch_game_over)
-			if val_slider_pitch_go != null: val_slider_pitch_go.text = "%.2fx" % cfg_musica.pitch_game_over
-
-	if slider_vol_base != null and not slider_vol_base.value_changed.is_connected(_on_slider_vol_base_value_changed):
-		slider_vol_base.value_changed.connect(_on_slider_vol_base_value_changed)
-	if slider_aten_pausa != null and not slider_aten_pausa.value_changed.is_connected(_on_slider_aten_pausa_value_changed):
-		slider_aten_pausa.value_changed.connect(_on_slider_aten_pausa_value_changed)
-	if slider_pitch_go != null and not slider_pitch_go.value_changed.is_connected(_on_slider_pitch_go_value_changed):
-		slider_pitch_go.value_changed.connect(_on_slider_pitch_go_value_changed)
+func _on_preset_selected(index: int) -> void:
+	if window_manager.todas_las_ventanas.is_empty():
+		_asegurar_inicializacion_ventanas()
+	window_manager.aplicar_preset(index)
+	if option_presets != null:
+		option_presets.selected = 0
 
 
-func _on_btn_musica_menu_pressed() -> void:
-	system_ctrl.forzar_musica_menu()
-
-
-func _on_btn_musica_supervivencia_pressed() -> void:
-	system_ctrl.forzar_musica_supervivencia()
-
-
-func _on_btn_musica_jumpscare_pressed() -> void:
-	system_ctrl.forzar_corte_jumpscare()
-
-
-func _on_btn_musica_game_over_pressed() -> void:
-	system_ctrl.forzar_modo_game_over()
-
-
-func _on_btn_musica_restaurar_pressed() -> void:
-	system_ctrl.restaurar_audio_normal()
-
-
-func _on_slider_vol_base_value_changed(val: float) -> void:
-	system_ctrl.set_volumen_base(val)
-	if val_slider_vol_base != null:
-		val_slider_vol_base.text = "%.1f dB" % val
-
-
-func _on_slider_aten_pausa_value_changed(val: float) -> void:
-	system_ctrl.set_atenuacion_pausa(val)
-	if val_slider_aten_pausa != null:
-		val_slider_aten_pausa.text = "%.1f dB" % val
-
-
-func _on_slider_pitch_go_value_changed(val: float) -> void:
-	system_ctrl.set_pitch_game_over(val)
-	if val_slider_pitch_go != null:
-		val_slider_pitch_go.text = "%.2fx" % val
-
-
-func _inicializar_controles_persistencia() -> void:
-	if btn_reset_high_score != null and not btn_reset_high_score.pressed.is_connected(_on_btn_reset_high_score_pressed):
-		btn_reset_high_score.pressed.connect(_on_btn_reset_high_score_pressed)
-
-
-func _on_btn_reset_high_score_pressed() -> void:
-	system_ctrl.resetear_high_score()
-	if val_high_score != null:
-		val_high_score.text = str(system_ctrl.obtener_high_score())
+func _asegurar_inicializacion_ventanas() -> void:
+	var lista_ventanas: Array[DebugWindow] = []
+	for w in [win_jugador, win_fisicas, win_escenario, win_enemigo, win_audio, win_sistema]:
+		if w != null:
+			lista_ventanas.append(w)
+	window_manager.inicializar(lista_ventanas)

@@ -1,0 +1,149 @@
+[gd_scene format=3 uid="uid://k3xc474tnhok"]
+
+[ext_resource type="Script" uid="uid://xkpm1ugs2260" path="res://scripts/debug/debug_menu/debug_window.gd" id="1_21cfj"]
+
+[node name="ventana_debug_jugador" type="PanelContainer" unique_id=1538980073]
+script = ExtResource("1_21cfj")
+window_id = "jugador"
+window_title = "🏃 Jugador & Cheats"
+
+[node name="Margin" type="MarginContainer" parent="." unique_id=1029433179]
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="Margin" unique_id=599536216]
+layout_mode = 2
+
+[node name="BarraTitulo" type="HBoxContainer" parent="Margin/VBox" unique_id=1796782180]
+layout_mode = 2
+
+[node name="LblTitulo" type="Label" parent="Margin/VBox/BarraTitulo" unique_id=2070720056]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "🏃 Jugador & Cheats"
+
+[node name="BtnFijar" type="Button" parent="Margin/VBox/BarraTitulo" unique_id=1195384589]
+layout_mode = 2
+text = "📍"
+
+[node name="BtnColapsar" type="Button" parent="Margin/VBox/BarraTitulo" unique_id=82668980]
+layout_mode = 2
+text = "_"
+
+[node name="BtnCerrar" type="Button" parent="Margin/VBox/BarraTitulo" unique_id=110055012]
+layout_mode = 2
+text = "✕"
+
+[node name="Contenido" type="MarginContainer" parent="Margin/VBox" unique_id=268284935]
+layout_mode = 2
+
+[node name="VBoxJugador" type="VBoxContainer" parent="Margin/VBox/Contenido" unique_id=812111386]
+layout_mode = 2
+
+[node name="GridTelemetria" type="GridContainer" parent="Margin/VBox/Contenido/VBoxJugador" unique_id=5830442]
+layout_mode = 2
+columns = 2
+
+[node name="@Label@21195" type="Label" parent="Margin/VBox/Contenido/VBoxJugador/GridTelemetria" unique_id=162539401]
+layout_mode = 2
+text = "Velocidad actual:"
+
+[node name="ValVel" type="Label" parent="Margin/VBox/Contenido/VBoxJugador/GridTelemetria" unique_id=292559807]
+layout_mode = 2
+
+[node name="@Label@21196" type="Label" parent="Margin/VBox/Contenido/VBoxJugador/GridTelemetria" unique_id=587561217]
+layout_mode = 2
+text = "Velocidad máxima:"
+
+[node name="ValVelMax" type="Label" parent="Margin/VBox/Contenido/VBoxJugador/GridTelemetria" unique_id=976975056]
+layout_mode = 2
+
+[node name="@Label@21197" type="Label" parent="Margin/VBox/Contenido/VBoxJugador/GridTelemetria" unique_id=1746940268]
+layout_mode = 2
+text = "Aceleración:"
+
+[node name="ValAcel" type="Label" parent="Margin/VBox/Contenido/VBoxJugador/GridTelemetria" unique_id=482069580]
+layout_mode = 2
+
+[node name="@Label@21198" type="Label" parent="Margin/VBox/Contenido/VBoxJugador/GridTelemetria" unique_id=242455729]
+layout_mode = 2
+text = "Fricción:"
+
+[node name="ValFric" type="Label" parent="Margin/VBox/Contenido/VBoxJugador/GridTelemetria" unique_id=1610146425]
+layout_mode = 2
+
+[node name="@Label@21199" type="Label" parent="Margin/VBox/Contenido/VBoxJugador/GridTelemetria" unique_id=773356697]
+layout_mode = 2
+text = "Estado FSM:"
+
+[node name="ValEstado" type="Label" parent="Margin/VBox/Contenido/VBoxJugador/GridTelemetria" unique_id=9254564]
+layout_mode = 2
+
+[node name="@Label@21200" type="Label" parent="Margin/VBox/Contenido/VBoxJugador/GridTelemetria" unique_id=585885260]
+layout_mode = 2
+text = "Estamina:"
+
+[node name="ValEstamina" type="Label" parent="Margin/VBox/Contenido/VBoxJugador/GridTelemetria" unique_id=1803988832]
+layout_mode = 2
+
+[node name="@Label@21201" type="Label" parent="Margin/VBox/Contenido/VBoxJugador/GridTelemetria" unique_id=440227524]
+layout_mode = 2
+text = "Posición:"
+
+[node name="ValPosicion" type="Label" parent="Margin/VBox/Contenido/VBoxJugador/GridTelemetria" unique_id=567339281]
+layout_mode = 2
+
+[node name="@Label@21202" type="Label" parent="Margin/VBox/Contenido/VBoxJugador/GridTelemetria" unique_id=760745310]
+layout_mode = 2
+text = "Cuadrante actual:"
+
+[node name="ValCuadrante" type="Label" parent="Margin/VBox/Contenido/VBoxJugador/GridTelemetria" unique_id=2016121449]
+layout_mode = 2
+
+[node name="HBoxPad" type="HBoxContainer" parent="Margin/VBox/Contenido/VBoxJugador" unique_id=1538797930]
+layout_mode = 2
+
+[node name="GridPad" type="GridContainer" parent="Margin/VBox/Contenido/VBoxJugador/HBoxPad" unique_id=1223402977]
+layout_mode = 2
+columns = 3
+
+[node name="@Control@21203" type="Control" parent="Margin/VBox/Contenido/VBoxJugador/HBoxPad/GridPad" unique_id=401332816]
+layout_mode = 2
+
+[node name="FlechaUp" type="Label" parent="Margin/VBox/Contenido/VBoxJugador/HBoxPad/GridPad" unique_id=9854949]
+layout_mode = 2
+text = "▲"
+
+[node name="@Control@21204" type="Control" parent="Margin/VBox/Contenido/VBoxJugador/HBoxPad/GridPad" unique_id=1373132762]
+layout_mode = 2
+
+[node name="FlechaLeft" type="Label" parent="Margin/VBox/Contenido/VBoxJugador/HBoxPad/GridPad" unique_id=92995265]
+layout_mode = 2
+text = "◀"
+
+[node name="@Control@21205" type="Control" parent="Margin/VBox/Contenido/VBoxJugador/HBoxPad/GridPad" unique_id=1320855126]
+layout_mode = 2
+
+[node name="FlechaRight" type="Label" parent="Margin/VBox/Contenido/VBoxJugador/HBoxPad/GridPad" unique_id=1204346196]
+layout_mode = 2
+text = "▶"
+
+[node name="@Control@21206" type="Control" parent="Margin/VBox/Contenido/VBoxJugador/HBoxPad/GridPad" unique_id=545725844]
+layout_mode = 2
+
+[node name="FlechaDown" type="Label" parent="Margin/VBox/Contenido/VBoxJugador/HBoxPad/GridPad" unique_id=737634775]
+layout_mode = 2
+text = "▼"
+
+[node name="@Control@21207" type="Control" parent="Margin/VBox/Contenido/VBoxJugador/HBoxPad/GridPad" unique_id=2025519732]
+layout_mode = 2
+
+[node name="HBoxCheats" type="HBoxContainer" parent="Margin/VBox/Contenido/VBoxJugador" unique_id=395685884]
+layout_mode = 2
+
+[node name="CheckEstaminaInfinita" type="CheckBox" parent="Margin/VBox/Contenido/VBoxJugador/HBoxCheats" unique_id=882743953]
+layout_mode = 2
+text = "Estamina Infinita"
+
+[node name="CheckGodMode" type="CheckBox" parent="Margin/VBox/Contenido/VBoxJugador/HBoxCheats" unique_id=1189193326]
+layout_mode = 2
+text = "Invencibilidad (God Mode)"
