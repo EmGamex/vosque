@@ -151,3 +151,29 @@ func test_gestor_ventanas_y_presets() -> void:
 	assert_false(menu.win_fisicas.abierta, "Ventana físicas debe cerrarse")
 
 	menu.free()
+
+
+func test_desacople_ventana_externa() -> void:
+	var escena_debug: PackedScene = load("res://escenas/debug_menu.tscn")
+	assert_true(escena_debug != null, "debug_menu.tscn debe cargar")
+	var menu: DebugMenu = escena_debug.instantiate() as DebugMenu
+	assert_true(menu != null, "DebugMenu debe instanciarse")
+
+	# Simular inicialización de nodos
+	menu._ready()
+
+	assert_true(menu.dock_controller != null, "Dock controller debe inicializarse")
+	assert_true(menu.external_window != null, "External window debe instanciarse")
+
+	if DisplayServer.has_feature(DisplayServer.FEATURE_SUBWINDOWS):
+		# Desacoplar
+		menu.set_desacoplada(true)
+		assert_true(menu.esta_desacoplada, "Menu debe reportar estado desacoplado")
+		assert_eq(menu.control_raiz.get_parent(), menu.external_window, "ControlRaiz debe ser hijo de external_window al desacoplar")
+
+		# Re-acoplar
+		menu.set_desacoplada(false)
+		assert_false(menu.esta_desacoplada, "Menu debe reportar estado acoplado")
+		assert_eq(menu.control_raiz.get_parent(), menu, "ControlRaiz debe volver a ser hijo de DebugMenu")
+
+	menu.free()

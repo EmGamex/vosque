@@ -36,6 +36,16 @@ var time_scale: float = 1.0
 # Formato: { "window_id": { "abierta": bool, "fijada": bool, "colapsada": bool, "posicion": Vector2 } }
 var ventanas_estado: Dictionary = {}
 
+# Persistencia de ventana externa independiente (Pop-out Window)
+var ventana_desacoplada: bool = false
+var ventana_externa_pos: Vector2i = Vector2i(80, 80)
+var ventana_externa_size: Vector2i = Vector2i(1120, 750)
+
+
+func guardar_geometria_ventana_externa(pos: Vector2i, tam: Vector2i) -> void:
+	ventana_externa_pos = pos
+	ventana_externa_size = tam
+
 
 func guardar_estado_ventana(window_id: String, abierta: bool, fijada: bool, colapsada: bool, posicion: Vector2) -> void:
 	ventanas_estado[window_id] = {

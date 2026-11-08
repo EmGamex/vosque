@@ -50,6 +50,8 @@ var monitors: DebugCustomMonitors
 # Gestores de interfaz y ventanas
 var window_manager: DebugWindowManager
 var dock_controller: DebugDockController
+var external_window: DebugExternalWindow
+var esta_desacoplada: bool = false
 
 # Paneles de contenido para cada ventana
 var panel_jugador: DebugPlayerPanel
@@ -193,6 +195,11 @@ func _inicializar_gestores_y_paneles() -> void:
 	dock_controller.conectar_eventos(window_manager, system_ctrl, get_tree())
 	dock_controller.modo_ocultar_solicitado.connect(func(): modo_actual = ModoVisual.OCULTO)
 	dock_controller.ordenar_mosaico_solicitado.connect(ordenar_ventanas_en_mosaico)
+	dock_controller.desacoplar_toggled.connect(set_desacoplada)
+
+	external_window = DebugExternalWindow.new()
+	external_window.cierre_solicitado.connect(func(): modo_actual = ModoVisual.OCULTO)
+	add_child(external_window)
 
 	panel_jugador.vincular_nodos(win_jugador)
 	panel_jugador.conectar_eventos(cheats, context, _get_debug_config)
@@ -230,6 +237,12 @@ func _restaurar_estado_desde_config() -> void:
 
 	window_manager.restaurar_desde_config(cfg)
 
+	if external_window != null:
+		external_window.inicializar_geometria(cfg)
+
+	if "ventana_desacoplada" in cfg and cfg.ventana_desacoplada and DisplayServer.has_feature(DisplayServer.FEATURE_SUBWINDOWS):
+		set_desacoplada(true)
+
 
 func _exit_tree() -> void:
 	monitors.limpiar()
@@ -255,7 +268,22 @@ func _actualizar_visibilidad() -> void:
 	var hay_overlays: bool = scenario != null and (scenario.debug_dibujar_cuadrantes or scenario.debug_dibujar_corredores)
 	var en_edicion: bool = (modo_actual == ModoVisual.COMPLETO or modo_actual == ModoVisual.MINI_HUD)
 
-	visible = window_manager.actualizar_visibilidad(en_edicion, hay_overlays, barra_dock)
+	var visible_interior: bool = window_manager.actualizar_visibilidad(en_edicion, hay_overlays, barra_dock)
+
+	if esta_desacoplada and external_window != null:
+		# En modo desacoplado, la ventana externa muestra la UI si estamos en edición o si hay ventanas fijadas
+		var hay_fijadas: bool = false
+		for win in window_manager.todas_las_ventanas:
+			if win != null and win.abierta and win.fijada:
+				hay_fijadas = true
+				break
+		external_window.visible = en_edicion or hay_fijadas
+		# El CanvasLayer principal solo debe estar visible si hay overlays de dibujo sobre el juego
+		visible = hay_overlays
+	else:
+		if external_window != null:
+			external_window.visible = false
+		visible = visible_interior
 
 	if overlay_draw != null:
 		overlay_draw.queue_redraw()
@@ -347,8 +375,36 @@ func _get_debug_config() -> Node:
 
 
 # Métodos de delegación para compatibilidad hacia atrás
+func set_desacoplada(desacoplar: bool) -> void:
+	if desacoplar == esta_desacoplada:
+		return
+	if desacoplar and not DisplayServer.has_feature(DisplayServer.FEATURE_SUBWINDOWS):
+		return
+
+	esta_desacoplada = desacoplar
+	var cfg = _get_debug_config()
+	if cfg != null:
+		cfg.ventana_desacoplada = esta_desacoplada
+
+	dock_controller.actualizar_estado_desacople(esta_desacoplada)
+
+	if control_raiz != null:
+		if esta_desacoplada and external_window != null:
+			control_raiz.reparent(external_window)
+			control_raiz.set_anchors_preset(Control.PRESET_FULL_RECT)
+		elif not esta_desacoplada:
+			control_raiz.reparent(self)
+			control_raiz.set_anchors_preset(Control.PRESET_FULL_RECT)
+
+	_actualizar_visibilidad()
+
+
 func ordenar_ventanas_en_mosaico() -> void:
-	var ancho: float = get_viewport().get_visible_rect().size.x if get_viewport() != null else 1280.0
+	var ancho: float = 1280.0
+	if esta_desacoplada and external_window != null:
+		ancho = float(external_window.size.x)
+	elif get_viewport() != null:
+		ancho = get_viewport().get_visible_rect().size.x
 	window_manager.ordenar_ventanas_en_mosaico(ancho)
 
 
