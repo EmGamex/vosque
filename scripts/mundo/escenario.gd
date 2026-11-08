@@ -53,6 +53,32 @@ func _ready() -> void:
 	_inicializar_catalogo()
 	_instanciar_sectores_iniciales()
 	_inicializar_iluminacion_ambiental()
+	if not Engine.is_editor_hint():
+		call_deferred("_precalentar_recursos_web")
+
+
+func _precalentar_recursos_web() -> void:
+	# Calentar shaders de variantes de sector fuera de pantalla
+	if not is_inside_tree():
+		return
+	var contenedor_warmup := Node2D.new()
+	contenedor_warmup.name = "WarmupSectores"
+	contenedor_warmup.visible = false
+	contenedor_warmup.process_mode = Node.PROCESS_MODE_DISABLED
+	add_child(contenedor_warmup)
+
+	for variante in catalogo_variantes:
+		if variante != null:
+			var inst := variante.instantiate() as Node2D
+			if inst != null:
+				contenedor_warmup.add_child(inst)
+
+	# Dejar que el backend gráfico/WebGL registre y compile los recursos, luego liberar
+	var arbol := get_tree()
+	if arbol != null:
+		await arbol.process_frame
+	if is_instance_valid(contenedor_warmup):
+		contenedor_warmup.queue_free()
 
 
 func _inicializar_iluminacion_ambiental() -> void:
@@ -285,7 +311,10 @@ func _ejecutar_mutacion_con_fade(duracion_pausa: float) -> void:
 
 	_tween_fade_sectores.chain().tween_callback(func():
 		_swap_ejecutado_en_ciclo = true
-		mutar_sectores_lejanos(sectores_a_mutar)
+		if OS.has_feature("web") or OS.get_name() == "Web":
+			mutar_sectores_lejanos_progresivo(sectores_a_mutar)
+		else:
+			mutar_sectores_lejanos(sectores_a_mutar)
 	)
 
 	for nodo_sec in nodos_a_mutar:
@@ -323,6 +352,47 @@ func mutar_sectores_lejanos(sectores_permitidos: Array[String] = []) -> void:
 			elegida = catalogo_variantes[randi() % catalogo_variantes.size()]
 
 		_instanciar_variante_en_sector(sector, elegida)
+
+	validar_y_reubicar_enemigo()
+	sectores_mutados.emit(cuadrante_activo, variantes_activas)
+
+
+## Variante asíncrona para repartir la instanciación de sectores en múltiples fotogramas (Web optimization)
+func mutar_sectores_lejanos_progresivo(sectores_permitidos: Array[String] = []) -> void:
+	_inicializar_catalogo()
+	if catalogo_variantes.is_empty():
+		return
+
+	_resolver_referencias_objetivos()
+
+	var pos_jugador: Vector2 = objetivo_jugador.global_position if (objetivo_jugador != null and is_instance_valid(objetivo_jugador)) else Vector2.ZERO
+	var cuadrante_activo: String = obtener_cuadrante_jugador(pos_jugador)
+	var arbol := get_tree()
+
+	for sector in SECTORES:
+		if sector == cuadrante_activo:
+			continue
+
+		if not sectores_permitidos.is_empty() and not sectores_permitidos.has(sector):
+			continue
+
+		var variante_actual_nombre: String = variantes_activas.get(sector, "")
+		var candidatos: Array[PackedScene] = []
+		for var_scene in catalogo_variantes:
+			if var_scene.resource_path.get_file().get_basename() != variante_actual_nombre:
+				candidatos.append(var_scene)
+
+		var elegida: PackedScene
+		if not candidatos.is_empty():
+			elegida = candidatos[randi() % candidatos.size()]
+		else:
+			elegida = catalogo_variantes[randi() % catalogo_variantes.size()]
+
+		_instanciar_variante_en_sector(sector, elegida)
+
+		# Repartir la carga de instanciación y física en el siguiente cuadro si estamos en runtime
+		if arbol != null and not Engine.is_editor_hint():
+			await arbol.process_frame
 
 	validar_y_reubicar_enemigo()
 	sectores_mutados.emit(cuadrante_activo, variantes_activas)

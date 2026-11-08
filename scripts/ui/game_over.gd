@@ -18,10 +18,6 @@ signal menu_solicitado
 
 func _ready() -> void:
 	_refrescar_desde_persistencia()
-	enfocar()
-	if not Engine.is_editor_hint() and has_node("/root/GestorMusica"):
-		get_node("/root/GestorMusica").activar_modo_game_over()
-
 	if _boton_reintentar != null:
 		_boton_reintentar.pressed.connect(_on_reintentar_pulsado)
 		_boton_reintentar.focus_entered.connect(_on_boton_enfocado)

@@ -167,6 +167,7 @@ var estado: EstadoMenu:
 
 # Nodos
 @onready var _camara: Camera2D = $CamaraMenu
+@onready var _efecto_motion_blur: ColorRect = get_node_or_null("CamaraMenu/EfectoMotionBlur") as ColorRect
 @onready var _animador: AnimationPlayer = $AnimadorCinematica
 @onready var _presentacion: Control = $Presentacion
 @onready var _fondo_presentacion: Sprite2D = $Fondos/FondoPresentacion
@@ -214,7 +215,7 @@ func _ready() -> void:
 	if _textos_nodo != null:
 		_textos_nodo.z_index = 10
 
-	cinematica.inicializar_nodos(_camara, _animador, _presentacion, _fondo_presentacion, _textos_nodo)
+	cinematica.inicializar_nodos(_camara, _animador, _presentacion, _fondo_presentacion, _textos_nodo, _efecto_motion_blur)
 	particulas.inicializar(self, _particulas_estrellas, _particulas_nubes)
 	parallax.inicializar_nodos(_fondos, _fondo_degradado, _montana_2, _montana_1, _arboles_tercera, _arboles_segunda, _arboles_nodo, _textos_nodo)
 	parallax.capturar_posiciones_iniciales(particulas.obtener_particulas_estrellas(), particulas.obtener_particulas_nubes())

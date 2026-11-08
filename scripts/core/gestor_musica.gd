@@ -68,8 +68,15 @@ func reproducir_menu_o_tutorial() -> void:
 	if reproductor_audio == null or config == null:
 		return
 
-	# Si ya está activo en menú/tutorial y reproduciendo sin pausa, no interrumpir ni reiniciar
-	if reproductor_audio.playing and not reproductor_audio.stream_paused and estado_actual == EstadoMusical.MENU_TUTORIAL:
+	# Si venía de GAME_OVER o con reverb activo, apagar reverb y restaurar pitch
+	if estado_actual == EstadoMusical.GAME_OVER or reproductor_audio.pitch_scale != PITCH_NORMAL:
+		reproductor_audio.pitch_scale = PITCH_NORMAL
+		_set_reverb_enabled(false)
+
+	# Si ya está activo en menú/tutorial y reproduciendo sin pausa, asegurar reverb apagado y salir sin conmutar clip
+	if reproductor_audio.playing and not reproductor_audio.stream_paused and (estado_actual == EstadoMusical.MENU_TUTORIAL or clip_actual == config.clip_menu_tutorial):
+		_set_reverb_enabled(false)
+		estado_actual = EstadoMusical.MENU_TUTORIAL
 		return
 
 	_asegurar_reproductor()
@@ -225,7 +232,8 @@ func _conmutar_clip(nombre_clip: StringName) -> void:
 		return
 	if not reproductor_audio.playing:
 		reproductor_audio.play()
-	reproductor_audio.set(PARAM_SWITCH_TO_CLIP, nombre_clip)
+	if clip_actual != nombre_clip:
+		reproductor_audio.set(PARAM_SWITCH_TO_CLIP, nombre_clip)
 
 
 func _on_config_changed() -> void:

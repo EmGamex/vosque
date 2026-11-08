@@ -29,6 +29,10 @@ func esta_recolectada() -> bool:
 func _ready() -> void:
 	if not body_entered.is_connected(_on_body_entered):
 		body_entered.connect(_on_body_entered)
+	if not Engine.is_editor_hint() and _particulas_recogida != null:
+		# Calentar el buffer de partículas para evitar microtirones al emitir
+		_particulas_recogida.emitting = false
+		_particulas_recogida.restart()
 
 
 func _process(delta: float) -> void:

@@ -15,6 +15,12 @@ const RUTA_MENU: String = "res://escenas/menu_inicio.tscn"
 const RUTA_JUEGO: String = "res://escenas/maain.tscn"
 const RUTA_GAME_OVER: String = "res://escenas/game_over.tscn"
 
+const ESCENAS_PRECARGADAS: Dictionary = {
+	RUTA_MENU: preload(RUTA_MENU),
+	RUTA_JUEGO: preload(RUTA_JUEGO),
+	RUTA_GAME_OVER: preload(RUTA_GAME_OVER),
+}
+
 @onready var _contenedor: Node = $Contenedor
 @onready var _transicion: TransicionEscenas = $Transicion
 @onready var _menu_pausa: MenuPausa = get_node_or_null("MenuPausa") as MenuPausa
@@ -161,6 +167,18 @@ func ir_a(ruta: String, reiniciar: bool = false) -> void:
 	if reiniciar:
 		_descartar(ruta)
 	_activar(ruta)
+
+	# Pausa de estabilización bajo pantalla negra antes de abrir el telón:
+	# Permite que la jerarquía recién instanciada (_ready(), add_child, colisiones físicas)
+	# se asiente sin saturar el hilo principal ni trabar la animación del iris.
+	if is_inside_tree():
+		var arbol := get_tree()
+		if arbol != null:
+			await arbol.process_frame
+			# En Web, dar un fotograma extra para la sincronización con el servidor de física
+			if OS.has_feature("web") or OS.get_name() == "Web":
+				await arbol.process_frame
+
 	await _fundir(false)
 	_cambiando = false
 
@@ -256,7 +274,10 @@ func _fijar_canvas_layers(raiz: Node, activa: bool) -> void:
 func _obtener(ruta: String) -> Node:
 	var pantalla: Node = _pantallas.get(ruta) as Node
 	if pantalla == null or not is_instance_valid(pantalla):
-		pantalla = (load(ruta) as PackedScene).instantiate()
+		var escena: PackedScene = ESCENAS_PRECARGADAS.get(ruta) as PackedScene
+		if escena == null:
+			escena = load(ruta) as PackedScene
+		pantalla = escena.instantiate()
 		_contenedor.add_child(pantalla)
 		_pantallas[ruta] = pantalla
 		_conectar_senales_pantalla(pantalla)
