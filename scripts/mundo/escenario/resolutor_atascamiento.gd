@@ -58,6 +58,9 @@ func verificar_solapamiento_solido(enemigo: CharacterBody2D) -> bool:
 	if enemigo == null or not is_instance_valid(enemigo):
 		return false
 
+	if not enemigo.is_inside_tree() or enemigo.get_world_2d() == null:
+		return false
+
 	if enemigo.test_move(enemigo.global_transform, Vector2.ZERO):
 		return true
 

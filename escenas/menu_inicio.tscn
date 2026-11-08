@@ -19,6 +19,7 @@
 [ext_resource type="Texture2D" uid="uid://b7jp2hmn6jme4" path="res://graficos/menu principal/icono jugar.png" id="17_5s2e3"]
 [ext_resource type="Texture2D" uid="uid://cw18h3vi7dn7x" path="res://graficos/menu principal/icono creditos.png" id="18_51ctf"]
 [ext_resource type="Texture2D" uid="uid://bs4r1bfk5ofji" path="res://graficos/menu principal/icono configuracion.png" id="19_46wig"]
+[ext_resource type="PackedScene" uid="uid://boxk202uflaub" path="res://escenas/ui/menu_opciones.tscn" id="20_lp070"]
 
 [sub_resource type="Animation" id="Animation_q78gw"]
 length = 0.001
@@ -93,6 +94,42 @@ tracks/5/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 0,
 "values": [0.0]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("Fondos/FondoDegradado:scale:x")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.55]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("Fondos/Montaña2:scale:x")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.48]
+}
+tracks/8/type = "value"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath("Fondos/Montaña1:scale:x")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.52]
 }
 
 [sub_resource type="Animation" id="Animation_f3do1"]
@@ -244,11 +281,98 @@ tracks/5/keys = {
 "values": [0.0, 0.0]
 }
 
+[sub_resource type="Animation" id="Animation_itfft"]
+length = 0.75
+tracks/0/type = "bezier"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CamaraMenu:position:x")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"handle_modes": PackedInt32Array(0, 0),
+"points": PackedFloat32Array(540, -0.25, 0, 0.36666667, -15.5, -540, -0.35, 19.5, 0.25, 0),
+"times": PackedFloat32Array(0, 0.75)
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Textos:modulate:a")
+tracks/1/interp = 2
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.35),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [1.0, 0.0]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("MenuOpciones:modulate:a")
+tracks/2/interp = 2
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.25, 0.75),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("CamaraMenu/EfectoMotionBlur:material:shader_parameter/intensidad")
+tracks/3/interp = 2
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.35, 0.75),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [0.0, 0.015, 0.0]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Fondos/FondoDegradado:scale:x")
+tracks/4/interp = 2
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 0.75),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.55, 1.2394531]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Fondos/Montaña2:scale:x")
+tracks/5/interp = 2
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 0.75),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.48, 0.96]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("Fondos/Montaña1:scale:x")
+tracks/6/interp = 2
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0, 0.75),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.52, 1.0947691]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_mpb5u"]
 _data = {
 &"RESET": SubResource("Animation_q78gw"),
 &"bajar_al_bosque": SubResource("Animation_f3do1"),
-&"esperando_inicio": SubResource("Animation_dotxh")
+&"esperando_inicio": SubResource("Animation_dotxh"),
+&"ir_a_opciones": SubResource("Animation_itfft")
 }
 
 [node name="MenuInicio" type="Control" unique_id=987334960]
@@ -283,6 +407,7 @@ nubes_factor_rotacion = 0.12
 position = Vector2(540, 540)
 
 [node name="FondoDegradado" type="Sprite2D" parent="Fondos" unique_id=732065939]
+position = Vector2(-102.5001, 0)
 scale = Vector2(0.55, 0.55)
 texture = ExtResource("2_pwyh3")
 
@@ -297,7 +422,7 @@ scale = Vector2(0.48, 0.48)
 texture = ExtResource("3_q3oj6")
 
 [node name="Montaña1" type="Sprite2D" parent="Fondos" unique_id=1507619010]
-position = Vector2(-4, 244)
+position = Vector2(-224.07007, 244)
 scale = Vector2(0.52, 0.52)
 texture = ExtResource("4_pkm7p")
 
@@ -311,6 +436,7 @@ texture = ExtResource("6_xbcmh")
 
 [node name="ParticulasEstrellas" type="CPUParticles2D" parent="Fondos" unique_id=1695083557]
 position = Vector2(0, -500)
+scale = Vector2(3.0799987, 1)
 amount = 55
 texture = ExtResource("6_vxcbv")
 lifetime = 4.5
@@ -325,6 +451,7 @@ color_ramp = ExtResource("7_xbcmh")
 
 [node name="ParticulasNubes" type="CPUParticles2D" parent="Fondos" unique_id=422632142]
 position = Vector2(0, -320)
+scale = Vector2(3.000002, 1)
 amount = 10
 texture = ExtResource("8_883rq")
 lifetime = 16.0
@@ -411,7 +538,7 @@ texture = ExtResource("19_46wig")
 
 [node name="IconoJugar" type="Sprite2D" parent="Textos/Iconos" unique_id=869196332]
 position = Vector2(-12, -48)
-scale = Vector2(0.22716056, 0.2271605)
+scale = Vector2(0.28615692, 0.28615683)
 texture = ExtResource("17_5s2e3")
 
 [node name="IconoCreditos" type="Sprite2D" parent="Textos/Iconos" unique_id=254819263]
@@ -460,3 +587,10 @@ texture = ExtResource("16_883rq")
 
 [node name="AnimadorCinematica" type="AnimationPlayer" parent="." unique_id=513910754]
 libraries/ = SubResource("AnimationLibrary_mpb5u")
+
+[node name="MenuOpciones" parent="." unique_id=1280938452 instance=ExtResource("20_lp070")]
+modulate = Color(1, 1, 1, 0)
+layout_mode = 0
+offset_left = -1080.0
+offset_right = 1080.0
+offset_bottom = 1080.0
