@@ -20,6 +20,7 @@ config/icon="uid://dre3h4owcvqvh"
 [audio]
 
 buses/default_bus_layout="uid://d0jtrmn0hvqxr"
+driver/output_latency.web=50
 
 [autoload]
 

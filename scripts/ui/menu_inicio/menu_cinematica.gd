@@ -12,6 +12,7 @@ var animador: AnimationPlayer
 var presentacion: Control
 var fondo_presentacion: Sprite2D
 var textos_nodo: Control
+var efecto_motion_blur: ColorRect
 
 
 func inicializar_nodos(
@@ -19,13 +20,21 @@ func inicializar_nodos(
 	p_animador: AnimationPlayer,
 	p_presentacion: Control,
 	p_fondo_presentacion: Sprite2D,
-	p_textos_nodo: Control
+	p_textos_nodo: Control,
+	p_efecto_motion_blur: ColorRect = null
 ) -> void:
 	camara = p_camara
 	animador = p_animador
 	presentacion = p_presentacion
 	fondo_presentacion = p_fondo_presentacion
 	textos_nodo = p_textos_nodo
+	efecto_motion_blur = p_efecto_motion_blur
+
+	# En plataforma Web, desactivar Motion Blur para evitar el lag de compilación
+	# de hint_screen_texture y el consecuente tartamudeo en el audio de WebAssembly.
+	if efecto_motion_blur != null and (OS.has_feature("web") or OS.get_name() == "Web"):
+		efecto_motion_blur.visible = false
+		efecto_motion_blur.material = null
 
 
 func iniciar_presentacion(es_editor: bool, en_grupo_test: bool) -> void:
