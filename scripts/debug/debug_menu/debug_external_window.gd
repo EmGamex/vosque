@@ -3,7 +3,6 @@ extends Window
 
 ## Ventana nativa secundaria del sistema operativo para alojar el Debug Workspace (Pop-out).
 
-signal visibilidad_solicitada(abrir: bool)
 signal cierre_solicitado
 
 var cfg_referencia: Node

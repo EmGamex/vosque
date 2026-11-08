@@ -4,8 +4,6 @@ extends RefCounted
 ## Gestor de ventanas para DebugMenu: controla visibilidad, posiciones,
 ## presets de organización rápida y persistencia de estado con DebugConfig.
 
-signal visibilidad_cambiada(hay_visibles: bool)
-
 var todas_las_ventanas: Array[DebugWindow] = []
 
 # Referencias directas para presets rápidos

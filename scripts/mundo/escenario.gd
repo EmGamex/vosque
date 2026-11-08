@@ -38,22 +38,17 @@ var variantes_activas: Dictionary:
 	get: return gestor_sectores.variantes_activas
 	set(v): gestor_sectores.variantes_activas = v
 
-var _instancias_sectores: Dictionary:
-	get: return gestor_sectores.instancias_sectores
-	set(v): gestor_sectores.instancias_sectores = v
-
+@warning_ignore("UNUSED_PRIVATE_CLASS_VARIABLE")
 var _mutacion_en_progreso: bool:
 	get: return mutador_sectores.mutacion_en_progreso
 	set(v): mutador_sectores.mutacion_en_progreso = v
 
-var _mutacion_pendiente: bool:
-	get: return mutador_sectores.mutacion_pendiente
-	set(v): mutador_sectores.mutacion_pendiente = v
-
+@warning_ignore("UNUSED_PRIVATE_CLASS_VARIABLE")
 var _swap_ejecutado_en_ciclo: bool:
 	get: return mutador_sectores.swap_ejecutado_en_ciclo
 	set(v): mutador_sectores.swap_ejecutado_en_ciclo = v
 
+@warning_ignore("UNUSED_PRIVATE_CLASS_VARIABLE")
 var _tween_fade_sectores: Tween:
 	get: return mutador_sectores.tween_fade_sectores
 	set(v): mutador_sectores.tween_fade_sectores = v
