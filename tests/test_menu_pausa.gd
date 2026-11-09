@@ -169,6 +169,27 @@ func test_senales_menu_pausa() -> void:
 	menu.free()
 
 
+func test_supresion_audio_foco_inicial() -> void:
+	var menu: MenuPausa = _crear_instancia_menu()
+	menu._ready()
+
+	menu.mostrar()
+	assert_true(menu.get("_silenciar_foco_inicial"))
+
+	menu._on_boton_enfocado(0)
+	assert_false(menu.get("_silenciar_foco_inicial"))
+
+	menu._on_boton_enfocado(1)
+	assert_false(menu.get("_silenciar_foco_inicial"))
+
+	menu.mostrar()
+	assert_true(menu.get("_silenciar_foco_inicial"))
+	menu.ocultar()
+	assert_false(menu.get("_silenciar_foco_inicial"))
+
+	menu.free()
+
+
 func test_gestor_puede_pausar() -> void:
 	var gestor: GestorDeEscenas = _crear_instancia_gestor()
 	gestor._ready()

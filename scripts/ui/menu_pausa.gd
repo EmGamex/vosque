@@ -18,6 +18,7 @@ const LAYER_CANVAS: int = 50
 var _bloqueado: bool = false
 var _botones: Array[Button] = []
 var _indice_foco: int = 0
+var _silenciar_foco_inicial: bool = false
 
 
 func _ready() -> void:
@@ -45,6 +46,9 @@ func _ready() -> void:
 
 func _on_boton_enfocado(idx: int) -> void:
 	_indice_foco = idx
+	if _silenciar_foco_inicial:
+		_silenciar_foco_inicial = false
+		return
 	ControladorAudioUI.emitir_seguro(self, ControladorAudioUI.EventoUI.PAUSA_NAVEGAR)
 
 
@@ -58,16 +62,19 @@ func mostrar() -> void:
 	_habilitar_botones(true)
 	visible = true
 	_indice_foco = 0
+	_silenciar_foco_inicial = true
 	if _boton_continuar != null:
 		_boton_continuar.call_deferred("grab_focus")
 
 
 func ocultar() -> void:
+	_silenciar_foco_inicial = false
 	_liberar_foco()
 	visible = false
 
 
 func ocultar_inmediato() -> void:
+	_silenciar_foco_inicial = false
 	_bloqueado = true
 	_habilitar_botones(false)
 	_liberar_foco()
