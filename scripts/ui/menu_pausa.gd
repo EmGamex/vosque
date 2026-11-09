@@ -28,12 +28,27 @@ func _ready() -> void:
 		if btn != null:
 			_botones.append(btn)
 
+	for i in range(_botones.size()):
+		var btn: Button = _botones[i]
+		btn.focus_entered.connect(_on_boton_enfocado.bind(i))
+		btn.mouse_entered.connect(_on_boton_mouse_entered.bind(btn))
+
 	if _boton_continuar != null:
 		_boton_continuar.pressed.connect(_on_continuar_pulsado)
 	if _boton_reiniciar != null:
 		_boton_reiniciar.pressed.connect(_on_reiniciar_pulsado)
 	if _boton_menu != null:
 		_boton_menu.pressed.connect(_on_menu_pulsado)
+
+
+func _on_boton_enfocado(idx: int) -> void:
+	_indice_foco = idx
+	ControladorAudioUI.emitir_seguro(self, ControladorAudioUI.EventoUI.PAUSA_NAVEGAR)
+
+
+func _on_boton_mouse_entered(btn: Button) -> void:
+	if visible and not _bloqueado and btn != null and not btn.has_focus():
+		btn.grab_focus()
 
 
 func mostrar() -> void:
@@ -57,51 +72,23 @@ func ocultar_inmediato() -> void:
 	visible = false
 
 
-func _unhandled_input(evento: InputEvent) -> void:
-	if not visible or _bloqueado:
-		return
-
-	if evento.is_action_pressed("personaje-arriba"):
-		_navegar_vertical(-1)
-		get_viewport().set_input_as_handled()
-	elif evento.is_action_pressed("personaje-abajo"):
-		_navegar_vertical(1)
-		get_viewport().set_input_as_handled()
-	elif evento.is_action_pressed("personaje-salto"):
-		Input.action_release("personaje-salto")
-		Input.action_release("ui_accept")
-		_activar_boton_actual()
-		get_viewport().set_input_as_handled()
-
-
+## Navegación vertical programática (usada por tests y como fallback directo).
 func _navegar_vertical(direccion: int) -> void:
 	if _botones.is_empty():
 		return
 
-	# Si algún botón tiene el foco actualmente por UI de Godot, sincronizamos
-	for i in range(_botones.size()):
-		if _botones[i].has_focus():
-			_indice_foco = i
-			break
-
 	_indice_foco = posmod(_indice_foco + direccion, _botones.size())
 	_botones[_indice_foco].grab_focus()
-
-	ControladorAudioUI.emitir_seguro(self, ControladorAudioUI.EventoUI.PAUSA_NAVEGAR)
 
 
 func _activar_boton_actual() -> void:
 	if _botones.is_empty():
 		return
 
-	for i in range(_botones.size()):
-		if _botones[i].has_focus():
-			_indice_foco = i
-			break
-
-	var boton_activo: Button = _botones[_indice_foco]
-	if boton_activo != null and not boton_activo.disabled:
-		boton_activo.emit_signal("pressed")
+	if _indice_foco >= 0 and _indice_foco < _botones.size():
+		var boton_activo: Button = _botones[_indice_foco]
+		if boton_activo != null and not boton_activo.disabled:
+			boton_activo.emit_signal("pressed")
 
 
 func _liberar_foco() -> void:
