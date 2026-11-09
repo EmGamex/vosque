@@ -2,12 +2,9 @@
 class_name MenuOpciones
 extends Control
 
-## Mockup funcional del menú de opciones.
-## Navegable mediante las acciones de movimiento del juego:
-## - personaje-arriba / personaje-abajo: Foco vertical
-## - personaje-izquierda / personaje-derecha: Modificar valor o slider
-## - personaje-salto / ui_accept: Activar checkbox o botón
-## - ui_cancel: Emitir señal de volver
+## Menú de opciones de configuración (Audio y Pantalla).
+## Navegación nativa mediante foco de GUI (Flechas, WASD, Mando) y ratón.
+## La acción ui_cancel emite la señal volver_solicitado.
 
 signal volver_solicitado
 
@@ -25,6 +22,7 @@ const RUTA_BUS_LAYOUT_DEFECTO: String = "res://default_bus_layout.tres"
 const PASO_SLIDER: float = 5.0
 const VOLUMEN_LINEAL_MIN: float = 0.0001
 const VOLUMEN_LINEAL_MAX: float = 100.0
+const INTERVALO_MINIMO_TICK_SLIDER_MSEC: int = 50
 
 var _elementos_foco: Array[Control] = []
 var _indice_foco: int = 0
@@ -182,7 +180,7 @@ func _emitir_tick_slider() -> void:
 	if not _activo or _silenciar_audio_ajustes:
 		return
 	var ahora: int = Time.get_ticks_msec()
-	if ahora - _ultimo_tick_audio_slider_msec > 50:
+	if ahora - _ultimo_tick_audio_slider_msec > INTERVALO_MINIMO_TICK_SLIDER_MSEC:
 		_ultimo_tick_audio_slider_msec = ahora
 		ControladorAudioUI.emitir_seguro(self, ControladorAudioUI.EventoUI.MENU_SELECCIONAR)
 

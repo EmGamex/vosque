@@ -9,6 +9,8 @@ signal continuar_solicitado
 signal reiniciar_solicitado
 signal menu_solicitado
 
+const LAYER_CANVAS: int = 50
+
 @onready var _boton_continuar: Button = $Control/Layout/Columna/BotonContinuar
 @onready var _boton_reiniciar: Button = $Control/Layout/Columna/BotonReiniciar
 @onready var _boton_menu: Button = $Control/Layout/Columna/BotonMenu
@@ -19,7 +21,7 @@ var _indice_foco: int = 0
 
 
 func _ready() -> void:
-	layer = 50
+	layer = LAYER_CANVAS
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	visible = false
 

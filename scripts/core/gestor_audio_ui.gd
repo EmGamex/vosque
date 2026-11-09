@@ -261,10 +261,10 @@ static func emitir_seguro(nodo_contexto: Node, evento: EventoUI) -> void:
 	if Engine.is_editor_hint():
 		return
 	if nodo_contexto == null or not nodo_contexto.is_inside_tree():
-		print("[ControladorAudioUI] ALERTA: emitir_seguro() llamado con nodo nulo o fuera del árbol: ", nodo_contexto)
+		push_warning("[ControladorAudioUI] emitir_seguro() llamado con nodo nulo o fuera del árbol: %s" % str(nodo_contexto))
 		return
 	var gestor := nodo_contexto.get_tree().root.get_node_or_null(NodePath(NOMBRE_AUTOLOAD)) as ControladorAudioUI
 	if gestor != null:
 		gestor.reproducir_evento(evento)
 	else:
-		print("[ControladorAudioUI] ERROR: Autoload '%s' no existe en /root" % NOMBRE_AUTOLOAD)
+		push_warning("[ControladorAudioUI] Autoload '%s' no existe en /root" % NOMBRE_AUTOLOAD)
