@@ -2,12 +2,9 @@
 class_name MenuOpciones
 extends Control
 
-## Mockup funcional del menú de opciones.
-## Navegable mediante las acciones de movimiento del juego:
-## - personaje-arriba / personaje-abajo: Foco vertical
-## - personaje-izquierda / personaje-derecha: Modificar valor o slider
-## - personaje-salto / ui_accept: Activar checkbox o botón
-## - ui_cancel: Emitir señal de volver
+## Menú de opciones de configuración (Audio y Pantalla).
+## Navegación nativa mediante foco de GUI (Flechas, WASD, Mando) y ratón.
+## La acción ui_cancel emite la señal volver_solicitado.
 
 signal volver_solicitado
 
@@ -25,10 +22,13 @@ const RUTA_BUS_LAYOUT_DEFECTO: String = "res://default_bus_layout.tres"
 const PASO_SLIDER: float = 5.0
 const VOLUMEN_LINEAL_MIN: float = 0.0001
 const VOLUMEN_LINEAL_MAX: float = 100.0
+const INTERVALO_MINIMO_TICK_SLIDER_MSEC: int = 50
 
 var _elementos_foco: Array[Control] = []
 var _indice_foco: int = 0
 var _activo: bool = false
+var _silenciar_audio_ajustes: bool = false
+var _ultimo_tick_audio_slider_msec: int = 0
 
 func _ready() -> void:
 	_elementos_foco = []
@@ -44,6 +44,12 @@ func _ready() -> void:
 
 
 func _conectar_senales() -> void:
+	for i in range(_elementos_foco.size()):
+		var ctrl: Control = _elementos_foco[i]
+		if ctrl:
+			ctrl.focus_entered.connect(_on_control_enfocado.bind(i))
+			ctrl.mouse_entered.connect(_on_control_mouse_entered.bind(ctrl))
+
 	if slider_master and not slider_master.value_changed.is_connected(_on_slider_master_changed):
 		slider_master.value_changed.connect(_on_slider_master_changed)
 	if slider_musica and not slider_musica.value_changed.is_connected(_on_slider_musica_changed):
@@ -58,7 +64,19 @@ func _conectar_senales() -> void:
 		boton_volver.pressed.connect(_on_boton_volver_pressed)
 
 
+func _on_control_enfocado(idx: int) -> void:
+	_indice_foco = idx
+	if _activo and not _silenciar_audio_ajustes:
+		ControladorAudioUI.emitir_seguro(self, ControladorAudioUI.EventoUI.MENU_SELECCIONAR)
+
+
+func _on_control_mouse_entered(ctrl: Control) -> void:
+	if _activo and ctrl != null and not ctrl.has_focus():
+		ctrl.grab_focus()
+
+
 func _cargar_valores_actuales() -> void:
+	_silenciar_audio_ajustes = true
 	var idx_master := AudioServer.get_bus_index(&"Master")
 	if idx_master >= 0:
 		var db := AudioServer.get_bus_volume_db(idx_master)
@@ -88,6 +106,8 @@ func _cargar_valores_actuales() -> void:
 	if check_pantalla_completa and not Engine.is_editor_hint():
 		var modo := DisplayServer.window_get_mode()
 		check_pantalla_completa.button_pressed = (modo == DisplayServer.WINDOW_MODE_FULLSCREEN or modo == DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN)
+
+	_silenciar_audio_ajustes = false
 
 
 func activar() -> void:
@@ -128,6 +148,7 @@ func _on_slider_master_changed(val: float) -> void:
 	if idx >= 0:
 		var db := linear_to_db(max(val / VOLUMEN_LINEAL_MAX, VOLUMEN_LINEAL_MIN))
 		AudioServer.set_bus_volume_db(idx, db)
+	_emitir_tick_slider()
 
 
 func _on_slider_musica_changed(val: float) -> void:
@@ -142,6 +163,7 @@ func _on_slider_musica_changed(val: float) -> void:
 			gm.establecer_volumen_base(db)
 		elif "config" in gm and gm.config is ConfiguracionMusica:
 			gm.config.volumen_base_db = db
+	_emitir_tick_slider()
 
 
 func _on_slider_sfx_changed(val: float) -> void:
@@ -151,9 +173,21 @@ func _on_slider_sfx_changed(val: float) -> void:
 		var idx := AudioServer.get_bus_index(nombre_bus)
 		if idx >= 0:
 			AudioServer.set_bus_volume_db(idx, db)
+	_emitir_tick_slider()
+
+
+func _emitir_tick_slider() -> void:
+	if not _activo or _silenciar_audio_ajustes:
+		return
+	var ahora: int = Time.get_ticks_msec()
+	if ahora - _ultimo_tick_audio_slider_msec > INTERVALO_MINIMO_TICK_SLIDER_MSEC:
+		_ultimo_tick_audio_slider_msec = ahora
+		ControladorAudioUI.emitir_seguro(self, ControladorAudioUI.EventoUI.MENU_SELECCIONAR)
 
 
 func _on_pantalla_completa_toggled(activado: bool) -> void:
+	if not _silenciar_audio_ajustes and _activo:
+		ControladorAudioUI.emitir_seguro(self, ControladorAudioUI.EventoUI.MENU_ACEPTAR)
 	if Engine.is_editor_hint():
 		return
 	if activado:
@@ -210,57 +244,34 @@ func _on_boton_volver_pressed() -> void:
 	volver_solicitado.emit()
 
 
-func _unhandled_input(evento: InputEvent) -> void:
+func _input(evento: InputEvent) -> void:
 	if not _activo:
 		return
 
 	if evento.is_action_pressed("ui_cancel"):
-		ControladorAudioUI.emitir_seguro(self, ControladorAudioUI.EventoUI.MENU_RETROCEDER)
-		volver_solicitado.emit()
-		get_viewport().set_input_as_handled()
-		return
-
-	if evento.is_action_pressed("personaje-arriba"):
-		_navegar_foco(-1)
-		get_viewport().set_input_as_handled()
-	elif evento.is_action_pressed("personaje-abajo"):
-		_navegar_foco(1)
-		get_viewport().set_input_as_handled()
-	elif evento.is_action_pressed("personaje-izquierda"):
-		_modificar_control_actual(-1)
-		get_viewport().set_input_as_handled()
-	elif evento.is_action_pressed("personaje-derecha"):
-		_modificar_control_actual(1)
-		get_viewport().set_input_as_handled()
-	elif evento.is_action_pressed("personaje-salto"):
-		_activar_control_actual()
+		_on_boton_volver_pressed()
 		get_viewport().set_input_as_handled()
 
 
+## Navegación programática de foco (usada por tests y helpers directos).
 func _navegar_foco(dir: int) -> void:
 	if _elementos_foco.is_empty():
 		return
-	for i in range(_elementos_foco.size()):
-		if _elementos_foco[i].has_focus():
-			_indice_foco = i
-			break
 	_indice_foco = posmod(_indice_foco + dir, _elementos_foco.size())
 	_elementos_foco[_indice_foco].grab_focus()
-	ControladorAudioUI.emitir_seguro(self, ControladorAudioUI.EventoUI.MENU_SELECCIONAR)
 
 
+## Modificación programática de valor (usada por tests y helpers directos).
 func _modificar_control_actual(dir: int) -> void:
 	if _elementos_foco.is_empty():
 		return
-	var control := _elementos_foco[_indice_foco]
+	var control: Control = _elementos_foco[_indice_foco]
 	if control is HSlider:
-		var slider := control as HSlider
+		var slider: HSlider = control as HSlider
 		slider.value = clamp(slider.value + (dir * PASO_SLIDER), slider.min_value, slider.max_value)
-		ControladorAudioUI.emitir_seguro(self, ControladorAudioUI.EventoUI.MENU_SELECCIONAR)
 	elif control is CheckBox:
-		var check := control as CheckBox
+		var check: CheckBox = control as CheckBox
 		check.button_pressed = not check.button_pressed
-		ControladorAudioUI.emitir_seguro(self, ControladorAudioUI.EventoUI.MENU_ACEPTAR)
 
 
 func _activar_control_actual() -> void:
@@ -270,6 +281,5 @@ func _activar_control_actual() -> void:
 	if control is CheckBox:
 		var check := control as CheckBox
 		check.button_pressed = not check.button_pressed
-		ControladorAudioUI.emitir_seguro(self, ControladorAudioUI.EventoUI.MENU_ACEPTAR)
 	elif control is Button:
 		(control as Button).emit_signal("pressed")

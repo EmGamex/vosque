@@ -43,14 +43,20 @@ horizontal_alignment = 1
 [node name="BotonContinuar" type="Button" parent="Control/Layout/Columna" unique_id=2057596305]
 custom_minimum_size = Vector2(280, 56)
 layout_mode = 2
+focus_neighbor_top = NodePath("../BotonMenu")
+focus_neighbor_bottom = NodePath("../BotonReiniciar")
 text = "Continuar"
 
 [node name="BotonReiniciar" type="Button" parent="Control/Layout/Columna" unique_id=1492983787]
 custom_minimum_size = Vector2(280, 56)
 layout_mode = 2
+focus_neighbor_top = NodePath("../BotonContinuar")
+focus_neighbor_bottom = NodePath("../BotonMenu")
 text = "Reiniciar"
 
 [node name="BotonMenu" type="Button" parent="Control/Layout/Columna" unique_id=360397681]
 custom_minimum_size = Vector2(280, 48)
 layout_mode = 2
+focus_neighbor_top = NodePath("../BotonReiniciar")
+focus_neighbor_bottom = NodePath("../BotonContinuar")
 text = "Menú Principal"

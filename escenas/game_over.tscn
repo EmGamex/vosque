@@ -56,7 +56,7 @@ horizontal_alignment = 1
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
 theme_override_font_sizes/font_size = 28
-text = "Récord: 2"
+text = "Récord: 10"
 horizontal_alignment = 1
 
 [node name="NuevoRecordLabel" type="Label" parent="Layout/Columna/Stats" unique_id=150304990]
@@ -69,9 +69,13 @@ horizontal_alignment = 1
 [node name="BotonReintentar" type="Button" parent="Layout/Columna" unique_id=564060499]
 custom_minimum_size = Vector2(280, 56)
 layout_mode = 2
+focus_neighbor_top = NodePath("../BotonMenu")
+focus_neighbor_bottom = NodePath("../BotonMenu")
 text = "Reintentar"
 
 [node name="BotonMenu" type="Button" parent="Layout/Columna" unique_id=969352162]
 custom_minimum_size = Vector2(280, 44)
 layout_mode = 2
+focus_neighbor_top = NodePath("../BotonReintentar")
+focus_neighbor_bottom = NodePath("../BotonReintentar")
 text = "Menú"
