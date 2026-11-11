@@ -35,6 +35,10 @@ func test_instanciacion_y_nodos_base() -> void:
 	assert_true(arbol_visual.material is ShaderMaterial, "ArbolVisual debe tener asignado ShaderMaterial")
 	assert_true(datos_opciones[1].has("textura"), "Debe contener textura de JUGAR")
 
+	var montana_1: Sprite2D = menu.get_node_or_null("Fondos/Montaña1") as Sprite2D
+	assert_true(montana_1 != null, "Debe existir el nodo Fondos/Montaña1")
+	assert_eq(montana_1.position, Vector2(0.0, 244.0), "Montaña 1 debe estar centrada horizontalmente en x=0")
+
 	menu.free()
 
 
@@ -322,6 +326,7 @@ func test_animacion_ir_a_opciones_estira_fondos_y_no_arboles() -> void:
 	var anim: Animation = animador.get_animation("ir_a_opciones")
 	var pistas_scale_fondos: Array[String] = []
 	var pistas_arboles: Array[String] = []
+	var escala_final_montana_1: float = 0.0
 
 	for i in range(anim.get_track_count()):
 		var ruta: String = str(anim.track_get_path(i))
@@ -330,10 +335,15 @@ func test_animacion_ir_a_opciones_estira_fondos_y_no_arboles() -> void:
 				pistas_scale_fondos.append(ruta)
 			if "Arbol" in ruta or "arbol" in ruta:
 				pistas_arboles.append(ruta)
+		if ruta == "Fondos/Montaña1:scale:x":
+			var key_count: int = anim.track_get_key_count(i)
+			if key_count > 0:
+				escala_final_montana_1 = float(anim.track_get_key_value(i, key_count - 1))
 
 	assert_true(pistas_scale_fondos.has("Fondos/FondoDegradado:scale:x"), "FondoDegradado debe tener pista de escala X")
 	assert_true(pistas_scale_fondos.has("Fondos/Montaña2:scale:x"), "Montaña2 debe tener pista de escala X")
 	assert_true(pistas_scale_fondos.has("Fondos/Montaña1:scale:x"), "Montaña1 debe tener pista de escala X")
+	assert_true(escala_final_montana_1 >= 1.25, "Montaña 1 debe escalar al menos a 1.25 para cubrir la pantalla en opciones sin mostrar el borde del sprite")
 	assert_eq(pistas_arboles.size(), 0, "No debe estirarse ningún nodo relacionado a los árboles")
 
 	menu.free()

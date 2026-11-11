@@ -364,7 +364,7 @@ tracks/6/keys = {
 "times": PackedFloat32Array(0, 0.75),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [0.52, 1.0947691]
+"values": [0.52, 1.26]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_mpb5u"]
@@ -415,6 +415,7 @@ texture = ExtResource("2_pwyh3")
 position = Vector2(0, -540)
 scale = Vector2(0.55, 0.55)
 texture = ExtResource("3_2v816")
+metadata/_edit_lock_ = true
 
 [node name="Montaña2" type="Sprite2D" parent="Fondos" unique_id=1529222064]
 position = Vector2(-52, 260)
@@ -422,7 +423,7 @@ scale = Vector2(0.48, 0.48)
 texture = ExtResource("3_q3oj6")
 
 [node name="Montaña1" type="Sprite2D" parent="Fondos" unique_id=1507619010]
-position = Vector2(-224.07007, 244)
+position = Vector2(0, 244)
 scale = Vector2(0.52, 0.52)
 texture = ExtResource("4_pkm7p")
 
@@ -433,6 +434,7 @@ texture = ExtResource("6_883rq")
 [node name="ArbolesSegundaDivision" type="Sprite2D" parent="Fondos" unique_id=1634173691]
 position = Vector2(30, -277)
 texture = ExtResource("6_xbcmh")
+metadata/_edit_lock_ = true
 
 [node name="ParticulasEstrellas" type="CPUParticles2D" parent="Fondos" unique_id=1695083557]
 position = Vector2(0, -500)
@@ -484,6 +486,7 @@ offset_left = 540.0
 offset_top = 559.0
 offset_right = 1620.0
 offset_bottom = 1639.0
+metadata/_edit_lock_ = true
 
 [node name="TextoOpciones" type="Label" parent="Textos" unique_id=1266535697]
 self_modulate = Color(1, 1, 1, 0.16)
@@ -538,7 +541,7 @@ texture = ExtResource("19_46wig")
 
 [node name="IconoJugar" type="Sprite2D" parent="Textos/Iconos" unique_id=869196332]
 position = Vector2(-12, -48)
-scale = Vector2(0.28615692, 0.28615683)
+scale = Vector2(0.3090495, 0.3090494)
 texture = ExtResource("17_5s2e3")
 
 [node name="IconoCreditos" type="Sprite2D" parent="Textos/Iconos" unique_id=254819263]
@@ -594,3 +597,4 @@ layout_mode = 0
 offset_left = -1080.0
 offset_right = 1080.0
 offset_bottom = 1080.0
+metadata/_edit_lock_ = true
