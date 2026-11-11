@@ -44,8 +44,10 @@ func inicializar_nodos(
 
 	if menu_opciones != null:
 		menu_opciones.modulate.a = 0.0
+		menu_opciones.visible = false
 	if menu_creditos != null:
 		menu_creditos.modulate.a = 0.0
+		menu_creditos.visible = false
 
 
 func iniciar_presentacion(es_editor: bool, en_grupo_test: bool) -> void:
@@ -61,9 +63,11 @@ func iniciar_presentacion(es_editor: bool, en_grupo_test: bool) -> void:
 			textos_nodo.modulate.a = 1.0
 		if menu_opciones != null:
 			menu_opciones.modulate.a = 0.0
+			menu_opciones.visible = false
 			menu_opciones.desactivar()
 		if menu_creditos != null:
 			menu_creditos.modulate.a = 0.0
+			menu_creditos.visible = false
 			menu_creditos.desactivar()
 		return
 
@@ -78,9 +82,11 @@ func iniciar_presentacion(es_editor: bool, en_grupo_test: bool) -> void:
 		textos_nodo.modulate.a = 0.0
 	if menu_opciones != null:
 		menu_opciones.modulate.a = 0.0
+		menu_opciones.visible = false
 		menu_opciones.desactivar()
 	if menu_creditos != null:
 		menu_creditos.modulate.a = 0.0
+		menu_creditos.visible = false
 		menu_creditos.desactivar()
 
 	if animador != null and animador.has_animation("esperando_inicio"):
@@ -112,6 +118,8 @@ func regresar_a_presentacion(on_terminada_cb: Callable) -> void:
 
 func ir_a_opciones(on_terminada_cb: Callable) -> void:
 	estado = MenuConstantes.EstadoMenu.TRANSICION_OPCIONES
+	if menu_opciones != null:
+		menu_opciones.visible = true
 	_ejecutar_animacion_panel("ir_a_opciones", on_terminada_cb, false)
 
 
@@ -124,6 +132,8 @@ func regresar_de_opciones(on_terminada_cb: Callable) -> void:
 
 func ir_a_creditos(on_terminada_cb: Callable) -> void:
 	estado = MenuConstantes.EstadoMenu.TRANSICION_CREDITOS
+	if menu_creditos != null:
+		menu_creditos.visible = true
 	_ejecutar_animacion_panel("ir_a_creditos", on_terminada_cb, false)
 
 
@@ -189,14 +199,18 @@ func procesar_animacion_terminada(nombre: StringName) -> bool:
 			if camara != null and camara.position.x < 0.0:
 				estado = MenuConstantes.EstadoMenu.EN_OPCIONES
 				if menu_opciones != null:
+					menu_opciones.visible = true
 					menu_opciones.modulate.a = 1.0
 					menu_opciones.activar()
+				if menu_creditos != null:
+					menu_creditos.visible = false
 				if textos_nodo != null:
 					textos_nodo.modulate.a = 0.0
 			else:
 				estado = MenuConstantes.EstadoMenu.MENU_ACTIVO
 				if menu_opciones != null:
 					menu_opciones.modulate.a = 0.0
+					menu_opciones.visible = false
 					menu_opciones.desactivar()
 				if textos_nodo != null:
 					textos_nodo.modulate.a = 1.0
@@ -209,14 +223,18 @@ func procesar_animacion_terminada(nombre: StringName) -> bool:
 			if camara != null and camara.position.x > 1080.0:
 				estado = MenuConstantes.EstadoMenu.EN_CREDITOS
 				if menu_creditos != null:
+					menu_creditos.visible = true
 					menu_creditos.modulate.a = 1.0
 					menu_creditos.activar()
+				if menu_opciones != null:
+					menu_opciones.visible = false
 				if textos_nodo != null:
 					textos_nodo.modulate.a = 0.0
 			else:
 				estado = MenuConstantes.EstadoMenu.MENU_ACTIVO
 				if menu_creditos != null:
 					menu_creditos.modulate.a = 0.0
+					menu_creditos.visible = false
 					menu_creditos.desactivar()
 				if textos_nodo != null:
 					textos_nodo.modulate.a = 1.0

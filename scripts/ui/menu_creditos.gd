@@ -15,7 +15,9 @@ var _silenciar_audio_ajustes: bool = false
 
 
 func _ready() -> void:
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if boton_volver != null:
+		boton_volver.focus_mode = Control.FOCUS_NONE
 		if not boton_volver.pressed.is_connected(_on_boton_volver_pressed):
 			boton_volver.pressed.connect(_on_boton_volver_pressed)
 		if not boton_volver.focus_entered.is_connected(_on_boton_volver_focus_entered):
@@ -26,16 +28,22 @@ func _ready() -> void:
 
 func activar() -> void:
 	_activo = true
+	visible = true
+	mouse_filter = Control.MOUSE_FILTER_STOP
 	_silenciar_audio_ajustes = true
 	if boton_volver != null:
+		boton_volver.focus_mode = Control.FOCUS_ALL
 		boton_volver.grab_focus()
 	_silenciar_audio_ajustes = false
 
 
 func desactivar() -> void:
 	_activo = false
-	if boton_volver != null and boton_volver.has_focus():
-		boton_volver.release_focus()
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if boton_volver != null:
+		if boton_volver.has_focus():
+			boton_volver.release_focus()
+		boton_volver.focus_mode = Control.FOCUS_NONE
 
 
 func _on_boton_volver_focus_entered() -> void:

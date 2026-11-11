@@ -62,13 +62,13 @@ custom_minimum_size = Vector2(420, 44)
 layout_mode = 2
 focus_neighbor_top = NodePath("../../BotonVolver")
 focus_neighbor_bottom = NodePath("../../FilaMusica/SliderMusica")
-value = 97.0
+value = 100.0
 
 [node name="ValMaster" type="Label" parent="Layout/PanelOpciones/Margen/Columna/FilaMaster" unique_id=385040778]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("2_yrh4g")
 theme_override_font_sizes/font_size = 36
-text = "97%"
+text = "100%"
 
 [node name="FilaMusica" type="HBoxContainer" parent="Layout/PanelOpciones/Margen/Columna" unique_id=1434912404]
 layout_mode = 2
@@ -86,13 +86,13 @@ custom_minimum_size = Vector2(420, 44)
 layout_mode = 2
 focus_neighbor_top = NodePath("../../FilaMaster/SliderMaster")
 focus_neighbor_bottom = NodePath("../../FilaSFX/SliderSFX")
-value = 23.0
+value = 40.0
 
 [node name="ValMusica" type="Label" parent="Layout/PanelOpciones/Margen/Columna/FilaMusica" unique_id=1363035107]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("2_yrh4g")
 theme_override_font_sizes/font_size = 36
-text = "23%"
+text = "40%"
 
 [node name="FilaSFX" type="HBoxContainer" parent="Layout/PanelOpciones/Margen/Columna" unique_id=856386891]
 layout_mode = 2
@@ -110,13 +110,13 @@ custom_minimum_size = Vector2(420, 44)
 layout_mode = 2
 focus_neighbor_top = NodePath("../../FilaMusica/SliderMusica")
 focus_neighbor_bottom = NodePath("../../FilaPantalla/CheckPantalla")
-value = 75.0
+value = 79.0
 
 [node name="ValSFX" type="Label" parent="Layout/PanelOpciones/Margen/Columna/FilaSFX" unique_id=121746443]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("2_yrh4g")
 theme_override_font_sizes/font_size = 36
-text = "75%"
+text = "79%"
 
 [node name="FilaPantalla" type="HBoxContainer" parent="Layout/PanelOpciones/Margen/Columna" unique_id=1033751110]
 layout_mode = 2
@@ -131,7 +131,9 @@ text = "Pantalla Completa:"
 
 [node name="CheckPantalla" type="CheckBox" parent="Layout/PanelOpciones/Margen/Columna/FilaPantalla" unique_id=1984721454]
 layout_mode = 2
+focus_neighbor_left = NodePath(".")
 focus_neighbor_top = NodePath("../../FilaSFX/SliderSFX")
+focus_neighbor_right = NodePath(".")
 focus_neighbor_bottom = NodePath("../../BotonRestablecer")
 
 [node name="Separador2" type="HSeparator" parent="Layout/PanelOpciones/Margen/Columna" unique_id=1617394617]
@@ -142,7 +144,9 @@ theme_override_constants/separation = 16
 custom_minimum_size = Vector2(400, 72)
 layout_mode = 2
 size_flags_horizontal = 0
+focus_neighbor_left = NodePath(".")
 focus_neighbor_top = NodePath("../FilaPantalla/CheckPantalla")
+focus_neighbor_right = NodePath(".")
 focus_neighbor_bottom = NodePath("../BotonVolver")
 theme_override_colors/font_focus_color = Color(0.9019608, 1, 0.7019608, 1)
 theme_override_colors/font_hover_color = Color(0.9019608, 1, 0.7019608, 1)
@@ -155,7 +159,9 @@ alignment = 0
 custom_minimum_size = Vector2(400, 72)
 layout_mode = 2
 size_flags_horizontal = 0
+focus_neighbor_left = NodePath(".")
 focus_neighbor_top = NodePath("../BotonRestablecer")
+focus_neighbor_right = NodePath(".")
 focus_neighbor_bottom = NodePath("../FilaMaster/SliderMaster")
 theme_override_colors/font_focus_color = Color(0.9019608, 1, 0.7019608, 1)
 theme_override_colors/font_hover_color = Color(0.9019608, 1, 0.7019608, 1)

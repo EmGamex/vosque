@@ -54,9 +54,34 @@ func test_navegacion_y_eventos_boton_volver() -> void:
 	panel._on_boton_volver_mouse_entered()
 	panel._on_boton_volver_focus_entered()
 
-	# Configuración cíclica en foco
+	# Configuración cíclica en foco (4 direcciones bloqueadas a sí mismo)
 	assert_eq(String(panel.boton_volver.focus_neighbor_top), ".", "focus_neighbor_top debe ser cíclico")
 	assert_eq(String(panel.boton_volver.focus_neighbor_bottom), ".", "focus_neighbor_bottom debe ser cíclico")
+	assert_eq(String(panel.boton_volver.focus_neighbor_left), ".", "focus_neighbor_left debe ser cíclico")
+	assert_eq(String(panel.boton_volver.focus_neighbor_right), ".", "focus_neighbor_right debe ser cíclico")
+
+	panel.free()
+
+
+func test_aislamiento_foco_y_mouse_filter() -> void:
+	var escena: PackedScene = load(RUTA_ESCENA_CREDITOS)
+	var panel: MenuCreditos = escena.instantiate() as MenuCreditos
+	panel._ready()
+
+	# Tras _ready() debe arrancar desactivado
+	assert_eq(panel.mouse_filter, Control.MOUSE_FILTER_IGNORE, "Mouse filter debe ignorarse en reposo")
+	assert_eq(panel.boton_volver.focus_mode, Control.FOCUS_NONE, "BotonVolver debe tener FOCUS_NONE en reposo")
+
+	# Tras activar() debe tener FOCUS_ALL y MOUSE_FILTER_STOP
+	panel.activar()
+	assert_true(panel.visible, "Debe ser visible tras activar()")
+	assert_eq(panel.mouse_filter, Control.MOUSE_FILTER_STOP, "Mouse filter debe detener eventos tras activar()")
+	assert_eq(panel.boton_volver.focus_mode, Control.FOCUS_ALL, "BotonVolver debe tener FOCUS_ALL tras activar()")
+
+	# Tras desactivar() debe volver a FOCUS_NONE y MOUSE_FILTER_IGNORE
+	panel.desactivar()
+	assert_eq(panel.mouse_filter, Control.MOUSE_FILTER_IGNORE, "Mouse filter debe volver a IGNORE tras desactivar()")
+	assert_eq(panel.boton_volver.focus_mode, Control.FOCUS_NONE, "BotonVolver debe volver a FOCUS_NONE tras desactivar()")
 
 	panel.free()
 

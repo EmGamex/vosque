@@ -41,6 +41,16 @@ func _ready() -> void:
 
 	_conectar_senales()
 	_cargar_valores_actuales()
+	_aplicar_estado_interaccion(false)
+
+
+func _aplicar_estado_interaccion(habilitado: bool) -> void:
+	mouse_filter = Control.MOUSE_FILTER_STOP if habilitado else Control.MOUSE_FILTER_IGNORE
+	for elem in _elementos_foco:
+		if elem != null:
+			if not habilitado and elem.has_focus():
+				elem.release_focus()
+			elem.focus_mode = Control.FOCUS_ALL if habilitado else Control.FOCUS_NONE
 
 
 func _conectar_senales() -> void:
@@ -112,6 +122,8 @@ func _cargar_valores_actuales() -> void:
 
 func activar() -> void:
 	_activo = true
+	visible = true
+	_aplicar_estado_interaccion(true)
 	_cargar_valores_actuales()
 	_indice_foco = 0
 	if not _elementos_foco.is_empty():
@@ -120,13 +132,13 @@ func activar() -> void:
 
 func desactivar() -> void:
 	_activo = false
-	for elem in _elementos_foco:
-		if elem and elem.has_focus():
-			elem.release_focus()
+	_aplicar_estado_interaccion(false)
 	_guardar_ajustes()
 
 
 func _guardar_ajustes() -> void:
+	if not is_inside_tree():
+		return
 	if has_node("/root/GestorPersistencia"):
 		var gp = get_node("/root/GestorPersistencia")
 		if gp.has_method("guardar_configuracion_audio"):
