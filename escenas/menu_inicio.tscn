@@ -20,6 +20,7 @@
 [ext_resource type="Texture2D" uid="uid://cw18h3vi7dn7x" path="res://graficos/menu principal/icono creditos.png" id="18_51ctf"]
 [ext_resource type="Texture2D" uid="uid://bs4r1bfk5ofji" path="res://graficos/menu principal/icono configuracion.png" id="19_46wig"]
 [ext_resource type="PackedScene" uid="uid://boxk202uflaub" path="res://escenas/ui/menu_opciones.tscn" id="20_lp070"]
+[ext_resource type="PackedScene" uid="uid://c4hdsa43cxjfl" path="res://escenas/ui/menu_creditos.tscn" id="21_itfft"]
 
 [sub_resource type="Animation" id="Animation_q78gw"]
 length = 0.001
@@ -281,6 +282,92 @@ tracks/5/keys = {
 "values": [0.0, 0.0]
 }
 
+[sub_resource type="Animation" id="Animation_yfyi4"]
+length = 0.75
+tracks/0/type = "bezier"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CamaraMenu:position:x")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"handle_modes": PackedInt32Array(0, 0),
+"points": PackedFloat32Array(540, -0.25, 0, 0.36666667, 15.5, 1620, -0.35, -19.5, 0.25, 0),
+"times": PackedFloat32Array(0, 0.75)
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Textos:modulate:a")
+tracks/1/interp = 2
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.35),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [1.0, 0.0]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("MenuCreditos:modulate:a")
+tracks/2/interp = 2
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0.25, 0.75),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 1.0]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("CamaraMenu/EfectoMotionBlur:material:shader_parameter/intensidad")
+tracks/3/interp = 2
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.35, 0.75),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [0.0, 0.015, 0.0]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Fondos/FondoDegradado:scale:x")
+tracks/4/interp = 2
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 0.75),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.55, 1.36]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Fondos/Montaña2:scale:x")
+tracks/5/interp = 2
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 0.75),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.48, 0.96]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("Fondos/Montaña1:scale:x")
+tracks/6/interp = 2
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0, 0.75),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.52, 1.26]
+}
+
 [sub_resource type="Animation" id="Animation_itfft"]
 length = 0.75
 tracks/0/type = "bezier"
@@ -372,6 +459,7 @@ _data = {
 &"RESET": SubResource("Animation_q78gw"),
 &"bajar_al_bosque": SubResource("Animation_f3do1"),
 &"esperando_inicio": SubResource("Animation_dotxh"),
+&"ir_a_creditos": SubResource("Animation_yfyi4"),
 &"ir_a_opciones": SubResource("Animation_itfft")
 }
 
@@ -415,7 +503,6 @@ texture = ExtResource("2_pwyh3")
 position = Vector2(0, -540)
 scale = Vector2(0.55, 0.55)
 texture = ExtResource("3_2v816")
-metadata/_edit_lock_ = true
 
 [node name="Montaña2" type="Sprite2D" parent="Fondos" unique_id=1529222064]
 position = Vector2(-52, 260)
@@ -434,7 +521,6 @@ texture = ExtResource("6_883rq")
 [node name="ArbolesSegundaDivision" type="Sprite2D" parent="Fondos" unique_id=1634173691]
 position = Vector2(30, -277)
 texture = ExtResource("6_xbcmh")
-metadata/_edit_lock_ = true
 
 [node name="ParticulasEstrellas" type="CPUParticles2D" parent="Fondos" unique_id=1695083557]
 position = Vector2(0, -500)
@@ -486,7 +572,6 @@ offset_left = 540.0
 offset_top = 559.0
 offset_right = 1620.0
 offset_bottom = 1639.0
-metadata/_edit_lock_ = true
 
 [node name="TextoOpciones" type="Label" parent="Textos" unique_id=1266535697]
 self_modulate = Color(1, 1, 1, 0.16)
@@ -597,4 +682,10 @@ layout_mode = 0
 offset_left = -1080.0
 offset_right = 1080.0
 offset_bottom = 1080.0
-metadata/_edit_lock_ = true
+
+[node name="MenuCreditos" parent="." unique_id=980331015 instance=ExtResource("21_itfft")]
+modulate = Color(1, 1, 1, 0)
+layout_mode = 0
+offset_left = 1080.0
+offset_right = 2160.0
+offset_bottom = 1080.0

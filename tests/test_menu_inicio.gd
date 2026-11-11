@@ -349,3 +349,83 @@ func test_animacion_ir_a_opciones_estira_fondos_y_no_arboles() -> void:
 	menu.free()
 
 
+func test_animacion_ir_a_creditos_estira_fondos_y_cobertura_derecha() -> void:
+	var menu: Control = _crear_instancia_menu()
+	var animador: AnimationPlayer = menu.get_node_or_null("AnimadorCinematica") as AnimationPlayer
+	assert_true(animador != null, "Debe existir AnimadorCinematica")
+	assert_true(animador.has_animation("ir_a_creditos"), "Debe existir la animación ir_a_creditos")
+
+	var anim: Animation = animador.get_animation("ir_a_creditos")
+	var pistas_scale_fondos: Array[String] = []
+	var pistas_arboles: Array[String] = []
+	var escala_final_degradado: float = 0.0
+	var escala_final_montana_1: float = 0.0
+	var destino_camara_x: float = 0.0
+
+	for i in range(anim.get_track_count()):
+		var ruta: String = str(anim.track_get_path(i))
+		if ruta == "CamaraMenu:position:x":
+			assert_eq(anim.track_get_type(i), Animation.TYPE_BEZIER, "Pista de cámara debe ser bezier")
+			var key_count: int = anim.track_get_key_count(i)
+			if key_count > 0:
+				destino_camara_x = anim.bezier_track_get_key_value(i, key_count - 1)
+		if "scale" in ruta:
+			if "Fondos" in ruta:
+				pistas_scale_fondos.append(ruta)
+			if "Arbol" in ruta or "arbol" in ruta:
+				pistas_arboles.append(ruta)
+		if ruta == "Fondos/FondoDegradado:scale:x":
+			var key_count: int = anim.track_get_key_count(i)
+			if key_count > 0:
+				escala_final_degradado = float(anim.track_get_key_value(i, key_count - 1))
+		if ruta == "Fondos/Montaña1:scale:x":
+			var key_count: int = anim.track_get_key_count(i)
+			if key_count > 0:
+				escala_final_montana_1 = float(anim.track_get_key_value(i, key_count - 1))
+
+	assert_eq(destino_camara_x, 1620.0, "La cámara debe desplazarse a x=1620.0 en créditos")
+	assert_true(pistas_scale_fondos.has("Fondos/FondoDegradado:scale:x"), "FondoDegradado debe tener pista de escala X")
+	assert_true(pistas_scale_fondos.has("Fondos/Montaña2:scale:x"), "Montaña2 debe tener pista de escala X")
+	assert_true(pistas_scale_fondos.has("Fondos/Montaña1:scale:x"), "Montaña1 debe tener pista de escala X")
+	assert_true(escala_final_degradado >= 1.35, "Fondo degradado debe escalar al menos a 1.35 para cubrir la derecha")
+	assert_true(escala_final_montana_1 >= 1.25, "Montaña 1 debe escalar al menos a 1.25 para cubrir la pantalla en créditos")
+	assert_eq(pistas_arboles.size(), 0, "No debe estirarse ningún nodo relacionado a los árboles")
+
+	menu.free()
+
+
+func test_flujo_estados_creditos() -> void:
+	var menu: Control = _crear_instancia_menu()
+	menu.add_to_group("modo_test")
+	menu._ready()
+
+	# Llevar a MENU_ACTIVO simulando fin de descenso
+	menu.iniciar_descenso()
+	menu._on_animacion_terminada(&"bajar_al_bosque")
+	assert_eq(menu.get("estado"), 2, "Debe estar en MENU_ACTIVO")
+
+	# Solicitar créditos
+	menu.set("opcion_actual", 2)
+	menu._confirmar_opcion()
+	assert_eq(menu.get("estado"), 6, "Debe pasar a TRANSICION_CREDITOS (6)")
+	assert_true(menu.get("bloqueado"), "Menú debe estar bloqueado durante la transición a créditos")
+
+	# Simular llegada a la derecha (cámara en 1620)
+	var camara: Camera2D = menu.get_node("CamaraMenu") as Camera2D
+	camara.position = Vector2(1620.0, 540.0)
+	menu._on_animacion_terminada(&"ir_a_creditos")
+	assert_eq(menu.get("estado"), 7, "Debe pasar a EN_CREDITOS (7)")
+
+	# Volver de créditos
+	menu._on_volver_de_creditos()
+	assert_eq(menu.get("estado"), 6, "Debe volver a TRANSICION_CREDITOS (6)")
+
+	# Simular regreso al centro (cámara en 540)
+	camara.position = Vector2(540.0, 540.0)
+	menu._on_animacion_terminada(&"ir_a_creditos")
+	assert_eq(menu.get("estado"), 2, "Debe volver a MENU_ACTIVO (2)")
+	assert_false(menu.get("bloqueado"), "Menú debe desbloquearse tras volver a MENU_ACTIVO")
+
+	menu.free()
+
+

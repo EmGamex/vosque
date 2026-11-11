@@ -58,15 +58,21 @@ Para simular el pulso y la respiración natural de un explorador sosteniendo una
 * **Scale Punch tipográfico:** El texto de la opción activa incrementa su escala a $1.08\times$ mediante `Tween` con curva `TRANS_BACK` y opacidad $1.0$, mientras que las opciones inactivas reducen su opacidad a $0.16$ y escala base $1.0$.
 
 ### 1.5. Pantalla de Presentación y Paneo Cinemático (`Camera2D` + `AnimationPlayer`)
-El menú principal implementa una experiencia cinematográfica previa dividida en dos lienzos 2D continuos:
+El menú principal implementa una experiencia cinematográfica previa dividida en lienzos 2D continuos:
 * **Zona Superior ($Y \in [-1080, 0]$):** Vista del cielo nocturno y estrellas. Alberga el nodo `$Presentacion` con el logotipo (`Logo`) y el texto parpadeante (`TextoComenzar`: *"PRESIONA ENTER PARA COMENZAR"*), sobre la textura `FondoPresentacion` (`fondo degradado alargado.jpg`).
-* **Zona Inferior ($Y \in [0, 1080]$):** Vista a ras de suelo del bosque con las montañas, los 3 árboles y los textos de navegación.
+* **Zona Central / Inferior ($Y \in [0, 1080]$):** Vista a ras de suelo del bosque con las montañas, los 3 árboles y los textos de navegación.
+* **Zona Lateral Izquierda ($X \in [-1080, 0]$):** Vista del panel de Opciones/Ajustes (`MenuOpciones`) con paneo de cámara a $x = -540$.
+* **Zona Lateral Derecha ($X \in [1080, 2160]$):** Vista del panel de Créditos (`MenuCreditos`) con paneo de cámara a $x = 1620$.
 
 #### Flujo Cinemático y Control de Estados
 1. **Estado `PRESENTACION`:** La `CamaraMenu` inicia en `(540, -540)` reproduciendo en loop la animación `"esperando_inicio"` (respiración suave de opacidad del texto de inicio).
 2. **Descenso (`iniciar_descenso()`):** Al pulsar <kbd>Enter</kbd> o <kbd>Espacio</kbd>, pasa a `CINEMATICA_BAJANDO` y ejecuta `"bajar_al_bosque"`, desplazando la `CamaraMenu` verticalmente hasta `(540, 540)` y realizando un crossfade suave de salida (`modulate:a -> 0.0`) de `FondoPresentacion` hacia `FondoDegradado`.
-3. **Efecto Motion Blur Vertical (`shaders/motion_blur_vertical.gdshader`):** Un `ColorRect` a pantalla completa anclado a la cámara (`CamaraMenu/EfectoMotionBlur`) aplica un desenfoque direccional vertical sobre `screen_texture`. Su intensidad se modula mediante una curva de campana en el `AnimationPlayer` (pico de `0.035` a mitad de la caída y `0.0` al inicio y freno), otorgando una sensación vertiginosa de velocidad cinematográfica.
-4. **Función Skip Dinámica (`skipear_cinematica()`):** Si el jugador pulsa cualquier botón de acción (<kbd>Enter</kbd>, <kbd>Espacio</kbd>, <kbd>Escape</kbd>) durante el descenso o ascenso, el `AnimationPlayer` multiplica su velocidad (`speed_scale = multiplicador_velocidad_skip`, por defecto $4.0\times$, ajustable entre $1.5\times$ y $10.0\times$), concluyendo la animación de forma ágil y fluida ($\approx 0.35\text{ s}$) sin saltos abruptos.
+3. **Efecto Motion Blur Vertical y Horizontal (`shaders/motion_blur_vertical.gdshader`):** Un `ColorRect` a pantalla completa anclado a la cámara (`CamaraMenu/EfectoMotionBlur`) aplica un desenfoque direccional sobre `screen_texture`. Su intensidad se modula mediante una curva de campana en el `AnimationPlayer` (pico de `0.035` en bajada/subida y `0.015` en paneos laterales a opciones o créditos), otorgando una sensación vertiginosa de velocidad cinematográfica.
+4. **Transición a Opciones y Créditos (`ir_a_opciones` / `ir_a_creditos`):**
+   - Hacia la izquierda: `CamaraMenu:position:x` transiciona suavemente mediante curva Bézier de $540$ a $-540$, oculta los textos del menú y despliega `MenuOpciones`.
+   - Hacia la derecha: `CamaraMenu:position:x` transiciona con la curva simétrica de $540$ a $1620$, oculta los textos del menú y despliega `MenuCreditos` (`escenas/ui/menu_creditos.tscn`). Para asegurar cobertura continua a la derecha, `FondoDegradado` escala en $X$ a $\ge 1.35$ y las montañas escalan para evitar bordes vacíos.
+   - Retorno: `play_backwards` en la animación correspondiente restaura la cámara al centro ($x = 540$) y reactiva el menú principal.
+5. **Función Skip Dinámica (`skipear_cinematica()`):** Si el jugador pulsa cualquier botón de acción (<kbd>Enter</kbd>, <kbd>Espacio</kbd>, <kbd>Escape</kbd>) durante el descenso, ascenso o transiciones laterales, el `AnimationPlayer` multiplica su velocidad (`speed_scale = multiplicador_velocidad_skip`, por defecto $4.0\times$), concluyendo la animación de forma ágil y fluida.
 5. **Retorno a la Pantalla de Inicio con Escape (`regresar_a_presentacion()`):** Estando en el menú de selección de árboles (`MENU_ACTIVO`), presionar <kbd>Escape</kbd> (`ui_cancel`) activa el estado `CINEMATICA_SUBIENDO` y reproduce la animación en reversa (`play_backwards("bajar_al_bosque")`). La cámara se eleva desde el bosque hacia el cielo con *motion blur*, oculta los textos de opciones, restaura los fondos de presentación y reanuda el bucle de espera (*"PRESIONA ENTER PARA COMENZAR"*).
 6. **Reinicio al volver:** Cada vez que el jugador regresa al menú principal (desde el juego o Game Over vía `GestorDeEscenas.volver_al_menu()`), el método `enfocar()` reinicia la vista en la parte superior, permitiendo siempre la aceleración instantánea con doble pulsación.
 7. **Ajustes en Inspector:**
@@ -176,3 +182,106 @@ GameOver (Control) [scripts/ui/game_over.gd]
    - Páginas recogidas en la sesión actual.
    - Récord histórico (*High Score* persistido en IndexedDB y `LocalStorage` Web).
 4. **Acción Rápida:** Botón llamativo de "Reintentar" y soporte nativo para presionar <kbd>Espacio</kbd> o <kbd>Enter</kbd> para reiniciar la partida en menos de 1 segundo tras la revelación.
+
+---
+
+## 4. Estándar de Botones y Navegación de UI
+
+Para garantizar una experiencia consistente, táctil y accesible en todos los menús (`MenuInicio`, `MenuOpciones`, `MenuPausa`, `MenuCreditos`), el proyecto implementa un estándar unificado para botones interactivos tanto a nivel visual (`.tscn`) como de contrato de código (`.gd`).
+
+```mermaid
+flowchart TD
+    subgraph Entrada ["Interacción del Usuario"]
+        TecladoMando["Teclado / Gamepad (ui_up / ui_down)"]
+        Raton["Puntero del Ratón (mouse_entered)"]
+    end
+
+    subgraph Boton ["Botón de Menú (Button)"]
+        Foco["Evento focus_entered"]
+        Hover["grab_focus()"]
+        Presionar["Evento pressed / ui_cancel"]
+    end
+
+    subgraph AudioUI ["ControladorAudioUI (Autoload)"]
+        SfxSelect["MENU_SELECCIONAR (Cursor)"]
+        SfxRetroceder["MENU_RETROCEDER / MENU_CONFIRMAR"]
+    end
+
+    TecladoMando --> Foco
+    Raton --> Hover --> Foco
+    Foco -- "Si activo y no silenciado" --> SfxSelect
+    Presionar --> SfxRetroceder
+```
+
+### 4.1. Configuración Visual en Escena (`.tscn`)
+
+Todos los botones principales de menús deben respetar las siguientes propiedades en el árbol de nodos de Godot:
+
+| Propiedad | Valor / Recurso | Propósito |
+| :--- | :--- | :--- |
+| `custom_minimum_size` | `Vector2(400, 72)` | Área de interacción táctil amplia y altura uniforme entre botones. |
+| `size_flags_horizontal` | `0` | Alineado a la izquierda sin estirarse arbitrariamente según el contenedor. |
+| `alignment` | `0` (`HORIZONTAL_ALIGNMENT_LEFT`) | Texto alineado a la izquierda para mantener una columna de lectura limpia. |
+| `theme_override_fonts/font` | `res://fuentes/raleway_bold.tres` | Variante semibold/bold (peso 700) de Raleway para máxima legibilidad. |
+| `theme_override_font_sizes/font_size` | `40` | Jerarquía tipográfica estandarizada para acciones primarias. |
+| `theme_override_colors/font_focus_color` | `Color(0.902, 1.0, 0.702, 1)` (`#e6ffb3`) | Tinte verde lima pálido distintivo al recibir el foco de UI. |
+| `theme_override_colors/font_hover_color` | `Color(0.902, 1.0, 0.702, 1)` (`#e6ffb3`) | Mismo tono que focus para coherencia visual al interactuar con ratón. |
+
+#### Navegación Cíclica (`focus_neighbor_*`)
+- **Botón solitario (ej. `BotonVolver` en `MenuCreditos`):** Para evitar que el foco se pierda en el vacío al navegar con flechas o palanca de mando, se fija cíclicamente a sí mismo:
+  ```text
+  focus_neighbor_top = NodePath(".")
+  focus_neighbor_bottom = NodePath(".")
+  ```
+- **Listas verticales (ej. `MenuOpciones`, `MenuPausa`):** Cada botón o control enlaza hacia el anterior y posterior, cerrando el ciclo entre el primer y último elemento.
+
+### 4.2. Contrato de Script y Ciclo de Vida (`.gd`)
+
+Todo script de panel o menú interactivo debe adoptar las siguientes prácticas:
+
+1. **Sincronización Ratón-Foco:**
+   Al pasar el cursor sobre cualquier botón o control interactivo mientras el menú esté activo, debe otorgarse el foco nativo mediante `grab_focus()`. Esto previene desincronizaciones donde el ratón apunta a un botón pero el teclado acciona otro:
+   ```gdscript
+   func _on_boton_mouse_entered(btn: Button) -> void:
+       if _activo and btn != null and not btn.has_focus():
+           btn.grab_focus()
+   ```
+
+2. **Supresión de Audio Espurio en Foco Inicial (`_silenciar_audio_ajustes`):**
+   Al activar o desplegar una pantalla, forzar programáticamente `grab_focus()` en el botón inicial dispararía el sonido de cursor sin que el jugador haya realizado ninguna acción intencional. Para prevenirlo, se usa una bandera temporal de silenciamiento:
+   ```gdscript
+   var _silenciar_audio_ajustes: bool = false
+
+   func activar() -> void:
+       _activo = true
+       _silenciar_audio_ajustes = true
+       if boton_volver != null:
+           boton_volver.grab_focus()
+       _silenciar_audio_ajustes = false
+
+   func _on_boton_focus_entered() -> void:
+       if _activo and not _silenciar_audio_ajustes:
+           ControladorAudioUI.emitir_seguro(self, ControladorAudioUI.EventoUI.MENU_SELECCIONAR)
+   ```
+
+3. **Retroalimentación Auditiva y Señalización:**
+   Al presionar el botón, se valida el estado activo, se emite el evento correspondiente (`MENU_RETROCEDER` o `MENU_CONFIRMAR`) a través del bus desacoplado y se emite la señal del componente:
+   ```gdscript
+   func _on_boton_volver_pressed() -> void:
+       if not _activo:
+           return
+       ControladorAudioUI.emitir_seguro(self, ControladorAudioUI.EventoUI.MENU_RETROCEDER)
+       volver_solicitado.emit()
+   ```
+
+4. **Captura Global de Cancelación (`ui_cancel`):**
+   El método `_input(evento)` captura <kbd>Escape</kbd> (`ui_cancel`) si el panel está activo, reutilizando el callback del botón de volver y marcando el evento como manejado para evitar fugas:
+   ```gdscript
+   func _input(evento: InputEvent) -> void:
+       if not _activo:
+           return
+       if evento.is_action_pressed("ui_cancel"):
+           _on_boton_volver_pressed()
+           get_viewport().set_input_as_handled()
+   ```
+

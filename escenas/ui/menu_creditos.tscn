@@ -1,0 +1,129 @@
+[gd_scene format=3 uid="uid://c4hdsa43cxjfl"]
+
+[ext_resource type="Script" uid="uid://bh256suaeokuo" path="res://scripts/ui/menu_creditos.gd" id="1_ssfvp"]
+[ext_resource type="FontVariation" uid="uid://0htusin8b5jm" path="res://fuentes/raleway_bold.tres" id="2_5cqkm"]
+[ext_resource type="FontVariation" uid="uid://de3fhajt7mhd7" path="res://fuentes/raleway_black.tres" id="2_ujg5v"]
+[ext_resource type="FontVariation" uid="uid://465ayw0pr084" path="res://fuentes/raleway_medium.tres" id="4_stugo"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_qfrpt"]
+
+[node name="MenuCreditos" type="Control" unique_id=980331015]
+custom_minimum_size = Vector2(1080, 1080)
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_ssfvp")
+
+[node name="Layout" type="CenterContainer" parent="." unique_id=319523605]
+custom_minimum_size = Vector2(1080, 1080)
+layout_mode = 0
+
+[node name="PanelCreditos" type="PanelContainer" parent="Layout" unique_id=671930409]
+custom_minimum_size = Vector2(960, 900)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_qfrpt")
+
+[node name="Margen" type="MarginContainer" parent="Layout/PanelCreditos" unique_id=1451253702]
+layout_mode = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 50
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 50
+
+[node name="Columna" type="VBoxContainer" parent="Layout/PanelCreditos/Margen" unique_id=2119057279]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Titulo" type="Label" parent="Layout/PanelCreditos/Margen/Columna" unique_id=686005663]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9019608, 1, 0.7019608, 1)
+theme_override_colors/font_shadow_color = Color(0.6, 0, 0, 0)
+theme_override_constants/shadow_offset_y = 3
+theme_override_constants/shadow_outline_size = 4
+theme_override_fonts/font = ExtResource("2_ujg5v")
+theme_override_font_sizes/font_size = 68
+text = "CRÉDITOS"
+
+[node name="Separador1" type="HSeparator" parent="Layout/PanelCreditos/Margen/Columna" unique_id=358481014]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="SecDireccion" type="VBoxContainer" parent="Layout/PanelCreditos/Margen/Columna" unique_id=1772780014]
+layout_mode = 2
+
+[node name="LblRol" type="Label" parent="Layout/PanelCreditos/Margen/Columna/SecDireccion" unique_id=228425457]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9019608, 1, 0.7019608, 1)
+theme_override_fonts/font = ExtResource("2_5cqkm")
+theme_override_font_sizes/font_size = 36
+text = "DIRECCIÓN Y PROGRAMACIÓN"
+
+[node name="LblNombres" type="Label" parent="Layout/PanelCreditos/Margen/Columna/SecDireccion" unique_id=2092985132]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_stugo")
+theme_override_font_sizes/font_size = 26
+text = "EmGamex  •  Cu-be"
+
+[node name="SecArte" type="VBoxContainer" parent="Layout/PanelCreditos/Margen/Columna" unique_id=921995888]
+layout_mode = 2
+
+[node name="LblRol" type="Label" parent="Layout/PanelCreditos/Margen/Columna/SecArte" unique_id=1877820172]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9019608, 1, 0.7019608, 1)
+theme_override_fonts/font = ExtResource("2_5cqkm")
+theme_override_font_sizes/font_size = 36
+text = "ARTE Y DISEÑO VISUAL"
+
+[node name="LblNombres" type="Label" parent="Layout/PanelCreditos/Margen/Columna/SecArte" unique_id=1374479831]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_stugo")
+theme_override_font_sizes/font_size = 26
+text = "Pipeline Híbrido 3D & Vectorial (Blender + Inkscape)"
+
+[node name="SecAudio" type="VBoxContainer" parent="Layout/PanelCreditos/Margen/Columna" unique_id=252883123]
+layout_mode = 2
+
+[node name="LblRol" type="Label" parent="Layout/PanelCreditos/Margen/Columna/SecAudio" unique_id=1370762289]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9019608, 1, 0.7019608, 1)
+theme_override_fonts/font = ExtResource("2_5cqkm")
+theme_override_font_sizes/font_size = 36
+text = "MÚSICA Y EFECTOS DE SONIDO"
+
+[node name="LblNombres" type="Label" parent="Layout/PanelCreditos/Margen/Columna/SecAudio" unique_id=480244162]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_stugo")
+theme_override_font_sizes/font_size = 26
+text = "Pac-Man World 2 OST (Night Crawling & Haunted Boardwalk)"
+
+[node name="SecMotor" type="VBoxContainer" parent="Layout/PanelCreditos/Margen/Columna" unique_id=633947914]
+layout_mode = 2
+
+[node name="LblRol" type="Label" parent="Layout/PanelCreditos/Margen/Columna/SecMotor" unique_id=1485263516]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9019608, 1, 0.7019608, 1)
+theme_override_fonts/font = ExtResource("2_5cqkm")
+theme_override_font_sizes/font_size = 36
+text = "MOTOR Y HERRAMIENTAS"
+
+[node name="LblNombres" type="Label" parent="Layout/PanelCreditos/Margen/Columna/SecMotor" unique_id=813507393]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_stugo")
+theme_override_font_sizes/font_size = 26
+text = "Godot Engine 4 (Compatibility Renderer)"
+
+[node name="Separador2" type="HSeparator" parent="Layout/PanelCreditos/Margen/Columna" unique_id=1329860056]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="BotonVolver" type="Button" parent="Layout/PanelCreditos/Margen/Columna" unique_id=119249776]
+custom_minimum_size = Vector2(400, 72)
+layout_mode = 2
+size_flags_horizontal = 0
+focus_neighbor_top = NodePath(".")
+focus_neighbor_bottom = NodePath(".")
+theme_override_colors/font_focus_color = Color(0.9019608, 1, 0.7019608, 1)
+theme_override_colors/font_hover_color = Color(0.9019608, 1, 0.7019608, 1)
+theme_override_fonts/font = ExtResource("2_5cqkm")
+theme_override_font_sizes/font_size = 40
+text = "VOLVER AL MENÚ"
+alignment = 0

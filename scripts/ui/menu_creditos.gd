@@ -1,0 +1,65 @@
+@tool
+class_name MenuCreditos
+extends Control
+
+## Menú de créditos del juego.
+## Muestra los roles, autores, herramientas y licencias en un lienzo limpio.
+## Emite volver_solicitado al presionar el botón de volver o la acción ui_cancel.
+
+signal volver_solicitado
+
+@onready var boton_volver: Button = $Layout/PanelCreditos/Margen/Columna/BotonVolver
+
+var _activo: bool = false
+var _silenciar_audio_ajustes: bool = false
+
+
+func _ready() -> void:
+	if boton_volver != null:
+		if not boton_volver.pressed.is_connected(_on_boton_volver_pressed):
+			boton_volver.pressed.connect(_on_boton_volver_pressed)
+		if not boton_volver.focus_entered.is_connected(_on_boton_volver_focus_entered):
+			boton_volver.focus_entered.connect(_on_boton_volver_focus_entered)
+		if not boton_volver.mouse_entered.is_connected(_on_boton_volver_mouse_entered):
+			boton_volver.mouse_entered.connect(_on_boton_volver_mouse_entered)
+
+
+func activar() -> void:
+	_activo = true
+	_silenciar_audio_ajustes = true
+	if boton_volver != null:
+		boton_volver.grab_focus()
+	_silenciar_audio_ajustes = false
+
+
+func desactivar() -> void:
+	_activo = false
+	if boton_volver != null and boton_volver.has_focus():
+		boton_volver.release_focus()
+
+
+func _on_boton_volver_focus_entered() -> void:
+	if _activo and not _silenciar_audio_ajustes:
+		ControladorAudioUI.emitir_seguro(self, ControladorAudioUI.EventoUI.MENU_SELECCIONAR)
+
+
+func _on_boton_volver_mouse_entered() -> void:
+	if _activo and boton_volver != null and not boton_volver.has_focus():
+		boton_volver.grab_focus()
+
+
+func _on_boton_volver_pressed() -> void:
+	if not _activo:
+		return
+	ControladorAudioUI.emitir_seguro(self, ControladorAudioUI.EventoUI.MENU_RETROCEDER)
+	volver_solicitado.emit()
+
+
+func _input(evento: InputEvent) -> void:
+	if not _activo:
+		return
+
+	if evento.is_action_pressed("ui_cancel"):
+		_on_boton_volver_pressed()
+		get_viewport().set_input_as_handled()
+

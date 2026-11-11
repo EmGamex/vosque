@@ -14,6 +14,7 @@ var fondo_presentacion: Sprite2D
 var textos_nodo: Control
 var efecto_motion_blur: ColorRect
 var menu_opciones: MenuOpciones
+var menu_creditos: MenuCreditos
 
 
 func inicializar_nodos(
@@ -23,7 +24,8 @@ func inicializar_nodos(
 	p_fondo_presentacion: Sprite2D,
 	p_textos_nodo: Control,
 	p_efecto_motion_blur: ColorRect = null,
-	p_menu_opciones: MenuOpciones = null
+	p_menu_opciones: MenuOpciones = null,
+	p_menu_creditos: MenuCreditos = null
 ) -> void:
 	camara = p_camara
 	animador = p_animador
@@ -32,6 +34,7 @@ func inicializar_nodos(
 	textos_nodo = p_textos_nodo
 	efecto_motion_blur = p_efecto_motion_blur
 	menu_opciones = p_menu_opciones
+	menu_creditos = p_menu_creditos
 
 	# En plataforma Web, desactivar Motion Blur para evitar el lag de compilación
 	# de hint_screen_texture y el consecuente tartamudeo en el audio de WebAssembly.
@@ -41,6 +44,8 @@ func inicializar_nodos(
 
 	if menu_opciones != null:
 		menu_opciones.modulate.a = 0.0
+	if menu_creditos != null:
+		menu_creditos.modulate.a = 0.0
 
 
 func iniciar_presentacion(es_editor: bool, en_grupo_test: bool) -> void:
@@ -57,6 +62,9 @@ func iniciar_presentacion(es_editor: bool, en_grupo_test: bool) -> void:
 		if menu_opciones != null:
 			menu_opciones.modulate.a = 0.0
 			menu_opciones.desactivar()
+		if menu_creditos != null:
+			menu_creditos.modulate.a = 0.0
+			menu_creditos.desactivar()
 		return
 
 	estado = MenuConstantes.EstadoMenu.PRESENTACION
@@ -71,6 +79,9 @@ func iniciar_presentacion(es_editor: bool, en_grupo_test: bool) -> void:
 	if menu_opciones != null:
 		menu_opciones.modulate.a = 0.0
 		menu_opciones.desactivar()
+	if menu_creditos != null:
+		menu_creditos.modulate.a = 0.0
+		menu_creditos.desactivar()
 
 	if animador != null and animador.has_animation("esperando_inicio"):
 		animador.speed_scale = 1.0
@@ -101,29 +112,44 @@ func regresar_a_presentacion(on_terminada_cb: Callable) -> void:
 
 func ir_a_opciones(on_terminada_cb: Callable) -> void:
 	estado = MenuConstantes.EstadoMenu.TRANSICION_OPCIONES
-	if animador != null and animador.has_animation("ir_a_opciones"):
-		animador.speed_scale = 1.0
-		animador.play("ir_a_opciones")
-	else:
-		on_terminada_cb.call(&"ir_a_opciones")
+	_ejecutar_animacion_panel("ir_a_opciones", on_terminada_cb, false)
 
 
 func regresar_de_opciones(on_terminada_cb: Callable) -> void:
 	estado = MenuConstantes.EstadoMenu.TRANSICION_OPCIONES
 	if menu_opciones != null:
 		menu_opciones.desactivar()
+	_ejecutar_animacion_panel("ir_a_opciones", on_terminada_cb, true)
 
-	if animador != null and animador.has_animation("ir_a_opciones"):
+
+func ir_a_creditos(on_terminada_cb: Callable) -> void:
+	estado = MenuConstantes.EstadoMenu.TRANSICION_CREDITOS
+	_ejecutar_animacion_panel("ir_a_creditos", on_terminada_cb, false)
+
+
+func regresar_de_creditos(on_terminada_cb: Callable) -> void:
+	estado = MenuConstantes.EstadoMenu.TRANSICION_CREDITOS
+	if menu_creditos != null:
+		menu_creditos.desactivar()
+	_ejecutar_animacion_panel("ir_a_creditos", on_terminada_cb, true)
+
+
+func _ejecutar_animacion_panel(nombre_anim: String, on_terminada_cb: Callable, reversa: bool) -> void:
+	if animador != null and animador.has_animation(nombre_anim):
 		animador.speed_scale = 1.0
-		animador.play_backwards("ir_a_opciones")
+		if reversa:
+			animador.play_backwards(nombre_anim)
+		else:
+			animador.play(nombre_anim)
 	else:
-		on_terminada_cb.call(&"ir_a_opciones")
+		on_terminada_cb.call(StringName(nombre_anim))
 
 
 func skipear_cinematica() -> void:
 	if (estado == MenuConstantes.EstadoMenu.CINEMATICA_BAJANDO or \
 		estado == MenuConstantes.EstadoMenu.CINEMATICA_SUBIENDO or \
-		estado == MenuConstantes.EstadoMenu.TRANSICION_OPCIONES) and \
+		estado == MenuConstantes.EstadoMenu.TRANSICION_OPCIONES or \
+		estado == MenuConstantes.EstadoMenu.TRANSICION_CREDITOS) and \
 		animador != null and animador.is_playing():
 		animador.speed_scale = multiplicador_velocidad_skip
 
@@ -172,6 +198,26 @@ func procesar_animacion_terminada(nombre: StringName) -> bool:
 				if menu_opciones != null:
 					menu_opciones.modulate.a = 0.0
 					menu_opciones.desactivar()
+				if textos_nodo != null:
+					textos_nodo.modulate.a = 1.0
+
+	elif nombre == &"ir_a_creditos":
+		if animador != null:
+			animador.speed_scale = 1.0
+		if estado == MenuConstantes.EstadoMenu.TRANSICION_CREDITOS:
+			# Comprobamos si la cámara llegó a la derecha (1620) o volvió al centro (540)
+			if camara != null and camara.position.x > 1080.0:
+				estado = MenuConstantes.EstadoMenu.EN_CREDITOS
+				if menu_creditos != null:
+					menu_creditos.modulate.a = 1.0
+					menu_creditos.activar()
+				if textos_nodo != null:
+					textos_nodo.modulate.a = 0.0
+			else:
+				estado = MenuConstantes.EstadoMenu.MENU_ACTIVO
+				if menu_creditos != null:
+					menu_creditos.modulate.a = 0.0
+					menu_creditos.desactivar()
 				if textos_nodo != null:
 					textos_nodo.modulate.a = 1.0
 
