@@ -204,6 +204,7 @@ var estado: EstadoMenu:
 	"IconoCreditos"
 ])
 @onready var _menu_opciones: MenuOpciones = get_node_or_null("MenuOpciones") as MenuOpciones
+@onready var _menu_creditos: MenuCreditos = get_node_or_null("MenuCreditos") as MenuCreditos
 
 
 func _obtener_nodo_icono(rutas: Array) -> Sprite2D:
@@ -217,7 +218,7 @@ func _ready() -> void:
 	if _textos_nodo != null:
 		_textos_nodo.z_index = 10
 
-	cinematica.inicializar_nodos(_camara, _animador, _presentacion, _fondo_presentacion, _textos_nodo, _efecto_motion_blur, _menu_opciones)
+	cinematica.inicializar_nodos(_camara, _animador, _presentacion, _fondo_presentacion, _textos_nodo, _efecto_motion_blur, _menu_opciones, _menu_creditos)
 	particulas.inicializar(self, _particulas_estrellas, _particulas_nubes)
 	parallax.inicializar_nodos(_fondos, _fondo_degradado, _montana_2, _montana_1, _arboles_tercera, _arboles_segunda, _arboles_nodo, _textos_nodo)
 	parallax.capturar_posiciones_iniciales(particulas.obtener_particulas_estrellas(), particulas.obtener_particulas_nubes())
@@ -235,6 +236,7 @@ func _ready() -> void:
 	_conectar_senales_submodulos()
 	_conectar_animador()
 	_conectar_menu_opciones()
+	_conectar_menu_creditos()
 
 	iniciar_presentacion()
 	_actualizar_seleccion(false)
@@ -249,8 +251,8 @@ func _conectar_senales_submodulos() -> void:
 		seleccion.jugar_solicitado.connect(jugar_solicitado.emit)
 	if not seleccion.opciones_solicitado.is_connected(_on_opciones_solicitado):
 		seleccion.opciones_solicitado.connect(_on_opciones_solicitado)
-	if not seleccion.creditos_solicitado.is_connected(creditos_solicitado.emit):
-		seleccion.creditos_solicitado.connect(creditos_solicitado.emit)
+	if not seleccion.creditos_solicitado.is_connected(_on_creditos_solicitado):
+		seleccion.creditos_solicitado.connect(_on_creditos_solicitado)
 	if not seleccion.offset_rotacion_cambiado.is_connected(_on_offset_rotacion_cambiado):
 		seleccion.offset_rotacion_cambiado.connect(_on_offset_rotacion_cambiado)
 
@@ -263,6 +265,11 @@ func _conectar_animador() -> void:
 func _conectar_menu_opciones() -> void:
 	if _menu_opciones != null and not _menu_opciones.volver_solicitado.is_connected(_on_volver_de_opciones):
 		_menu_opciones.volver_solicitado.connect(_on_volver_de_opciones)
+
+
+func _conectar_menu_creditos() -> void:
+	if _menu_creditos != null and not _menu_creditos.volver_solicitado.is_connected(_on_volver_de_creditos):
+		_menu_creditos.volver_solicitado.connect(_on_volver_de_creditos)
 
 
 func _on_offset_rotacion_cambiado(nuevo_offset: Vector2, nueva_rotacion: float, animar: bool) -> void:
@@ -314,6 +321,20 @@ func _on_volver_de_opciones() -> void:
 	cinematica.regresar_de_opciones(_on_animacion_terminada)
 
 
+func _on_creditos_solicitado() -> void:
+	creditos_solicitado.emit()
+	if estado != EstadoMenu.MENU_ACTIVO:
+		return
+	seleccion.bloqueado = true
+	cinematica.ir_a_creditos(_on_animacion_terminada)
+
+
+func _on_volver_de_creditos() -> void:
+	if estado != EstadoMenu.EN_CREDITOS:
+		return
+	cinematica.regresar_de_creditos(_on_animacion_terminada)
+
+
 func skipear_cinematica() -> void:
 	cinematica.skipear_cinematica()
 
@@ -327,7 +348,7 @@ func _on_animacion_terminada(nombre: StringName) -> void:
 			_actualizar_seleccion(false)
 		else:
 			_actualizar_seleccion(false)
-	elif nombre == &"ir_a_opciones":
+	elif nombre == &"ir_a_opciones" or nombre == &"ir_a_creditos":
 		if estado == EstadoMenu.MENU_ACTIVO:
 			seleccion.bloqueado = false
 			_actualizar_seleccion(false)
@@ -378,7 +399,7 @@ func _unhandled_input(evento: InputEvent) -> void:
 				iniciar_descenso()
 				get_viewport().set_input_as_handled()
 
-		EstadoMenu.CINEMATICA_BAJANDO, EstadoMenu.CINEMATICA_SUBIENDO, EstadoMenu.TRANSICION_OPCIONES:
+		EstadoMenu.CINEMATICA_BAJANDO, EstadoMenu.CINEMATICA_SUBIENDO, EstadoMenu.TRANSICION_OPCIONES, EstadoMenu.TRANSICION_CREDITOS:
 			if evento.is_action_pressed("ui_accept") or evento.is_action_pressed("ui_cancel") or evento.is_action_pressed("personaje-salto"):
 				skipear_cinematica()
 				get_viewport().set_input_as_handled()

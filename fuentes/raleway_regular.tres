@@ -1,0 +1,9 @@
+[gd_resource type="FontVariation" format=3 uid="uid://cu2jbunbvoqdh"]
+
+[ext_resource type="FontFile" uid="uid://c8fddvlvqpoow" path="res://fuentes/Raleway-VariableFont_wght.ttf" id="1_umybk"]
+
+[resource]
+base_font = ExtResource("1_umybk")
+variation_opentype = {
+"2003265652": 400.0
+}

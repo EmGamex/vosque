@@ -144,9 +144,9 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
   - [x] Navegación cíclica horizontal por teclado/mando con *Scale Punch* tipográfico y bloqueo de confirmación contra doble clic.
   - [x] Arquitectura de señales hacia el orquestador (`jugar_solicitado`, `opciones_solicitado`, `creditos_solicitado`).
   - [x] Suite de pruebas automatizadas [`tests/test_menu_inicio.gd`](../../tests/test_menu_inicio.gd).
-- [ ] **Sub-Pantallas del Menú Principal:**
-  - [ ] Pantalla de Opciones conectada a la señal `opciones_solicitado` de `MenuInicio`.
-  - [ ] Pantalla de Créditos conectada a la señal `creditos_solicitado` de `MenuInicio`.
+- [x] **Sub-Pantallas del Menú Principal:**
+  - [x] Pantalla de Opciones conectada a la señal `opciones_solicitado` de `MenuInicio` con cinemática lateral izquierda.
+  - [x] Pantalla de Créditos conectada a la señal `creditos_solicitado` de `MenuInicio` con cinemática lateral derecha (`ir_a_creditos`).
 - [x] **Tutorial Flotante sobre la Cabeza (`TutorialCabeza`):**
   - [x] Componente visual flotante a $Y \approx -90\text{ px}$ con fondo traslúcido, badges de teclas reactivos y glifo de orientación de ratón.
   - [x] Secuencia progresiva: WASD + Ratón $\to$ Salto con transición contextual en el aire a Plancha (*Dive*) $\to$ Sprint (Shift).
