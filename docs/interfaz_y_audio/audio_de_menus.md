@@ -132,6 +132,18 @@ GestorAudioUI.reproducir_pausa_aceptar()
 GestorAudioUI.reproducir_pausa_cerrar()
 ```
 
+### Silenciamiento Preventivo en Foco Inicial
+Al inicializar o abrir un menú, asignar el foco inicial por código (`grab_focus()`) puede disparar de forma no intencionada el evento `MENU_SELECCIONAR`. Para evitar feedback auditivo espurio, los menús (`MenuOpciones`, `MenuCreditos`) implementan una bandera temporal `_silenciar_audio_ajustes`:
+```gdscript
+func activar() -> void:
+    _activo = true
+    _silenciar_audio_ajustes = true
+    if boton_inicial != null:
+        boton_inicial.grab_focus()
+    _silenciar_audio_ajustes = false
+```
+Consulta el [Estándar de Botones y Navegación de UI](pantallas_y_menus.md#4-estándar-de-botones-y-navegación-de-ui) para la guía completa de integración con botones y controles de interfaz.
+
 ---
 
 ## 5. Pruebas Automatizadas
