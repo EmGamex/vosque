@@ -118,3 +118,38 @@ func test_restablecer_valores_por_defecto() -> void:
 	assert_eq(panel.check_pantalla_completa.button_pressed, false, "Pantalla completa debe volver al modo por defecto del proyecto")
 
 	panel.free()
+
+
+func test_aislamiento_foco_y_mouse_filter() -> void:
+	var escena: PackedScene = load(RUTA_ESCENA_OPCIONES)
+	var panel: MenuOpciones = escena.instantiate() as MenuOpciones
+	panel._ready()
+
+	# Tras _ready(), todos los controles deben tener FOCUS_NONE y mouse_filter IGNORE
+	assert_eq(panel.mouse_filter, Control.MOUSE_FILTER_IGNORE, "Mouse filter debe ser IGNORE en reposo")
+	var elementos: Array[Control] = panel.get("_elementos_foco")
+	for elem in elementos:
+		assert_eq(elem.focus_mode, Control.FOCUS_NONE, "Elementos de foco deben ser FOCUS_NONE en reposo")
+
+	# Tras activar(), deben recuperar FOCUS_ALL y mouse_filter STOP
+	panel.activar()
+	assert_true(panel.visible, "Debe ser visible tras activar()")
+	assert_eq(panel.mouse_filter, Control.MOUSE_FILTER_STOP, "Mouse filter debe ser STOP tras activar()")
+	for elem in elementos:
+		assert_eq(elem.focus_mode, Control.FOCUS_ALL, "Elementos de foco deben recuperar FOCUS_ALL tras activar()")
+
+	# Tras desactivar(), deben volver a FOCUS_NONE
+	panel.desactivar()
+	assert_eq(panel.mouse_filter, Control.MOUSE_FILTER_IGNORE, "Mouse filter debe volver a IGNORE tras desactivar()")
+	for elem in elementos:
+		assert_eq(elem.focus_mode, Control.FOCUS_NONE, "Elementos de foco deben volver a FOCUS_NONE tras desactivar()")
+
+	# Verificar bloqueo lateral en controles no sliders
+	assert_eq(String(panel.check_pantalla_completa.focus_neighbor_left), ".", "CheckPantalla debe bloquear izquierda")
+	assert_eq(String(panel.check_pantalla_completa.focus_neighbor_right), ".", "CheckPantalla debe bloquear derecha")
+	assert_eq(String(panel.boton_restablecer.focus_neighbor_left), ".", "BotonRestablecer debe bloquear izquierda")
+	assert_eq(String(panel.boton_restablecer.focus_neighbor_right), ".", "BotonRestablecer debe bloquear derecha")
+	assert_eq(String(panel.boton_volver.focus_neighbor_left), ".", "BotonVolver debe bloquear izquierda")
+	assert_eq(String(panel.boton_volver.focus_neighbor_right), ".", "BotonVolver debe bloquear derecha")
+
+	panel.free()

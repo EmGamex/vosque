@@ -399,22 +399,35 @@ func test_flujo_estados_creditos() -> void:
 	menu.add_to_group("modo_test")
 	menu._ready()
 
+	var menu_opciones: MenuOpciones = menu.get_node_or_null("MenuOpciones") as MenuOpciones
+	var menu_creditos: MenuCreditos = menu.get_node_or_null("MenuCreditos") as MenuCreditos
+	assert_true(menu_opciones != null, "Debe existir MenuOpciones")
+	assert_true(menu_creditos != null, "Debe existir MenuCreditos")
+
+	# Inicialmente ambos deben estar ocultos
+	assert_false(menu_opciones.visible, "MenuOpciones debe iniciar con visible = false")
+	assert_false(menu_creditos.visible, "MenuCreditos debe iniciar con visible = false")
+
 	# Llevar a MENU_ACTIVO simulando fin de descenso
 	menu.iniciar_descenso()
 	menu._on_animacion_terminada(&"bajar_al_bosque")
 	assert_eq(menu.get("estado"), 2, "Debe estar en MENU_ACTIVO")
 
-	# Solicitar créditos
+	# Solicitar créditos: visible se activa para la animación
 	menu.set("opcion_actual", 2)
 	menu._confirmar_opcion()
 	assert_eq(menu.get("estado"), 6, "Debe pasar a TRANSICION_CREDITOS (6)")
 	assert_true(menu.get("bloqueado"), "Menú debe estar bloqueado durante la transición a créditos")
+	assert_true(menu_creditos.visible, "MenuCreditos debe ser visible durante la transición")
+	assert_false(menu_opciones.visible, "MenuOpciones debe permanecer oculto")
 
 	# Simular llegada a la derecha (cámara en 1620)
 	var camara: Camera2D = menu.get_node("CamaraMenu") as Camera2D
 	camara.position = Vector2(1620.0, 540.0)
 	menu._on_animacion_terminada(&"ir_a_creditos")
 	assert_eq(menu.get("estado"), 7, "Debe pasar a EN_CREDITOS (7)")
+	assert_true(menu_creditos.visible, "MenuCreditos debe permanecer visible en EN_CREDITOS")
+	assert_false(menu_opciones.visible, "MenuOpciones debe permanecer oculto en EN_CREDITOS")
 
 	# Volver de créditos
 	menu._on_volver_de_creditos()
@@ -425,6 +438,49 @@ func test_flujo_estados_creditos() -> void:
 	menu._on_animacion_terminada(&"ir_a_creditos")
 	assert_eq(menu.get("estado"), 2, "Debe volver a MENU_ACTIVO (2)")
 	assert_false(menu.get("bloqueado"), "Menú debe desbloquearse tras volver a MENU_ACTIVO")
+	assert_false(menu_creditos.visible, "MenuCreditos debe volver a visible = false tras regresar")
+	assert_false(menu_opciones.visible, "MenuOpciones debe permanecer visible = false")
+
+	menu.free()
+
+
+func test_flujo_estados_opciones() -> void:
+	var menu: Control = _crear_instancia_menu()
+	menu.add_to_group("modo_test")
+	menu._ready()
+
+	var menu_opciones: MenuOpciones = menu.get_node_or_null("MenuOpciones") as MenuOpciones
+	var menu_creditos: MenuCreditos = menu.get_node_or_null("MenuCreditos") as MenuCreditos
+
+	# Llevar a MENU_ACTIVO
+	menu.iniciar_descenso()
+	menu._on_animacion_terminada(&"bajar_al_bosque")
+
+	# Solicitar opciones
+	menu.set("opcion_actual", 0)
+	menu._confirmar_opcion()
+	assert_eq(menu.get("estado"), 4, "Debe pasar a TRANSICION_OPCIONES (4)")
+	assert_true(menu_opciones.visible, "MenuOpciones debe ser visible durante la transición")
+	assert_false(menu_creditos.visible, "MenuCreditos debe permanecer oculto")
+
+	# Simular llegada a la izquierda (cámara en -540)
+	var camara: Camera2D = menu.get_node("CamaraMenu") as Camera2D
+	camara.position = Vector2(-540.0, 540.0)
+	menu._on_animacion_terminada(&"ir_a_opciones")
+	assert_eq(menu.get("estado"), 5, "Debe pasar a EN_OPCIONES (5)")
+	assert_true(menu_opciones.visible, "MenuOpciones debe estar visible en EN_OPCIONES")
+	assert_false(menu_creditos.visible, "MenuCreditos debe estar oculto en EN_OPCIONES")
+
+	# Volver de opciones
+	menu._on_volver_de_opciones()
+	assert_eq(menu.get("estado"), 4, "Debe pasar a TRANSICION_OPCIONES (4)")
+
+	# Simular regreso al centro
+	camara.position = Vector2(540.0, 540.0)
+	menu._on_animacion_terminada(&"ir_a_opciones")
+	assert_eq(menu.get("estado"), 2, "Debe volver a MENU_ACTIVO (2)")
+	assert_false(menu_opciones.visible, "MenuOpciones debe volver a visible = false tras regresar")
+	assert_false(menu_creditos.visible, "MenuCreditos debe permanecer visible = false")
 
 	menu.free()
 

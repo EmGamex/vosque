@@ -69,9 +69,9 @@ El menú principal implementa una experiencia cinematográfica previa dividida e
 2. **Descenso (`iniciar_descenso()`):** Al pulsar <kbd>Enter</kbd> o <kbd>Espacio</kbd>, pasa a `CINEMATICA_BAJANDO` y ejecuta `"bajar_al_bosque"`, desplazando la `CamaraMenu` verticalmente hasta `(540, 540)` y realizando un crossfade suave de salida (`modulate:a -> 0.0`) de `FondoPresentacion` hacia `FondoDegradado`.
 3. **Efecto Motion Blur Vertical y Horizontal (`shaders/motion_blur_vertical.gdshader`):** Un `ColorRect` a pantalla completa anclado a la cámara (`CamaraMenu/EfectoMotionBlur`) aplica un desenfoque direccional sobre `screen_texture`. Su intensidad se modula mediante una curva de campana en el `AnimationPlayer` (pico de `0.035` en bajada/subida y `0.015` en paneos laterales a opciones o créditos), otorgando una sensación vertiginosa de velocidad cinematográfica.
 4. **Transición a Opciones y Créditos (`ir_a_opciones` / `ir_a_creditos`):**
-   - Hacia la izquierda: `CamaraMenu:position:x` transiciona suavemente mediante curva Bézier de $540$ a $-540$, oculta los textos del menú y despliega `MenuOpciones`.
-   - Hacia la derecha: `CamaraMenu:position:x` transiciona con la curva simétrica de $540$ a $1620$, oculta los textos del menú y despliega `MenuCreditos` (`escenas/ui/menu_creditos.tscn`). Para asegurar cobertura continua a la derecha, `FondoDegradado` escala en $X$ a $\ge 1.35$ y las montañas escalan para evitar bordes vacíos.
-   - Retorno: `play_backwards` en la animación correspondiente restaura la cámara al centro ($x = 540$) y reactiva el menú principal.
+   - Hacia la izquierda: activa `visible = true` en `MenuOpciones`, desplaza `CamaraMenu:position:x` mediante curva Bézier de $540$ a $-540$, oculta los textos del menú central y culmina en el estado `EN_OPCIONES` llamando a `menu_opciones.activar()`.
+   - Hacia la derecha: activa `visible = true` en `MenuCreditos`, desplaza `CamaraMenu:position:x` con curva simétrica de $540$ a $1620$, oculta los textos del menú y culmina en el estado `EN_CREDITOS` llamando a `menu_creditos.activar()`. Para asegurar cobertura continua a la derecha, `FondoDegradado` escala en $X$ a $\ge 1.35$ y las montañas escalan para evitar bordes vacíos.
+   - Retorno: `play_backwards` en la animación correspondiente restaura la cámara al centro ($x = 540$), llama a `desactivar()` en el submenú correspondiente y, al completar la animación, establece `visible = false` para garantizar aislamiento visual y de eventos antes de reactivar el menú principal (`MENU_ACTIVO`).
 5. **Función Skip Dinámica (`skipear_cinematica()`):** Si el jugador pulsa cualquier botón de acción (<kbd>Enter</kbd>, <kbd>Espacio</kbd>, <kbd>Escape</kbd>) durante el descenso, ascenso o transiciones laterales, el `AnimationPlayer` multiplica su velocidad (`speed_scale = multiplicador_velocidad_skip`, por defecto $4.0\times$), concluyendo la animación de forma ágil y fluida.
 5. **Retorno a la Pantalla de Inicio con Escape (`regresar_a_presentacion()`):** Estando en el menú de selección de árboles (`MENU_ACTIVO`), presionar <kbd>Escape</kbd> (`ui_cancel`) activa el estado `CINEMATICA_SUBIENDO` y reproduce la animación en reversa (`play_backwards("bajar_al_bosque")`). La cámara se eleva desde el bosque hacia el cielo con *motion blur*, oculta los textos de opciones, restaura los fondos de presentación y reanuda el bucle de espera (*"PRESIONA ENTER PARA COMENZAR"*).
 6. **Reinicio al volver:** Cada vez que el jugador regresa al menú principal (desde el juego o Game Over vía `GestorDeEscenas.volver_al_menu()`), el método `enfocar()` reinicia la vista en la parte superior, permitiendo siempre la aceleración instantánea con doble pulsación.
@@ -227,19 +227,33 @@ Todos los botones principales de menús deben respetar las siguientes propiedade
 | `theme_override_colors/font_focus_color` | `Color(0.902, 1.0, 0.702, 1)` (`#e6ffb3`) | Tinte verde lima pálido distintivo al recibir el foco de UI. |
 | `theme_override_colors/font_hover_color` | `Color(0.902, 1.0, 0.702, 1)` (`#e6ffb3`) | Mismo tono que focus para coherencia visual al interactuar con ratón. |
 
-#### Navegación Cíclica (`focus_neighbor_*`)
-- **Botón solitario (ej. `BotonVolver` en `MenuCreditos`):** Para evitar que el foco se pierda en el vacío al navegar con flechas o palanca de mando, se fija cíclicamente a sí mismo:
+#### Navegación Cíclica y Blindaje Espacial (`focus_neighbor_*`)
+- **Botón solitario (ej. `BotonVolver` en `MenuCreditos`):** Para evitar que el foco se pierda en el vacío o escape lateralmente hacia otros paneles situados en el mismo `Viewport` al navegar con flechas o palanca de mando, se fija cíclicamente a sí mismo en las 4 direcciones cardinales:
   ```text
   focus_neighbor_top = NodePath(".")
   focus_neighbor_bottom = NodePath(".")
+  focus_neighbor_left = NodePath(".")
+  focus_neighbor_right = NodePath(".")
   ```
-- **Listas verticales (ej. `MenuOpciones`, `MenuPausa`):** Cada botón o control enlaza hacia el anterior y posterior, cerrando el ciclo entre el primer y último elemento.
+- **Listas verticales (ej. `MenuOpciones`, `MenuPausa`):** Cada botón o control enlaza hacia el anterior y posterior, cerrando el ciclo vertical entre el primer y último elemento. Asimismo, los controles sin ajuste horizontal propio (como botones y checkboxes) bloquean sus salidas laterales (`focus_neighbor_left` y `focus_neighbor_right = NodePath(".")`) para que la búsqueda espacial de foco nativa de Godot jamás salte a paneles adyacentes.
 
 ### 4.2. Contrato de Script y Ciclo de Vida (`.gd`)
 
-Todo script de panel o menú interactivo debe adoptar las siguientes prácticas:
+Todo script de panel o submenú interactivo debe adoptar las siguientes prácticas de ciclo de vida e interactividad:
 
-1. **Sincronización Ratón-Foco:**
+1. **Aislamiento Total en Reposo y Desactivación (`focus_mode` y `mouse_filter`):**
+   Los paneles que coexisten en el mismo `Viewport` o escena no deben capturar foco ni eventos cuando están inactivos, incluso si su opacidad es cero (`modulate.a = 0.0`).
+   - En `_ready()` y `desactivar()`:
+     - Establecer `mouse_filter = Control.MOUSE_FILTER_IGNORE`.
+     - Liberar el foco actual (`release_focus()`).
+     - Asignar `focus_mode = Control.FOCUS_NONE` a todos los controles interactivos hijos.
+   - En `activar()`:
+     - Establecer `visible = true`.
+     - Restaurar `mouse_filter = Control.MOUSE_FILTER_STOP`.
+     - Reasignar `focus_mode = Control.FOCUS_ALL` a los controles interactivos antes de otorgar el foco inicial.
+   - Al concluir las transiciones de salida en el orquestador (`MenuCinematica`), se establece `visible = false` como cierre definitivo.
+
+2. **Sincronización Ratón-Foco:**
    Al pasar el cursor sobre cualquier botón o control interactivo mientras el menú esté activo, debe otorgarse el foco nativo mediante `grab_focus()`. Esto previene desincronizaciones donde el ratón apunta a un botón pero el teclado acciona otro:
    ```gdscript
    func _on_boton_mouse_entered(btn: Button) -> void:
