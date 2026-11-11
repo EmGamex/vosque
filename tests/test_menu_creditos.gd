@@ -41,3 +41,22 @@ func test_emision_volver_solicitado() -> void:
 	assert_true(senal_recibida[0], "Presionar botón volver debe emitir volver_solicitado")
 
 	panel.free()
+
+
+func test_navegacion_y_eventos_boton_volver() -> void:
+	var escena: PackedScene = load(RUTA_ESCENA_CREDITOS)
+	var panel: MenuCreditos = escena.instantiate() as MenuCreditos
+	panel._ready()
+	assert_true(panel.boton_volver != null, "BotonVolver debe existir")
+
+	# Simular hover / mouse_entered
+	panel.activar()
+	panel._on_boton_volver_mouse_entered()
+	panel._on_boton_volver_focus_entered()
+
+	# Configuración cíclica en foco
+	assert_eq(String(panel.boton_volver.focus_neighbor_top), ".", "focus_neighbor_top debe ser cíclico")
+	assert_eq(String(panel.boton_volver.focus_neighbor_bottom), ".", "focus_neighbor_bottom debe ser cíclico")
+
+	panel.free()
+
