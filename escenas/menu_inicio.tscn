@@ -341,7 +341,7 @@ tracks/4/keys = {
 "times": PackedFloat32Array(0, 0.75),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [0.55, 1.36]
+"values": [0.55, 1.3844922]
 }
 tracks/5/type = "value"
 tracks/5/imported = false
@@ -495,7 +495,7 @@ nubes_factor_rotacion = 0.12
 position = Vector2(540, 540)
 
 [node name="FondoDegradado" type="Sprite2D" parent="Fondos" unique_id=732065939]
-position = Vector2(-102.5001, 0)
+position = Vector2(-71.15004, 0)
 scale = Vector2(0.55, 0.55)
 texture = ExtResource("2_pwyh3")
 
@@ -626,7 +626,7 @@ texture = ExtResource("19_46wig")
 
 [node name="IconoJugar" type="Sprite2D" parent="Textos/Iconos" unique_id=869196332]
 position = Vector2(-12, -48)
-scale = Vector2(0.3090495, 0.3090494)
+scale = Vector2(0.36047536, 0.36047527)
 texture = ExtResource("17_5s2e3")
 
 [node name="IconoCreditos" type="Sprite2D" parent="Textos/Iconos" unique_id=254819263]
@@ -677,14 +677,16 @@ texture = ExtResource("16_883rq")
 libraries/ = SubResource("AnimationLibrary_mpb5u")
 
 [node name="MenuOpciones" parent="." unique_id=1280938452 instance=ExtResource("20_lp070")]
+visible = false
 modulate = Color(1, 1, 1, 0)
 layout_mode = 0
 offset_left = -1080.0
 offset_right = 1080.0
 offset_bottom = 1080.0
+mouse_filter = 2
 
 [node name="MenuCreditos" parent="." unique_id=980331015 instance=ExtResource("21_itfft")]
-modulate = Color(1, 1, 1, 0)
+visible = false
 layout_mode = 0
 offset_left = 1080.0
 offset_right = 2160.0
