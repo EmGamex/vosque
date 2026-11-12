@@ -8,20 +8,19 @@ cutoff_hz = 800.0
 resource_name = "ReverbGameOver"
 
 [resource]
-bus/0/volume_db = -0.26456532
 bus/0/effect/0/effect = SubResource("AudioEffectLowPassFilter_j3pel")
 bus/0/effect/0/enabled = false
 bus/1/name = &"sfx"
 bus/1/solo = false
 bus/1/mute = false
 bus/1/bypass_fx = false
-bus/1/volume_db = -2.4987748
+bus/1/volume_db = -2.0474582
 bus/1/send = &"Master"
 bus/2/name = &"musica"
 bus/2/solo = false
 bus/2/mute = false
 bus/2/bypass_fx = false
-bus/2/volume_db = -12.765443
+bus/2/volume_db = -7.9588003
 bus/2/send = &"Master"
 bus/2/effect/0/effect = SubResource("AudioEffectReverb_g28q7")
 bus/2/effect/0/enabled = false

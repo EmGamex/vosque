@@ -11,6 +11,7 @@
 custom_minimum_size = Vector2(1080, 1080)
 layout_mode = 3
 anchors_preset = 0
+mouse_filter = 2
 script = ExtResource("1_ssfvp")
 
 [node name="Layout" type="CenterContainer" parent="." unique_id=319523605]
@@ -36,7 +37,8 @@ theme_override_constants/separation = 24
 [node name="Titulo" type="Label" parent="Layout/PanelCreditos/Margen/Columna" unique_id=686005663]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9019608, 1, 0.7019608, 1)
-theme_override_colors/font_shadow_color = Color(0.6, 0, 0, 0)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.6)
+theme_override_constants/shadow_offset_x = 0
 theme_override_constants/shadow_offset_y = 3
 theme_override_constants/shadow_outline_size = 4
 theme_override_fonts/font = ExtResource("2_ujg5v")
@@ -123,6 +125,7 @@ focus_neighbor_left = NodePath(".")
 focus_neighbor_top = NodePath(".")
 focus_neighbor_right = NodePath(".")
 focus_neighbor_bottom = NodePath(".")
+focus_mode = 0
 theme_override_colors/font_focus_color = Color(0.9019608, 1, 0.7019608, 1)
 theme_override_colors/font_hover_color = Color(0.9019608, 1, 0.7019608, 1)
 theme_override_fonts/font = ExtResource("2_5cqkm")
