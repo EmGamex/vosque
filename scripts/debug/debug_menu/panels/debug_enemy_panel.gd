@@ -10,6 +10,7 @@ var lbl_enemigo_vel: Label
 var lbl_enemigo_atascado: Label
 var btn_teleport_enemigo: Button
 var check_visual_debug: CheckBox
+var check_pausar_ia: CheckBox
 
 
 func vincular_nodos(win: DebugWindow) -> void:
@@ -23,6 +24,7 @@ func vincular_nodos(win: DebugWindow) -> void:
 	lbl_enemigo_atascado = win.get_node_or_null(base + "GridEnemigo/ValAtascamiento") as Label
 	btn_teleport_enemigo = win.get_node_or_null(base + "BtnTeleportEnemigo") as Button
 	check_visual_debug = win.get_node_or_null(base + "CheckVisualDebug") as CheckBox
+	check_pausar_ia = win.get_node_or_null(base + "CheckPausarIA") as CheckBox
 
 
 func conectar_eventos(enemy_ctrl: DebugEnemyController, context: DebugContext, get_cfg: Callable) -> void:
@@ -30,11 +32,13 @@ func conectar_eventos(enemy_ctrl: DebugEnemyController, context: DebugContext, g
 		btn_teleport_enemigo.pressed.connect(_on_btn_teleport_pressed.bind(enemy_ctrl, context))
 	if check_visual_debug != null and not check_visual_debug.toggled.is_connected(_on_check_visual_debug_toggled.bind(enemy_ctrl, context, get_cfg)):
 		check_visual_debug.toggled.connect(_on_check_visual_debug_toggled.bind(enemy_ctrl, context, get_cfg))
+	if check_pausar_ia != null and not check_pausar_ia.toggled.is_connected(_on_check_pausar_ia_toggled.bind(enemy_ctrl, context, get_cfg)):
+		check_pausar_ia.toggled.connect(_on_check_pausar_ia_toggled.bind(enemy_ctrl, context, get_cfg))
 
 
 func restaurar_desde_config(enemy_ctrl: DebugEnemyController, cfg: Node) -> void:
 	if enemy_ctrl != null:
-		enemy_ctrl.restaurar_desde_config(cfg, check_visual_debug)
+		enemy_ctrl.restaurar_desde_config(cfg, check_visual_debug, check_pausar_ia)
 
 
 func actualizar_telemetria(telemetry: DebugTelemetryPresenter, context: DebugContext, pos_jugador: Vector2, dibujar_vectores_ia: bool) -> void:
@@ -57,3 +61,8 @@ func _on_btn_teleport_pressed(enemy_ctrl: DebugEnemyController, context: DebugCo
 func _on_check_visual_debug_toggled(toggled_on: bool, enemy_ctrl: DebugEnemyController, context: DebugContext, get_cfg: Callable) -> void:
 	if enemy_ctrl != null:
 		enemy_ctrl.set_visual_debug(toggled_on, context.target_enemigo, get_cfg.call())
+
+
+func _on_check_pausar_ia_toggled(toggled_on: bool, enemy_ctrl: DebugEnemyController, context: DebugContext, get_cfg: Callable) -> void:
+	if enemy_ctrl != null:
+		enemy_ctrl.set_ia_pausada(toggled_on, context.target_enemigo, get_cfg.call())

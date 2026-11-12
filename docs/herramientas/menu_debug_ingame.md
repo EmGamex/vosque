@@ -115,6 +115,7 @@ Cada ventana flotante hereda de [`DebugWindow`](../../scripts/debug/debug_menu/d
 * **Acciones Tácticas:**
   - **Reubicar Monstruo a Cuadrante Opuesto:** Teletransporta al enemigo al sector simétrico opuesto al jugador respetando una distancia mínima de $300\text{ px}$.
   - `[x] Línea de Visión / Vector IA (Raycast)`: Conmuta el componente `DepuradorVisualEnemigo` (área de captura letal de $56\text{ px}$, círculo sólido de $42\text{ px}$, vector flecha de velocidad, RayCast con punto de impacto y estela de migas de pan).
+  - `[x] Pausar IA del Monstruo`: Detiene únicamente la persecución (`velocity = Vector2.ZERO`) y desactiva la captura letal de la criatura manteniendo activa la simulación del jugador y del entorno; su estado persiste en `DebugConfig.debug_pausar_ia_enemigo` y `ValEstadoIA` muestra `"IA Pausada"`.
 
 ### 5.5. 🎵 Audio & Música (`ventana_debug_audio.tscn`)
 * **Telemetría Musical (Issue #28):** Estado FSM (`SILENCIO`, `MENU_TUTORIAL`, `SUPERVIVENCIA`, `GAME_OVER`), clip activo y volumen del bus `&"musica"` en `dB`.

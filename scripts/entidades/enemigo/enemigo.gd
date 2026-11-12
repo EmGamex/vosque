@@ -53,6 +53,7 @@ const VELOCIDADES_MONSTRUO: Array[float] = [
 @export_range(0.0, 10000.0, 50.0, "suffix:px/s²") var acceleration: float = 3500.0
 
 var hibernando: bool = false
+var ia_pausada: bool = false
 var modulador_velocidad_niebla: float = 1.0
 var _capturado: bool = false
 var tiene_linea_vision: bool = true
@@ -148,6 +149,9 @@ func obtener_velocidad_efectiva() -> float:
 
 
 func _physics_process(delta: float) -> void:
+	if ia_pausada:
+		velocity = Vector2.ZERO
+		return
 	if hibernando or _capturado or objetivo == null or not is_instance_valid(objetivo):
 		return
 
@@ -191,7 +195,7 @@ func _on_body_entered(body: Node2D) -> void:
 
 
 func _intentar_capturar(body: Node2D) -> void:
-	if _capturado or hibernando:
+	if _capturado or hibernando or ia_pausada:
 		return
 	if body is Personaje or body == objetivo:
 		if body.get("god_mode") == true:
@@ -204,7 +208,7 @@ func _intentar_capturar(body: Node2D) -> void:
 
 
 func _comprobar_captura_continua() -> void:
-	if _capturado or hibernando or _area_captura == null:
+	if _capturado or hibernando or ia_pausada or _area_captura == null:
 		return
 	for body in _area_captura.get_overlapping_bodies():
 		if body is Personaje or body == objetivo:

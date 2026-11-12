@@ -14,6 +14,7 @@ var cheat_god_mode: bool = false
 var debug_dibujar_cuadrantes: bool = false
 var debug_dibujar_corredores: bool = false
 var debug_dibujar_vectores_ia: bool = false
+var debug_pausar_ia_enemigo: bool = false
 
 # Cámara Cenital (God View)
 var god_view_activo: bool = false

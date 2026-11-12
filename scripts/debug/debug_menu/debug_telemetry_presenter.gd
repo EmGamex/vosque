@@ -101,7 +101,12 @@ func actualizar_tab_enemigo(labels: Dictionary, enemigo: CharacterBody2D, pos_ju
 			vision_txt = " (Visión directa)" if enemigo.get("tiene_linea_vision") else " (Obstruido)"
 
 		if lbl_estado != null:
-			lbl_estado.text = ("Persiguiendo objetivo" + vision_txt) if enemigo.get("objetivo") != null else "Sin objetivo"
+			if enemigo.get("ia_pausada") == true:
+				lbl_estado.text = "IA Pausada"
+			elif enemigo.get("objetivo") != null:
+				lbl_estado.text = "Persiguiendo objetivo" + vision_txt
+			else:
+				lbl_estado.text = "Sin objetivo"
 		if lbl_atascado != null:
 			lbl_atascado.text = "Colisión activa" if enemigo.is_on_wall() else "Libre / Transitable"
 	else:
