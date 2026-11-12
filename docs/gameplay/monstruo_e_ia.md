@@ -156,3 +156,5 @@ A través del **Menú de Debug F3** ([`docs/herramientas/menu_debug_ingame.md`](
   - Arco ámbar de $42\text{ px}$ (`RADIO_COLISION_CUERPO`).
   - Rayo de visión en tiempo real (Verde: directo, Rojo: obstruido con punto de impacto).
   - Vector directriz de velocidad y estela de desplazamiento (*breadcrumbs* de 45 muestras con degradado alfa).
+* **Pausa de IA (`CheckPausarIA` / `Enemigo.ia_pausada`):**
+  - Permite congelar la persecución (`velocity = Vector2.ZERO`) e ignorar la captura letal sin pausar el árbol completo (`SceneTree.paused`) ni activar invencibilidad, reflejando `"IA Pausada"` en `ValEstadoIA`.

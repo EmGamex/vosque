@@ -232,3 +232,45 @@ func test_indicador_fuera_pantalla() -> void:
 	assert_true(componente._debe_estar_activo(), "Debe reactivarse cuando el enemigo despierta")
 
 	enemigo.free()
+
+
+func test_ia_pausada_detiene_persecucion_y_captura() -> void:
+	var mock_jugador := CharacterBody2D.new()
+	mock_jugador.name = "personaje"
+	mock_jugador.global_position = Vector2(300.0, 0.0)
+
+	var enemigo := Enemigo.new()
+	enemigo.add_to_group("modo_test")
+	enemigo.hibernar_al_iniciar = false
+	enemigo.objetivo = mock_jugador
+	enemigo.global_position = Vector2.ZERO
+	enemigo.speed = 500.0
+	enemigo.velocity = Vector2(200.0, 100.0)
+
+	var captura_emitida := [false]
+	enemigo.jugador_capturado.connect(func(_pos: Vector2): captura_emitida[0] = true)
+
+	enemigo.ia_pausada = true
+	enemigo._physics_process(0.016)
+
+	assert_eq(enemigo.velocity, Vector2.ZERO, "Con ia_pausada = true, velocity debe quedar en Vector2.ZERO")
+	assert_eq(enemigo.global_position, Vector2.ZERO, "Con ia_pausada = true, el enemigo no debe desplazarse")
+
+	enemigo._intentar_capturar(mock_jugador)
+	assert_false(captura_emitida[0], "Con ia_pausada = true, no debe emitirse jugador_capturado")
+	assert_false(enemigo.get("_capturado"), "Con ia_pausada = true, _capturado debe permanecer false")
+
+	# Verificar que hibernar() y despertar() conservan ia_pausada
+	enemigo.hibernar()
+	assert_true(enemigo.ia_pausada, "hibernar() debe respetar ia_pausada")
+	enemigo.despertar(500.0)
+	assert_true(enemigo.ia_pausada, "despertar() debe respetar ia_pausada")
+
+	# Verificar que al desactivar ia_pausada retoma la persecución
+	enemigo.ia_pausada = false
+	enemigo.global_position = Vector2.ZERO
+	enemigo._physics_process(0.016)
+	assert_true(enemigo.velocity.x > 0.0, "Al desactivar ia_pausada, el enemigo debe volver a acelerar hacia el objetivo")
+
+	enemigo.free()
+	mock_jugador.free()

@@ -177,3 +177,40 @@ func test_desacople_ventana_externa() -> void:
 		assert_eq(menu.control_raiz.get_parent(), menu, "ControlRaiz debe volver a ser hijo de DebugMenu")
 
 	menu.free()
+
+
+func test_pausar_ia_monstruo_en_debug() -> void:
+	var escena_debug: PackedScene = load("res://escenas/debug_menu.tscn")
+	assert_true(escena_debug != null, "debug_menu.tscn debe cargar")
+	var menu: DebugMenu = escena_debug.instantiate() as DebugMenu
+	assert_true(menu != null, "DebugMenu debe instanciarse")
+
+	var check_pausar_ia := menu.get_node_or_null("ControlRaiz/ContenedorVentanas/VentanaEnemigo/Margin/VBox/Contenido/VBoxEnemigo/CheckPausarIA") as CheckBox
+	assert_true(check_pausar_ia != null, "Debe existir CheckPausarIA en VentanaEnemigo")
+
+	var cfg = load("res://scripts/debug/debug_config.gd").new()
+	var enemigo := Enemigo.new()
+	enemigo.velocity = Vector2(150.0, 0.0)
+
+	menu.enemy_ctrl.set_ia_pausada(true, enemigo, cfg)
+	assert_true(menu.enemy_ctrl.ia_pausada, "enemy_ctrl.ia_pausada debe ser true")
+	assert_true(cfg.debug_pausar_ia_enemigo, "DebugConfig.debug_pausar_ia_enemigo debe persistirse en true")
+	assert_true(enemigo.ia_pausada, "enemigo.ia_pausada debe ser true")
+	assert_eq(enemigo.velocity, Vector2.ZERO, "enemigo.velocity debe reiniciarse a Vector2.ZERO al pausar IA")
+
+	var nuevo_enemigo := Enemigo.new()
+	menu.enemy_ctrl.sincronizar_en_process(nuevo_enemigo)
+	assert_true(nuevo_enemigo.ia_pausada, "sincronizar_en_process debe aplicar ia_pausada al nuevo enemigo")
+
+	menu.enemy_ctrl.restaurar_desde_config(cfg, null, check_pausar_ia)
+	assert_true(check_pausar_ia.button_pressed, "restaurar_desde_config debe sincronizar CheckPausarIA")
+
+	var lbl_estado := Label.new()
+	menu.telemetry.actualizar_tab_enemigo({"lbl_enemigo_estado": lbl_estado}, enemigo, Vector2.ZERO, menu.context, false)
+	assert_eq(lbl_estado.text, "IA Pausada", "ValEstadoIA debe mostrar 'IA Pausada' cuando ia_pausada es true")
+
+	lbl_estado.free()
+	nuevo_enemigo.free()
+	enemigo.free()
+	cfg.free()
+	menu.free()
