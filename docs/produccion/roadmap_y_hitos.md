@@ -125,7 +125,7 @@ flowchart TD
 * **Objetivo:** Sustituir los placeholders geométricos por el catálogo visual definitivo de ~30 piezas vectorizadas/renderizadas bajo el pipeline híbrido (Blender + Inkscape).
 * **Entregables Clave:**
   - [ ] Crear estructura de directorio `assets_raw/` con `.gdignore` para archivos fuente de Blender e Inkscape.
-  - [ ] Exportar los 15 frames definitivos del protagonista (caminar 3 perspectivas, salto en aire, plancha aerodinámica, recuperación y sombra).
+  - [ ] Exportar los 8 frames definitivos del protagonista (sprites 2D sin ángulo: caminar 2D, salto en aire, plancha, recuperación y sombra).
   - [ ] Integrar sprite cenital del monstruo con garras y máscara de ojos brillantes/emisivos.
   - [ ] Sustituir los tiles y obstáculos modulares (suelo hojarasca, árboles secos/frondosos, rocas asimétricas, troncos caídos y vallas de estacas).
   - [ ] Producir la ilustración final de impacto de jumpscare ($512 \times 512$ px) para el `AnimationPlayer` de Game Over.

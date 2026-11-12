@@ -104,8 +104,8 @@ El proyecto cuenta con un plugin de editor dedicado (`character_bar.gd`) que per
 * **Estructura de Iluminación Optimizada para Web:**
   1. **Halo Corporal Aditivo (`HaloCorporal`):** Para economizar pases de renderizado en WebGL 2.0 (`gl_compatibility`), se implementa como un `Sprite2D` radial translúcido con material `CanvasItemMaterial(blend_mode = BLEND_MODE_ADD)`, proporcionando iluminación suave en los pies sin generar un pase de luz real en GPU.
   2. **Haz Direccional (`LinternaFrontal`):** Un nodo `PointLight2D` frontal (sin sombras dinámicas `shadow_enabled = false`) con textura cónica procedural ($60^\circ$ de apertura, $700\text{ px}$ de alcance) que proyecta visión a media distancia hacia donde apunta. Ambos se organizan bajo `PivoteLinterna`.
-* **Desacople y Conmutación Inteligente de Orientación:**
-  - El sprite del personaje orienta sus animaciones según el vector de entrada de movimiento (`velocity`).
+* **Desacople de Orientación y Linterna:**
+  - El personaje utiliza sprites 2D planos directos (sin ángulos cenitales ni perspectivas inclinadas). La dirección horizontal se refleja mediante volteo del sprite (`flip_h = velocity.x < 0`), mientras que la linterna y el halo operan de manera desacoplada en $360^\circ$.
   - **Detección Dinámica de Entrada (Ratón vs. Teclado):** Para evitar que en Web la linterna quede anclada a la última posición estática del cursor tras hacer clic en la pantalla de inicio:
     - Se registra el tiempo del último evento `InputEventMouseMotion` con desplazamiento significativo ($> 4\text{ px}$).
     - **Modo Ratón Activo:** Si hubo movimiento de ratón reciente ($< 1.5\text{ s}$), el haz apunta a `get_global_mouse_position()`.
@@ -162,7 +162,7 @@ stateDiagram-v2
 Personaje (CharacterBody2D) [scripts/entidades/personaje/personaje.gd, y_sort_enabled=true]
 ├── Sombra (Node2D)                     # Sprite/óvalo en suelo (nodo hermano de Visual)
 ├── Visual (Node2D)                     # Contenedor para elevación en eje Z durante salto
-│   └── Sprite2D (AnimatedSprite2D)     # Animaciones y vistas direccionales (pivote en pies)
+│   └── Sprite2D (AnimatedSprite2D)     # Sprites 2D planos (caminar, salto, plancha, recuperación, pivote en pies)
 ├── CollisionShape2D                    # Colisión física circular compacta en los pies
 ├── PivoteLinterna (Node2D)             # Contenedor orientable 360° desacoplado
 │   ├── LinternaFrontal (PointLight2D)  # Haz cónico procedural orientable hacia el ratón/marcha

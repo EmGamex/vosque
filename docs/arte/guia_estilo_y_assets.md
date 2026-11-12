@@ -19,25 +19,24 @@ Este documento define la dirección artística, paleta de colores y el catálogo
 
 ## 2. Catálogo de Sprites (Checklist de Producción)
 
-### 2.1. Protagonista (Pipeline Minimalista de 15 Frames)
+### 2.1. Protagonista (Pipeline de Sprites 2D sin Ángulos)
 
-Para maximizar la eficiencia y reducir el tiempo de dibujo a mano alzada en Inkscape, se adopta un enfoque de **perspectiva 3/4 simplificada a 3 direcciones con simetría horizontal y animación procedural en motor**:
+Para mantener la estética limpia, directa y libre de complicaciones angulares o vistas múltiples, el personaje utiliza **sprites 2D planos directos sin ningún tipo de ángulo de cámara (sin perspectiva cenital, isométrica ni vistas direccionales frontales/espalda)**, apoyándose en volteo horizontal (`flip_h`) y animación procedural en motor:
 
-| ID de Animación / Asset | Dirección / Pose | Cuadros | Resolución | Comportamiento / Optimización en Motor |
+| ID de Animación / Asset | Acción / Pose | Cuadros | Resolución | Comportamiento / Optimización en Motor |
 | :--- | :--- | :---: | :---: | :--- |
-| `jugador_caminar_frente` | Frente / Hacia abajo | 4 | $128 \times 128$ px | Ciclo de paso regular en loop. |
-| `jugador_caminar_perfil` | Lateral / Perfil | 4 | $128 \times 128$ px | Sirve para izquierda y derecha mediante volteo horizontal (`flip_h = true`). |
-| `jugador_caminar_espalda` | Espalda / Hacia arriba | 4 | $128 \times 128$ px | Ciclo de paso regular en loop. |
-| `jugador_salto_aire` | Pose de Salto Libre | 1 | $128 \times 128$ px | Pose estática con rodillas encogidas. El arco en el aire se anima en Godot alterando `position.y`. |
-| `jugador_plancha_aire` | Pose de Plancha (*Dive*) | 1 | $128 \times 128$ px | Pose estática horizontal con brazos y piernas estiradas. |
-| `jugador_suelo_recuperacion` | Caída y Recuperación | 1 | $128 \times 128$ px | Pose del personaje tendido boca abajo en la hojarasca durante los $0.6\text{ s}$ de vulnerabilidad. |
-| `jugador_sombra` | Sombra Proyectada | 1 | $64 \times 32$ px | Óvalo negro con gradiente alfa suave en los pies; se escala inversamente en Godot al saltar. |
-| **TOTAL CUADROS DIBUJADOS** | **Todo el Personaje** | **15** | — | **Ahorro de más del 75% frente a las 8 direcciones tradicionales.** |
+| `jugador_caminar` | Caminar 2D (sin ángulo) | 4 | $128 \times 128$ px | Ciclo de paso regular en loop. Orientación horizontal mediante volteo (`flip_h`). |
+| `jugador_salto_aire` | Pose de Salto Libre | 1 | $128 \times 128$ px | Pose estática 2D en el aire. El arco vertical se anima en Godot alterando `position.y`. |
+| `jugador_plancha_aire` | Pose de Plancha (*Dive*) | 1 | $128 \times 128$ px | Pose estática 2D horizontal con cuerpo extendido. |
+| `jugador_suelo_recuperacion` | Caída y Recuperación | 1 | $128 \times 128$ px | Pose 2D del personaje tendido en la hojarasca durante los $0.6\text{ s}$ de vulnerabilidad. |
+| `jugador_sombra` | Sombra Proyectada | 1 | $64 \times 32$ px | Óvalo negro con gradiente alfa suave en la base; se escala inversamente en Godot al saltar. |
+| **TOTAL CUADROS DIBUJADOS** | **Todo el Personaje** | **8** | — | **Sprites 2D puros sin vistas cenitales ni ángulos complejos.** |
 
 #### Técnicas de Ahorro y Proceduralidad en Godot 4:
 * **Sprint (Carrera):** No se dibujan cuadros nuevos; se acelera la reproducción del ciclo de caminar (`speed_scale = 1.6`) y se aplica una rotación leve de $5^\circ$ hacia adelante en el nodo del sprite.
-* **Reposo (*Idle*):** Se usa el primer cuadro estático de la dirección correspondiente con un `Tween` sutil que modula la escala vertical (`scale.y` entre $0.97$ y $1.0$) simulando respiración agitada sin dibujar cuadros extra.
+* **Reposo (*Idle*):** Se usa el primer cuadro estático de caminar con un `Tween` sutil que modula la escala vertical (`scale.y` entre $0.97$ y $1.0$) simulando respiración agitada sin dibujar cuadros extra.
 * **Pivote y Profundidad:** El origen del sprite se ubica en los pies (eje central inferior) para que el orden `y_sort_enabled` sea exacto respecto a los troncos y rocas.
+* **Orientación 2D:** El sprite se orienta a izquierda o derecha con volteo horizontal (`flip_h = velocity.x < 0`), sin requerir variantes por ángulo o dirección vertical.
 
 ### 2.2. La Criatura (Pipeline Ultra-Minimalista de 2 a 3 Cuadros)
 
@@ -115,13 +114,13 @@ En el renderizador `gl_compatibility`, cada `PointLight2D` activo genera un pase
 
 | Categoría | Elementos Dibujados | Total Cuadros / Sprites |
 | :--- | :--- | :---: |
-| **Protagonista** | Caminar (3 vistas $\times$ 4 cuadros) + Salto (1) + Plancha (1) + Recuperación (1) + Sombra (1) | **15 cuadros** |
+| **Protagonista** | Caminar 2D sin ángulo (4) + Salto (1) + Plancha (1) + Recuperación (1) + Sombra (1) | **8 cuadros** |
 | **Criatura** | Silueta cenital en $+X$ (2 a 3 cuadros) | **2–3 cuadros** |
 | **Menú Principal** | 3 Capas de fondo (cielo, montaña lejana, montaña cercana) + 3 Variaciones de iluminación de árboles | **6 capas** |
 | **Entorno Modular** | Suelo tile + 2 Árboles + 1 Roca asimétrica + 1 Tronco caído + 1 Valla | **6 piezas** |
 | **Coleccionable y HUD** | 1 Nota coleccionable + 1 Icono HUD | **2 piezas** |
 | **Game Over** | 1 Ilustración jumpscare de impacto | **1 pieza** |
-| **TOTAL ABSOLUTO DE TODO EL JUEGO** | **Todas las animaciones, menús, mapas y entidades** | **~32 a 33 piezas/cuadros** |
+| **TOTAL ABSOLUTO DE TODO EL JUEGO** | **Todas las animaciones, menús, mapas y entidades** | **~25 a 26 piezas/cuadros** |
 
 > [!TIP]
 > **Eficiencia Máxima de Producción:** Con menos de 30 piezas gráficas en total, el juego completo dispone de gráficos propios de autor, coherencia estética tenebrosa y cero elementos "cutrillos", apoyándose en la iluminación 2D, shaders y físicas de Godot 4 para toda la riqueza visual.

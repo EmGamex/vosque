@@ -30,13 +30,13 @@ flowchart LR
 
 ---
 
-## 1. Fase 1: Blender (Estructura y Perspectiva)
+## 1. Fase 1: Blender (Estructura y Proporciones)
 
-* **Función:** Generar la volumetría, perspectiva y proporciones correctas sin tener que calcular escorzos o ángulos complejos a mano alzada.
+* **Función:** Generar volumetría y proporciones base sin cálculos anatómicos manuales.
 * **Cámara:** 
   - Modo: `Orthographic`.
-  - Inclinación: Cenital inclinada (vista isométrica/top-down de $45^\circ$ o $60^\circ$ tipo 3/4).
-  - **Ángulos Clave para Personajes:** Para minimizar renders y entintado, solo se capturan **3 orientaciones**: Frente ($0^\circ$), Perfil ($90^\circ$) y Espalda ($180^\circ$). El perfil opuesto se obtiene por volteo horizontal (`flip_h`) en Godot.
+  - Inclinación: Frontal / lateral plana sin ángulo cenital ni perspectiva inclinada para los sprites 2D del protagonista.
+  - **Sprites del Personaje:** Sprites 2D directos sin ángulos ni vistas cenitales (caminar, salto, plancha y recuperación). Las direcciones horizontales se gestionan mediante volteo horizontal (`flip_h`) en Godot.
 * **Gestión de Color (Color Management):**
   - Display Device: `sRGB`.
   - View Transform: **Standard** (evitar *AgX* o *Filmic*, ya que desaturan y alteran los valores requeridos como plantilla de calcado).

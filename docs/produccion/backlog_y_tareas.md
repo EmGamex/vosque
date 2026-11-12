@@ -182,13 +182,11 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
 - [ ] **Estructura de Directorios de Arte y Fuentes Crudas:**
   - [ ] Crear directorio `assets_raw/` con archivo `.gdignore` para alojar archivos editables de Blender (`.blend`) e Inkscape (`.svg`).
   - [ ] Estructurar destinos en `res://graficos/`: `personaje/`, `criatura/`, `entorno/`, `notas/`, `interfaz/`, `jumpscare/` y `bocetos/`.
-- [ ] **Protagonista (15 Cuadros en `res://graficos/personaje/`):**
-  - [ ] Caminar frente (4 cuadros, $128 \times 128$ px).
-  - [ ] Caminar perfil (4 cuadros, $128 \times 128$ px, simetría `flip_h`).
-  - [ ] Caminar espalda (4 cuadros, $128 \times 128$ px).
+- [ ] **Protagonista (8 Cuadros en `res://graficos/personaje/` - Sprites 2D sin Ángulo):**
+  - [ ] Caminar 2D (4 cuadros, $128 \times 128$ px, volteo horizontal con `flip_h`).
   - [ ] Salto libre en aire (1 cuadro).
   - [ ] Plancha aerodinámica en aire (1 cuadro).
-  - [ ] Suelo recuperación boca abajo (1 cuadro).
+  - [ ] Suelo recuperación tendido (1 cuadro).
   - [ ] Sombra elíptica (1 sprite, $64 \times 32$ px).
 - [ ] **Criatura (2 a 3 Cuadros):**
   - [ ] Silueta cenital hacia $+X$ con garras (2 a 3 cuadros, $128 \times 128$ px).
