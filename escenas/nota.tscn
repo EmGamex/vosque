@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://cx8bnnbmuynox" path="res://scripts/entidades/items/nota.gd" id="1_3p1gy"]
 [ext_resource type="Texture2D" uid="uid://cfsys4vyiwpya" path="res://graficos/coleccionable_nota.svg" id="2_q2k08"]
 [ext_resource type="Texture2D" uid="uid://ckap2m8bjlqp5" path="res://escenas/luz_baliza_textura.tres" id="3_50qer"]
+[ext_resource type="AudioStream" uid="uid://dib5wv5ifvx3s" path="res://sonido/sfx/interfaz/nota_revelacion.wav" id="4_q2k08"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_qalj3"]
 radius = 32.0
@@ -34,5 +35,10 @@ gravity = Vector2(0, 0)
 initial_velocity_min = 40.0
 initial_velocity_max = 90.0
 color = Color(1, 0.9, 0.6, 1)
+
+[node name="SfxRevelacion" type="AudioStreamPlayer2D" parent="." unique_id=1360068811]
+stream = ExtResource("4_q2k08")
+max_polyphony = 2
+bus = &"sfx"
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]

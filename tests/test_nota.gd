@@ -51,6 +51,33 @@ func test_jerarquia_de_nodos_y_propiedades() -> void:
 	assert_true(part.one_shot, "one_shot debe ser true")
 	assert_false(part.emitting, "emitting inicial debe ser false")
 
+	var sfx: AudioStreamPlayer2D = inst.get_node_or_null("SfxRevelacion") as AudioStreamPlayer2D
+	assert_true(sfx != null, "Debe existir nodo hijo SfxRevelacion")
+	assert_eq(sfx.bus, &"sfx", "SfxRevelacion debe usar el bus sfx")
+	assert_eq(sfx.max_polyphony, 2, "SfxRevelacion debe tener max_polyphony = 2")
+	assert_true(sfx.stream != null, "SfxRevelacion debe tener stream asignado")
+
+	inst.free()
+
+
+func test_estado_inicial_oculto_y_guarda_recoleccion() -> void:
+	var escena_nota: PackedScene = load("res://escenas/nota.tscn")
+	var inst: Nota = escena_nota.instantiate() as Nota
+	inst._visual_papel = inst.get_node_or_null("VisualPapel") as Sprite2D
+	inst._luz_baliza = inst.get_node_or_null("LuzBaliza") as PointLight2D
+	inst._particulas_recogida = inst.get_node_or_null("ParticulasRecogida") as CPUParticles2D
+	inst._ready()
+
+	assert_false(inst.esta_revelada(), "La nota debe iniciar con _revelada = false")
+	assert_false(inst._visual_papel.visible, "VisualPapel debe iniciar invisible")
+	assert_false(inst._luz_baliza.visible, "LuzBaliza debe iniciar invisible")
+
+	var senal_recolectada: Array = []
+	inst.recolectada.connect(func(pos: Vector2): senal_recolectada.append(pos))
+	inst.recolectar()
+	assert_false(inst.esta_recolectada(), "No debe recolectarse mientras no esté revelada")
+	assert_eq(senal_recolectada.size(), 0, "No debe emitirse recolectada si está oculta")
+
 	inst.free()
 
 
@@ -59,8 +86,11 @@ func test_animacion_procedural_process() -> void:
 	var inst: Nota = escena_nota.instantiate() as Nota
 	var visual: Sprite2D = inst.get_node_or_null("VisualPapel") as Sprite2D
 	var luz: PointLight2D = inst.get_node_or_null("LuzBaliza") as PointLight2D
+	inst._visual_papel = visual
+	inst._luz_baliza = luz
+	inst.revelar()
 
-	# Simular avance de tiempo
+	# Simular avance de tiempo tras revelación
 	inst._process(0.2)
 	assert_true(absf(visual.position.y) <= 4.001, "La flotación vertical debe mantenerse dentro de +-4 px")
 	assert_true(luz.energy >= 0.649 and luz.energy <= 0.951, "La energía de la luz debe mantenerse entre 0.65 y 0.95")
@@ -85,6 +115,18 @@ func test_protocolo_recoleccion() -> void:
 	inst._visual_papel = visual
 	inst._luz_baliza = luz
 	inst._particulas_recogida = part
+
+	var senal_revelada: Array = []
+	inst.revelada.connect(func(pos: Vector2): senal_revelada.append(pos))
+	inst.revelar()
+	assert_true(inst.esta_revelada(), "esta_revelada() debe ser true tras revelar()")
+	assert_true(visual.visible, "VisualPapel debe encenderse al revelar")
+	assert_true(luz.visible, "LuzBaliza debe encenderse al revelar")
+	assert_eq(senal_revelada.size(), 1, "Debe emitirse revelada exactamente 1 vez")
+
+	# Idempotencia de revelar()
+	inst.revelar()
+	assert_eq(senal_revelada.size(), 1, "revelar() debe ser idempotente")
 
 	var senal_emitida: Array = []
 	inst.recolectada.connect(func(pos: Vector2): senal_emitida.append(pos))

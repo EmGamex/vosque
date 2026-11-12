@@ -9,9 +9,10 @@ extends CanvasLayer
 @export var color_texto: Color = Color.WHITE
 @export var color_flash_punch: Color = Color(1.6, 1.5, 1.2, 1.0)
 
-@onready var contenedor_contador: Control = get_node_or_null("MargenSeguridad/ContadorNotas") as Control
-@onready var icono_nota: TextureRect = get_node_or_null("MargenSeguridad/ContadorNotas/IconoNota") as TextureRect
-@onready var label_notas: Label = get_node_or_null("MargenSeguridad/ContadorNotas/LabelNotas") as Label
+@onready var contenedor_contador: Control = get_node_or_null("MargenSeguridad/ContenedorSuperiorIzquierdo/ContadorNotas") as Control
+@onready var icono_nota: TextureRect = get_node_or_null("MargenSeguridad/ContenedorSuperiorIzquierdo/ContadorNotas/IconoNota") as TextureRect
+@onready var label_notas: Label = get_node_or_null("MargenSeguridad/ContenedorSuperiorIzquierdo/ContadorNotas/LabelNotas") as Label
+@onready var minimapa: MinimapaHUD = get_node_or_null("MargenSeguridad/ContenedorSuperiorIzquierdo/Minimapa") as MinimapaHUD
 
 var _tween_punch: Tween = null
 
@@ -24,11 +25,37 @@ func _ready() -> void:
 
 func _resolver_referencias() -> void:
 	if contenedor_contador == null:
-		contenedor_contador = get_node_or_null("MargenSeguridad/ContadorNotas") as Control
+		contenedor_contador = get_node_or_null("MargenSeguridad/ContenedorSuperiorIzquierdo/ContadorNotas") as Control
 	if icono_nota == null:
-		icono_nota = get_node_or_null("MargenSeguridad/ContadorNotas/IconoNota") as TextureRect
+		icono_nota = get_node_or_null("MargenSeguridad/ContenedorSuperiorIzquierdo/ContadorNotas/IconoNota") as TextureRect
 	if label_notas == null:
-		label_notas = get_node_or_null("MargenSeguridad/ContadorNotas/LabelNotas") as Label
+		label_notas = get_node_or_null("MargenSeguridad/ContenedorSuperiorIzquierdo/ContadorNotas/LabelNotas") as Label
+	if minimapa == null:
+		minimapa = get_node_or_null("MargenSeguridad/ContenedorSuperiorIzquierdo/Minimapa") as MinimapaHUD
+
+
+func actualizar_posicion_jugador_minimapa(pos_mundo: Vector2) -> void:
+	_resolver_referencias()
+	if minimapa != null:
+		minimapa.actualizar_posicion_jugador(pos_mundo)
+
+
+func actualizar_minimapa_objetivo(cuadrante: String, esta_revelada: bool = false) -> void:
+	_resolver_referencias()
+	if minimapa != null:
+		minimapa.actualizar_objetivo(cuadrante, esta_revelada)
+
+
+func marcar_nota_minimapa_revelada(esta_revelada: bool = true) -> void:
+	_resolver_referencias()
+	if minimapa != null:
+		minimapa.marcar_nota_revelada(esta_revelada)
+
+
+func limpiar_minimapa_objetivo() -> void:
+	_resolver_referencias()
+	if minimapa != null:
+		minimapa.limpiar_objetivo()
 
 func actualizar_contador(total_notas: int, con_animacion: bool = true) -> void:
 	_resolver_referencias()

@@ -230,6 +230,7 @@ func test_integracion_maain_spawn_y_recoleccion() -> void:
 	var senal_emitida: Array = []
 	inst_maain.nota_recogida.connect(func(pos, total): senal_emitida.append(total))
 
+	nota_generada.revelar()
 	nota_generada.recolectar()
 	assert_eq(senal_emitida.size(), 1, "Al recolectar la nota se debe emitir nota_recogida en Maain")
 	assert_eq(inst_maain.notas_recolectadas, 1, "notas_recolectadas debe incrementarse a 1")

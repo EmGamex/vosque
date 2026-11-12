@@ -182,3 +182,35 @@ func test_presupuesto_webgl_maximo_tres_luces() -> void:
 	assert_true(luces_activas <= 3, "El presupuesto de PointLight2D activas nunca debe superar 3 (activo: %d)" % luces_activas)
 
 	main_node.free()
+
+
+func test_revelacion_nota_por_haz_linterna() -> void:
+	var pivote := ControladorLinterna.new()
+	var cfg := ConfiguracionIluminacion.new()
+	cfg.alcance_px = 700.0
+	cfg.apertura_grados = 60.0
+	pivote.config = cfg
+	pivote.position = Vector2.ZERO
+	pivote.rotation = 0.0
+
+	var escena_nota: PackedScene = load("res://escenas/nota.tscn")
+	var nota := escena_nota.instantiate() as Nota
+	nota._visual_papel = nota.get_node_or_null("VisualPapel") as Sprite2D
+	nota._luz_baliza = nota.get_node_or_null("LuzBaliza") as PointLight2D
+	nota._ready()
+	pivote.objetivo_nota = nota
+
+	# Fuera de alcance (> 700 px) -> sigue oculta
+	nota.position = Vector2(800.0, 0.0)
+	pivote.procesar_revelacion_notas()
+	assert_false(nota.esta_revelada(), "Nota fuera de alcance no debe revelarse")
+	assert_false(nota._luz_baliza.visible, "LuzBaliza debe seguir apagada mientras la nota está oculta")
+
+	# Dentro del cono (< 700 px, 0°) -> se revela
+	nota.position = Vector2(350.0, 0.0)
+	pivote.procesar_revelacion_notas()
+	assert_true(nota.esta_revelada(), "Nota dentro del haz debe revelarse automáticamente")
+	assert_true(nota._luz_baliza.visible, "LuzBaliza debe encenderse al revelarse")
+
+	nota.free()
+	pivote.free()

@@ -26,7 +26,8 @@ func generar_nota(
 	enemigo: Enemigo,
 	distancia_segura_jugador: float = DISTANCIA_SEGURA_JUGADOR_DEFECTO,
 	distancia_segura_monstruo: float = DISTANCIA_SEGURA_MONSTRUO_DEFECTO,
-	callback_recolectada: Callable = Callable()
+	callback_recolectada: Callable = Callable(),
+	callback_revelada: Callable = Callable()
 ) -> Nota:
 	if hay_nota_activa():
 		return null
@@ -75,6 +76,8 @@ func generar_nota(
 
 	if callback_recolectada.is_valid():
 		nueva_nota.recolectada.connect(callback_recolectada)
+	if callback_revelada.is_valid():
+		nueva_nota.revelada.connect(callback_revelada)
 
 	nueva_nota.tree_exited.connect(func():
 		if nota_activa == nueva_nota:

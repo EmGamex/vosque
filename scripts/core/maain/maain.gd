@@ -6,6 +6,7 @@ extends Node2D
 ## Gestiona el ciclo de vida del escenario, la mutación y coordina SpawnerNotas y ControladorAmenazaMonstruo.
 
 signal nota_aparecida(posicion: Vector2)
+signal nota_revelada(posicion: Vector2)
 signal nota_recogida(posicion: Vector2, total_recogidas: int)
 signal game_over_solicitado
 
@@ -48,6 +49,8 @@ func _ready() -> void:
 
 	if hud != null and is_instance_valid(hud):
 		hud.actualizar_contador(notas_recolectadas, false)
+		if jugador != null and is_instance_valid(jugador):
+			hud.actualizar_posicion_jugador_minimapa(jugador.global_position)
 
 	amenaza_monstruo.inicializar_enemigo(enemigo)
 
@@ -56,6 +59,13 @@ func _ready() -> void:
 		musica.reproducir_menu_o_tutorial()
 
 	call_deferred("spawn_nota_inicial")
+
+
+func _process(_delta: float) -> void:
+	if Engine.is_editor_hint() or partida_terminada:
+		return
+	if hud != null and is_instance_valid(hud) and jugador != null and is_instance_valid(jugador):
+		hud.actualizar_posicion_jugador_minimapa(jugador.global_position)
 
 
 func _on_visibility_changed() -> void:
@@ -147,13 +157,29 @@ func generar_nota() -> Nota:
 		enemigo,
 		distancia_segura_jugador,
 		distancia_segura_monstruo,
-		_on_nota_recolectada
+		_on_nota_recolectada,
+		_on_nota_revelada
 	)
 
 	if nueva_nota != null:
 		nota_aparecida.emit(nueva_nota.global_position)
+		if hud != null and is_instance_valid(hud):
+			var cuadrante_nota: String = (
+				escenario.calcular_cuadrante(nueva_nota.global_position)
+				if (escenario != null and is_instance_valid(escenario))
+				else SpawnerNotas.calcular_cuadrante_estatico(nueva_nota.global_position)
+			)
+			hud.actualizar_minimapa_objetivo(cuadrante_nota, nueva_nota.esta_revelada())
 
 	return nueva_nota
+
+
+func _on_nota_revelada(pos_nota: Vector2) -> void:
+	if partida_terminada:
+		return
+	nota_revelada.emit(pos_nota)
+	if hud != null and is_instance_valid(hud):
+		hud.marcar_nota_minimapa_revelada(true)
 
 
 func _on_nota_recolectada(pos_nota: Vector2) -> void:
@@ -165,6 +191,7 @@ func _on_nota_recolectada(pos_nota: Vector2) -> void:
 
 	if hud != null and is_instance_valid(hud):
 		hud.actualizar_contador(notas_recolectadas, true)
+		hud.limpiar_minimapa_objetivo()
 
 	amenaza_monstruo.procesar_nota_recolectada(
 		notas_recolectadas,
