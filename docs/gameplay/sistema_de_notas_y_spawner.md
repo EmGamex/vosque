@@ -7,8 +7,8 @@ Este documento define la arquitectura técnica de la entidad coleccionable `Nota
 ## 1. Filosofía de Diseño Arcade
 
 En los juegos clásicos de recolección de notas, el jugador suele detenerse a leer textos o inspeccionar hojas estáticas en pantalla completa. En *Vosque*, en cambio, el diseño responde al ritmo **arcade puro y continuo**:
-* **Recolección Instantánea (Estilo Moneda/Gema):** La nota se recoge por simple contacto físico sin detener la carrera ni bloquear los controles.
-* **Foco de Orientación en la Penumbra:** La nota no está oculta en una oscuridad ciega; emite su propia luz pulsante tenue para que el jugador pueda avistarla desde la distancia y trazar mentalmente su ruta de escape.
+* **Recolección Instantánea (Estilo Moneda/Gema):** La nota se recoge por simple contacto físico sin detener la carrera ni bloquear los controles, siempre que haya sido revelada previamente por la linterna.
+* **Dualidad Minimapa + Revelación con Linterna (Memoria de Luz):** El jugador se orienta a nivel macro mediante el **Minimapa Esquemático 2x2** en el HUD (que indica el cuadrante objetivo), pero la nota nace oculta en la penumbra (`VisualPapel` y `LuzBaliza` apagados). Para poder recogerla, debe enfocarla con el haz de la linterna, momento en que se materializa de forma permanente.
 
 ---
 
@@ -26,8 +26,8 @@ Nota (Area2D) [scripts/entidades/items/nota.gd, Capa 5: Interactuables]
 
 > 💡 **Detalles del presupuesto:** Ver [Sistema de Iluminación](sistema_de_iluminacion.md).
 
-* **Integración en el Presupuesto Lumínico:** `LuzBaliza` constituye la segunda y última luz `PointLight2D` permitida en simultáneo en el mundo (`shadow_enabled = false`).
-* **Implementación con `PointLight2D`:** Utiliza `res://escenas/luz_baliza_textura.tres` con modulación senoidal en su propiedad `energy` ($\text{rango } 0.65 - 0.95$, frecuencia angular $3.5\text{ rad/s}$).
+* **Integración en el Presupuesto Lumínico:** `LuzBaliza` constituye la segunda y última luz `PointLight2D` permitida en simultáneo en el mundo (`shadow_enabled = false`), permaneciendo **apagada** (`visible = false`) mientras la nota está oculta y encendiéndose únicamente al ser revelada por la linterna.
+* **Implementación con `PointLight2D`:** Utiliza `res://escenas/luz_baliza_textura.tres` con modulación senoidal en su propiedad `energy` ($\text{rango } 0.65 - 0.95$, frecuencia angular $3.5\text{ rad/s}$) una vez revelada.
 * **Color:** Blanco cálido / pergamino ámbar (`Color(1.0, 0.95, 0.8, 1.0)`).
 * **Apagado Atómico:** Al recolectar la nota, `_luz_baliza.visible = false` de forma sincrónica para liberar de inmediato el pase de luz en GPU antes de que el spawner cree la nota siguiente.
 
@@ -43,9 +43,18 @@ func _process(delta: float) -> void:
 
 ---
 
-## 3. Protocolo de Recolección Atómica
+## 3. Protocolo de Revelación (Memoria de Luz) y Recolección Atómica
 
+### 3.1. Revelación por Haz de Linterna
+1. **Estado Inicial Oculto:** Al instanciarse, `_revelada = false`, `_visual_papel.visible = false` y `_luz_baliza.visible = false`.
+2. **Activación Permanente:** Cuando `ControladorLinterna.evaluar_posicion_en_haz(nota.global_position)` devuelve `en_haz == true`, se invoca `nota.revelar()`:
+   * Marca `_revelada = true` (permanente aunque se aparte la linterna).
+   * Enciende `VisualPapel` (con *fade-in* rápido) y `LuzBaliza`, reproduce el SFX de revelación y emite `revelada(global_position)`.
+   * Expone el estado mediante `func esta_revelada() -> bool: return _revelada`.
+
+### 3.2. Recolección Atómica
 Al hacer contacto con el cuerpo del jugador (`body_entered`):
+0. **Guarda de Revelación:** Si `not _revelada`, se ignora el contacto (`return`).
 1. **Desactivación Inmediata de Colisión:** Para evitar emisiones dobles en el mismo frame:
    ```gdscript
    $CollisionShape2D.set_deferred("disabled", true)

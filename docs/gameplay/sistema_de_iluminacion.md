@@ -16,8 +16,8 @@ Este documento detalla la arquitectura técnica, el presupuesto de renderizado p
 
 El juego no implementa una oscuridad absoluta ciega que frustre al jugador. Su estética se fundamenta en la **Penumbra Contrastada (Noche Americana)**:
 1. **Fondo Visible:** Una base ambiental azul petróleo (`#141824`) permite al jugador identificar siluetas de árboles, rocas y vallas perimetrales a media distancia incluso sin apuntar con la linterna, garantizando la navegación fluida a altas velocidades ($800 - 1000\text{ px/s}$).
-2. **Haz Focal Directo:** La linterna frontal actúa como el bisturí visual del jugador: recorta la penumbra, resalta detalles de corteza, descubre notas y proyecta el peligro inminente.
-3. **Balizas en la Oscuridad:** Los coleccionables y los ojos de la criatura emiten señales lumínicas visibles a través de la penumbra, guiando o alertando al jugador.
+2. **Haz Focal Directo:** La linterna frontal actúa como el bisturí visual y herramienta activa de descubrimiento del jugador: recorta la penumbra, **revela notas ocultas**, resalta detalles de corteza y proyecta el peligro inminente.
+3. **Balizas en la Oscuridad:** Los ojos de la criatura emiten señales lumínicas constantes, mientras que la baliza de la nota se enciende una vez revelada por la linterna para mantener el punto de referencia.
 
 ---
 
@@ -30,7 +30,7 @@ Para mantener $60\text{ FPS}$ estables en navegadores de escritorio:
 * **Presupuesto Máximo:** **3 nodos `PointLight2D` activos simultáneamente en el árbol de escena del mundo.**
   1. `LinternaFrontal` (Protagonista): Haz direccional cónico siempre activo.
   2. `HaloCorporal` (Protagonista): Luz radial suave centrada en el personaje para iluminar sus pies y entorno inmediato.
-  3. `LuzBaliza` (Nota activa): Halo radial pulsante que sirve como objetivo. Al recolectarse, su luz se apaga de inmediato antes de que el spawner instancie la siguiente.
+  3. `LuzBaliza` (Nota activa): Halo radial pulsante que permanece apagado mientras la nota está oculta y se enciende al ser revelada por la linterna. Al recolectarse, su luz se apaga de inmediato antes de que el spawner instancie la siguiente.
 * **Prohibición de Sombras Dinámicas:** Todos los nodos `PointLight2D` deben configurarse con **`shadow_enabled = false`**. El cálculo de oclusión de sombras dinámicas 2D en WebGL resulta prohibitivo.
 
 | Elemento | Tipo de Nodo | Técnica | Coste GPU |
@@ -123,9 +123,9 @@ flowchart TD
 
 ---
 
-## 5. Detección Analítica y Perturbación Electromagnética (Flicker)
+## 5. Detección Analítica Dual (Monstruo y Nota Oculta) y Flicker
 
-Para maximizar el rendimiento y evitar cálculos de física innecesarios, la presencia del monstruo en el haz de la linterna se determina **analíticamente en código**, sin usar nodos de colisión `Area2D` adicionales.
+Para maximizar el rendimiento y evitar cálculos de física innecesarios, tanto la presencia del monstruo como la revelación de la nota activa en el haz de la linterna se determinan **analíticamente en código** mediante `evaluar_posicion_en_haz(pos_objetivo)`, sin usar nodos de colisión `Area2D` adicionales.
 
 ### 5.1. Algoritmo Matemático de Visión Cónica
 En cada ciclo de proceso, la linterna evalúa la posición relativa de la criatura:
