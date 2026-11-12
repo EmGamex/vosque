@@ -113,6 +113,7 @@ stateDiagram-v2
 ### 4. Steering Tangencial y Desatasco
 * **Steering Tangencial:** Si `tiene_linea_vision == false`, `is_on_wall()` y la velocidad decae significativamente frente a un obstáculo, el movimiento proyecta vectores tangenciales a $\pm 45^\circ$ respecto a la normal del muro, eligiendo la rama que minimice la distancia al jugador.
 * **Desatasco Post-Mutación:** Si al mutar sectores el monstruo queda solapado (`ResolutorAtascamiento.verificar_solapamiento_solido()`), se reubica al `Marker2D` (`puntos_nota`) libre más cercano a $\ge 600\text{ px}$ del jugador y se anota en `ultimo_marcador_desatasco` para que el spawner no genere una nota encima.
+* **Memoria de Luz y Cuadrantes:** Al iluminar una nota activa con la linterna, se revela su cuadrante en el `MinimapaHUD` (`Maain` -> `HUD`) sin exponer la posición exacta del monstruo.
 
 ---
 

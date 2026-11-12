@@ -20,8 +20,12 @@ func test_instanciacion_y_jerarquia() -> void:
 	assert_eq(margen.anchors_preset, 15, "MargenSeguridad debe estar anclado a pantalla completa (15)")
 	assert_eq(margen.mouse_filter, Control.MOUSE_FILTER_IGNORE, "MargenSeguridad no debe capturar clics")
 
-	var contador: HBoxContainer = hud.get_node_or_null("MargenSeguridad/ContadorNotas") as HBoxContainer
+	var contador: HBoxContainer = hud.get_node_or_null("MargenSeguridad/ContenedorSuperiorIzquierdo/ContadorNotas") as HBoxContainer
 	assert_true(contador != null, "Debe existir nodo ContadorNotas")
+
+	var minimapa: MinimapaHUD = hud.get_node_or_null("MargenSeguridad/ContenedorSuperiorIzquierdo/Minimapa") as MinimapaHUD
+	assert_true(minimapa != null, "Debe existir nodo Minimapa de tipo MinimapaHUD")
+	assert_eq(minimapa.mouse_filter, Control.MOUSE_FILTER_IGNORE, "Minimapa no debe capturar clics")
 
 	var icono: TextureRect = contador.get_node_or_null("IconoNota") as TextureRect
 	assert_true(icono != null, "Debe existir nodo IconoNota")
@@ -30,6 +34,32 @@ func test_instanciacion_y_jerarquia() -> void:
 	var label: Label = contador.get_node_or_null("LabelNotas") as Label
 	assert_true(label != null, "Debe existir nodo LabelNotas")
 	assert_eq(label.text, "x 0", "El texto inicial debe ser 'x 0'")
+
+	hud.free()
+
+
+func test_minimapa_normalizacion_y_estados() -> void:
+	assert_eq(MinimapaHUD.normalizar_posicion_mapa(Vector2(-2160.0, -2160.0)), Vector2(0.0, 0.0), "Esquina NO debe mapearse a (0,0)")
+	assert_eq(MinimapaHUD.normalizar_posicion_mapa(Vector2.ZERO), Vector2(0.5, 0.5), "Centro (0,0) debe mapearse a (0.5,0.5)")
+	assert_eq(MinimapaHUD.normalizar_posicion_mapa(Vector2(2160.0, 2160.0)), Vector2(1.0, 1.0), "Esquina SE debe mapearse a (1,1)")
+	assert_eq(MinimapaHUD.normalizar_posicion_mapa(Vector2(5000.0, -5000.0)), Vector2(1.0, 0.0), "Coordenadas fuera de rango deben clampearse a [0,1]")
+
+	var escena_hud: PackedScene = load("res://escenas/hud.tscn")
+	var hud: HUD = escena_hud.instantiate() as HUD
+	hud._ready()
+
+	hud.actualizar_posicion_jugador_minimapa(Vector2(1080.0, -1080.0))
+	assert_eq(hud.minimapa.pos_jugador_norm, Vector2(0.75, 0.25), "Posición del jugador en centro de NE debe normalizarse a (0.75, 0.25)")
+
+	hud.actualizar_minimapa_objetivo("SO", false)
+	assert_eq(hud.minimapa.cuadrante_objetivo, "SO", "El cuadrante objetivo debe ser SO")
+	assert_false(hud.minimapa.nota_revelada, "La nota debe iniciar como no revelada en el minimapa")
+
+	hud.marcar_nota_minimapa_revelada(true)
+	assert_true(hud.minimapa.nota_revelada, "El minimapa debe reflejar el estado revelado")
+
+	hud.limpiar_minimapa_objetivo()
+	assert_eq(hud.minimapa.cuadrante_objetivo, "", "limpiar_minimapa_objetivo debe limpiar el cuadrante")
 
 	hud.free()
 

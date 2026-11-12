@@ -6,6 +6,7 @@ extends Node2D
 
 signal monstruo_enfocado(distancia: float, en_rango_critico: bool)
 signal flicker_actualizado(energia: float)
+signal nota_revelada(nota: Node2D, distancia: float)
 
 @export var config: ConfiguracionIluminacion:
 	set(val):
@@ -17,6 +18,7 @@ signal flicker_actualizado(energia: float)
 		_aplicar_configuracion()
 
 @export var objetivo_monstruo: Node2D
+@export var objetivo_nota: Node2D
 
 @onready var linterna: PointLight2D = get_node_or_null("LinternaFrontal") as PointLight2D
 @onready var halo: PointLight2D = get_node_or_null("HaloCorporal") as PointLight2D
@@ -67,6 +69,9 @@ func _physics_process(delta: float) -> void:
 
 	# 2. Detección analítica de la criatura y perturbación (flicker)
 	_procesar_deteccion_y_flicker(delta)
+
+	# 3. Evaluación analítica de notas ocultas dentro del haz
+	procesar_revelacion_notas()
 
 
 func _actualizar_orientacion(delta: float) -> void:
@@ -164,6 +169,30 @@ func _notificar_estres_camara(delta: float) -> void:
 		if cam != null and cam.has_method("agregar_trauma"):
 			var tasa: float = config.tasa_estres_camara if config != null else 0.12
 			cam.call("agregar_trauma", tasa * delta)
+
+
+## Evalúa analíticamente si alguna nota oculta se encuentra dentro del haz y la revela.
+func procesar_revelacion_notas() -> void:
+	var candidatos: Array[Node2D] = []
+	if objetivo_nota != null and is_instance_valid(objetivo_nota):
+		candidatos.append(objetivo_nota)
+	if is_inside_tree():
+		var tree := get_tree()
+		if tree != null:
+			for n in tree.get_nodes_in_group("notas"):
+				if n is Node2D and is_instance_valid(n) and not candidatos.has(n):
+					candidatos.append(n as Node2D)
+
+	for nota in candidatos:
+		if nota.has_method("esta_revelada") and nota.call("esta_revelada"):
+			continue
+		if nota.has_method("esta_recolectada") and nota.call("esta_recolectada"):
+			continue
+		var pos_nota: Vector2 = nota.global_position if nota.is_inside_tree() else nota.position
+		var resultado := evaluar_posicion_en_haz(pos_nota)
+		if resultado.get("en_haz", false) and nota.has_method("revelar"):
+			nota.call("revelar")
+			nota_revelada.emit(nota, resultado.get("distancia", 0.0))
 
 
 func _resolver_objetivo_monstruo() -> void:
