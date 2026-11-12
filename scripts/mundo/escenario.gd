@@ -15,6 +15,11 @@ const RUTAS_VARIANTES_DEFECTO: Array[String] = [
 	"res://escenas/sectores/variantes/variante_bosque_denso.tscn",
 	"res://escenas/sectores/variantes/variante_sendero_troncos.tscn",
 ]
+const VARIANTES_PRECARGADAS: Array[PackedScene] = [
+	preload("res://escenas/sectores/variantes/variante_claro_rocoso.tscn"),
+	preload("res://escenas/sectores/variantes/variante_bosque_denso.tscn"),
+	preload("res://escenas/sectores/variantes/variante_sendero_troncos.tscn"),
+]
 
 @export var objetivo_jugador: Node2D
 @export var objetivo_enemigo: CharacterBody2D
@@ -144,11 +149,7 @@ func _on_niebla_oscuridad_terminada() -> void:
 
 func _inicializar_catalogo() -> void:
 	if catalogo_variantes.is_empty():
-		for ruta in RUTAS_VARIANTES_DEFECTO:
-			if ResourceLoader.exists(ruta):
-				var res = load(ruta) as PackedScene
-				if res != null:
-					catalogo_variantes.append(res)
+		catalogo_variantes.assign(VARIANTES_PRECARGADAS)
 
 
 func _instanciar_sectores_iniciales() -> void:
