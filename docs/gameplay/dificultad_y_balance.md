@@ -10,7 +10,7 @@ El juego utiliza un escalado continuo de peligro por nota recolectada dentro de 
 
 | Nota Recogida | Fase de Comportamiento | Velocidad Monstruo | Relación vs Jugador ($800\text{ px/s}$) | Dinámica de Juego |
 | :---: | :--- | :---: | :---: | :--- |
-| **0 (Inicio)** | *Hibernación / Fase Tutorial* | $0\text{ px/s}$ | $0\%$ | **El monstruo literalmente no aparece en el mapa.** Fase de aclimatación y tutorial sobre la cabeza del personaje. En motor reside en hibernación total (`process_mode = DISABLED`, invisible, fuera de mapa). El jugador explora con seguridad la penumbra hasta ubicar la primera baliza luminosa. |
+| **0 (Inicio)** | *Hibernación / Fase Tutorial* | $0\text{ px/s}$ | $0\%$ | **El monstruo literalmente no aparece en el mapa.** Fase de aclimatación segura: el jugador aprende a leer el minimapa 2x2 y a enfocar la primera nota oculta con la linterna para revelarla y recogerla antes de que despierte la criatura. |
 | **Nota 1** | *Materialización y Despertar* | $500\text{ px/s}$ | $62.5\%$ | **Despertar de la Criatura:** La criatura se reposiciona en un sector distante y seguro, se reactiva (`process_mode = INHERIT`) e inicia la persecución a $500\text{ px/s}$. El jugador puede dejar atrás al enemigo caminando en línea recta. |
 | **Nota 2** | *Patrulla Lenta* | $580\text{ px/s}$ | $72.5\%$ | El sonido de pasos y crujidos del monstruo se vuelve más persistente. |
 | **Nota 3** | *Patrulla Lenta* | $620\text{ px/s}$ | $77.5\%$ | Comienza a cerrarse la brecha de distancia si el jugador se detiene a inspeccionar callejones sin salida. |

@@ -8,19 +8,20 @@ Este documento detalla el bucle principal de juego (*Core Gameplay Loop*), la in
 
 ```mermaid
 flowchart TD
-    A([Inicio de Partida en Bosque]) --> B[Explorar en penumbra con linterna]
-    B --> C{¿Encontró Nota?}
-    C -- Sí --> D[+1 Puntuación & Sonido Inquietante]
-    D --> E[Aumentar Velocidad del Monstruo]
-    E --> F[Cerrar Niebla Radial & Mutar los 3 Sectores Lejanos]
-    F --> G[Spawnear Nueva Nota en Sector Mutado & Abrir Niebla]
-    G --> B
-    C -- No --> H{¿Contacto con Monstruo?}
-    H -- No --> B
-    H -- Sí --> I([Game Over / Jumpscare])
-    I --> J[Guardar High Score en Persistencia]
-    J --> K[Reintentar Inmediato]
-    K --> A
+    A([Inicio de Partida en Bosque]) --> B[Ubicar cuadrante objetivo en Minimapa]
+    B --> C[Explorar en penumbra y enfocar con linterna]
+    C --> D{¿Nota revelada y recolectada?}
+    D -- Sí --> E[+1 Puntuación & Sonido Inquietante]
+    E --> F[Aumentar Velocidad del Monstruo]
+    F --> G[Cerrar Niebla Radial & Mutar los 3 Sectores Lejanos]
+    G --> H[Spawnear Nueva Nota Oculta en Sector Mutado & Abrir Niebla]
+    H --> B
+    D -- No --> I{¿Contacto con Monstruo?}
+    I -- No --> C
+    I -- Sí --> J([Game Over / Jumpscare])
+    J --> K[Guardar High Score en Persistencia]
+    K --> L[Reintentar Inmediato]
+    L --> A
 ```
 
 ---

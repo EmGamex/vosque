@@ -59,7 +59,7 @@ classDiagram
 
 1. **`Maain` ([`scripts/core/maain/maain.gd`](../../scripts/core/maain/maain.gd)):**
    * Fachada de alto nivel y único nodo en el árbol de escenas (`Node2D`).
-   * Gestiona el estado macro de la partida (`partida_terminada`, `notas_recolectadas`).
+   * Gestiona el estado macro de la partida (`partida_terminada`, `notas_recolectadas`), conecta la señal `revelada` de `Nota` y actualiza al `HUD` (contador + **Minimapa 2x2** con posición normalizada del jugador y cuadrante objetivo).
    * Emite las señales de dominio (`nota_aparecida`, `nota_recogida`, `game_over_solicitado`).
    * Provee acceso seguro al autoload `GestorMusica` mediante `_obtener_gestor_musica()` validando previamente `is_inside_tree()`.
 2. **`SpawnerNotas` ([`scripts/core/maain/spawner_notas.gd`](../../scripts/core/maain/spawner_notas.gd)):**

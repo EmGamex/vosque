@@ -101,6 +101,10 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
   - [x] Restricción de distancias mínimas: $\ge 600\text{ px}$ al jugador y $\ge 800\text{ px}$ al monstruo.
   - [x] Exclusión mutua respecto al marcador utilizado para desatascar al enemigo.
   - [x] Fallback robusto al marcador más lejano si todos quedan filtrados.
+- [ ] **Mecánica de Revelación con Linterna (*Memoria de Luz*) y Minimapa 2x2:**
+  - [ ] Estado `_revelada` en `Nota` (`nota.gd`): ocultar `VisualPapel` y `LuzBaliza` al instanciar, bloquear `recolectar()` hasta revelarse, y materializar con *fade-in* + señal `revelada`.
+  - [ ] Evaluación analítica de la nota activa en `ControladorLinterna.evaluar_posicion_en_haz()` y SFX de revelación.
+  - [ ] Componente `Minimapa` 2x2 en `HUD` (debajo del contador de notas) mostrando posición normalizada del jugador y cuadrante objetivo de la nota.
 
 ---
 

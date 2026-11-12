@@ -31,6 +31,10 @@ Este documento especifica los esquemas de entrada para teclado en PC, los elemen
   - Posición: Esquina superior izquierda (`Vector2(32, 32)`).
   - Componentes: Icono vectorial simple de página (`hud_icono_nota`, $32 \times 32$ px) seguido del valor numérico con tipografía limpia y de alto contraste (ejemplo: `x 0`).
   - Animación de Recogida: Al tomar una nota, el contador realiza un salto de escala elástico mediante un `Tween` (`scale` $1.3 \to 1.0$ en $0.25\text{ s}$) y un breve destello blanco.
+* **Minimapa Esquemático 2x2 (Radar de Cuadrantes):**
+  - **Posición:** Agrupado en la esquina superior izquierda, inmediatamente debajo del `ContadorNotas` dentro de `MargenSeguridad`.
+  - **Representación:** Cuadrícula minimalista y semi-translúcida dividida en los 4 sectores (`NO`, `NE`, `SO`, `SE`). Muestra la posición normalizada aproximada del jugador (coordenadas de `[-2160, 2160]` mapeadas a `[0, 1]`), **sin mostrar al monstruo**.
+  - **Indicador de Objetivo:** Resalta y pulsa el **cuadrante completo** donde se encuentra la nota activa (sin revelar su píxel exacto). Una vez que la linterna revela la nota, el cuadrante cambia de estado visual para confirmar que ya está materializada.
 * **Indicador Diegético de Estamina (Resistencia):**
   - Componente circular procedural anclado a la cabeza del personaje (`Vector2(0, -60)`).
   - Anillo radial nítido dibujado proceduralmente con `_draw()` (`draw_arc`).

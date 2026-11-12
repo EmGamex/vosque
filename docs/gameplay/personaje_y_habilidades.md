@@ -100,7 +100,7 @@ El proyecto cuenta con un plugin de editor dedicado (`character_bar.gd`) que per
 
 > 💡 **Especificación completa:** Ver [Sistema de Iluminación](sistema_de_iluminacion.md) para detalles de presupuesto WebGL, generación procedural del haz cónico y perturbación electromagnética.
 
-* **Comportamiento:** La linterna es un elemento **decorativo y atmosférico siempre activo**. No requiere recarga de baterías ni posee interruptor de apagado manual.
+* **Comportamiento:** La linterna es una **herramienta activa de exploración y detección siempre encendida** (revela notas ocultas en la penumbra mediante `evaluar_posicion_en_haz()` y dispara *flicker* al enfocar al monstruo). No requiere recarga de baterías ni posee interruptor de apagado manual.
 * **Estructura de Iluminación Optimizada para Web:**
   1. **Halo Corporal Aditivo (`HaloCorporal`):** Para economizar pases de renderizado en WebGL 2.0 (`gl_compatibility`), se implementa como un `Sprite2D` radial translúcido con material `CanvasItemMaterial(blend_mode = BLEND_MODE_ADD)`, proporcionando iluminación suave en los pies sin generar un pase de luz real en GPU.
   2. **Haz Direccional (`LinternaFrontal`):** Un nodo `PointLight2D` frontal (sin sombras dinámicas `shadow_enabled = false`) con textura cónica procedural ($60^\circ$ de apertura, $700\text{ px}$ de alcance) que proyecta visión a media distancia hacia donde apunta. Ambos se organizan bajo `PivoteLinterna`.

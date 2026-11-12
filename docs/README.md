@@ -40,14 +40,14 @@ Para facilitar la lectura y desarrollo, la documentación está dividida en las 
 - [La Criatura (Monstruo) y su IA](gameplay/monstruo_e_ia.md): Ciclo de vida (hibernación en Nota 0 $\to$ despertar en Nota 1), cinemática, línea de visión, desatasco tangencial (*steering*) y detección letal.
 - [Mapa y Sectores](gameplay/mapa_y_sectores.md): Topología 2x2 ($4320 \times 4320\text{ px}$), límites físicos/visuales perimetrales, corredores seguros ($160\text{ px}$) y diseño de variantes.
 - [Sistema de Mutación y Niebla](gameplay/sistema_de_mutacion_y_niebla.md): Algoritmo dinámico de reemplazo de los 3 sectores lejanos, telón visual de niebla, exclusión mutua y optimizaciones WebGL.
-- [Sistema de Iluminación](gameplay/sistema_de_iluminacion.md): Arquitectura de penumbra (Noche Americana), presupuesto WebGL 2.0 (2 luces reales), linterna procedural, halo aditivo y detección analítica del monstruo.
-- [Sistema de Notas y Spawner](gameplay/sistema_de_notas_y_spawner.md): Jerarquía de `Area2D`, baliza luminosa, recolección atómica con método `esta_recolectada()` y algoritmo con filtros espaciales en `SpawnerNotas`.
+- [Sistema de Iluminación](gameplay/sistema_de_iluminacion.md): Arquitectura de penumbra (Noche Americana), presupuesto WebGL 2.0, linterna procedural, halo aditivo y detección analítica dual (monstruo y notas ocultas).
+- [Sistema de Notas y Spawner](gameplay/sistema_de_notas_y_spawner.md): Jerarquía de `Area2D`, revelación permanente por linterna (*Memoria de Luz*), recolección atómica con `esta_recolectada()` y filtros espaciales en `SpawnerNotas`.
 - [Dificultad y Balance](gameplay/dificultad_y_balance.md): Progresión por notas, tabla cuantitativa de velocidades ($500 \to 920\text{ px/s}$) y reglas de mutación.
 - [Arquitectura de Partida y Director](gameplay/arquitectura_de_partida_y_director.md): Módulo modular del Game Director (`scripts/core/maain/`), sub-controladores desacoplados, ciclo de señales, Game Over y persistencia de récords en Web.
 - [Cámara y Game Feel](gameplay/camara_y_game_feel.md): Cámara $1:1$, sistema de sacudidas (*Shake*) por trauma acumulativo y post-procesamiento.
 
 ### [Interfaz y Audio](interfaz_y_audio/controles_y_hud.md)
-- [Controles y HUD In-Game](interfaz_y_audio/controles_y_hud.md): Entradas de teclado, HUD minimalista en partida, barra de estamina y tutorial flotante sobre la cabeza.
+- [Controles y HUD In-Game](interfaz_y_audio/controles_y_hud.md): Entradas de teclado, HUD minimalista en partida (contador + minimapa esquemático 2x2), barra de estamina y tutorial flotante sobre la cabeza.
 - [Pantallas y Menús](interfaz_y_audio/pantallas_y_menus.md): Menú principal diegético con linterna en 1ª persona y parallax, menú de pausa (`CanvasLayer 50`) y pantalla de Game Over con jumpscare.
 - [Gestor de Escenas y Ciclo de Vida](interfaz_y_audio/gestor_de_escenas.md): Patrón *Call Down, Signal Up*, control de `process_mode` y guía para integrar nuevas pantallas (Opciones/Créditos).
 - [Audio y Feedback](interfaz_y_audio/audio_y_feedback.md): Paisaje sonoro, layout de buses de audio, radar de proximidad y efectos sensoriales.
