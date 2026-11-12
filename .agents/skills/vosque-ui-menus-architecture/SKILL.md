@@ -85,6 +85,8 @@ flowchart TD
 
 ## 5. Invariante 4: Integración de Audio Desacoplada (`GestorAudioUI`)
 
+> 🔊 **Arquitectura completa de audio y música:** Para la especificación de los 5 buses, `AudioStreamInteractive`, `GestorMusica` y contratos de volumen, consulta `../vosque-audio-architecture/SKILL.md`.
+
 * **Prohibido colocar nodos `AudioStreamPlayer` sueltos en cada botón.**
 * Toda reproducción de UI se canaliza mediante el Autoload `GestorAudioUI` (`ControladorAudioUI`) con `process_mode = PROCESS_MODE_ALWAYS` en el bus `sfx`:
   ```gdscript
