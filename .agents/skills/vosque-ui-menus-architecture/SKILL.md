@@ -80,6 +80,7 @@ flowchart TD
 ```
 
 * **Salvaguarda de Linterna:** Al salir de la pausa o cerrar menús, limpiar/ignorar el movimiento relativo acumulado del ratón para prevenir giros bruscos (*mouse snap*) de la linterna.
+* **Minimapa del HUD (`MinimapaHUD`):** Dibujado nativamente con `_draw()` en `escenas/hud.tscn` (`MargenSeguridad/ContenedorSuperiorIzquierdo/Minimapa`, `mouse_filter = MOUSE_FILTER_IGNORE`); muestra la posición normalizada del jugador y el cuadrante objetivo sin revelar al monstruo.
 
 ---
 
