@@ -162,6 +162,15 @@ func _init() -> void:
 
 
 func _ready() -> void:
+	if not Engine.is_editor_hint() and not OS.is_debug_build():
+		visible = false
+		set_process(false)
+		set_physics_process(false)
+		set_process_input(false)
+		set_process_unhandled_input(false)
+		queue_free()
+		return
+
 	process_mode = Node.PROCESS_MODE_ALWAYS
 
 	_inicializar_gestores_y_paneles()

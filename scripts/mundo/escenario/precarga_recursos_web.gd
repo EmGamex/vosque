@@ -6,13 +6,21 @@ extends RefCounted
 ## para evitar tirones (shader compilation stuttering) en exportaciones HTML5.
 
 
-func precalentar_recursos_web(nodo_padre: Node2D, catalogo: Array[PackedScene]) -> void:
+static var _shaders_precalentados: bool = false
+
+
+func precalentar_recursos_web(nodo_padre: Node2D, catalogo: Array[PackedScene], forzar: bool = false) -> void:
 	if nodo_padre == null or not nodo_padre.is_inside_tree() or catalogo.is_empty():
 		return
+	if _shaders_precalentados and not forzar:
+		return
+	_shaders_precalentados = true
 
 	var contenedor_warmup := Node2D.new()
 	contenedor_warmup.name = "WarmupSectores"
-	contenedor_warmup.visible = false
+	contenedor_warmup.visible = true
+	contenedor_warmup.modulate = Color(1.0, 1.0, 1.0, 0.01)
+	contenedor_warmup.z_index = -4096
 	contenedor_warmup.process_mode = Node.PROCESS_MODE_DISABLED
 	nodo_padre.add_child(contenedor_warmup)
 

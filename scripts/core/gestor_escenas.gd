@@ -27,9 +27,11 @@ const ESCENAS_PRECARGADAS: Dictionary = {
 
 ## Ruta de escena -> instancia dentro del contenedor.
 var _pantallas: Dictionary = {}
+var _cache_nodos_pantalla: Dictionary = {}
 var _ruta_actual: String = ""
 var _cambiando: bool = false
 var _pausado: bool = false
+var _juego_ya_iniciado: bool = false
 
 
 func _ready() -> void:
@@ -183,9 +185,11 @@ func ir_a(ruta: String, reiniciar: bool = false) -> void:
 	_cambiando = false
 
 
-## Empieza una partida nueva (recrea la pantalla de juego).
+## Empieza una partida nueva (reutiliza la instancia inicial limpia la primera vez; la recrea en reinicios).
 func iniciar_partida() -> void:
-	ir_a(RUTA_JUEGO, true)
+	var debe_reiniciar: bool = _juego_ya_iniciado or not _pantallas.has(RUTA_JUEGO) or not is_instance_valid(_pantallas.get(RUTA_JUEGO))
+	_juego_ya_iniciado = true
+	ir_a(RUTA_JUEGO, debe_reiniciar)
 
 
 ## Reinicia la pantalla actual desde cero.
@@ -247,6 +251,8 @@ func _activar(ruta: String) -> void:
 	var pantalla: Node = _obtener(ruta)
 	for hijo in _contenedor.get_children():
 		var activa: bool = hijo == pantalla
+		if not activa and not hijo.visible and hijo.process_mode == Node.PROCESS_MODE_DISABLED and _cache_nodos_pantalla.has(hijo):
+			continue
 		hijo.visible = activa
 		if activa:
 			if ruta == RUTA_JUEGO:
@@ -255,11 +261,42 @@ func _activar(ruta: String) -> void:
 				hijo.process_mode = Node.PROCESS_MODE_INHERIT
 		else:
 			hijo.process_mode = Node.PROCESS_MODE_DISABLED
-		_fijar_camaras(hijo, activa)
-		_fijar_canvas_layers(hijo, activa)
+		_aplicar_estado_nodos_pantalla(hijo, activa)
 	_ruta_actual = ruta
 	if pantalla.has_method("enfocar"):
 		pantalla.call_deferred("enfocar")
+
+
+func _obtener_cache_pantalla(raiz: Node) -> Dictionary:
+	if _cache_nodos_pantalla.has(raiz):
+		return _cache_nodos_pantalla[raiz]
+	var camaras: Array[Camera2D] = []
+	var layers: Array[CanvasLayer] = []
+	var pila: Array[Node] = [raiz]
+	while not pila.is_empty():
+		var actual: Node = pila.pop_back()
+		if actual is Camera2D:
+			camaras.append(actual as Camera2D)
+		elif actual is CanvasLayer and actual.name != "Transicion" and actual.name != "MenuPausa":
+			layers.append(actual as CanvasLayer)
+		for hijo in actual.get_children():
+			pila.append(hijo)
+	var cache: Dictionary = {"camaras": camaras, "layers": layers}
+	_cache_nodos_pantalla[raiz] = cache
+	return cache
+
+
+func _aplicar_estado_nodos_pantalla(raiz: Node, activa: bool) -> void:
+	var cache: Dictionary = _obtener_cache_pantalla(raiz)
+	for cam in cache["camaras"]:
+		if is_instance_valid(cam):
+			if cam.is_in_group("camaras_debug") or cam.name == "CamaraDios":
+				cam.enabled = false
+			else:
+				cam.enabled = activa
+	for layer in cache["layers"]:
+		if is_instance_valid(layer):
+			layer.visible = activa
 
 
 ## Enciende o apaga CanvasLayers anidados dentro de una pantalla (ej. HUD en Maain).
@@ -290,6 +327,7 @@ func _descartar(ruta: String) -> void:
 	if pantalla == null or not is_instance_valid(pantalla):
 		return
 	_pantallas.erase(ruta)
+	_cache_nodos_pantalla.erase(pantalla)
 	_contenedor.remove_child(pantalla)
 	pantalla.queue_free()
 
