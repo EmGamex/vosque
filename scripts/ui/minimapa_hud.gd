@@ -76,10 +76,8 @@ func _draw() -> void:
 	var tam: Vector2 = size if size.x > 1.0 and size.y > 1.0 else custom_minimum_size
 	var rect_total := Rect2(Vector2.ZERO, tam)
 
-	# 1. Fondo semi-translúcido
 	draw_rect(rect_total, color_fondo, true)
 
-	# 2. Resaltado/pulso del cuadrante objetivo (sin revelar píxel exacto)
 	if CUADRANTES_RECT.has(cuadrante_objetivo):
 		var norm_rect: Rect2 = CUADRANTES_RECT[cuadrante_objetivo]
 		var quad_rect := Rect2(norm_rect.position * tam, norm_rect.size * tam)
@@ -99,13 +97,11 @@ func _draw() -> void:
 			col_edge.a = 0.60
 			draw_rect(quad_rect, col_edge, false, 1.0)
 
-	# 3. Cruceta central (X=0, Y=0) y marco exterior
 	var mitad := tam * 0.5
 	draw_line(Vector2(mitad.x, 0.0), Vector2(mitad.x, tam.y), color_borde, 1.0)
 	draw_line(Vector2(0.0, mitad.y), Vector2(tam.x, mitad.y), color_borde, 1.0)
 	draw_rect(rect_total, color_borde, false, 1.5)
 
-	# 4. Indicador de posición del jugador (sin mostrar al monstruo)
 	var pos_px := Vector2(pos_jugador_norm.x * tam.x, pos_jugador_norm.y * tam.y)
 	draw_circle(pos_px, radio_jugador_px + 1.5, Color(0.0, 0.0, 0.0, 0.55))
 	draw_circle(pos_px, radio_jugador_px, color_jugador)
