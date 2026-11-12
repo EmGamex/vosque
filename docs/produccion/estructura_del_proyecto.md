@@ -9,6 +9,7 @@ Este documento establece la arquitectura oficial del árbol de directorios de Go
 ```text
 c:/Proyectos/vosque/
 ├── .agents/                    # Configuraciones, prompts y skills de pair programming con agentes IA
+│   └── skills/                 # Skills especializadas del proyecto (arquitectura, gameplay, audio, UI, MCP)
 ├── addons/                     # Plugins y extensiones del motor Godot
 │   ├── godot_ai/               # Servidor de integración MCP / IA para inspección en vivo
 │   └── personaje_tools/        # Toolbar contextual en 2D para calibración cinemática
@@ -20,20 +21,21 @@ c:/Proyectos/vosque/
 │   ├── criatura/               # SFX del monstruo, zumbido de estática y jumpscare (.wav / .ogg)
 │   ├── jugador/                # Pisadas, esfuerzo de salto, impacto y respiración (.wav)
 │   ├── interfaz/               # Clics de botones, rasgado de papel de nota (.wav)
-│   └── default_bus_layout.tres # Configuración de los 4 buses de audio
+│   └── default_bus_layout.tres # Configuración de los 5 buses de audio (Master, Ambiente, sfx, Criatura, musica)
 ├── docs/                       # Documentación técnica, diseño (GDD) y producción
 ├── escenas/                    # Escenas empaquetadas (.tscn)
 │   ├── efectos/                # Efectos visuales independientes (niebla_mutacion.tscn, etc.)
 │   ├── obstaculos/             # Prefabs de colisión del mundo (arbol.tscn, roca.tscn, tronco_bajo.tscn)
 │   ├── sectores/               # Infraestructura modular de cuadrantes
 │   │   └── variantes/          # Sub-escenas de variantes 2160x2160 (variante_bosque_denso.tscn, etc.)
-│   ├── ui/                     # Componentes específicos de UI (indicador_estamina.tscn)
+│   ├── ui/                     # Componentes específicos de UI (indicador_estamina.tscn, menu_opciones.tscn, menu_creditos.tscn, tutorial_cabeza.tscn)
 │   ├── camara.tscn             # Cámara 2D con suavizado y trauma shake
 │   ├── debug_menu.tscn         # Menú unificado de depuración in-game (F3)
 │   ├── enemigo.tscn            # Criatura perseguidora
 │   ├── escenario.tscn          # Arena 2x2, valla perimetral y orquestador de mutación
 │   ├── game_over.tscn          # Pantalla de derrota y estadísticas
 │   ├── gestor_escenas.tscn     # Escena raíz principal con transiciones entre pantallas
+│   ├── gestor_musica.tscn      # Singleton de música interactiva y crossfades
 │   ├── hud.tscn                # HUD in-game (contador de notas y alertas)
 │   ├── maain.tscn              # Escena del mundo activo (Game Director)
 │   ├── menu_inicio.tscn        # Menú principal diegético en primera persona
@@ -56,8 +58,14 @@ c:/Proyectos/vosque/
 │   ├── temas/                  # Estilos visuales de UI y botones (StyleBoxFlat, fuentes)
 │   └── tilesets/               # Tileset de obstáculos y suelo (tileset_obstaculos.tres, etc.)
 ├── scripts/                    # Código fuente GDScript (.gd) estructurado por dominio
-│   ├── core/                   # Orquestación de ciclo de juego y escenas
-│   │   ├── gestor_escenas.gd   # Máquina de estados de pantallas y transiciones
+│   ├── audio/                  # Módulo de inicialización y sincronización de buses de audio
+│   ├── core/                   # Orquestación de ciclo de juego, audio y escenas
+│   │   ├── configuracion_audio_ui.gd # Recurso exportado de configuración y SFX de UI
+│   │   ├── configuracion_musica.gd   # Recurso de configuración musical (@tool)
+│   │   ├── gestor_audio_ui.gd        # Gestor y bus desacoplado de eventos sonoros de UI
+│   │   ├── gestor_escenas.gd         # Máquina de estados de pantallas y transiciones
+│   │   ├── gestor_musica.gd          # Autoload de música interactiva y crossfades
+│   │   ├── gestor_persistencia.gd    # Persistencia local y fallback web
 │   │   ├── maain/              # Módulo orquestador de gameplay y sub-controladores
 │   │   │   ├── maain.gd        # Game Director y fachada pública de la partida
 │   │   │   ├── spawner_notas.gd # Sub-controlador de ciclo e instanciación de notas
@@ -80,17 +88,20 @@ c:/Proyectos/vosque/
 │   │   ├── configuracion_niebla.gd      # Recurso tipado de configuración de niebla
 │   │   ├── escenario.gd                 # Mutación de sectores lejanos y reubicación segura
 │   │   ├── generador_luz_cono.gd        # Generación procedimental de mallas de luz
-│   │   └── efecto_niebla/               # Módulo desacoplado del efecto visual de niebla geométrica
-│   │       ├── efecto_niebla_mutacion.gd      # Fachada CanvasLayer y orquestador público
-│   │       ├── niebla_material_controller.gd  # Duplicación en memoria y asignación de uniforms
-│   │       ├── niebla_foco_controller.gd      # Seguimiento del jugador y proyección UV
-│   │       └── niebla_transicion_controller.gd # FSM, tweens y acumulación de fase
+│   │   ├── efecto_niebla/               # Módulo desacoplado del efecto visual de niebla geométrica
+│   │   │   ├── efecto_niebla_mutacion.gd      # Fachada CanvasLayer y orquestador público
+│   │   │   ├── niebla_material_controller.gd  # Duplicación en memoria y asignación de uniforms
+│   │   │   ├── niebla_foco_controller.gd      # Seguimiento del jugador y proyección UV
+│   │   │   └── niebla_transicion_controller.gd # FSM, tweens y acumulación de fase
+│   │   └── escenario/                   # Sub-controladores modulares de escenario (mutación, sectores, etc.)
 │   └── ui/                     # Interfaces gráficas y HUD
-│       ├── game_over.gd        # Lógica de fin de partida y récord
+│       ├── game_over.gd        # Lógica de fin de partida, récord y navegación desacoplada
 │       ├── hud.gd              # HUD de telemetría y estado de linterna
 │       ├── indicador_estamina.gd # Indicador visual de estamina
+│       ├── menu_creditos.gd    # Pantalla de créditos con cinemática lateral derecha
 │       ├── menu_inicio.gd      # Menú diegético de linterna 1ª persona, parallax relativo y señales
-│       ├── menu_inicio/        # Componentes modulares del menú principal
+│       ├── menu_inicio/        # Componentes modulares del menú principal (cinemática, parallax, etc.)
+│       ├── menu_opciones.gd    # Pantalla de configuración audiovisual con cinemática lateral izquierda
 │       ├── menu_pausa.gd       # Control de pausa en CanvasLayer 50
 │       └── tutorial_cabeza/    # Controladores del tutorial de cabeza de pantalla
 ├── shaders/                    # Archivos de sombreadores en tiempo real (.gdshader)

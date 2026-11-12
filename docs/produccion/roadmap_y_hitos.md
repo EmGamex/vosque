@@ -19,8 +19,8 @@ flowchart TD
     end
 
     subgraph NOV ["Noviembre 2026: Game Feel, Audio, Arte y Lanzamiento v1.0"]
-        S5["Semana 5 (01/11 - 07/11): Feedback Sensorial, Jumpscare y Audio Core [EN CURSO]"]
-        S6["Semana 6 (08/11 - 14/11): Persistencia Web, IA Steering y Menús [PENDIENTE]"]
+        S5["Semana 5 (01/11 - 07/11): Audio Core, Persistencia y Menús [EN CURSO]"]
+        S6["Semana 6 (08/11 - 14/11): Feedback Sensorial, Jumpscare e IA Steering [EN CURSO]"]
         S7["Semana 7 (15/11 - 21/11): Pipeline Artístico y Sustitución de Assets [PENDIENTE]"]
         S8["Semana 8 (22/11 - 30/11): QA Multi-Navegador, Key Art y Lanzamiento v1.0 [PENDIENTE]"]
         S5 --> S6
@@ -35,8 +35,8 @@ flowchart TD
     classDef pending fill:#1f2430,stroke:#4f5b66,color:#c0c5ce;
 
     class S1,S2,S3,S4 done;
-    class S5 current;
-    class S6,S7,S8 pending;
+    class S5,S6 current;
+    class S7,S8 pending;
 ```
 
 ---
@@ -97,24 +97,26 @@ flowchart TD
 
 ---
 
-### Semana 5 (01/11/2026 – 07/11/2026): Feedback Sensorial, Jumpscare y Audio Core — **[EN CURSO]**
-* **Objetivo:** Conectar el impacto físico y auditivo del juego mediante retroalimentación táctil de cámara y orquestación audiovisual dramática.
-* **Entregables Clave:**
-  - [ ] Implementar el sistema de sacudida por trauma (*Camera Shake*) en [`escenas/camara.tscn`](../../escenas/camara.tscn) con modelo de trauma cuadrático ($T^2$), decaimiento lineal e impulsos por caída de plancha ($+0.35$), proximidad y muerte ($+1.0$).
-  - [ ] Implementar la orquestación de Game Over en [`escenas/game_over.tscn`](../../escenas/game_over.tscn) mediante `AnimationPlayer` con track multicanal de zoom de jumpscare, flash carmesí, trauma de cámara y audio de impacto.
-  - [ ] Crear el Singleton Autoload `GestorMusica` ([`scripts/gestor_musica.gd`](../../scripts/gestor_musica.gd)) y recurso `AudioStreamInteractive` con conmutación en `NEXT_BEAT` sin fade de `Night Crawling` a `Haunted Boardwalk` al recolectar la Nota 1, atenuación de doble capa por proximidad y linterna (*audio ducking*), atenuación en pausa ($-16\text{ dB}$) y corte súbito a $0\text{ ms}$ en derrota.
-  - [ ] Configurar los 5 buses de audio en `default_bus_layout.tres` (`Master`, `Ambiente`, `sfx`, `Criatura`, `musica`) con filtros dedicados (reverberación cavernosa en `musica` post-derrota y filtro pasa-bajos en `Master` para fatiga).
-  - [ ] Integrar biblioteca de SFX esenciales (pasos según velocidad sobre hojarasca, despegue de salto, golpe de plancha, rasgado de nota y zumbido/alarma de la criatura).
+### Semana 5 (01/11/2026 – 07/11/2026): Audio Core, Layout de Buses y Persistencia Web — **[CONCLUIDA]**
+* **Objetivo:** Orquestar el subsistema interactivo de música, layout de buses de mezcla y retención de progreso en Web.
+* **Entregables Clave Concluidos:**
+  - [x] Crear el Singleton Autoload `GestorMusica` ([`scripts/core/gestor_musica.gd`](../../scripts/core/gestor_musica.gd)) y recurso `AudioStreamInteractive` con conmutación en `NEXT_BEAT` sin fade de `Night Crawling` a `Haunted Boardwalk` al recolectar la Nota 1, atenuación en pausa (`atenuacion_pausa_db`) y efecto post-derrota en Game Over.
+  - [x] Configurar los 5 buses de audio en `default_bus_layout.tres` (`Master`, `Ambiente`, `sfx`, `Criatura`, `musica`) con reverberación post-derrota.
+  - [x] Implementar persistencia de High Score en Web mediante `user://` (IndexedDB en Godot Web) y fallback a `JavaScriptBridge` (`localStorage`) (Issue #35 / PR #36).
+  - [x] Unificar sincronización y persistencia de ajustes de volumen entre `MenuOpciones`, `MenuPausa` y `ConfiguracionMusica`.
+  - [x] Implementar `GestorAudioUI` y `ControladorAudioUI` para eventos desacoplados de navegación sonora en menús.
 
 ---
 
-### Semana 6 (08/11/2026 – 14/11/2026): Persistencia Web, IA Steering y Menús — **[PLANIFICADA]**
-* **Objetivo:** Asegurar la retención de progreso del jugador en navegadores, afinar la navegación del monstruo en la arena y completar el flujo de menús secundarios.
+### Semana 6 (08/11/2026 – 14/11/2026): Menús Secundarios, Feedback Sensorial e IA Steering — **[EN CURSO]**
+* **Objetivo:** Completar el flujo y aislamiento de sub-pantallas de menús, integrar estadísticas de derrota y afinar navegación e impacto audiovisual.
 * **Entregables Clave:**
-  - [ ] Implementar persistencia de High Score en Web mediante `user://` (IndexedDB en Godot Web) y fallback a `JavaScriptBridge` (`localStorage`).
-  - [ ] Presentar estadísticas de fin de partida (páginas recolectadas vs récord histórico) en la pantalla de Game Over.
+  - [x] Conectar las sub-pantallas de Opciones (`MenuOpciones`) y Créditos (`MenuCreditos`) a las señales de [`escenas/menu_inicio.tscn`](../../escenas/menu_inicio.tscn) con cinemáticas laterales (PR #40 y PR #43).
+  - [x] Aislamiento estricto de foco y eventos entre sub-pantallas de menú (`MOUSE_FILTER_IGNORE` / `FOCUS_NONE` en reposo) y estándar de navegación `#e6ffb3` (PR #44).
+  - [x] Presentar estadísticas de fin de partida (páginas recolectadas vs récord histórico) y navegación cíclica con auto-enfoque diferido en `GameOver` ([`scripts/ui/game_over.gd`](../../scripts/ui/game_over.gd)).
+  - [ ] Implementar el sistema de sacudida por trauma (*Camera Shake*) en [`escenas/camara.tscn`](../../escenas/camara.tscn) con modelo de trauma cuadrático ($T^2$), decaimiento lineal e impulsos por caída de plancha ($+0.35$), proximidad y muerte ($+1.0$).
+  - [ ] Implementar la orquestación de Game Over en [`escenas/game_over.tscn`](../../escenas/game_over.tscn) mediante `AnimationPlayer` con track multicanal de zoom de jumpscare, flash carmesí, trauma de cámara y audio de impacto.
   - [ ] Programar vector de desatasco tangencial (*steering*) en [`scripts/entidades/enemigo/enemigo.gd`](../../scripts/entidades/enemigo/enemigo.gd) para sortear obstáculos convexos sin perder agresividad.
-  - [ ] Conectar las sub-pantallas de Opciones y Créditos a las señales de [`escenas/menu_inicio.tscn`](../../escenas/menu_inicio.tscn).
   - [ ] Añadir controles de calibración en vivo para linterna y trauma de cámara en [`escenas/debug_menu.tscn`](../../escenas/debug_menu.tscn).
 
 ---

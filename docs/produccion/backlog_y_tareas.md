@@ -145,8 +145,10 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
   - [x] Arquitectura de señales hacia el orquestador (`jugar_solicitado`, `opciones_solicitado`, `creditos_solicitado`).
   - [x] Suite de pruebas automatizadas [`tests/test_menu_inicio.gd`](../../tests/test_menu_inicio.gd).
 - [x] **Sub-Pantallas del Menú Principal:**
-  - [x] Pantalla de Opciones conectada a la señal `opciones_solicitado` de `MenuInicio` con cinemática lateral izquierda.
+  - [x] Pantalla de Opciones conectada a la señal `opciones_solicitado` de `MenuInicio` con cinemática lateral izquierda (`ir_a_opciones`).
   - [x] Pantalla de Créditos conectada a la señal `creditos_solicitado` de `MenuInicio` con cinemática lateral derecha (`ir_a_creditos`).
+  - [x] Aislamiento estricto de foco y eventos entre `MenuOpciones` y `MenuCreditos` (`mouse_filter = IGNORE` y `FOCUS_NONE` en reposo, activados a `FOCUS_ALL` solo al entrar).
+  - [x] Estándar de botones: navegación cíclica con `focus_neighbor_*`, realce `#e6ffb3` (`font_focus_color` y `font_hover_color`) y atajo `ui_cancel` para retorno inmediato.
 - [x] **Tutorial Flotante sobre la Cabeza (`TutorialCabeza`):**
   - [x] Componente visual flotante a $Y \approx -90\text{ px}$ con fondo traslúcido, badges de teclas reactivos y glifo de orientación de ratón.
   - [x] Secuencia progresiva: WASD + Ratón $\to$ Salto con transición contextual en el aire a Plancha (*Dive*) $\to$ Sprint (Shift).
@@ -163,11 +165,14 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
   - [x] Auto-pausa por pérdida de foco en navegadores Web (`NOTIFICATION_APPLICATION_FOCUS_OUT`).
   - [x] Precedencia con Menú de Depuración (<kbd>Escape</kbd> cierra primero `DebugMenu` si está completo).
   - [x] Suite de pruebas automatizadas `tests/test_menu_pausa.gd` (9 tests pasando).
-- [ ] **Pantalla de Game Over con Orquestador `AnimationPlayer`:**
+- [x] **Pantalla de Game Over y Estadísticas (`escenas/game_over.tscn`, `scripts/ui/game_over.gd`):**
+  - [x] Desacoplamiento arquitectónico *Call Down, Signal Up*: señales semánticas `reintentar_solicitado` y `menu_solicitado`.
+  - [x] Navegación cíclica vertical y auto-enfoque diferido en `BotonReintentar` (`enfocar()`) con supresión de audio en foco inicial.
+  - [x] Aislamiento de eventos con bandera `_bloqueado` contra dobles activaciones y soporte de <kbd>Escape</kbd> (`ui_cancel`) para volver al menú.
+  - [x] Integración con `GestorMusica`: activación de efecto post-derrota (`activar_modo_game_over()`) y restauración al salir.
+  - [x] Presentación de páginas recolectadas vs récord histórico persistido (`_refrescar_desde_persistencia()`).
   - [ ] Nodo `AnimationPlayer` en `escenas/game_over.tscn` con animación multicanal `jumpscare_derrota` (escala elástica de ilustración 512x512, modulación carmesí de flash, inyección de trauma de cámara a 1.0 y pista de audio en bus `sfx`).
-  - [ ] Revelación progresiva del panel de estadísticas y resultados (páginas recogidas vs High Score persistido).
-  - [ ] Transición fluida hacia `GestorMusica` con activación de reverberación cavernosa y `pitch_scale = 0.65` post-impacto.
-  - [ ] Enfoque diferido automático en botón `BotonReintentar` tras la secuencia con reinicio instantáneo en <kbd>Espacio</kbd>/<kbd>Enter</kbd>.
+  - [ ] Corte en seco a $0\text{ ms}$ en jumpscare y transición fluida con reverberación cavernosa en derrota.
 
 ---
 
@@ -229,6 +234,10 @@ Este documento contiene el desglose granular de tareas técnicas, de arte y de d
   - [ ] Corte en seco a $0\text{ ms}$ en jumpscare y activación en Game Over de `pitch_scale = config.pitch_game_over` con reverberación cavernosa.
   - [x] Integración de telemetría, sliders en vivo y botones de prueba de clips en `TabSistema` del Menú de Debug in-game (<kbd>F3</kbd>).
   - [x] Suite de pruebas automatizadas en `tests/test_gestor_musica.gd`.
+- [x] **Arquitectura y Buses de Audio UI Desacoplados:**
+  - [x] `GestorAudioUI` y `ControladorAudioUI` para emisión segura de eventos de navegación y aceptación (`PAUSA_NAVEGAR`, `PAUSA_ACEPTAR`, sliders) sin acoplamiento entre nodos.
+  - [x] Supresión de SFX en focos programáticos iniciales (pausa, opciones, créditos y game over).
+  - [x] Unificación de persistencia y sincronización de volumen (`Master`, `musica`, `sfx`) entre `MenuOpciones`, `MenuPausa` y `ConfiguracionMusica`.
 - [ ] **Efectos de Jugador:** Pasos sobre hojarasca seca con cadencia según velocidad, sonido de despegue de salto y golpe seco al caer en plancha con jadeo.
 - [ ] **Efectos de Criatura:** Radar sonoro mediante `AudioStreamPlayer2D` con atenuación logarítmica ($1400\text{ px}$) y zumbido de estática.
 - [ ] **Efectos de Entorno y Notas:** Viento frío continuo de fondo, rasgado seco de nota recogida y golpe orquestal repentino de jumpscare.
