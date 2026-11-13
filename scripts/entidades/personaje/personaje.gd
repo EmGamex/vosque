@@ -3,6 +3,7 @@ class_name Personaje
 extends CharacterBody2D
 
 ## Máquina de estados del personaje para evasión y control físico en Vosque.
+## Fachada modular que coordina PersonajeEstaminaController, PersonajeLocomocionController y PersonajeVistaController.
 enum Estado {
 	REPOSO,
 	CAMINANDO,
@@ -47,73 +48,89 @@ signal estado_cambiado(nuevo_estado: Estado, nombre_estado: String)
 @export var note_boost_tint: Color = Color(0.75, 1.0, 0.9, 1.0)
 
 var estado_actual: Estado = Estado.REPOSO
-var stamina: float = 100.0
-var fatigado: bool = false
 var god_mode: bool = false
 var sin_gasto_estamina: bool = false
 
-var _regen_timer: float = 0.0
-var _tiempo_aire: float = 0.0
-var _duracion_aire_actual: float = 0.45
-var _altura_despegue: float = 0.0
-var _tiempo_recuperacion: float = 0.0
-var _ultima_direccion: Vector2 = Vector2.DOWN
-var _direccion_plancha: Vector2 = Vector2.DOWN
-var _bloquear_salto_un_frame: bool = false
-var _tiempo_boost_nota: float = 0.0
-var _tween_feedback_nota: Tween = null
+var _estamina_ctrl := PersonajeEstaminaController.new()
+var _locomocion_ctrl := PersonajeLocomocionController.new()
+var _vista_ctrl := PersonajeVistaController.new()
 
-@onready var _visual: Node2D = get_node_or_null("Visual") as Node2D
-@onready var _sprite: AnimatedSprite2D = get_node_or_null("Visual/Sprite2D") as AnimatedSprite2D
-@onready var _sombra: Node2D = get_node_or_null("Sombra") as Node2D
 @onready var pivote_linterna: ControladorLinterna = get_node_or_null("PivoteLinterna") as ControladorLinterna
-@onready var _indicador_estamina: Node2D = get_node_or_null("IndicadorEstamina") as Node2D
-@onready var _tutorial_cabeza: Node2D = get_node_or_null("TutorialCabeza") as Node2D
+
+# Propiedades proxy para compatibilidad con debug_info, tests y herramientas.
+var stamina: float:
+	get: return _estamina_ctrl.stamina
+	set(v): _estamina_ctrl.stamina = v
+
+var fatigado: bool:
+	get: return _estamina_ctrl.fatigado
+	set(v): _estamina_ctrl.fatigado = v
+
+@warning_ignore("unused_private_class_variable")
+var _regen_timer: float:
+	get: return _estamina_ctrl.regen_timer
+	set(v): _estamina_ctrl.regen_timer = v
+
+@warning_ignore("unused_private_class_variable")
+var _tiempo_boost_nota: float:
+	get: return _estamina_ctrl.tiempo_boost_nota
+	set(v): _estamina_ctrl.tiempo_boost_nota = v
+
+@warning_ignore("unused_private_class_variable")
+var _tiempo_aire: float:
+	get: return _locomocion_ctrl.tiempo_aire
+	set(v): _locomocion_ctrl.tiempo_aire = v
+
+@warning_ignore("unused_private_class_variable")
+var _duracion_aire_actual: float:
+	get: return _locomocion_ctrl.duracion_aire_actual
+	set(v): _locomocion_ctrl.duracion_aire_actual = v
+
+@warning_ignore("unused_private_class_variable")
+var _visual: Node2D:
+	get: return _vista_ctrl.visual
 
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_UNPAUSED:
-		_bloquear_salto_un_frame = true
+		_locomocion_ctrl.bloquear_salto_un_frame = true
 	elif what == NOTIFICATION_PREDELETE:
-		if _tween_feedback_nota != null and _tween_feedback_nota.is_valid():
-			_tween_feedback_nota.kill()
+		_vista_ctrl.limpiar()
 
 
 ## Fuerza la limpieza de cualquier intento de salto residual acumulado en pausa o transiciones.
 func consumir_buffer_salto() -> void:
-	_bloquear_salto_un_frame = true
+	_locomocion_ctrl.bloquear_salto_un_frame = true
 	Input.action_release("personaje-salto")
 	Input.action_release("ui_accept")
 
 
 ## Detiene el movimiento y procesamiento del personaje al ser capturado.
 func detener_por_captura() -> void:
-	_tiempo_boost_nota = 0.0
-	_restaurar_feedback_nota()
+	_estamina_ctrl.limpiar_boost()
+	_vista_ctrl.restaurar_feedback_nota()
 	velocity = Vector2.ZERO
 	set_physics_process(false)
 
 
 ## Restaura estamina parcial, limpia fatiga y activa un boost temporal de velocidad al recoger una nota.
 func aplicar_impulso_nota() -> void:
-	var estamina_extra: float = max_stamina * note_stamina_restore_ratio
-	stamina = minf(max_stamina, stamina + estamina_extra)
-	_regen_timer = 0.0
-	fatigado = false
+	_estamina_ctrl.aplicar_impulso_nota(
+		max_stamina, note_stamina_restore_ratio, note_speed_boost_duration
+	)
 	if estado_actual == Estado.FATIGA:
 		_cambiar_estado(Estado.CAMINANDO if velocity.length() >= stop_threshold else Estado.REPOSO)
-	estamina_cambiada.emit(stamina, max_stamina, fatigado)
-
-	_tiempo_boost_nota = note_speed_boost_duration
-	_ejecutar_feedback_visual_nota()
+	emitir_estamina_cambiada()
+	_vista_ctrl.ejecutar_feedback_visual_nota(note_boost_tint)
 
 
 func _ready() -> void:
 	add_to_group("jugador")
 	motion_mode = CharacterBody2D.MOTION_MODE_FLOATING
-	stamina = max_stamina
-	_restaurar_mascara_colision_suelo()
-	estamina_cambiada.emit(stamina, max_stamina, fatigado)
+	_vista_ctrl.inicializar(self)
+	_estamina_ctrl.inicializar(max_stamina)
+	restaurar_mascara_colision_suelo()
+	emitir_estamina_cambiada()
 	estado_cambiado.emit(estado_actual, obtener_nombre_estado())
 
 
@@ -124,317 +141,24 @@ func _physics_process(delta: float) -> void:
 
 
 func _physics_process_logica(delta: float) -> void:
-	var direction: Vector2 = Input.get_vector(
-		"personaje-izquierda", "personaje-derecha", "personaje-arriba", "personaje-abajo"
-	)
-	var is_moving: bool = direction != Vector2.ZERO
-	if is_moving:
-		_ultima_direccion = direction.normalized()
-
-	var quiere_sprint: bool = (
-		Input.is_action_pressed("sprint")
-		or (InputMap.has_action("personaje-sprint") and Input.is_action_pressed("personaje-sprint"))
-	)
-	var quiere_salto: bool = Input.is_action_just_pressed("personaje-salto")
-	if _bloquear_salto_un_frame:
-		_bloquear_salto_un_frame = false
-		quiere_salto = false
-
-	var estamina_consumida_en_frame: bool = false
-	var tenia_boost: bool = _tiempo_boost_nota > 0.0
-	if tenia_boost:
-		_tiempo_boost_nota = maxf(0.0, _tiempo_boost_nota - delta)
-		if _tiempo_boost_nota <= 0.0:
-			_restaurar_feedback_nota()
-	var factor_boost: float = note_speed_boost_multiplier if _tiempo_boost_nota > 0.0 else 1.0
-
-	match estado_actual:
-		Estado.REPOSO, Estado.CAMINANDO, Estado.SPRINT, Estado.FATIGA:
-			if quiere_salto and not fatigado and (sin_gasto_estamina or stamina >= jump_stamina_cost):
-				_iniciar_salto_libre()
-				estamina_consumida_en_frame = true
-			else:
-				var vel_objetivo: float = speed * factor_boost
-				if quiere_sprint and is_moving and not fatigado and (sin_gasto_estamina or stamina > 0.0):
-					_cambiar_estado(Estado.SPRINT)
-					vel_objetivo = sprint_speed * factor_boost
-					if not sin_gasto_estamina:
-						stamina = max(0.0, stamina - sprint_drain_rate * delta)
-						_regen_timer = stamina_regen_delay
-						estamina_consumida_en_frame = true
-						if stamina <= 0.0:
-							stamina = 0.0
-							fatigado = true
-							_cambiar_estado(Estado.FATIGA)
-						estamina_cambiada.emit(stamina, max_stamina, fatigado)
-					else:
-						# En modo sin gasto no reiniciamos _regen_timer ni agotamos la barra
-						pass
-				elif fatigado:
-					_cambiar_estado(Estado.FATIGA)
-					vel_objetivo = speed
-				elif is_moving:
-					_cambiar_estado(Estado.CAMINANDO)
-					vel_objetivo = speed
-				else:
-					_cambiar_estado(Estado.REPOSO)
-					vel_objetivo = 0.0
-
-				var target: Vector2 = direction * vel_objetivo
-				var rate: float = acceleration if is_moving else friction
-				velocity = velocity.move_toward(target, rate * delta)
-				if not is_moving and velocity.length() < stop_threshold:
-					velocity = Vector2.ZERO
-
-				_actualizar_procedural_suelo(direction, delta)
-
-		Estado.SALTO:
-			if quiere_salto and not fatigado and (sin_gasto_estamina or stamina >= dive_stamina_cost):
-				_iniciar_plancha(direction)
-				estamina_consumida_en_frame = true
-			else:
-				_tiempo_aire += delta
-				var u: float = clampf(_tiempo_aire / _duracion_aire_actual, 0.0, 1.0)
-				var factor_altura: float = 4.0 * u * (1.0 - u)
-				_aplicar_elevacion_eje_z(factor_altura)
-
-				var air_target: Vector2 = direction * max(speed * factor_boost, velocity.length())
-				if is_moving:
-					velocity = velocity.move_toward(air_target, acceleration * 0.5 * delta)
-
-				if _tiempo_aire >= _duracion_aire_actual:
-					_finalizar_salto_libre(is_moving)
-
-		Estado.PLANCHA_AIRE:
-			_tiempo_aire += delta
-			var u_plancha: float = clampf(_tiempo_aire / _duracion_aire_actual, 0.0, 1.0)
-			var factor_restante: float = (1.0 - u_plancha) * _altura_despegue
-			_aplicar_elevacion_eje_z(factor_restante)
-
-			if _tiempo_aire >= _duracion_aire_actual:
-				_impactar_plancha()
-
-		Estado.RECUPERANDOSE:
-			_tiempo_recuperacion -= delta
-			velocity = velocity.move_toward(Vector2.ZERO, dive_slide_friction * delta)
-			if _tiempo_recuperacion <= 0.0:
-				_finalizar_recuperacion(is_moving)
-
-	if not estamina_consumida_en_frame:
-		_procesar_regeneracion_estamina(delta)
-
-	_actualizar_animacion(direction, is_moving)
-
-	move_and_slide()
+	_locomocion_ctrl.procesar_frame(self, delta, _estamina_ctrl, _vista_ctrl)
 
 
-func _iniciar_salto_libre() -> void:
-	if not sin_gasto_estamina:
-		stamina = max(0.0, stamina - jump_stamina_cost)
-		_regen_timer = stamina_regen_delay
-		if stamina <= 0.0:
-			stamina = 0.0
-			fatigado = true
-		estamina_cambiada.emit(stamina, max_stamina, fatigado)
-
-	_tiempo_aire = 0.0
-	_duracion_aire_actual = jump_duration
-	_altura_despegue = 1.0
-
-	set_collision_mask_value(2, false)
-	set_collision_mask_value(1, true)
-	_cambiar_estado(Estado.SALTO)
+func emitir_estamina_cambiada() -> void:
+	estamina_cambiada.emit(_estamina_ctrl.stamina, max_stamina, _estamina_ctrl.fatigado)
 
 
-func _finalizar_salto_libre(is_moving: bool) -> void:
-	_restaurar_mascara_colision_suelo()
-	_restaurar_visuales_eje_z()
-
-	if fatigado:
-		_cambiar_estado(Estado.FATIGA)
-	elif is_moving:
-		_cambiar_estado(Estado.CAMINANDO)
-	else:
-		_cambiar_estado(Estado.REPOSO)
-
-
-func _iniciar_plancha(direccion_actual: Vector2) -> void:
-	if not sin_gasto_estamina:
-		stamina = max(0.0, stamina - dive_stamina_cost)
-		_regen_timer = stamina_regen_delay
-		if stamina <= 0.0:
-			stamina = 0.0
-			fatigado = true
-		estamina_cambiada.emit(stamina, max_stamina, fatigado)
-
-	if direccion_actual != Vector2.ZERO:
-		_direccion_plancha = direccion_actual.normalized()
-	elif velocity.length() > stop_threshold:
-		_direccion_plancha = velocity.normalized()
-	else:
-		_direccion_plancha = _ultima_direccion
-
-	velocity = _direccion_plancha * dive_speed
-
-	var u_actual: float = clampf(_tiempo_aire / _duracion_aire_actual, 0.0, 1.0)
-	_altura_despegue = max(0.2, 4.0 * u_actual * (1.0 - u_actual))
-	_tiempo_aire = 0.0
-	_duracion_aire_actual = max(0.2, jump_duration * 0.5)
-
-	set_collision_mask_value(2, false)
-	set_collision_mask_value(1, true)
-	_cambiar_estado(Estado.PLANCHA_AIRE)
-
-
-func _impactar_plancha() -> void:
-	_restaurar_mascara_colision_suelo()
-	_restaurar_visuales_eje_z()
-	_tiempo_recuperacion = dive_recovery_duration
-	_cambiar_estado(Estado.RECUPERANDOSE)
-
-
-func _finalizar_recuperacion(is_moving: bool) -> void:
-	if fatigado:
-		_cambiar_estado(Estado.FATIGA)
-	elif is_moving:
-		_cambiar_estado(Estado.CAMINANDO)
-	else:
-		_cambiar_estado(Estado.REPOSO)
-
-
-func _procesar_regeneracion_estamina(delta: float) -> void:
-	if _regen_timer > 0.0:
-		_regen_timer -= delta
-		return
-
-	if stamina < max_stamina:
-		stamina = min(max_stamina, stamina + stamina_regen_rate * delta)
-		if fatigado and stamina >= fatigue_recovery_threshold:
-			fatigado = false
-		estamina_cambiada.emit(stamina, max_stamina, fatigado)
-
-
-func _aplicar_elevacion_eje_z(factor_altura: float) -> void:
-	if _visual != null:
-		_visual.position.y = -jump_height * factor_altura
-	if _sombra != null:
-		_sombra.scale = Vector2.ONE.lerp(shadow_min_scale, factor_altura)
-	if _tutorial_cabeza == null:
-		_tutorial_cabeza = get_node_or_null("TutorialCabeza") as Node2D
-	if _indicador_estamina == null:
-		_indicador_estamina = get_node_or_null("IndicadorEstamina") as Node2D
-	if _indicador_estamina != null and is_instance_valid(_indicador_estamina):
-		_indicador_estamina.position.y = -60.0 - jump_height * factor_altura
-	if _tutorial_cabeza != null and is_instance_valid(_tutorial_cabeza):
-		_tutorial_cabeza.position.y = -90.0 - jump_height * factor_altura
-
-
-func _restaurar_visuales_eje_z() -> void:
-	if _visual != null:
-		_visual.position = Vector2.ZERO
-		_visual.rotation = 0.0
-	if _sombra != null:
-		_sombra.scale = Vector2.ONE
-	if _tutorial_cabeza == null:
-		_tutorial_cabeza = get_node_or_null("TutorialCabeza") as Node2D
-	if _indicador_estamina == null:
-		_indicador_estamina = get_node_or_null("IndicadorEstamina") as Node2D
-	if _indicador_estamina != null and is_instance_valid(_indicador_estamina):
-		_indicador_estamina.position = Vector2(0, -60)
-	if _tutorial_cabeza != null and is_instance_valid(_tutorial_cabeza):
-		_tutorial_cabeza.position = Vector2(0, -90)
-
-
-func _actualizar_procedural_suelo(direction: Vector2, _delta: float) -> void:
-	if _visual == null:
-		return
-	_visual.position = Vector2.ZERO
-	if estado_actual == Estado.SPRINT and direction.x != 0.0:
-		_visual.rotation = deg_to_rad(5.0 * signf(direction.x))
-	else:
-		_visual.rotation = 0.0
-
-
-func _actualizar_animacion(direction: Vector2, is_moving: bool) -> void:
-	if _sprite == null:
-		return
-
-	var dir: Vector2 = direction if is_moving else _ultima_direccion
-
-	if dir.x < -0.05:
-		_sprite.flip_h = true
-	elif dir.x > 0.05:
-		_sprite.flip_h = false
-
-	var abs_x: float = absf(dir.x)
-	var abs_y: float = absf(dir.y)
-
-	if not is_moving and estado_actual == Estado.REPOSO:
-		if abs_x > abs_y:
-			_reproducir_animacion_con_fallback(&"idle-lado", [&"idle", &"lado", &"idle-arriba"])
-		elif dir.y > 0.0:
-			_reproducir_animacion_con_fallback(&"idle-abajo", [&"idle", &"idle-arriba", &"arriba"])
-		else:
-			_reproducir_animacion_con_fallback(&"idle-arriba", [&"idle", &"arriba"])
-		return
-
-	if abs_x > 0.3 and abs_y > 0.3:
-		if dir.y > 0.0:
-			_reproducir_animacion_con_fallback(&"diagonal-abajo", [&"diagonal-arriba", &"diagonal", &"lado"])
-		else:
-			_reproducir_animacion_con_fallback(&"diagonal-arriba", [&"diagonal", &"lado"])
-	elif abs_y > abs_x:
-		if dir.y > 0.0:
-			_reproducir_animacion_con_fallback(&"abajo", [&"idle-abajo", &"diagonal-abajo", &"lado"])
-		else:
-			_reproducir_animacion_con_fallback(&"arriba", [&"idle-arriba", &"idle"])
-	else:
-		_reproducir_animacion_con_fallback(&"lado", [&"idle-lado", &"diagonal-arriba"])
-
-
-func _reproducir_animacion_con_fallback(anim_principal: StringName, fallbacks: Array[StringName]) -> void:
-	if _sprite == null or _sprite.sprite_frames == null:
-		return
-
-	var candidatas: Array[StringName] = [anim_principal]
-	candidatas.append_array(fallbacks)
-
-	for anim in candidatas:
-		if _sprite.sprite_frames.has_animation(anim):
-			# Solo reproducir si tiene al menos un frame configurado
-			if _sprite.sprite_frames.get_frame_count(anim) > 0:
-				if _sprite.animation != anim or not _sprite.is_playing():
-					_sprite.play(anim)
-				return
-
-
-func _reproducir_animacion(anim_name: StringName) -> void:
-	_reproducir_animacion_con_fallback(anim_name, [])
-
-
-func _restaurar_mascara_colision_suelo() -> void:
+func restaurar_mascara_colision_suelo() -> void:
 	set_collision_mask_value(1, true)
 	set_collision_mask_value(2, true)
 
 
-func _ejecutar_feedback_visual_nota() -> void:
-	if _visual == null or not is_instance_valid(_visual):
-		return
-	if _tween_feedback_nota != null and _tween_feedback_nota.is_valid():
-		_tween_feedback_nota.kill()
-	_visual.modulate = note_boost_tint
-	if is_inside_tree():
-		_tween_feedback_nota = create_tween()
-		_tween_feedback_nota.tween_property(_visual, "scale", Vector2(1.12, 1.12), 0.1).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-		_tween_feedback_nota.tween_property(_visual, "scale", Vector2.ONE, 0.12).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+func _iniciar_salto_libre() -> void:
+	_locomocion_ctrl.iniciar_salto_libre(self, _estamina_ctrl)
 
 
-func _restaurar_feedback_nota() -> void:
-	if _tween_feedback_nota != null and _tween_feedback_nota.is_valid():
-		_tween_feedback_nota.kill()
-	if _visual != null and is_instance_valid(_visual):
-		_visual.modulate = Color.WHITE
-		_visual.scale = Vector2.ONE
+func _finalizar_salto_libre(is_moving: bool) -> void:
+	_locomocion_ctrl.finalizar_salto_libre(self, _estamina_ctrl, _vista_ctrl, is_moving)
 
 
 func _cambiar_estado(nuevo_estado: Estado) -> void:
