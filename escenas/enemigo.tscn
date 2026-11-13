@@ -9,11 +9,11 @@
 radius = 42.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_743j8"]
-radius = 56.0
+radius = 8.0
 
 [node name="Enemigo" type="CharacterBody2D" unique_id=1591042193 groups=["monstruo"]]
 collision_layer = 8
-collision_mask = 7
+collision_mask = 3
 motion_mode = 1
 script = ExtResource("1_sms58")
 

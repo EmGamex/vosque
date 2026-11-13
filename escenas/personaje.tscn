@@ -86,10 +86,15 @@ animations = [{
 [node name="EmGamex" type="CharacterBody2D" unique_id=1025630962 groups=["jugador"]]
 y_sort_enabled = true
 collision_layer = 4
-collision_mask = 27
+collision_mask = 19
 motion_mode = 1
 script = ExtResource("1_5nfxw")
 stamina_regen_rate = 60.0
+note_stamina_restore_ratio = null
+note_speed_boost_multiplier = null
+note_speed_boost_duration = null
+note_no_stamina_drain_duration = null
+note_boost_tint = null
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=517982902]
 position = Vector2(0, 32)

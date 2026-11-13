@@ -6,7 +6,7 @@
 [ext_resource type="AudioStream" uid="uid://dib5wv5ifvx3s" path="res://sonido/sfx/interfaz/nota_revelacion.wav" id="4_q2k08"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_qalj3"]
-radius = 32.0
+radius = 128.0
 
 [node name="Nota" type="Area2D" unique_id=1235575928]
 collision_layer = 16
