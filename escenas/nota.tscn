@@ -45,6 +45,7 @@ bus = &"sfx"
 
 [node name="SfxRecoleccion" type="AudioStreamPlayer2D" parent="." unique_id=13609470]
 stream = ExtResource("5_50qer")
+volume_db = 4.0
 max_polyphony = 2
 bus = &"sfx"
 

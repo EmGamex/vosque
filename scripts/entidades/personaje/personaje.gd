@@ -48,6 +48,9 @@ signal estado_cambiado(nuevo_estado: Estado, nombre_estado: String)
 @export_range(0.0, 10.0, 0.1, "suffix:s") var note_no_stamina_drain_duration: float = 1.5
 @export var note_boost_tint: Color = Color(0.75, 1.0, 0.9, 1.0)
 
+@export_group("Audio")
+@export_range(0.1, 1.0, 0.02, "suffix:s") var step_interval_base: float = 0.32
+
 var estado_actual: Estado = Estado.REPOSO
 var god_mode: bool = false
 var sin_gasto_estamina: bool = false
@@ -55,6 +58,7 @@ var sin_gasto_estamina: bool = false
 var _estamina_ctrl := PersonajeEstaminaController.new()
 var _locomocion_ctrl := PersonajeLocomocionController.new()
 var _vista_ctrl := PersonajeVistaController.new()
+var _audio_ctrl := PersonajeAudioController.new()
 
 @onready var pivote_linterna: ControladorLinterna = get_node_or_null("PivoteLinterna") as ControladorLinterna
 
@@ -110,6 +114,7 @@ func consumir_buffer_salto() -> void:
 func detener_por_captura() -> void:
 	_estamina_ctrl.limpiar_boost()
 	_vista_ctrl.restaurar_feedback_nota()
+	_audio_ctrl.detener_todo()
 	velocity = Vector2.ZERO
 	set_physics_process(false)
 
@@ -134,6 +139,7 @@ func _ready() -> void:
 	_locomocion_ctrl.inicializar()
 	_vista_ctrl.inicializar(self)
 	_estamina_ctrl.inicializar(max_stamina)
+	_audio_ctrl.inicializar(self)
 	restaurar_mascara_colision_suelo()
 	emitir_estamina_cambiada()
 	estado_cambiado.emit(estado_actual, obtener_nombre_estado())
@@ -147,6 +153,14 @@ func _physics_process(delta: float) -> void:
 
 func _physics_process_logica(delta: float) -> void:
 	_locomocion_ctrl.procesar_frame(self, delta, _estamina_ctrl, _vista_ctrl)
+	_audio_ctrl.actualizar_pasos(
+		delta,
+		estado_actual,
+		velocity.length(),
+		stop_threshold,
+		speed,
+		step_interval_base
+	)
 
 
 func emitir_estamina_cambiada() -> void:
@@ -170,6 +184,7 @@ func cambiar_estado(nuevo_estado: Estado) -> void:
 	if estado_actual == nuevo_estado:
 		return
 	estado_actual = nuevo_estado
+	_audio_ctrl.on_estado_cambiado(nuevo_estado)
 	estado_cambiado.emit(estado_actual, obtener_nombre_estado())
 
 

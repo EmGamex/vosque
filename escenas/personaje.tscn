@@ -13,6 +13,9 @@
 [ext_resource type="Texture2D" uid="uid://b8duj3viyr6eg" path="res://recursos/iluminacion/textura_halo_corporal.tres" id="11_41mom"]
 [ext_resource type="PackedScene" uid="uid://bosn1xlpgwiqr" path="res://escenas/ui/indicador_estamina.tscn" id="11_kmopf"]
 [ext_resource type="PackedScene" uid="uid://dte8iac0uavl" path="res://escenas/ui/tutorial_cabeza.tscn" id="12_8xrj8"]
+[ext_resource type="AudioStream" uid="uid://drx0n7rux4x0r" path="res://sonido/sfx/gameplay/Footsteps.wav" id="14_qjgqo"]
+[ext_resource type="AudioStream" uid="uid://dmabbm7hr8uke" path="res://sonido/sfx/gameplay/salto.wav" id="15_3s3u2"]
+[ext_resource type="AudioStream" uid="uid://c6smiilytmrmm" path="res://sonido/sfx/gameplay/clavado.wav" id="16_pes16"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_5nfxw"]
 radius = 32.0
@@ -90,11 +93,7 @@ collision_mask = 19
 motion_mode = 1
 script = ExtResource("1_5nfxw")
 stamina_regen_rate = 60.0
-note_stamina_restore_ratio = null
-note_speed_boost_multiplier = null
-note_speed_boost_duration = null
-note_no_stamina_drain_duration = null
-note_boost_tint = null
+step_interval_base = null
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=517982902]
 position = Vector2(0, 32)
@@ -138,3 +137,21 @@ position = Vector2(0, -60)
 [node name="TutorialCabeza" parent="." unique_id=1460520052 instance=ExtResource("12_8xrj8")]
 position = Vector2(0, -112)
 scale = Vector2(1, 1)
+
+[node name="AudioPasos" type="AudioStreamPlayer2D" parent="." unique_id=1571109107]
+stream = ExtResource("14_qjgqo")
+volume_db = 5.0
+max_polyphony = 3
+bus = &"sfx"
+
+[node name="AudioSalto" type="AudioStreamPlayer2D" parent="." unique_id=1798839135]
+stream = ExtResource("15_3s3u2")
+volume_db = 10.0
+max_polyphony = 2
+bus = &"sfx"
+
+[node name="AudioPlancha" type="AudioStreamPlayer2D" parent="." unique_id=47859321]
+stream = ExtResource("16_pes16")
+volume_db = 2.0
+max_polyphony = 2
+bus = &"sfx"
