@@ -54,11 +54,15 @@ func test_navegacion_y_eventos_boton_volver() -> void:
 	panel._on_boton_volver_mouse_entered()
 	panel._on_boton_volver_focus_entered()
 
-	# Configuración cíclica en foco (4 direcciones bloqueadas a sí mismo)
-	assert_eq(String(panel.boton_volver.focus_neighbor_top), ".", "focus_neighbor_top debe ser cíclico")
-	assert_eq(String(panel.boton_volver.focus_neighbor_bottom), ".", "focus_neighbor_bottom debe ser cíclico")
+	# Configuración cíclica en foco vertical (LinkEmGamex <-> LinkNixu <-> BotonVolver) y bloqueo lateral
+	assert_eq(String(panel.boton_volver.focus_neighbor_top), "../ScrollCreditos/ListaSecciones/SecAssets/LinkNixu", "focus_neighbor_top de BotonVolver debe apuntar a LinkNixu")
+	assert_eq(String(panel.boton_volver.focus_neighbor_bottom), "../ScrollCreditos/ListaSecciones/SecDesarrollo/LinkEmGamex", "focus_neighbor_bottom de BotonVolver debe apuntar a LinkEmGamex")
 	assert_eq(String(panel.boton_volver.focus_neighbor_left), ".", "focus_neighbor_left debe ser cíclico")
 	assert_eq(String(panel.boton_volver.focus_neighbor_right), ".", "focus_neighbor_right debe ser cíclico")
+	assert_eq(String(panel.link_emgamex.focus_neighbor_top), "../../../../../BotonVolver", "focus_neighbor_top de LinkEmGamex debe apuntar a BotonVolver")
+	assert_eq(String(panel.link_emgamex.focus_neighbor_bottom), "../../SecAssets/LinkNixu", "focus_neighbor_bottom de LinkEmGamex debe apuntar a LinkNixu")
+	assert_eq(String(panel.link_nixu.focus_neighbor_top), "../../SecDesarrollo/LinkEmGamex", "focus_neighbor_top de LinkNixu debe apuntar a LinkEmGamex")
+	assert_eq(String(panel.link_nixu.focus_neighbor_bottom), "../../../../../BotonVolver", "focus_neighbor_bottom de LinkNixu debe apuntar a BotonVolver")
 
 	panel.free()
 
@@ -71,17 +75,23 @@ func test_aislamiento_foco_y_mouse_filter() -> void:
 	# Tras _ready() debe arrancar desactivado
 	assert_eq(panel.mouse_filter, Control.MOUSE_FILTER_IGNORE, "Mouse filter debe ignorarse en reposo")
 	assert_eq(panel.boton_volver.focus_mode, Control.FOCUS_NONE, "BotonVolver debe tener FOCUS_NONE en reposo")
+	assert_eq(panel.link_emgamex.focus_mode, Control.FOCUS_NONE, "LinkEmGamex debe tener FOCUS_NONE en reposo")
+	assert_eq(panel.link_nixu.focus_mode, Control.FOCUS_NONE, "LinkNixu debe tener FOCUS_NONE en reposo")
 
 	# Tras activar() debe tener FOCUS_ALL y MOUSE_FILTER_STOP
 	panel.activar()
 	assert_true(panel.visible, "Debe ser visible tras activar()")
 	assert_eq(panel.mouse_filter, Control.MOUSE_FILTER_STOP, "Mouse filter debe detener eventos tras activar()")
 	assert_eq(panel.boton_volver.focus_mode, Control.FOCUS_ALL, "BotonVolver debe tener FOCUS_ALL tras activar()")
+	assert_eq(panel.link_emgamex.focus_mode, Control.FOCUS_ALL, "LinkEmGamex debe tener FOCUS_ALL tras activar()")
+	assert_eq(panel.link_nixu.focus_mode, Control.FOCUS_ALL, "LinkNixu debe tener FOCUS_ALL tras activar()")
 
 	# Tras desactivar() debe volver a FOCUS_NONE y MOUSE_FILTER_IGNORE
 	panel.desactivar()
 	assert_eq(panel.mouse_filter, Control.MOUSE_FILTER_IGNORE, "Mouse filter debe volver a IGNORE tras desactivar()")
 	assert_eq(panel.boton_volver.focus_mode, Control.FOCUS_NONE, "BotonVolver debe volver a FOCUS_NONE tras desactivar()")
+	assert_eq(panel.link_emgamex.focus_mode, Control.FOCUS_NONE, "LinkEmGamex debe volver a FOCUS_NONE tras desactivar()")
+	assert_eq(panel.link_nixu.focus_mode, Control.FOCUS_NONE, "LinkNixu debe volver a FOCUS_NONE tras desactivar()")
 
 	panel.free()
 
@@ -97,6 +107,31 @@ func test_scroll_creditos_sin_foco_y_reinicio_al_activar() -> void:
 	panel.scroll_creditos.scroll_vertical = 120
 	panel.activar()
 	assert_eq(panel.scroll_creditos.scroll_vertical, 0, "activar() debe reiniciar el scroll al inicio")
+
+	panel.free()
+
+
+func test_enlaces_externos_abren_urls_correctas() -> void:
+	var escena: PackedScene = load(RUTA_ESCENA_CREDITOS)
+	var panel: MenuCreditos = escena.instantiate() as MenuCreditos
+	panel._ready()
+
+	var urls_abiertas: Array[String] = []
+	panel._abridor_url = func(url: String) -> void:
+		urls_abiertas.append(url)
+
+	# Inactivo no debe abrir URLs
+	panel.link_emgamex.pressed.emit()
+	panel.link_nixu.pressed.emit()
+	assert_eq(urls_abiertas.size(), 0, "No debe abrir enlaces mientras el menú está inactivo")
+
+	# Activo debe abrir las URLs exactas
+	panel.activar()
+	panel.link_emgamex.pressed.emit()
+	panel.link_nixu.pressed.emit()
+	assert_eq(urls_abiertas.size(), 2, "Debe abrir ambos enlaces al presionarlos activo")
+	assert_eq(urls_abiertas[0], MenuCreditos.URL_YOUTUBE_EMGAMEX, "Debe abrir el canal de YouTube de EmGamex")
+	assert_eq(urls_abiertas[1], MenuCreditos.URL_INSTAGRAM_NIXU, "Debe abrir el Instagram de Nixu")
 
 	panel.free()
 

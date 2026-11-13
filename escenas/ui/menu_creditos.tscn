@@ -52,6 +52,7 @@ theme_override_constants/separation = 16
 [node name="ScrollCreditos" type="ScrollContainer" parent="Layout/PanelCreditos/Margen/Columna" unique_id=1437329117]
 layout_mode = 2
 size_flags_vertical = 3
+follow_focus = true
 horizontal_scroll_mode = 0
 
 [node name="ListaSecciones" type="VBoxContainer" parent="Layout/PanelCreditos/Margen/Columna/ScrollCreditos" unique_id=1083590740]
@@ -77,6 +78,21 @@ theme_override_font_sizes/font_size = 26
 text = "EmGamex"
 autowrap_mode = 3
 
+[node name="LinkEmGamex" type="LinkButton" parent="Layout/PanelCreditos/Margen/Columna/ScrollCreditos/ListaSecciones/SecDesarrollo" unique_id=1682705910]
+layout_mode = 2
+size_flags_horizontal = 0
+focus_neighbor_left = NodePath(".")
+focus_neighbor_top = NodePath("../../../../../BotonVolver")
+focus_neighbor_right = NodePath(".")
+focus_neighbor_bottom = NodePath("../../SecAssets/LinkNixu")
+focus_mode = 0
+theme_override_colors/font_color = Color(0.78039217, 0.8784314, 0.6784314, 1)
+theme_override_colors/font_focus_color = Color(0.9019608, 1, 0.7019608, 1)
+theme_override_colors/font_hover_color = Color(0.9019608, 1, 0.7019608, 1)
+theme_override_fonts/font = ExtResource("4_stugo")
+theme_override_font_sizes/font_size = 24
+text = "YouTube — @EmGamex"
+
 [node name="SecAssets" type="VBoxContainer" parent="Layout/PanelCreditos/Margen/Columna/ScrollCreditos/ListaSecciones" unique_id=1265242501]
 layout_mode = 2
 
@@ -94,6 +110,21 @@ theme_override_fonts/font = ExtResource("4_stugo")
 theme_override_font_sizes/font_size = 26
 text = "Nixu"
 autowrap_mode = 3
+
+[node name="LinkNixu" type="LinkButton" parent="Layout/PanelCreditos/Margen/Columna/ScrollCreditos/ListaSecciones/SecAssets" unique_id=909587776]
+layout_mode = 2
+size_flags_horizontal = 0
+focus_neighbor_left = NodePath(".")
+focus_neighbor_top = NodePath("../../SecDesarrollo/LinkEmGamex")
+focus_neighbor_right = NodePath(".")
+focus_neighbor_bottom = NodePath("../../../../../BotonVolver")
+focus_mode = 0
+theme_override_colors/font_color = Color(0.78039217, 0.8784314, 0.6784314, 1)
+theme_override_colors/font_focus_color = Color(0.9019608, 1, 0.7019608, 1)
+theme_override_colors/font_hover_color = Color(0.9019608, 1, 0.7019608, 1)
+theme_override_fonts/font = ExtResource("4_stugo")
+theme_override_font_sizes/font_size = 24
+text = "Instagram — @nixu_dg"
 
 [node name="SecMusica" type="VBoxContainer" parent="Layout/PanelCreditos/Margen/Columna/ScrollCreditos/ListaSecciones" unique_id=1312204160]
 layout_mode = 2
@@ -180,9 +211,9 @@ custom_minimum_size = Vector2(400, 72)
 layout_mode = 2
 size_flags_horizontal = 0
 focus_neighbor_left = NodePath(".")
-focus_neighbor_top = NodePath(".")
+focus_neighbor_top = NodePath("../ScrollCreditos/ListaSecciones/SecAssets/LinkNixu")
 focus_neighbor_right = NodePath(".")
-focus_neighbor_bottom = NodePath(".")
+focus_neighbor_bottom = NodePath("../ScrollCreditos/ListaSecciones/SecDesarrollo/LinkEmGamex")
 focus_mode = 0
 theme_override_colors/font_focus_color = Color(0.9019608, 1, 0.7019608, 1)
 theme_override_colors/font_hover_color = Color(0.9019608, 1, 0.7019608, 1)
