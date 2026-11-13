@@ -28,12 +28,15 @@ func limpiar() -> void:
 	_tween_feedback_nota = null
 
 
-func aplicar_elevacion_eje_z(jump_height: float, factor_altura: float) -> void:
-	_resolver_hijos_flotantes()
+func aplicar_elevacion_eje_z(
+	jump_height: float,
+	factor_altura: float,
+	shadow_min_scale: Vector2 = Vector2(0.6, 0.6)
+) -> void:
 	if visual != null:
 		visual.position.y = -jump_height * factor_altura
 	if sombra != null:
-		sombra.scale = Vector2.ONE.lerp(_obtener_shadow_min_scale(), factor_altura)
+		sombra.scale = Vector2.ONE.lerp(shadow_min_scale, factor_altura)
 	if indicador_estamina != null and is_instance_valid(indicador_estamina):
 		indicador_estamina.position.y = -60.0 - jump_height * factor_altura
 	if tutorial_cabeza != null and is_instance_valid(tutorial_cabeza):
@@ -41,7 +44,6 @@ func aplicar_elevacion_eje_z(jump_height: float, factor_altura: float) -> void:
 
 
 func restaurar_visuales_eje_z() -> void:
-	_resolver_hijos_flotantes()
 	if visual != null:
 		visual.position = Vector2.ZERO
 		visual.rotation = 0.0
@@ -138,18 +140,3 @@ func restaurar_feedback_nota() -> void:
 	if visual != null and is_instance_valid(visual):
 		visual.modulate = Color.WHITE
 		visual.scale = Vector2.ONE
-
-
-func _resolver_hijos_flotantes() -> void:
-	if _host == null:
-		return
-	if tutorial_cabeza == null:
-		tutorial_cabeza = _host.get_node_or_null("TutorialCabeza") as Node2D
-	if indicador_estamina == null:
-		indicador_estamina = _host.get_node_or_null("IndicadorEstamina") as Node2D
-
-
-func _obtener_shadow_min_scale() -> Vector2:
-	if _host != null and "shadow_min_scale" in _host:
-		return _host.get("shadow_min_scale")
-	return Vector2(0.6, 0.6)

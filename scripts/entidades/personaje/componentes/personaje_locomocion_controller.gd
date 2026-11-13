@@ -10,6 +10,11 @@ var tiempo_recuperacion: float = 0.0
 var ultima_direccion: Vector2 = Vector2.DOWN
 var direccion_plancha: Vector2 = Vector2.DOWN
 var bloquear_salto_un_frame: bool = false
+var _tiene_accion_personaje_sprint: bool = false
+
+
+func inicializar() -> void:
+	_tiene_accion_personaje_sprint = InputMap.has_action("personaje-sprint")
 
 
 func procesar_frame(
@@ -27,7 +32,7 @@ func procesar_frame(
 
 	var quiere_sprint: bool = (
 		Input.is_action_pressed("sprint")
-		or (InputMap.has_action("personaje-sprint") and Input.is_action_pressed("personaje-sprint"))
+		or (_tiene_accion_personaje_sprint and Input.is_action_pressed("personaje-sprint"))
 	)
 	var quiere_salto: bool = Input.is_action_just_pressed("personaje-salto")
 	if bloquear_salto_un_frame:
@@ -54,19 +59,24 @@ func procesar_frame(
 			)
 
 		Personaje.Estado.SALTO:
+			var sin_gasto: bool = estamina_ctrl.esta_sin_gasto_activo(personaje.sin_gasto_estamina)
 			if quiere_salto and not estamina_ctrl.fatigado and estamina_ctrl.puede_pagar(
-				personaje.dive_stamina_cost, personaje.sin_gasto_estamina
+				personaje.dive_stamina_cost, sin_gasto
 			):
 				iniciar_plancha(personaje, estamina_ctrl, direction)
 				estamina_consumida_en_frame = true
 			else:
-				_procesar_salto(personaje, delta, direction, is_moving, factor_boost, vista_ctrl)
+				_procesar_salto(
+					personaje, delta, direction, is_moving, factor_boost, estamina_ctrl, vista_ctrl
+				)
 
 		Personaje.Estado.PLANCHA_AIRE:
 			tiempo_aire += delta
 			var u_plancha: float = clampf(tiempo_aire / duracion_aire_actual, 0.0, 1.0)
 			var factor_restante: float = (1.0 - u_plancha) * altura_despegue
-			vista_ctrl.aplicar_elevacion_eje_z(personaje.jump_height, factor_restante)
+			vista_ctrl.aplicar_elevacion_eje_z(
+				personaje.jump_height, factor_restante, personaje.shadow_min_scale
+			)
 			if tiempo_aire >= duracion_aire_actual:
 				impactar_plancha(personaje, vista_ctrl)
 
@@ -97,8 +107,9 @@ func procesar_frame(
 
 
 func iniciar_salto_libre(personaje: Personaje, estamina_ctrl: PersonajeEstaminaController) -> void:
+	var sin_gasto: bool = estamina_ctrl.esta_sin_gasto_activo(personaje.sin_gasto_estamina)
 	if estamina_ctrl.consumir_puntual(
-		personaje.jump_stamina_cost, personaje.stamina_regen_delay, personaje.sin_gasto_estamina
+		personaje.jump_stamina_cost, personaje.stamina_regen_delay, sin_gasto
 	):
 		personaje.emitir_estamina_cambiada()
 
@@ -108,7 +119,7 @@ func iniciar_salto_libre(personaje: Personaje, estamina_ctrl: PersonajeEstaminaC
 
 	personaje.set_collision_mask_value(2, false)
 	personaje.set_collision_mask_value(1, true)
-	personaje._cambiar_estado(Personaje.Estado.SALTO)
+	personaje.cambiar_estado(Personaje.Estado.SALTO)
 
 
 func finalizar_salto_libre(
@@ -127,8 +138,9 @@ func iniciar_plancha(
 	estamina_ctrl: PersonajeEstaminaController,
 	direccion_actual: Vector2
 ) -> void:
+	var sin_gasto: bool = estamina_ctrl.esta_sin_gasto_activo(personaje.sin_gasto_estamina)
 	if estamina_ctrl.consumir_puntual(
-		personaje.dive_stamina_cost, personaje.stamina_regen_delay, personaje.sin_gasto_estamina
+		personaje.dive_stamina_cost, personaje.stamina_regen_delay, sin_gasto
 	):
 		personaje.emitir_estamina_cambiada()
 
@@ -148,14 +160,14 @@ func iniciar_plancha(
 
 	personaje.set_collision_mask_value(2, false)
 	personaje.set_collision_mask_value(1, true)
-	personaje._cambiar_estado(Personaje.Estado.PLANCHA_AIRE)
+	personaje.cambiar_estado(Personaje.Estado.PLANCHA_AIRE)
 
 
 func impactar_plancha(personaje: Personaje, vista_ctrl: PersonajeVistaController) -> void:
 	personaje.restaurar_mascara_colision_suelo()
 	vista_ctrl.restaurar_visuales_eje_z()
 	tiempo_recuperacion = personaje.dive_recovery_duration
-	personaje._cambiar_estado(Personaje.Estado.RECUPERANDOSE)
+	personaje.cambiar_estado(Personaje.Estado.RECUPERANDOSE)
 
 
 func finalizar_recuperacion(
@@ -177,8 +189,9 @@ func _procesar_suelo(
 	estamina_ctrl: PersonajeEstaminaController,
 	vista_ctrl: PersonajeVistaController
 ) -> bool:
+	var sin_gasto: bool = estamina_ctrl.esta_sin_gasto_activo(personaje.sin_gasto_estamina)
 	if quiere_salto and not estamina_ctrl.fatigado and estamina_ctrl.puede_pagar(
-		personaje.jump_stamina_cost, personaje.sin_gasto_estamina
+		personaje.jump_stamina_cost, sin_gasto
 	):
 		iniciar_salto_libre(personaje, estamina_ctrl)
 		return true
@@ -187,25 +200,25 @@ func _procesar_suelo(
 	var vel_objetivo: float = personaje.speed * factor_boost
 
 	if quiere_sprint and is_moving and not estamina_ctrl.fatigado and (
-		personaje.sin_gasto_estamina or estamina_ctrl.stamina > 0.0
+		sin_gasto or estamina_ctrl.stamina > 0.0
 	):
-		personaje._cambiar_estado(Personaje.Estado.SPRINT)
+		personaje.cambiar_estado(Personaje.Estado.SPRINT)
 		vel_objetivo = personaje.sprint_speed * factor_boost
 		if estamina_ctrl.drenar_continuo(
-			personaje.sprint_drain_rate, delta, personaje.stamina_regen_delay, personaje.sin_gasto_estamina
+			personaje.sprint_drain_rate, delta, personaje.stamina_regen_delay, sin_gasto
 		):
 			estamina_consumida = true
 			if estamina_ctrl.fatigado:
-				personaje._cambiar_estado(Personaje.Estado.FATIGA)
+				personaje.cambiar_estado(Personaje.Estado.FATIGA)
 			personaje.emitir_estamina_cambiada()
 	elif estamina_ctrl.fatigado:
-		personaje._cambiar_estado(Personaje.Estado.FATIGA)
+		personaje.cambiar_estado(Personaje.Estado.FATIGA)
 		vel_objetivo = personaje.speed
 	elif is_moving:
-		personaje._cambiar_estado(Personaje.Estado.CAMINANDO)
+		personaje.cambiar_estado(Personaje.Estado.CAMINANDO)
 		vel_objetivo = personaje.speed
 	else:
-		personaje._cambiar_estado(Personaje.Estado.REPOSO)
+		personaje.cambiar_estado(Personaje.Estado.REPOSO)
 		vel_objetivo = 0.0
 
 	var target: Vector2 = direction * vel_objetivo
@@ -226,12 +239,15 @@ func _procesar_salto(
 	direction: Vector2,
 	is_moving: bool,
 	factor_boost: float,
+	estamina_ctrl: PersonajeEstaminaController,
 	vista_ctrl: PersonajeVistaController
 ) -> void:
 	tiempo_aire += delta
 	var u: float = clampf(tiempo_aire / duracion_aire_actual, 0.0, 1.0)
 	var factor_altura: float = 4.0 * u * (1.0 - u)
-	vista_ctrl.aplicar_elevacion_eje_z(personaje.jump_height, factor_altura)
+	vista_ctrl.aplicar_elevacion_eje_z(
+		personaje.jump_height, factor_altura, personaje.shadow_min_scale
+	)
 
 	var air_target: Vector2 = direction * maxf(
 		personaje.speed * factor_boost, personaje.velocity.length()
@@ -242,7 +258,7 @@ func _procesar_salto(
 		)
 
 	if tiempo_aire >= duracion_aire_actual:
-		finalizar_salto_libre(personaje, personaje._estamina_ctrl, vista_ctrl, is_moving)
+		finalizar_salto_libre(personaje, estamina_ctrl, vista_ctrl, is_moving)
 
 
 func _transicionar_a_suelo(
@@ -251,8 +267,8 @@ func _transicionar_a_suelo(
 	is_moving: bool
 ) -> void:
 	if estamina_ctrl.fatigado:
-		personaje._cambiar_estado(Personaje.Estado.FATIGA)
+		personaje.cambiar_estado(Personaje.Estado.FATIGA)
 	elif is_moving:
-		personaje._cambiar_estado(Personaje.Estado.CAMINANDO)
+		personaje.cambiar_estado(Personaje.Estado.CAMINANDO)
 	else:
-		personaje._cambiar_estado(Personaje.Estado.REPOSO)
+		personaje.cambiar_estado(Personaje.Estado.REPOSO)

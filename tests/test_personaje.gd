@@ -108,3 +108,33 @@ func test_maain_aplica_impulso_nota_desde_nota_1() -> void:
 
 	p.free()
 	maain.free()
+
+
+func test_impulso_nota_permite_gastar_acciones_sin_drenar_estamina() -> void:
+	var escena: PackedScene = load("res://escenas/personaje.tscn")
+	var p: Personaje = escena.instantiate() as Personaje
+	p._ready()
+
+	p.stamina = 40.0
+	p.aplicar_impulso_nota()
+	var estamina_tras_nota: float = p.stamina
+	assert_true(p._estamina_ctrl.esta_sin_gasto_activo(p.sin_gasto_estamina), "Debe activar ventana sin gasto de estamina")
+
+	# Salto y plancha durante la ventana no deben consumir estamina ni activar fatiga
+	p._iniciar_salto_libre()
+	assert_true(is_equal_approx(p.stamina, estamina_tras_nota), "El salto no debe gastar estamina durante la ventana de nota")
+	p._locomocion_ctrl.iniciar_plancha(p, p._estamina_ctrl, Vector2.RIGHT)
+	assert_true(is_equal_approx(p.stamina, estamina_tras_nota), "La plancha no debe gastar estamina durante la ventana de nota")
+	assert_false(p.fatigado, "No debe fatigarse durante la ventana sin gasto")
+
+	# Expirar ventana (1.5 s)
+	p._physics_process_logica(1.6)
+	assert_false(p._estamina_ctrl.esta_sin_gasto_activo(p.sin_gasto_estamina), "La ventana sin gasto debe expirar tras 1.5 s")
+
+	# Tras expirar, volver a saltar sí consume estamina
+	p._cambiar_estado(Personaje.Estado.REPOSO)
+	var estamina_antes_salto: float = p.stamina
+	p._iniciar_salto_libre()
+	assert_true(p.stamina < estamina_antes_salto, "Al expirar la ventana, saltar debe volver a consumir estamina")
+
+	p.free()

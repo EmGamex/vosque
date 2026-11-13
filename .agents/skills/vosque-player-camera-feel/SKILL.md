@@ -55,7 +55,7 @@ stateDiagram-v2
    * Al aterrizar (`_finalizar_salto_libre` / `_impactar_plancha`), **siempre** restaurar Capa 2 (`_restaurar_mascara_colision_suelo()`) y resetear visuales (`_restaurar_visuales_eje_z()`).
 2. **Anti-salto fantasma, impulso por nota y captura:**
    * `NOTIFICATION_UNPAUSED` y `consumir_buffer_salto()` activan `_bloquear_salto_un_frame = true` para evitar saltos residuales al despausar con <kbd>Espacio</kbd>.
-   * `aplicar_impulso_nota()` (invocado por `Maain._on_nota_recolectada()`) restaura `+50%` de `max_stamina`, limpia `fatigado`, reinicia `_regen_timer = 0.0` y activa un boost temporal de velocidad (`1.20x` durante `1.5 s` en caminata, sprint y `SALTO`, sin alterar `dive_speed` ni `@export` base).
+   * `aplicar_impulso_nota()` (invocado por `Maain._on_nota_recolectada()`) restaura `+50%` de `max_stamina`, limpia `fatigado`, reinicia `_regen_timer = 0.0` y activa durante `1.5 s` un boost temporal de velocidad (`1.20x` en caminata, sprint y `SALTO`, sin alterar `dive_speed` ni `@export` base) junto con una ventana sin gasto de estamina (`note_no_stamina_drain_duration = 1.5 s`) para sprint, salto y plancha.
    * `detener_por_captura()` fija `velocity = Vector2.ZERO`, limpia el boost/feedback visual y `set_physics_process(false)`.
 3. **Modo `@tool` y debug:**
    * `_physics_process()` debe retornar de inmediato si `Engine.is_editor_hint()`.

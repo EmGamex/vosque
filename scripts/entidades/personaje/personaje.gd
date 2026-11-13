@@ -45,6 +45,7 @@ signal estado_cambiado(nuevo_estado: Estado, nombre_estado: String)
 @export_range(0.0, 1.0, 0.05) var note_stamina_restore_ratio: float = 0.5
 @export_range(1.0, 2.0, 0.05) var note_speed_boost_multiplier: float = 1.2
 @export_range(0.0, 5.0, 0.1, "suffix:s") var note_speed_boost_duration: float = 1.5
+@export_range(0.0, 10.0, 0.1, "suffix:s") var note_no_stamina_drain_duration: float = 1.5
 @export var note_boost_tint: Color = Color(0.75, 1.0, 0.9, 1.0)
 
 var estado_actual: Estado = Estado.REPOSO
@@ -113,10 +114,13 @@ func detener_por_captura() -> void:
 	set_physics_process(false)
 
 
-## Restaura estamina parcial, limpia fatiga y activa un boost temporal de velocidad al recoger una nota.
+## Restaura estamina parcial, limpia fatiga y activa un boost temporal de velocidad y sin gasto de estamina al recoger una nota.
 func aplicar_impulso_nota() -> void:
 	_estamina_ctrl.aplicar_impulso_nota(
-		max_stamina, note_stamina_restore_ratio, note_speed_boost_duration
+		max_stamina,
+		note_stamina_restore_ratio,
+		note_speed_boost_duration,
+		note_no_stamina_drain_duration
 	)
 	if estado_actual == Estado.FATIGA:
 		_cambiar_estado(Estado.CAMINANDO if velocity.length() >= stop_threshold else Estado.REPOSO)
@@ -127,6 +131,7 @@ func aplicar_impulso_nota() -> void:
 func _ready() -> void:
 	add_to_group("jugador")
 	motion_mode = CharacterBody2D.MOTION_MODE_FLOATING
+	_locomocion_ctrl.inicializar()
 	_vista_ctrl.inicializar(self)
 	_estamina_ctrl.inicializar(max_stamina)
 	restaurar_mascara_colision_suelo()
@@ -161,11 +166,15 @@ func _finalizar_salto_libre(is_moving: bool) -> void:
 	_locomocion_ctrl.finalizar_salto_libre(self, _estamina_ctrl, _vista_ctrl, is_moving)
 
 
-func _cambiar_estado(nuevo_estado: Estado) -> void:
+func cambiar_estado(nuevo_estado: Estado) -> void:
 	if estado_actual == nuevo_estado:
 		return
 	estado_actual = nuevo_estado
 	estado_cambiado.emit(estado_actual, obtener_nombre_estado())
+
+
+func _cambiar_estado(nuevo_estado: Estado) -> void:
+	cambiar_estado(nuevo_estado)
 
 
 func obtener_nombre_estado() -> String:
