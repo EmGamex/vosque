@@ -187,7 +187,40 @@ func test_persistencia_configuracion_audio() -> void:
 	assert_eq(cfg.get("musica"), 60.0, "Volumen musica guardado debe ser 60%")
 	assert_eq(cfg.get("sfx"), 85.0, "Volumen sfx guardado debe ser 85%")
 	assert_eq(cfg.get("pantalla_completa"), true, "Pantalla completa guardada debe ser true")
+	assert_eq(cfg.get("usar_audio_usuario"), true, "usar_audio_usuario debe ser true")
 
 	gestor.free()
 	gestor_reinicio.free()
+	_limpiar_archivo_test()
+
+
+func test_persistencia_dual_predeterminado_vs_usuario() -> void:
+	_limpiar_archivo_test()
+	var gestor: Node = GestorPersistenciaScript.new()
+	gestor.ruta_guardado = RUTA_TEST_SAVE
+	gestor.ruta_config = RUTA_TEST_CONFIG
+	gestor._ready()
+
+	# 1. Por defecto sin archivo debe estar en modo predeterminado (porcentajes reales de default_bus_layout.tres)
+	assert_false(gestor.esta_usando_audio_usuario(), "Sin archivo debe usar audio predeterminado")
+	var pred: Dictionary = gestor.obtener_configuracion_predeterminada()
+	assert_true(is_equal_approx(float(pred["master"]), 100.0), "Master predeterminado debe ser ~100%")
+	assert_true(absf(float(pred["musica"]) - 40.0) < 1.0, "Música predeterminada debe ser ~40%")
+	assert_true(absf(float(pred["sfx"]) - 80.0) < 1.0, "SFX predeterminado debe ser ~80%")
+
+	# 2. Guardar perfil de usuario al 50% en música
+	gestor.guardar_configuracion_audio(100.0, 50.0, 100.0, false, true)
+	assert_true(gestor.esta_usando_audio_usuario(), "Debe activar usar_audio_usuario")
+
+	# 3. Volver a predeterminado conservando el perfil de usuario en disco
+	gestor.restablecer_audio_predeterminado(true)
+	assert_false(gestor.esta_usando_audio_usuario(), "Debe volver al modo predeterminado")
+	var cfg_conservada: Dictionary = gestor.cargar_configuracion_audio()
+	assert_eq(cfg_conservada.get("musica"), 50.0, "El perfil del usuario en disco debe conservar el 50%")
+
+	# 4. Reactivar modo usuario recupera el 50%
+	gestor.alternar_modo_audio_usuario(true)
+	assert_true(gestor.esta_usando_audio_usuario(), "Debe reactivar el modo usuario")
+
+	gestor.free()
 	_limpiar_archivo_test()

@@ -110,11 +110,10 @@ func test_restablecer_valores_por_defecto() -> void:
 	# Ejecutar restablecer
 	panel.restablecer_valores_por_defecto()
 
-	# Comprobar que los valores no se quedaron en los modificados arbitrarios (20, 10, 15)
-	# y que coinciden con los que define default_bus_layout.tres y ProjectSettings
-	assert_ne(panel.slider_master.value, 20.0, "Master debe restablecerse")
-	assert_ne(panel.slider_musica.value, 10.0, "Música debe restablecerse")
-	assert_ne(panel.slider_sfx.value, 15.0, "SFX debe restablecerse")
+	# Comprobar que los valores vuelven al default_bus_layout.tres (~100% Master, ~40% Música, ~80% SFX)
+	assert_true(is_equal_approx(panel.slider_master.value, 100.0), "Master debe restablecerse a 100%")
+	assert_ne(panel.slider_musica.value, 10.0, "Música debe restablecerse desde 10%")
+	assert_ne(panel.slider_sfx.value, 15.0, "SFX debe restablecerse desde 15%")
 	assert_eq(panel.check_pantalla_completa.button_pressed, false, "Pantalla completa debe volver al modo por defecto del proyecto")
 
 	panel.free()
@@ -145,6 +144,8 @@ func test_aislamiento_foco_y_mouse_filter() -> void:
 		assert_eq(elem.focus_mode, Control.FOCUS_NONE, "Elementos de foco deben volver a FOCUS_NONE tras desactivar()")
 
 	# Verificar bloqueo lateral en controles no sliders
+	assert_eq(String(panel.slider_sfx.focus_neighbor_bottom), "../../FilaPantalla/CheckPantalla", "SliderSFX debe apuntar a CheckPantalla abajo")
+	assert_eq(String(panel.check_pantalla_completa.focus_neighbor_top), "../../FilaSFX/SliderSFX", "CheckPantalla debe apuntar a SliderSFX arriba")
 	assert_eq(String(panel.check_pantalla_completa.focus_neighbor_left), ".", "CheckPantalla debe bloquear izquierda")
 	assert_eq(String(panel.check_pantalla_completa.focus_neighbor_right), ".", "CheckPantalla debe bloquear derecha")
 	assert_eq(String(panel.boton_restablecer.focus_neighbor_left), ".", "BotonRestablecer debe bloquear izquierda")

@@ -118,8 +118,8 @@ Valores obligatorios validados por `tests/test_gestor_musica.gd`:
    * Al recolectar la primera nota en `Maain._on_nota_recolectada()`, se invoca diferidamente `musica.transicionar_a_supervivencia()`.
    * Conmuta mediante `reproductor.set("parameters/switch_to_clip", &"supervivencia")`.
 3. **Atenuación Aditiva en Pausa (`establecer_pausa`):**
-   * En `_process(delta)`, calcula el objetivo:
-     $$\text{volumen\_objetivo} = \text{config.volumen\_base\_db} + (\text{config.atenuacion\_pausa\_db si en\_pausa else } 0)$$
+   * En `_process(delta)`, calcula el objetivo sumando la base de diseño, el offset del jugador y la atenuación de pausa:
+     $$\text{volumen\_objetivo} = \text{config.volumen\_base\_db} + \text{\_offset\_usuario\_db} + (\text{config.atenuacion\_pausa\_db si en\_pausa else } 0)$$
    * Suaviza la ganancia hacia el objetivo usando `move_toward` a razón de `config.velocidad_suavizado_db` ($12.0\text{ dB/s}$).
 4. **Congelamiento en Jumpscare y Nightmare Decay (`detener_por_jumpscare` y `activar_modo_game_over`):**
    * **Jumpscare ($0\text{ ms}$):** Cuando el monstruo captura al jugador (`Maain._on_jugador_capturado`), se llama inmediatamente a `detener_por_jumpscare()`. Si el reproductor estaba activo, fija `reproductor.stream_paused = true` (en vez de `stop()`) para retener el compás y segundo exacto de la pista.
@@ -129,26 +129,36 @@ Valores obligatorios validados por `tests/test_gestor_musica.gd`:
 
 ---
 
-## 5. Invariante 4: Sincronización Obligatoria con Persistencia y Opciones
+## 5. Invariante 4: Sincronización Obligatoria con Persistencia y Opciones (Arquitectura Dual)
+
+El subsistema de volumen separa estrictamente el **bus default del juego** del **perfil persistente del jugador**:
+
+1. **Capa 1 — Bus Default Inmutable (`res://`):**
+   * Definido en `res://default_bus_layout.tres` (`Master: 0.0 dB` = `100%`, `musica: -7.9588 dB` $\approx$ `40%`, `sfx: -1.9382 dB` $\approx$ `80%`, `Ambiente: -6.0 dB`, `Criatura: +1.0 dB`) y `res://recursos/audio/config_musica_defecto.tres` (`volumen_base_db = -8.0 dB`).
+   * **Nunca** se debe sobrescribir `config.volumen_base_db` al mover sliders en `MenuOpciones` ni al cargar `GestorPersistencia`.
+2. **Capa 2 — Perfil del Jugador (`user://configuracion.cfg` + `localStorage`):**
+   * Almacena los porcentajes reales del usuario (`master`, `musica`, `sfx` en `0..100%`) junto con la bandera `usar_audio_usuario: bool`.
+   * Al pulsar **Restablecer Valores**, se vuelve al bus default (`restaurar_volumen_predeterminado(true)` y `usar_audio_usuario = false`).
 
 > [!WARNING]
 > **No modificar únicamente el `AudioServer` para el bus `musica`:**
 > Como `ControladorMusica._process(delta)` interpola en cada fotograma el volumen del bus `&"musica"` hacia `_calcular_volumen_objetivo()`, cualquier cambio realizado directamente con `AudioServer.set_bus_volume_db(idx_musica, db)` será **sobrescrito en el siguiente frame**.
 
-Para ajustar el volumen de música desde `MenuOpciones`, `GestorPersistencia` o código de juego:
+Para ajustar el volumen de música desde `MenuOpciones`, `GestorPersistencia` o código de juego sin mutar el recurso predeterminado:
 ```gdscript
 # 1. Ajustar AudioServer
 var idx_musica := AudioServer.get_bus_index(&"musica")
 if idx_musica >= 0:
 	AudioServer.set_bus_volume_db(idx_musica, db)
 
-# 2. Notificar SIEMPRE a GestorMusica para sincronizar su estado interno:
+# 2. Notificar SIEMPRE a GestorMusica mediante offset relativo al predeterminado:
+var offset_db: float = db - base_musica_predeterminada_db
 if has_node("/root/GestorMusica"):
 	var gm: Node = get_node("/root/GestorMusica")
-	if gm.has_method("establecer_volumen_base"):
+	if gm.has_method("establecer_offset_usuario_db"):
+		gm.establecer_offset_usuario_db(offset_db)
+	elif gm.has_method("establecer_volumen_base"):
 		gm.establecer_volumen_base(db)
-	elif "config" in gm and gm.config is ConfiguracionMusica:
-		gm.config.volumen_base_db = db
 ```
 
 ---

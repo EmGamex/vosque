@@ -37,6 +37,7 @@ var clip_actual: StringName = &""
 var _bus_index: int = -1
 var _en_pausa: bool = false
 var _volumen_actual_db: float = VOLUMEN_BASE_DEFECTO_DB
+var _offset_usuario_db: float = 0.0
 
 
 func _ready() -> void:
@@ -46,7 +47,7 @@ func _ready() -> void:
 	if config != null and not config.changed.is_connected(_on_config_changed):
 		config.changed.connect(_on_config_changed)
 
-	_volumen_actual_db = config.volumen_base_db if config != null else VOLUMEN_BASE_DEFECTO_DB
+	_volumen_actual_db = _calcular_volumen_objetivo()
 	_aplicar_volumen_bus(_volumen_actual_db)
 
 	var reproductor_audio := _obtener_reproductor()
@@ -112,8 +113,23 @@ func establecer_volumen_base(vol_db: float, inmediato: bool = false) -> void:
 	if config != null:
 		config.volumen_base_db = vol_db
 	if inmediato or not _en_pausa:
-		_volumen_actual_db = vol_db
+		_volumen_actual_db = _calcular_volumen_objetivo()
 		_aplicar_volumen_bus(_volumen_actual_db)
+
+
+func establecer_offset_usuario_db(offset_db: float, inmediato: bool = false) -> void:
+	_offset_usuario_db = offset_db
+	if inmediato or not _en_pausa:
+		_volumen_actual_db = _calcular_volumen_objetivo()
+		_aplicar_volumen_bus(_volumen_actual_db)
+
+
+func get_offset_usuario_db() -> float:
+	return _offset_usuario_db
+
+
+func restaurar_volumen_predeterminado(inmediato: bool = true) -> void:
+	establecer_offset_usuario_db(0.0, inmediato)
 
 
 func detener_por_jumpscare() -> void:
@@ -157,7 +173,7 @@ func restaurar_parametros_normales() -> void:
 		reproductor_audio.stream_paused = false
 		reproductor_audio.pitch_scale = PITCH_NORMAL
 	if config != null:
-		_volumen_actual_db = config.volumen_base_db
+		_volumen_actual_db = _calcular_volumen_objetivo()
 		_aplicar_volumen_bus(_volumen_actual_db)
 		_conmutar_clip(config.clip_menu_tutorial)
 		estado_actual = EstadoMusical.MENU_TUTORIAL
@@ -185,10 +201,9 @@ func get_clip_activo() -> StringName:
 # --- Métodos Privados y Auxiliares ---
 
 func _calcular_volumen_objetivo() -> float:
-	if config == null:
-		return VOLUMEN_BASE_DEFECTO_DB
-	var objetivo := config.volumen_base_db
-	if _en_pausa:
+	var base_db: float = config.volumen_base_db if config != null else VOLUMEN_BASE_DEFECTO_DB
+	var objetivo: float = base_db + _offset_usuario_db
+	if _en_pausa and config != null:
 		objetivo += config.atenuacion_pausa_db
 	return objetivo
 
