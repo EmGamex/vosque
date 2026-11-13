@@ -49,69 +49,158 @@ text = "CRÉDITOS"
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="SecDireccion" type="VBoxContainer" parent="Layout/PanelCreditos/Margen/Columna" unique_id=1772780014]
+[node name="ScrollCreditos" type="ScrollContainer" parent="Layout/PanelCreditos/Margen/Columna" unique_id=1437329117]
+layout_mode = 2
+size_flags_vertical = 3
+follow_focus = true
+horizontal_scroll_mode = 0
+
+[node name="ListaSecciones" type="VBoxContainer" parent="Layout/PanelCreditos/Margen/Columna/ScrollCreditos" unique_id=1083590740]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 22
+
+[node name="SecDesarrollo" type="VBoxContainer" parent="Layout/PanelCreditos/Margen/Columna/ScrollCreditos/ListaSecciones" unique_id=1620521246]
 layout_mode = 2
 
-[node name="LblRol" type="Label" parent="Layout/PanelCreditos/Margen/Columna/SecDireccion" unique_id=228425457]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.9019608, 1, 0.7019608, 1)
-theme_override_fonts/font = ExtResource("2_5cqkm")
-theme_override_font_sizes/font_size = 36
-text = "DIRECCIÓN Y PROGRAMACIÓN"
-
-[node name="LblNombres" type="Label" parent="Layout/PanelCreditos/Margen/Columna/SecDireccion" unique_id=2092985132]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("4_stugo")
-theme_override_font_sizes/font_size = 26
-text = "EmGamex  •  Cu-be"
-
-[node name="SecArte" type="VBoxContainer" parent="Layout/PanelCreditos/Margen/Columna" unique_id=921995888]
-layout_mode = 2
-
-[node name="LblRol" type="Label" parent="Layout/PanelCreditos/Margen/Columna/SecArte" unique_id=1877820172]
+[node name="LblRol" type="Label" parent="Layout/PanelCreditos/Margen/Columna/ScrollCreditos/ListaSecciones/SecDesarrollo" unique_id=1793804467]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9019608, 1, 0.7019608, 1)
 theme_override_fonts/font = ExtResource("2_5cqkm")
 theme_override_font_sizes/font_size = 36
-text = "ARTE Y DISEÑO VISUAL"
+text = "DISEÑO, PROGRAMACIÓN Y GRÁFICOS"
 
-[node name="LblNombres" type="Label" parent="Layout/PanelCreditos/Margen/Columna/SecArte" unique_id=1374479831]
+[node name="LblNombres" type="Label" parent="Layout/PanelCreditos/Margen/Columna/ScrollCreditos/ListaSecciones/SecDesarrollo" unique_id=1404337311]
+custom_minimum_size = Vector2(860, 0)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("4_stugo")
 theme_override_font_sizes/font_size = 26
-text = "Pipeline Híbrido 3D & Vectorial (Blender + Inkscape)"
+text = "EmGamex"
+autowrap_mode = 3
 
-[node name="SecAudio" type="VBoxContainer" parent="Layout/PanelCreditos/Margen/Columna" unique_id=252883123]
+[node name="LinkEmGamex" type="LinkButton" parent="Layout/PanelCreditos/Margen/Columna/ScrollCreditos/ListaSecciones/SecDesarrollo" unique_id=1682705910]
+layout_mode = 2
+size_flags_horizontal = 0
+focus_neighbor_left = NodePath(".")
+focus_neighbor_top = NodePath("../../../../../BotonVolver")
+focus_neighbor_right = NodePath(".")
+focus_neighbor_bottom = NodePath("../../SecAssets/LinkNixu")
+focus_mode = 0
+theme_override_colors/font_color = Color(0.78039217, 0.8784314, 0.6784314, 1)
+theme_override_colors/font_focus_color = Color(0.9019608, 1, 0.7019608, 1)
+theme_override_colors/font_hover_color = Color(0.9019608, 1, 0.7019608, 1)
+theme_override_fonts/font = ExtResource("4_stugo")
+theme_override_font_sizes/font_size = 24
+text = "YouTube — @EmGamex"
+
+[node name="SecAssets" type="VBoxContainer" parent="Layout/PanelCreditos/Margen/Columna/ScrollCreditos/ListaSecciones" unique_id=1265242501]
 layout_mode = 2
 
-[node name="LblRol" type="Label" parent="Layout/PanelCreditos/Margen/Columna/SecAudio" unique_id=1370762289]
+[node name="LblRol" type="Label" parent="Layout/PanelCreditos/Margen/Columna/ScrollCreditos/ListaSecciones/SecAssets" unique_id=835615956]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9019608, 1, 0.7019608, 1)
 theme_override_fonts/font = ExtResource("2_5cqkm")
 theme_override_font_sizes/font_size = 36
-text = "MÚSICA Y EFECTOS DE SONIDO"
+text = "ASSETS ADICIONALES"
 
-[node name="LblNombres" type="Label" parent="Layout/PanelCreditos/Margen/Columna/SecAudio" unique_id=480244162]
+[node name="LblNombres" type="Label" parent="Layout/PanelCreditos/Margen/Columna/ScrollCreditos/ListaSecciones/SecAssets" unique_id=1030676467]
+custom_minimum_size = Vector2(860, 0)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("4_stugo")
 theme_override_font_sizes/font_size = 26
-text = "Pac-Man World 2 OST (Night Crawling & Haunted Boardwalk)"
+text = "Nixu"
+autowrap_mode = 3
 
-[node name="SecMotor" type="VBoxContainer" parent="Layout/PanelCreditos/Margen/Columna" unique_id=633947914]
+[node name="LinkNixu" type="LinkButton" parent="Layout/PanelCreditos/Margen/Columna/ScrollCreditos/ListaSecciones/SecAssets" unique_id=909587776]
+layout_mode = 2
+size_flags_horizontal = 0
+focus_neighbor_left = NodePath(".")
+focus_neighbor_top = NodePath("../../SecDesarrollo/LinkEmGamex")
+focus_neighbor_right = NodePath(".")
+focus_neighbor_bottom = NodePath("../../../../../BotonVolver")
+focus_mode = 0
+theme_override_colors/font_color = Color(0.78039217, 0.8784314, 0.6784314, 1)
+theme_override_colors/font_focus_color = Color(0.9019608, 1, 0.7019608, 1)
+theme_override_colors/font_hover_color = Color(0.9019608, 1, 0.7019608, 1)
+theme_override_fonts/font = ExtResource("4_stugo")
+theme_override_font_sizes/font_size = 24
+text = "Instagram — @nixu_dg"
+
+[node name="SecMusica" type="VBoxContainer" parent="Layout/PanelCreditos/Margen/Columna/ScrollCreditos/ListaSecciones" unique_id=1312204160]
 layout_mode = 2
 
-[node name="LblRol" type="Label" parent="Layout/PanelCreditos/Margen/Columna/SecMotor" unique_id=1485263516]
+[node name="LblRol" type="Label" parent="Layout/PanelCreditos/Margen/Columna/ScrollCreditos/ListaSecciones/SecMusica" unique_id=488116097]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9019608, 1, 0.7019608, 1)
+theme_override_fonts/font = ExtResource("2_5cqkm")
+theme_override_font_sizes/font_size = 36
+text = "MÚSICA"
+
+[node name="LblNombres" type="Label" parent="Layout/PanelCreditos/Margen/Columna/ScrollCreditos/ListaSecciones/SecMusica" unique_id=957418486]
+custom_minimum_size = Vector2(860, 0)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_stugo")
+theme_override_font_sizes/font_size = 26
+text = "\"Haunted Boardwalk\" y \"Night Crawling\" (Pac-Man World 2 OST)
+Composición: David Logan — Namco"
+autowrap_mode = 3
+
+[node name="SecSfx" type="VBoxContainer" parent="Layout/PanelCreditos/Margen/Columna/ScrollCreditos/ListaSecciones" unique_id=337591571]
+layout_mode = 2
+
+[node name="LblRol" type="Label" parent="Layout/PanelCreditos/Margen/Columna/ScrollCreditos/ListaSecciones/SecSfx" unique_id=397764630]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9019608, 1, 0.7019608, 1)
+theme_override_fonts/font = ExtResource("2_5cqkm")
+theme_override_font_sizes/font_size = 36
+text = "EFECTOS DE SONIDO"
+
+[node name="LblNombres" type="Label" parent="Layout/PanelCreditos/Margen/Columna/ScrollCreditos/ListaSecciones/SecSfx" unique_id=1922531381]
+custom_minimum_size = Vector2(860, 0)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_stugo")
+theme_override_font_sizes/font_size = 26
+text = "Super Smash Bros. (N64) — HAL Laboratory / Nintendo
+Wario Land 4 (GBA) — Nintendo R&D1 / Nintendo
+Luigi's Mansion (GameCube) — Nintendo EAD / Nintendo
+(Vía The Sounds Resource · Rapidkirby3k, King_Harkinian, AlexTo@dstoolBoi, TZ Gaming y Xayrga)"
+autowrap_mode = 3
+
+[node name="SecMotor" type="VBoxContainer" parent="Layout/PanelCreditos/Margen/Columna/ScrollCreditos/ListaSecciones" unique_id=2137782785]
+layout_mode = 2
+
+[node name="LblRol" type="Label" parent="Layout/PanelCreditos/Margen/Columna/ScrollCreditos/ListaSecciones/SecMotor" unique_id=1186379181]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9019608, 1, 0.7019608, 1)
 theme_override_fonts/font = ExtResource("2_5cqkm")
 theme_override_font_sizes/font_size = 36
 text = "MOTOR Y HERRAMIENTAS"
 
-[node name="LblNombres" type="Label" parent="Layout/PanelCreditos/Margen/Columna/SecMotor" unique_id=813507393]
+[node name="LblNombres" type="Label" parent="Layout/PanelCreditos/Margen/Columna/ScrollCreditos/ListaSecciones/SecMotor" unique_id=919549245]
+custom_minimum_size = Vector2(860, 0)
 layout_mode = 2
 theme_override_fonts/font = ExtResource("4_stugo")
 theme_override_font_sizes/font_size = 26
-text = "Godot Engine 4 (Compatibility Renderer)"
+text = "Godot Engine · Blender · Inkscape"
+autowrap_mode = 3
+
+[node name="SecNota" type="VBoxContainer" parent="Layout/PanelCreditos/Margen/Columna/ScrollCreditos/ListaSecciones" unique_id=169509763]
+layout_mode = 2
+
+[node name="LblRol" type="Label" parent="Layout/PanelCreditos/Margen/Columna/ScrollCreditos/ListaSecciones/SecNota" unique_id=1439814378]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9019608, 1, 0.7019608, 1)
+theme_override_fonts/font = ExtResource("2_5cqkm")
+theme_override_font_sizes/font_size = 36
+text = "LICENCIA Y USO"
+
+[node name="LblNombres" type="Label" parent="Layout/PanelCreditos/Margen/Columna/ScrollCreditos/ListaSecciones/SecNota" unique_id=609733643]
+custom_minimum_size = Vector2(860, 0)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_stugo")
+theme_override_font_sizes/font_size = 26
+text = "Proyecto gratuito sin fines de lucro"
+autowrap_mode = 3
 
 [node name="Separador2" type="HSeparator" parent="Layout/PanelCreditos/Margen/Columna" unique_id=1329860056]
 layout_mode = 2
@@ -122,9 +211,9 @@ custom_minimum_size = Vector2(400, 72)
 layout_mode = 2
 size_flags_horizontal = 0
 focus_neighbor_left = NodePath(".")
-focus_neighbor_top = NodePath(".")
+focus_neighbor_top = NodePath("../ScrollCreditos/ListaSecciones/SecAssets/LinkNixu")
 focus_neighbor_right = NodePath(".")
-focus_neighbor_bottom = NodePath(".")
+focus_neighbor_bottom = NodePath("../ScrollCreditos/ListaSecciones/SecDesarrollo/LinkEmGamex")
 focus_mode = 0
 theme_override_colors/font_focus_color = Color(0.9019608, 1, 0.7019608, 1)
 theme_override_colors/font_hover_color = Color(0.9019608, 1, 0.7019608, 1)
