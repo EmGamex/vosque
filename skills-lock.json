@@ -1,35 +1,41 @@
 {
-  "version": 1,
+  "version": 2,
   "skills": {
     "godot-2d-movement": {
       "source": "gamedev-skills/awesome-gamedev-agent-skills",
       "sourceType": "github",
       "skillPath": "skills/godot/godot-2d-movement/SKILL.md",
-      "computedHash": "f28d9c9e662bab12395aa3e4b0bc0e927fcf12cfff941aaddc60893c378f449d"
+      "computedHash": "243a9b18f9d824b311eabb2cc97d7114eb16a87e7754c397dcf63a93329c99c2"
     },
     "godot-gdscript": {
       "source": "gamedev-skills/awesome-gamedev-agent-skills",
       "sourceType": "github",
       "skillPath": "skills/godot/godot-gdscript/SKILL.md",
-      "computedHash": "e3e01a0fa737b52e9cb4d9e9761900b39684e5212afea3a93608c3e99fa5f839"
+      "computedHash": "b015d81f1e2b0f21d5ff65c6ae6e2f3c5429c5c0d7a2ebb718d97b2bcdb76d03"
     },
     "godot-gdscript-patterns": {
       "source": "wshobson/agents",
       "sourceType": "github",
       "skillPath": "plugins/game-development/skills/godot-gdscript-patterns/SKILL.md",
-      "computedHash": "2c1033a49da376a6ebac9d45f9a25076660023b2e4448822b00188acf722ba9c"
+      "computedHash": "78195eaebec02434bd7cdb90a78bcf1573d1ec36c2a590649d9839a7a3350767"
     },
     "godot-nodes-scenes": {
       "source": "gamedev-skills/awesome-gamedev-agent-skills",
       "sourceType": "github",
       "skillPath": "skills/godot/godot-nodes-scenes/SKILL.md",
-      "computedHash": "c8da9c0defe579eea5e89956d8337085a3ce9e5d8cef9293b219a88b4b6e0cc2"
+      "computedHash": "658291c8c670516d41cd3850984ec579eb31f8669b8b2a8cc2ce5078f95b824b"
     },
     "godot-signals-groups": {
       "source": "gamedev-skills/awesome-gamedev-agent-skills",
       "sourceType": "github",
       "skillPath": "skills/godot/godot-signals-groups/SKILL.md",
-      "computedHash": "3e9afc9c3c261c2ba7deb9ad349cbb11a59b33b85a253096c98c7df94b9bfec9"
+      "computedHash": "b6149b5fcf4d9c6cbf1970f2e3d58fa6e1bdefca957a09f98fdfaeda1e2717bd"
+    },
+    "skill-creator": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/skill-creator/SKILL.md",
+      "computedHash": "2d7f889e6ae93c6c27d699856942c336b5b8644537496987d5571043d059b1dc"
     }
   }
 }

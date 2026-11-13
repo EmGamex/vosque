@@ -5,7 +5,8 @@ description: >-
   y mapas de entrada en Godot 4.x usando exclusivamente el MCP godot-ai. Incluye el flujo estándar
   scene_open -> node_create/node_set_property -> scene_save, instanciación, recursos embebidos vs
   compartidos, conexión de señales y resolución de errores típicos (EDITOR_NOT_READY, EDITED_SCENE_MISMATCH,
-  PROPERTY_NOT_ON_CLASS). Usa esta skill al crear o modificar escenas, nodos o configuraciones de Godot.
+  PROPERTY_NOT_ON_CLASS). Usa esta skill siempre que vayas a crear, abrir, guardar o modificar escenas,
+  nodos, recursos o configuraciones de Godot en el editor.
 ---
 
 # Vosque MCP Workflow: Manipulación de Escenas y Recursos
@@ -43,7 +44,7 @@ flowchart TD
   Llama a `scene_open`:
   ```json
   {
-    "path": "res://escenas/core/maain.tscn",
+    "path": "res://escenas/maain.tscn",
     "force_reload": false
   }
   ```
@@ -55,7 +56,7 @@ flowchart TD
   {
     "op": "create",
     "params": {
-      "path": "res://escenas/ui/menu_pausa.tscn",
+      "path": "res://escenas/menu_pausa.tscn",
       "root_type": "Control",
       "root_name": "MenuPausa"
     }
@@ -105,12 +106,12 @@ Una vez terminadas todas las mutaciones del paso 3:
 
 ### Instanciación de Escenas (`PackedScene`)
 
-Para instanciar una subescena ya empaquetada (ej. `jugador.tscn` dentro de `maain.tscn`):
+Para instanciar una subescena ya empaquetada (ej. `personaje.tscn` dentro de `maain.tscn`):
 * En `node_create`, usa el parámetro `scene_path` en lugar de `type` (son mutuamente excluyentes):
   ```json
   {
     "parent_path": "/Maain",
-    "scene_path": "res://escenas/entidades/jugador.tscn",
+    "scene_path": "res://escenas/personaje.tscn",
     "name": "Jugador"
   }
   ```
@@ -125,7 +126,7 @@ Para instanciar una subescena ya empaquetada (ej. `jugador.tscn` dentro de `maai
     }
   }
   ```
-  Si los cambios son estructurales (agregar o quitar nodos), abre y edita la escena fuente (`res://escenas/entidades/jugador.tscn`).
+  Si los cambios son estructurales (agregar o quitar nodos), abre y edita la escena fuente (`res://escenas/personaje.tscn`).
 
 ### Recursos: Embebidos vs. Compartidos (.tres)
 
@@ -220,7 +221,7 @@ Para instanciar una subescena ya empaquetada (ej. `jugador.tscn` dentro de `maai
 | `PROPERTY_NOT_ON_CLASS` | El nombre de la propiedad no existe en la clase Godot (ej. usar `field_of_view` en vez de `fov`, o `image` en vez de `texture`). | Inspeccionar con `node_get_properties(path="...", fields=[...])` antes de modificar. |
 | Error al editar hijos de instancia | Intentando alterar nodos internos de una subescena sin permisos. | Activar `node_manage(op="set_editable_children", params={"path": "...", "editable": true})` para modificar propiedades, o usar `scene_open` en la subescena para cambios estructurales. |
 | `switched: false` en `scene_open` | El cambio de escena tardó más del umbral de espera síncrono. | Consultar `editor_state()` para confirmar que la escena activa ya es la solicitada antes de continuar. |
-| Fallos espurios en `test_run` con `scene_warning` | Tests de integración asumen que la escena principal está cargada en el viewport del editor. | Abrir la escena principal con `scene_open(path="res://escenas/core/maain.tscn")` y volver a lanzar `test_run`. |
+| Fallos espurios en `test_run` con `scene_warning` | Tests de integración asumen que la escena principal está cargada en el viewport del editor. | Abrir la escena principal con `scene_open(path="res://escenas/maain.tscn")` y volver a lanzar `test_run`. |
 
 ---
 

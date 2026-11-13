@@ -6,6 +6,7 @@
 y_sort_enabled = true
 
 [node name="PuntosDeNota" type="Node2D" parent="." unique_id=1721145953]
+position = Vector2(98, -118)
 
 [node name="MarkerNota1" type="Marker2D" parent="PuntosDeNota" unique_id=820379915 groups=["puntos_nota"]]
 position = Vector2(-550, 550)

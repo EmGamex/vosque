@@ -4,7 +4,7 @@ description: >-
   Reglas de diseño, contratos e invariantes del bucle principal de Vosque: Game Director (Maain),
   subcontroladores RefCounted (SpawnerNotas, ControladorAmenazaMonstruo), lógica de notas con recolección atómica (esta_recolectada()),
   filtros de spawning seguro, progresión cuantitativa (500 a 920 px/s), y FSM de la Criatura (hibernación en Nota 0, despertar en Nota 1, steering tangencial).
-  Usa esta skill al modificar o diseñar sistemas de gameplay, orquestación de partida, mecánicas del monstruo, spawners de notas o tests relacionados.
+  Usa esta skill al modificar, diseñar o depurar gameplay, orquestación de partida, IA/velocidad/colisiones del monstruo, spawners de notas o tests relacionados.
 ---
 
 # Vosque Gameplay Architecture
@@ -113,6 +113,7 @@ stateDiagram-v2
 ### 4. Steering Tangencial y Desatasco
 * **Steering Tangencial:** Si `tiene_linea_vision == false`, `is_on_wall()` y la velocidad decae significativamente frente a un obstáculo, el movimiento proyecta vectores tangenciales a $\pm 45^\circ$ respecto a la normal del muro, eligiendo la rama que minimice la distancia al jugador.
 * **Desatasco Post-Mutación:** Si al mutar sectores el monstruo queda solapado (`ResolutorAtascamiento.verificar_solapamiento_solido()`), se reubica al `Marker2D` (`puntos_nota`) libre más cercano a $\ge 600\text{ px}$ del jugador y se anota en `ultimo_marcador_desatasco` para que el spawner no genere una nota encima.
+  * > 🌲 **Arquitectura completa del mundo, mutación y niebla:** Para los contratos de sectores 2x2, shader de niebla geométrica, iluminación ambiental y presupuesto WebGL 2.0, consulta [`vosque-world-mutation-lighting`](../vosque-world-mutation-lighting/SKILL.md).
 * **Memoria de Luz y Cuadrantes:** Al iluminar una nota activa con la linterna, se revela su cuadrante en el `MinimapaHUD` (`Maain` -> `HUD`) sin exponer la posición exacta del monstruo.
 
 ---
