@@ -75,11 +75,14 @@ func actualizar_estamina(actual: float, maxima: float, p_fatigado: bool) -> void
 		_interrumpir_cierre_y_mostrar()
 
 	var caida: float = ratio_visual - nuevo_ratio
+	var subida: float = nuevo_ratio - ratio_visual
 	ratio_estamina = nuevo_ratio
 
 	# Animar con Tween si la caída es brusca (salto, plancha/clavado)
 	if caida >= umbral_consumo_brusco:
 		_ejecutar_tween_consumo_brusco(nuevo_ratio)
+	elif subida >= umbral_consumo_brusco:
+		_ejecutar_tween_recuperacion_brusca(nuevo_ratio)
 	elif nuevo_ratio >= ratio_visual:
 		# En regeneración o aumento, seguir en tiempo real
 		if _tween_consumo != null and _tween_consumo.is_valid():
@@ -105,6 +108,21 @@ func _ejecutar_tween_consumo_brusco(nuevo_ratio: float) -> void:
 			_tween_consumo.tween_property(self, "scale", Vector2.ONE, duracion_tween_consumo * 0.6).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
 	else:
 		ratio_visual = nuevo_ratio
+
+func _ejecutar_tween_recuperacion_brusca(nuevo_ratio: float) -> void:
+	if _tween_consumo != null and _tween_consumo.is_valid():
+		_tween_consumo.kill()
+
+	ratio_visual = nuevo_ratio
+	if is_inside_tree():
+		_color_flash_actual = color_destello
+		_tween_consumo = create_tween()
+		_tween_consumo.tween_property(self, "scale", Vector2(1.12, 1.12), 0.1).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		_tween_consumo.tween_property(self, "scale", Vector2.ONE, 0.12).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+		_tween_consumo.parallel().tween_property(self, "_color_flash_actual", Color.WHITE, 0.2)
+	else:
+		_color_flash_actual = Color.WHITE
+		scale = Vector2.ONE
 
 func _interrumpir_cierre_y_mostrar() -> void:
 	_en_cierre = false

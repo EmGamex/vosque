@@ -26,6 +26,11 @@ Referencia detallada de constantes, fórmulas, contratos de API y *gotchas* veri
 | `dive_speed` | `1200.0` | — | `100.0..3000.0 px/s` |
 | `dive_recovery_duration` | `0.6` | — | `0.1..2.0 s` |
 | `dive_slide_friction` | `2200.0` | — | `0.0..10000.0 px/s²` |
+| `note_stamina_restore_ratio` | `0.5` | — | `0.0..1.0` |
+| `note_speed_boost_multiplier` | `1.2` | — | `1.0..2.0` |
+| `note_speed_boost_duration` | `1.5` | — | `0.0..5.0 s` |
+| `note_no_stamina_drain_duration` | `1.5` | — | `0.0..10.0 s` |
+| `note_boost_tint` | `Color(0.75, 1.0, 0.9, 1.0)` | — | — |
 
 * **Señales:** `estamina_cambiada(actual: float, maxima: float, fatigado: bool)`, `estado_cambiado(nuevo_estado: Estado, nombre_estado: String)`.
 * **Acciones `InputMap` (`project.godot`):** `personaje-arriba`, `personaje-abajo`, `personaje-izquierda`, `personaje-derecha`, `personaje-salto` (`Espacio`), `sprint` (`Shift`) y soporte opcional si existe `personaje-sprint`.

@@ -28,7 +28,7 @@ Esta skill centraliza los contratos técnicos, invariantes matemáticos y *gotch
 
 ## 2. FSM del Personaje, Locomoción y Eje Z Simulado
 
-[`Personaje`](../../../scripts/entidades/personaje/personaje.gd) (`@tool`, `CharacterBody2D`, grupo `"jugador"`) opera en `MOTION_MODE_FLOATING` con `Input.get_vector("personaje-izquierda", "personaje-derecha", "personaje-arriba", "personaje-abajo")`.
+[`Personaje`](../../../scripts/entidades/personaje/personaje.gd) (`@tool`, `CharacterBody2D`, grupo `"jugador"`) actúa como fachada modular que coordina [`PersonajeEstaminaController`](../../../scripts/entidades/personaje/componentes/personaje_estamina_controller.gd), [`PersonajeLocomocionController`](../../../scripts/entidades/personaje/componentes/personaje_locomocion_controller.gd) y [`PersonajeVistaController`](../../../scripts/entidades/personaje/componentes/personaje_vista_controller.gd), operando en `MOTION_MODE_FLOATING` con `Input.get_vector("personaje-izquierda", "personaje-derecha", "personaje-arriba", "personaje-abajo")`.
 
 ```mermaid
 stateDiagram-v2
@@ -53,9 +53,10 @@ stateDiagram-v2
 1. **Eje Z simulado y Capa 2 (`Obstaculos_Bajos`):**
    * En `SALTO` ($4u(1-u)$) y `PLANCHA_AIRE` ($(1-u)\cdot h_{\text{despegue}}$) se desactiva la máscara de Capa 2 (`set_collision_mask_value(2, false)`) manteniendo Capa 1 (`Mundo_Alto`) activa.
    * Al aterrizar (`_finalizar_salto_libre` / `_impactar_plancha`), **siempre** restaurar Capa 2 (`_restaurar_mascara_colision_suelo()`) y resetear visuales (`_restaurar_visuales_eje_z()`).
-2. **Anti-salto fantasma y captura:**
+2. **Anti-salto fantasma, impulso por nota y captura:**
    * `NOTIFICATION_UNPAUSED` y `consumir_buffer_salto()` activan `_bloquear_salto_un_frame = true` para evitar saltos residuales al despausar con <kbd>Espacio</kbd>.
-   * `detener_por_captura()` fija `velocity = Vector2.ZERO` y `set_physics_process(false)`.
+   * `aplicar_impulso_nota()` (invocado por `Maain._on_nota_recolectada()`) restaura `+50%` de `max_stamina`, limpia `fatigado`, reinicia `_regen_timer = 0.0` y activa durante `1.5 s` un boost temporal de velocidad (`1.20x` en caminata, sprint y `SALTO`, sin alterar `dive_speed` ni `@export` base) junto con una ventana sin gasto de estamina (`note_no_stamina_drain_duration = 1.5 s`) para sprint, salto y plancha.
+   * `detener_por_captura()` fija `velocity = Vector2.ZERO`, limpia el boost/feedback visual y `set_physics_process(false)`.
 3. **Modo `@tool` y debug:**
    * `_physics_process()` debe retornar de inmediato si `Engine.is_editor_hint()`.
    * Respetar `god_mode` y `sin_gasto_estamina` (sin reiniciar `_regen_timer` ni drenar barra).
@@ -68,7 +69,7 @@ stateDiagram-v2
 ### [`IndicadorEstamina`](../../../scripts/ui/indicador_estamina.gd) (`@tool`, `Node2D`, `z_index = 2`)
 * Anclado en `Vector2(0, -60)` sobre `Personaje`; se auto-conecta a la señal `estamina_cambiada(actual, maxima, fatigado)` del padre.
 * **Visibilidad:** Inicia invisible (`modulate.a = 0.0`) al `100%` y reaparece al consumir; al recargar al `100%` ejecuta pulso elástico + fade-out.
-* **Feedback:** Usa Tween ante caídas bruscas (`caida >= 0.05`) con *micro-punch* (`1.08`), y titileo a `16.0 Hz` cuando `esta_fatigado` o `ratio_estamina < 0.30`.
+* **Feedback:** Usa Tween ante caídas bruscas (`caida >= 0.05`) con *micro-punch* (`1.08`), ante recargas bruscas parciales (`subida >= 0.05`) con pulso/flash hacia `color_destello`, y titileo a `16.0 Hz` cuando `esta_fatigado` o `ratio_estamina < 0.30`.
 
 ### [`TutorialCabeza`](../../../scripts/ui/tutorial_cabeza/tutorial_cabeza.gd) (`@tool`, `Node2D`, `z_index = 3`)
 * Sigue el patrón fachada + subcontroladores `RefCounted`: [`TutorialEstadoController`](../../../scripts/ui/tutorial_cabeza/tutorial_estado_controller.gd) y [`TutorialVistaController`](../../../scripts/ui/tutorial_cabeza/tutorial_vista_controller.gd).
@@ -96,5 +97,6 @@ stateDiagram-v2
 
 * **Cuándo leer la referencia técnica:** Abre [player-camera-contracts.md](./references/player-camera-contracts.md) antes de ajustar constantes físicas, fórmulas de eje Z, contratos de `IndicadorEstamina`/`TutorialCabeza`, implementar `agregar_trauma()` en `Camera2D` o revisar *gotchas* conocidos entre escenas y scripts.
 * **Suites de prueba en motor (`godot-ai`):**
+  * `tests/test_personaje.gd` (`suite_name() -> "personaje"`)
   * `tests/test_indicador_estamina.gd` (`suite_name() -> "indicador_estamina"`)
   * `tests/test_tutorial_cabeza.gd` (`suite_name() -> "tutorial_cabeza"`)

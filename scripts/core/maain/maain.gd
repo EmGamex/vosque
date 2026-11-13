@@ -193,6 +193,9 @@ func _on_nota_recolectada(pos_nota: Vector2) -> void:
 		hud.actualizar_contador(notas_recolectadas, true)
 		hud.limpiar_minimapa_objetivo()
 
+	if jugador != null and is_instance_valid(jugador) and jugador.has_method("aplicar_impulso_nota"):
+		jugador.aplicar_impulso_nota()
+
 	amenaza_monstruo.procesar_nota_recolectada(
 		notas_recolectadas,
 		enemigo,
