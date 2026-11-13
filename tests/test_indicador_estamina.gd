@@ -113,3 +113,25 @@ func test_animacion_tween_consumo_brusco() -> void:
 	assert_eq(inst.ratio_visual, 0.8, "ratio_visual debe reflejar 0.8 fuera de arbol")
 
 	inst.free()
+
+
+func test_recuperacion_brusca_parcial_y_completa() -> void:
+	var escena: PackedScene = load("res://escenas/ui/indicador_estamina.tscn")
+	var inst: IndicadorEstamina = escena.instantiate() as IndicadorEstamina
+	inst._ready()
+
+	inst.actualizar_estamina(20.0, 100.0, true)
+	assert_true(inst.esta_fatigado, "Debe marcar fatiga en 20%")
+
+	# Recarga parcial (+50% -> 70%) limpiando fatiga
+	inst.actualizar_estamina(70.0, 100.0, false)
+	assert_false(inst.esta_fatigado, "Debe limpiar fatiga tras recarga parcial")
+	assert_true(is_equal_approx(inst.ratio_estamina, 0.7), "ratio_estamina debe ser 0.7")
+	assert_true(is_equal_approx(inst.ratio_visual, 0.7), "ratio_visual debe reflejar 0.7")
+
+	# Recarga completa (70% -> 100%)
+	inst.actualizar_estamina(100.0, 100.0, false)
+	assert_eq(inst.ratio_estamina, 1.0, "ratio_estamina debe ser 1.0")
+	assert_eq(inst.ratio_visual, 1.0, "ratio_visual debe ser 1.0")
+
+	inst.free()

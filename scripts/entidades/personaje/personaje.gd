@@ -40,6 +40,12 @@ signal estado_cambiado(nuevo_estado: Estado, nombre_estado: String)
 @export_range(0.1, 2.0, 0.05, "suffix:s") var dive_recovery_duration: float = 0.6
 @export_range(0.0, 10000.0, 50.0, "suffix:px/s²") var dive_slide_friction: float = 2200.0
 
+@export_group("Impulso por Nota")
+@export_range(0.0, 1.0, 0.05) var note_stamina_restore_ratio: float = 0.5
+@export_range(1.0, 2.0, 0.05) var note_speed_boost_multiplier: float = 1.2
+@export_range(0.0, 5.0, 0.1, "suffix:s") var note_speed_boost_duration: float = 1.5
+@export var note_boost_tint: Color = Color(0.75, 1.0, 0.9, 1.0)
+
 var estado_actual: Estado = Estado.REPOSO
 var stamina: float = 100.0
 var fatigado: bool = false
@@ -54,6 +60,8 @@ var _tiempo_recuperacion: float = 0.0
 var _ultima_direccion: Vector2 = Vector2.DOWN
 var _direccion_plancha: Vector2 = Vector2.DOWN
 var _bloquear_salto_un_frame: bool = false
+var _tiempo_boost_nota: float = 0.0
+var _tween_feedback_nota: Tween = null
 
 @onready var _visual: Node2D = get_node_or_null("Visual") as Node2D
 @onready var _sprite: AnimatedSprite2D = get_node_or_null("Visual/Sprite2D") as AnimatedSprite2D
@@ -66,6 +74,9 @@ var _bloquear_salto_un_frame: bool = false
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_UNPAUSED:
 		_bloquear_salto_un_frame = true
+	elif what == NOTIFICATION_PREDELETE:
+		if _tween_feedback_nota != null and _tween_feedback_nota.is_valid():
+			_tween_feedback_nota.kill()
 
 
 ## Fuerza la limpieza de cualquier intento de salto residual acumulado en pausa o transiciones.
@@ -77,8 +88,24 @@ func consumir_buffer_salto() -> void:
 
 ## Detiene el movimiento y procesamiento del personaje al ser capturado.
 func detener_por_captura() -> void:
+	_tiempo_boost_nota = 0.0
+	_restaurar_feedback_nota()
 	velocity = Vector2.ZERO
 	set_physics_process(false)
+
+
+## Restaura estamina parcial, limpia fatiga y activa un boost temporal de velocidad al recoger una nota.
+func aplicar_impulso_nota() -> void:
+	var estamina_extra: float = max_stamina * note_stamina_restore_ratio
+	stamina = minf(max_stamina, stamina + estamina_extra)
+	_regen_timer = 0.0
+	fatigado = false
+	if estado_actual == Estado.FATIGA:
+		_cambiar_estado(Estado.CAMINANDO if velocity.length() >= stop_threshold else Estado.REPOSO)
+	estamina_cambiada.emit(stamina, max_stamina, fatigado)
+
+	_tiempo_boost_nota = note_speed_boost_duration
+	_ejecutar_feedback_visual_nota()
 
 
 func _ready() -> void:
@@ -114,6 +141,12 @@ func _physics_process_logica(delta: float) -> void:
 		quiere_salto = false
 
 	var estamina_consumida_en_frame: bool = false
+	var tenia_boost: bool = _tiempo_boost_nota > 0.0
+	if tenia_boost:
+		_tiempo_boost_nota = maxf(0.0, _tiempo_boost_nota - delta)
+		if _tiempo_boost_nota <= 0.0:
+			_restaurar_feedback_nota()
+	var factor_boost: float = note_speed_boost_multiplier if _tiempo_boost_nota > 0.0 else 1.0
 
 	match estado_actual:
 		Estado.REPOSO, Estado.CAMINANDO, Estado.SPRINT, Estado.FATIGA:
@@ -121,10 +154,10 @@ func _physics_process_logica(delta: float) -> void:
 				_iniciar_salto_libre()
 				estamina_consumida_en_frame = true
 			else:
-				var vel_objetivo: float = speed
+				var vel_objetivo: float = speed * factor_boost
 				if quiere_sprint and is_moving and not fatigado and (sin_gasto_estamina or stamina > 0.0):
 					_cambiar_estado(Estado.SPRINT)
-					vel_objetivo = sprint_speed
+					vel_objetivo = sprint_speed * factor_boost
 					if not sin_gasto_estamina:
 						stamina = max(0.0, stamina - sprint_drain_rate * delta)
 						_regen_timer = stamina_regen_delay
@@ -165,7 +198,7 @@ func _physics_process_logica(delta: float) -> void:
 				var factor_altura: float = 4.0 * u * (1.0 - u)
 				_aplicar_elevacion_eje_z(factor_altura)
 
-				var air_target: Vector2 = direction * max(speed, velocity.length())
+				var air_target: Vector2 = direction * max(speed * factor_boost, velocity.length())
 				if is_moving:
 					velocity = velocity.move_toward(air_target, acceleration * 0.5 * delta)
 
@@ -382,6 +415,26 @@ func _reproducir_animacion(anim_name: StringName) -> void:
 func _restaurar_mascara_colision_suelo() -> void:
 	set_collision_mask_value(1, true)
 	set_collision_mask_value(2, true)
+
+
+func _ejecutar_feedback_visual_nota() -> void:
+	if _visual == null or not is_instance_valid(_visual):
+		return
+	if _tween_feedback_nota != null and _tween_feedback_nota.is_valid():
+		_tween_feedback_nota.kill()
+	_visual.modulate = note_boost_tint
+	if is_inside_tree():
+		_tween_feedback_nota = create_tween()
+		_tween_feedback_nota.tween_property(_visual, "scale", Vector2(1.12, 1.12), 0.1).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		_tween_feedback_nota.tween_property(_visual, "scale", Vector2.ONE, 0.12).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+
+
+func _restaurar_feedback_nota() -> void:
+	if _tween_feedback_nota != null and _tween_feedback_nota.is_valid():
+		_tween_feedback_nota.kill()
+	if _visual != null and is_instance_valid(_visual):
+		_visual.modulate = Color.WHITE
+		_visual.scale = Vector2.ONE
 
 
 func _cambiar_estado(nuevo_estado: Estado) -> void:
