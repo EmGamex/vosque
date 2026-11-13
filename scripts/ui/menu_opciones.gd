@@ -23,6 +23,11 @@ const PASO_SLIDER: float = 5.0
 const VOLUMEN_LINEAL_MIN: float = 0.0001
 const VOLUMEN_LINEAL_MAX: float = 100.0
 const INTERVALO_MINIMO_TICK_SLIDER_MSEC: int = 50
+const VOLUMEN_DEFECTO_BUS_DB: Dictionary = {
+	&"Master": 0.0,
+	&"musica": -7.9588003,
+	&"sfx": -1.9382002,
+}
 
 var _elementos_foco: Array[Control] = []
 var _indice_foco: int = 0
@@ -85,6 +90,24 @@ func _on_control_mouse_entered(ctrl: Control) -> void:
 		ctrl.grab_focus()
 
 
+func _obtener_db_predeterminado_bus(nombre_bus: StringName) -> float:
+	if is_inside_tree() and has_node("/root/GestorPersistencia"):
+		var gp := get_node("/root/GestorPersistencia")
+		if gp.has_method("obtener_volumen_bus_predeterminado_db"):
+			return float(gp.obtener_volumen_bus_predeterminado_db(nombre_bus))
+	return float(VOLUMEN_DEFECTO_BUS_DB.get(nombre_bus, 0.0))
+
+
+func _calcular_offset_db(porcentaje: float) -> float:
+	return linear_to_db(clampf(porcentaje / VOLUMEN_LINEAL_MAX, VOLUMEN_LINEAL_MIN, 1.0))
+
+
+func _calcular_porcentaje_relativo(nombre_bus: StringName, db_actual: float) -> float:
+	var base_db: float = _obtener_db_predeterminado_bus(nombre_bus)
+	var lineal: float = db_to_linear(db_actual - base_db) * VOLUMEN_LINEAL_MAX
+	return clampf(lineal, 0.0, VOLUMEN_LINEAL_MAX)
+
+
 func _cargar_valores_actuales() -> void:
 	_silenciar_audio_ajustes = true
 	var idx_master := AudioServer.get_bus_index(&"Master")
@@ -136,7 +159,7 @@ func desactivar() -> void:
 	_guardar_ajustes()
 
 
-func _guardar_ajustes() -> void:
+func _guardar_ajustes(usar_audio_usuario: bool = true) -> void:
 	if not is_inside_tree():
 		return
 	if has_node("/root/GestorPersistencia"):
@@ -146,7 +169,7 @@ func _guardar_ajustes() -> void:
 			var musica_v: float = slider_musica.value if slider_musica else VOLUMEN_LINEAL_MAX
 			var sfx_v: float = slider_sfx.value if slider_sfx else VOLUMEN_LINEAL_MAX
 			var pantalla_c: bool = check_pantalla_completa.button_pressed if check_pantalla_completa else false
-			gp.guardar_configuracion_audio(master_v, musica_v, sfx_v, pantalla_c)
+			gp.guardar_configuracion_audio(master_v, musica_v, sfx_v, pantalla_c, usar_audio_usuario)
 
 
 func _actualizar_label_porcentaje(lbl: Label, val: float) -> void:
@@ -166,12 +189,15 @@ func _on_slider_master_changed(val: float) -> void:
 func _on_slider_musica_changed(val: float) -> void:
 	_actualizar_label_porcentaje(label_val_musica, val)
 	var db := linear_to_db(max(val / VOLUMEN_LINEAL_MAX, VOLUMEN_LINEAL_MIN))
+	var offset_db := db - _obtener_db_predeterminado_bus(&"musica")
 	var idx := AudioServer.get_bus_index(&"musica")
 	if idx >= 0:
 		AudioServer.set_bus_volume_db(idx, db)
 	if has_node("/root/GestorMusica"):
 		var gm = get_node("/root/GestorMusica")
-		if gm.has_method("establecer_volumen_base"):
+		if gm.has_method("establecer_offset_usuario_db"):
+			gm.establecer_offset_usuario_db(offset_db)
+		elif gm.has_method("establecer_volumen_base"):
 			gm.establecer_volumen_base(db)
 		elif "config" in gm and gm.config is ConfiguracionMusica:
 			gm.config.volumen_base_db = db
@@ -230,22 +256,18 @@ func restablecer_valores_por_defecto() -> void:
 	if not Engine.is_editor_hint():
 		DisplayServer.window_set_mode(modo_defecto_config)
 
+	_silenciar_audio_ajustes = true
 	if check_pantalla_completa:
 		check_pantalla_completa.button_pressed = es_pantalla_completa
+	_silenciar_audio_ajustes = false
+
+	if has_node("/root/GestorMusica"):
+		var gm = get_node("/root/GestorMusica")
+		if gm.has_method("restaurar_volumen_predeterminado"):
+			gm.restaurar_volumen_predeterminado(true)
 
 	_cargar_valores_actuales()
-
-	var idx_musica := AudioServer.get_bus_index(&"musica")
-	if idx_musica >= 0:
-		var db := AudioServer.get_bus_volume_db(idx_musica)
-		if has_node("/root/GestorMusica"):
-			var gm = get_node("/root/GestorMusica")
-			if gm.has_method("establecer_volumen_base"):
-				gm.establecer_volumen_base(db)
-			elif "config" in gm and gm.config is ConfiguracionMusica:
-				gm.config.volumen_base_db = db
-
-	_guardar_ajustes()
+	_guardar_ajustes(false)
 
 
 func _on_boton_volver_pressed() -> void:

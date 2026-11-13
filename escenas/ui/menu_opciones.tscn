@@ -9,6 +9,7 @@
 custom_minimum_size = Vector2(1080, 1080)
 layout_mode = 3
 anchors_preset = 0
+mouse_filter = 2
 script = ExtResource("1_be8ok")
 
 [node name="Layout" type="CenterContainer" parent="." unique_id=869476734]
@@ -62,6 +63,7 @@ custom_minimum_size = Vector2(420, 44)
 layout_mode = 2
 focus_neighbor_top = NodePath("../../BotonVolver")
 focus_neighbor_bottom = NodePath("../../FilaMusica/SliderMusica")
+focus_mode = 0
 value = 100.0
 
 [node name="ValMaster" type="Label" parent="Layout/PanelOpciones/Margen/Columna/FilaMaster" unique_id=385040778]
@@ -86,6 +88,7 @@ custom_minimum_size = Vector2(420, 44)
 layout_mode = 2
 focus_neighbor_top = NodePath("../../FilaMaster/SliderMaster")
 focus_neighbor_bottom = NodePath("../../FilaSFX/SliderSFX")
+focus_mode = 0
 value = 40.0
 
 [node name="ValMusica" type="Label" parent="Layout/PanelOpciones/Margen/Columna/FilaMusica" unique_id=1363035107]
@@ -110,13 +113,14 @@ custom_minimum_size = Vector2(420, 44)
 layout_mode = 2
 focus_neighbor_top = NodePath("../../FilaMusica/SliderMusica")
 focus_neighbor_bottom = NodePath("../../FilaPantalla/CheckPantalla")
-value = 79.0
+focus_mode = 0
+value = 80.0
 
 [node name="ValSFX" type="Label" parent="Layout/PanelOpciones/Margen/Columna/FilaSFX" unique_id=121746443]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("2_yrh4g")
 theme_override_font_sizes/font_size = 36
-text = "79%"
+text = "80%"
 
 [node name="FilaPantalla" type="HBoxContainer" parent="Layout/PanelOpciones/Margen/Columna" unique_id=1033751110]
 layout_mode = 2
@@ -135,6 +139,7 @@ focus_neighbor_left = NodePath(".")
 focus_neighbor_top = NodePath("../../FilaSFX/SliderSFX")
 focus_neighbor_right = NodePath(".")
 focus_neighbor_bottom = NodePath("../../BotonRestablecer")
+focus_mode = 0
 
 [node name="Separador2" type="HSeparator" parent="Layout/PanelOpciones/Margen/Columna" unique_id=1617394617]
 layout_mode = 2
@@ -148,6 +153,7 @@ focus_neighbor_left = NodePath(".")
 focus_neighbor_top = NodePath("../FilaPantalla/CheckPantalla")
 focus_neighbor_right = NodePath(".")
 focus_neighbor_bottom = NodePath("../BotonVolver")
+focus_mode = 0
 theme_override_colors/font_focus_color = Color(0.9019608, 1, 0.7019608, 1)
 theme_override_colors/font_hover_color = Color(0.9019608, 1, 0.7019608, 1)
 theme_override_fonts/font = ExtResource("2_yrh4g")
@@ -163,6 +169,7 @@ focus_neighbor_left = NodePath(".")
 focus_neighbor_top = NodePath("../BotonRestablecer")
 focus_neighbor_right = NodePath(".")
 focus_neighbor_bottom = NodePath("../FilaMaster/SliderMaster")
+focus_mode = 0
 theme_override_colors/font_focus_color = Color(0.9019608, 1, 0.7019608, 1)
 theme_override_colors/font_hover_color = Color(0.9019608, 1, 0.7019608, 1)
 theme_override_fonts/font = ExtResource("2_yrh4g")

@@ -54,22 +54,30 @@ func _restaurar_audio_normal() -> void:
 
 ---
 
-### 1.3. Sincronización de Volumen Base desde Ajustes / Sliders
-Al modificar el slider de música en `MenuOpciones` o al cargar datos desde `GestorPersistencia`:
+### 1.3. Sincronización de Volumen de Usuario desde Ajustes / Sliders
+Al modificar el slider de música en `MenuOpciones` o al cargar datos desde `GestorPersistencia` (sin mutar `config.volumen_base_db` en `config_musica_defecto.tres`):
 
 ```gdscript
-func _aplicar_volumen_musica(db: float) -> void:
+func _aplicar_volumen_musica(db: float, base_musica_predeterminada_db: float) -> void:
 	var idx := AudioServer.get_bus_index(&"musica")
 	if idx >= 0:
 		AudioServer.set_bus_volume_db(idx, db)
 
-	# Sincronización obligatoria para que GestorMusica no sobrescriba el volumen en su _process
+	# Sincronización obligatoria mediante offset relativo para preservar el preset base
+	var offset_db: float = db - base_musica_predeterminada_db
 	if has_node("/root/GestorMusica"):
 		var gm: Node = get_node("/root/GestorMusica")
-		if gm.has_method("establecer_volumen_base"):
+		if gm.has_method("establecer_offset_usuario_db"):
+			gm.establecer_offset_usuario_db(offset_db)
+		elif gm.has_method("establecer_volumen_base"):
 			gm.establecer_volumen_base(db)
-		elif "config" in gm and gm.config is ConfiguracionMusica:
-			gm.config.volumen_base_db = db
+
+# Al pulsar "Restablecer Valores" en MenuOpciones:
+func _restaurar_musica_predeterminada() -> void:
+	if has_node("/root/GestorMusica"):
+		var gm: Node = get_node("/root/GestorMusica")
+		if gm.has_method("restaurar_volumen_predeterminado"):
+			gm.restaurar_volumen_predeterminado(true)
 ```
 
 ---
