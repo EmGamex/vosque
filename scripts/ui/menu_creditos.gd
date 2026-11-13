@@ -8,6 +8,7 @@ extends Control
 
 signal volver_solicitado
 
+@onready var scroll_creditos: ScrollContainer = $Layout/PanelCreditos/Margen/Columna/ScrollCreditos
 @onready var boton_volver: Button = $Layout/PanelCreditos/Margen/Columna/BotonVolver
 
 var _activo: bool = false
@@ -30,6 +31,8 @@ func activar() -> void:
 	_activo = true
 	visible = true
 	mouse_filter = Control.MOUSE_FILTER_STOP
+	if scroll_creditos != null:
+		scroll_creditos.scroll_vertical = 0
 	_silenciar_audio_ajustes = true
 	if boton_volver != null:
 		boton_volver.focus_mode = Control.FOCUS_ALL
@@ -69,5 +72,11 @@ func _input(evento: InputEvent) -> void:
 
 	if evento.is_action_pressed("ui_cancel"):
 		_on_boton_volver_pressed()
+		get_viewport().set_input_as_handled()
+	elif scroll_creditos != null and evento.is_action_pressed("ui_down", true):
+		scroll_creditos.scroll_vertical += 48
+		get_viewport().set_input_as_handled()
+	elif scroll_creditos != null and evento.is_action_pressed("ui_up", true):
+		scroll_creditos.scroll_vertical = maxi(0, scroll_creditos.scroll_vertical - 48)
 		get_viewport().set_input_as_handled()
 

@@ -85,3 +85,18 @@ func test_aislamiento_foco_y_mouse_filter() -> void:
 
 	panel.free()
 
+
+func test_scroll_creditos_sin_foco_y_reinicio_al_activar() -> void:
+	var escena: PackedScene = load(RUTA_ESCENA_CREDITOS)
+	var panel: MenuCreditos = escena.instantiate() as MenuCreditos
+	panel._ready()
+
+	assert_true(panel.scroll_creditos != null, "Debe existir ScrollCreditos")
+	assert_eq(panel.scroll_creditos.focus_mode, Control.FOCUS_NONE, "ScrollCreditos no debe robar foco")
+
+	panel.scroll_creditos.scroll_vertical = 120
+	panel.activar()
+	assert_eq(panel.scroll_creditos.scroll_vertical, 0, "activar() debe reiniciar el scroll al inicio")
+
+	panel.free()
+
