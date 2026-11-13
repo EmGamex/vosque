@@ -4,8 +4,8 @@ description: >-
   Arquitectura, contratos e invariantes para interfaces, pantallas, menús y audio de UI en Vosque:
   contrato Call Down / Signal Up, proceso de pausa híbrida (process_mode y CanvasLayer 50),
   blindaje anti-salto fantasma en 3 capas, audio desacoplado vía ControladorAudioUI/GestorAudioUI,
-  estándar de botones (foco cíclico, aislamiento y #e6ffb3) y directivas obligatorias de creación con el MCP godot-ai.
-  Usa esta skill al crear, editar o refactorizar pantallas, menús, HUD, pausas, transiciones o botones.
+  estándar de botones (foco cíclico, aislamiento y #e6ffb3) y capas CanvasLayer. Usa esta skill al crear,
+  editar o depurar pantallas, menús, HUD, pausas, transiciones, foco de botones o bugs de salto/ratón al despausar.
 ---
 
 # Vosque UI & Menus Architecture
@@ -14,12 +14,9 @@ Esta skill centraliza la arquitectura técnica, los contratos, los estándares v
 
 ---
 
-## 1. Directiva 0: Uso Obligatorio del MCP `godot-ai` para Escenas y Recursos
+## 1. Uso del MCP `godot-ai`
 
-Siguiendo las normas estrictas del proyecto ([`GEMINI.md`](../../../GEMINI.md)) y el protocolo operativo de [`vosque-mcp-workflow`](../vosque-mcp-workflow/SKILL.md):
-
-* **Prohibición absoluta:** NUNCA crees ni edites archivos `.tscn`, `.tres` ni configuraciones de motor modificando directamente archivos de texto plano en disco con herramientas de escritura de archivos.
-* **Flujo MCP estricto:** Consulta y sigue al pie de la letra las firmas y esquemas de parámetros definidos en [`vosque-mcp-workflow`](../vosque-mcp-workflow/SKILL.md) para la apertura/creación de escenas, mutación de nodos, fijación de propiedades, persistencia obligatoria con `scene_save` y validación de sintaxis en caliente con `script_create` / `script_patch`.
+Toda creación o edición de escenas UI (`.tscn`) y recursos (`.tres`) debe ejecutarse vía MCP `godot-ai` siguiendo el flujo de [`vosque-mcp-workflow`](../vosque-mcp-workflow/SKILL.md).
 
 ---
 

@@ -4,8 +4,8 @@ description: >-
   Arquitectura técnica, contratos e invariantes del subsistema de audio y música interactiva en Vosque:
   GestorMusica (ControladorMusica) con AudioStreamInteractive, layout de 5 buses (default_bus_layout.tres),
   efecto Nightmare Decay (pitch 0.65 + reverb en Game Over), atenuación aditiva en pausa, GestorAudioUI
-  desacoplado (ControladorAudioUI), sincronización de volumen base con persistencia/opciones y directivas
-  MCP godot-ai para audio. Usa esta skill al diseñar, editar o refactorizar música, buses, SFX o audio de UI.
+  desacoplado (ControladorAudioUI) y sincronización de volumen con persistencia/opciones. Usa esta skill
+  al diseñar, editar o depurar música, buses, SFX, volumen, cortes de audio en WebAudio o sonidos de UI.
 ---
 
 # Vosque Audio & Music Architecture
@@ -14,16 +14,11 @@ Esta skill centraliza la arquitectura de audio y música interactiva de **Vosque
 
 ---
 
-## 1. Directiva 0: Uso Obligatorio del MCP `godot-ai` y Utilidad Canónica
+## 1. Uso del MCP `godot-ai` y Utilidad Canónica
 
-Siguiendo las normas estrictas del proyecto (`GEMINI.md`) y el protocolo operativo de `vosque-mcp-workflow`:
-
-* **Prohibición absoluta:** NUNCA crees ni edites archivos `.tscn`, `.tres` (`default_bus_layout.tres`, `musica_interactiva.tres`, recursos de configuración) modificando directamente archivos de texto plano en disco.
-* **Inspección y manipulación:**
-  * Usa las herramientas MCP (`audio_manage`, `resource_manage`, `scene_manage`, `scene_open`, `scene_save`).
-  * Para generar o restaurar programáticamente el layout de buses y el recurso interactivo con las clases nativas de Godot, apóyate en la utilidad canónica `ConfiguradorBusesYMusica` (`scripts/audio/configurador_buses_y_musica.gd`):
-    * `ConfiguradorBusesYMusica.configurar_bus_layout(true)`
-    * `ConfiguradorBusesYMusica.configurar_musica_interactiva()`
+Toda mutación de escenas o recursos (`.tscn`, `.tres`, `default_bus_layout.tres`, `musica_interactiva.tres`) debe hacerse vía MCP `godot-ai` (`audio_manage`, `resource_manage`, `scene_open`, `scene_save`) según [`vosque-mcp-workflow`](../vosque-mcp-workflow/SKILL.md). Para generar o restaurar programáticamente el layout de buses y el recurso interactivo, apóyate en `ConfiguradorBusesYMusica` (`scripts/audio/configurador_buses_y_musica.gd`):
+* `ConfiguradorBusesYMusica.configurar_bus_layout(true)`
+* `ConfiguradorBusesYMusica.configurar_musica_interactiva()`
 
 ---
 
