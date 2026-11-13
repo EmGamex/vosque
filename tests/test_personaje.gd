@@ -138,3 +138,22 @@ func test_impulso_nota_permite_gastar_acciones_sin_drenar_estamina() -> void:
 	assert_true(p.stamina < estamina_antes_salto, "Al expirar la ventana, saltar debe volver a consumir estamina")
 
 	p.free()
+
+
+func test_nodos_audio_locomocion_configurados() -> void:
+	var escena: PackedScene = load("res://escenas/personaje.tscn")
+	var p: Personaje = escena.instantiate() as Personaje
+	p._ready()
+
+	for nombre in ["AudioPasos", "AudioSalto", "AudioPlancha"]:
+		var player: AudioStreamPlayer2D = p.get_node_or_null(nombre) as AudioStreamPlayer2D
+		assert_true(player != null, "Debe existir el nodo %s como AudioStreamPlayer2D" % nombre)
+		if player != null:
+			assert_eq(player.bus, &"sfx", "%s debe enrutar al bus sfx" % nombre)
+			assert_true(player.stream != null, "%s debe tener un stream asignado" % nombre)
+			assert_true(player.max_polyphony <= 3, "%s debe respetar max_polyphony <= 3 para WebAudio" % nombre)
+
+	p.detener_por_captura()
+	assert_eq(p._audio_ctrl._timer_paso, 0.0, "detener_por_captura debe reiniciar el temporizador de pasos")
+
+	p.free()

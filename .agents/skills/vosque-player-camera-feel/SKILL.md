@@ -28,7 +28,7 @@ Esta skill centraliza los contratos técnicos, invariantes matemáticos y *gotch
 
 ## 2. FSM del Personaje, Locomoción y Eje Z Simulado
 
-[`Personaje`](../../../scripts/entidades/personaje/personaje.gd) (`@tool`, `CharacterBody2D`, grupo `"jugador"`) actúa como fachada modular que coordina [`PersonajeEstaminaController`](../../../scripts/entidades/personaje/componentes/personaje_estamina_controller.gd), [`PersonajeLocomocionController`](../../../scripts/entidades/personaje/componentes/personaje_locomocion_controller.gd) y [`PersonajeVistaController`](../../../scripts/entidades/personaje/componentes/personaje_vista_controller.gd), operando en `MOTION_MODE_FLOATING` con `Input.get_vector("personaje-izquierda", "personaje-derecha", "personaje-arriba", "personaje-abajo")`.
+[`Personaje`](../../../scripts/entidades/personaje/personaje.gd) (`@tool`, `CharacterBody2D`, grupo `"jugador"`) actúa como fachada modular que coordina [`PersonajeEstaminaController`](../../../scripts/entidades/personaje/componentes/personaje_estamina_controller.gd), [`PersonajeLocomocionController`](../../../scripts/entidades/personaje/componentes/personaje_locomocion_controller.gd), [`PersonajeVistaController`](../../../scripts/entidades/personaje/componentes/personaje_vista_controller.gd) y [`PersonajeAudioController`](../../../scripts/entidades/personaje/componentes/personaje_audio_controller.gd), operando en `MOTION_MODE_FLOATING` con `Input.get_vector("personaje-izquierda", "personaje-derecha", "personaje-arriba", "personaje-abajo")`.
 
 ```mermaid
 stateDiagram-v2
