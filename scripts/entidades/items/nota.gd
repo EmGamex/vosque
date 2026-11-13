@@ -15,6 +15,8 @@ const AMPLITUD_FLOTACION: float = 4.0
 const VELOCIDAD_FLOTACION: float = 2.5
 const DURACION_FADE_REVELACION: float = 0.25
 
+@export var sfx_recoleccion: AudioStream = preload("res://sonido/sfx/gameplay/recolectar-nota.wav")
+
 var _tiempo: float = 0.0
 var _revelada: bool = false
 var _recolectada: bool = false
@@ -25,6 +27,7 @@ var _tween_revelacion: Tween = null
 @onready var _luz_baliza: PointLight2D = get_node_or_null("LuzBaliza") as PointLight2D
 @onready var _particulas_recogida: CPUParticles2D = get_node_or_null("ParticulasRecogida") as CPUParticles2D
 @onready var _sfx_revelacion: AudioStreamPlayer2D = get_node_or_null("SfxRevelacion") as AudioStreamPlayer2D
+@onready var _sfx_recoleccion: AudioStreamPlayer2D = get_node_or_null("SfxRecoleccion") as AudioStreamPlayer2D
 
 
 func esta_revelada() -> bool:
@@ -117,15 +120,24 @@ func recolectar() -> void:
 	if _luz_baliza != null:
 		_luz_baliza.visible = false
 
+	var duracion_sfx: float = 0.0
+	if _sfx_recoleccion != null:
+		if sfx_recoleccion != null:
+			_sfx_recoleccion.stream = sfx_recoleccion
+		if _sfx_recoleccion.stream != null and is_inside_tree():
+			_sfx_recoleccion.pitch_scale = randf_range(0.96, 1.04)
+			_sfx_recoleccion.play()
+			duracion_sfx = _sfx_recoleccion.stream.get_length() / maxf(_sfx_recoleccion.pitch_scale, 0.01)
+
+	var tiempo_espera: float = duracion_sfx
 	if _particulas_recogida != null:
 		_particulas_recogida.emitting = true
-		var tiempo_vida: float = maxf(_particulas_recogida.lifetime, 0.4)
-		if is_inside_tree():
-			var arbol := get_tree()
-			if arbol != null:
-				arbol.create_timer(tiempo_vida).timeout.connect(queue_free)
-			else:
-				queue_free()
+		tiempo_espera = maxf(tiempo_espera, maxf(_particulas_recogida.lifetime, 0.4))
+
+	if tiempo_espera > 0.0 and is_inside_tree():
+		var arbol := get_tree()
+		if arbol != null:
+			arbol.create_timer(tiempo_espera).timeout.connect(queue_free)
 		else:
 			queue_free()
 	else:

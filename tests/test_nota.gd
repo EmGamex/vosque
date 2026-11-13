@@ -36,7 +36,7 @@ func test_jerarquia_de_nodos_y_propiedades() -> void:
 	assert_true(col != null, "Debe existir nodo hijo CollisionShape2D")
 	var circulo := col.shape as CircleShape2D
 	assert_true(circulo != null, "El CollisionShape2D debe ser de tipo CircleShape2D")
-	assert_eq(circulo.radius, 32.0, "El radio del círculo de colisión debe ser de 32 px")
+	assert_eq(circulo.radius, 128.0, "El radio del círculo de colisión debe ser de 128 px")
 
 	var luz: PointLight2D = inst.get_node_or_null("LuzBaliza") as PointLight2D
 	assert_true(luz != null, "Debe existir nodo hijo LuzBaliza")
@@ -56,6 +56,13 @@ func test_jerarquia_de_nodos_y_propiedades() -> void:
 	assert_eq(sfx.bus, &"sfx", "SfxRevelacion debe usar el bus sfx")
 	assert_eq(sfx.max_polyphony, 2, "SfxRevelacion debe tener max_polyphony = 2")
 	assert_true(sfx.stream != null, "SfxRevelacion debe tener stream asignado")
+
+	var sfx_rec: AudioStreamPlayer2D = inst.get_node_or_null("SfxRecoleccion") as AudioStreamPlayer2D
+	assert_true(sfx_rec != null, "Debe existir nodo hijo SfxRecoleccion")
+	assert_eq(sfx_rec.bus, &"sfx", "SfxRecoleccion debe usar el bus sfx")
+	assert_eq(sfx_rec.max_polyphony, 2, "SfxRecoleccion debe tener max_polyphony = 2")
+	assert_true(sfx_rec.stream != null, "SfxRecoleccion debe tener stream asignado")
+	assert_true(inst.get("sfx_recoleccion") != null, "Nota debe exponer sfx_recoleccion asignable en el Inspector")
 
 	inst.free()
 
