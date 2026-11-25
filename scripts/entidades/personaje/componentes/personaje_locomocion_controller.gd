@@ -101,7 +101,9 @@ func procesar_frame(
 		direction,
 		is_moving,
 		ultima_direccion,
-		personaje.estado_actual == Personaje.Estado.REPOSO
+		personaje.estado_actual,
+		personaje.velocity.length(),
+		personaje.speed
 	)
 	personaje.move_and_slide()
 

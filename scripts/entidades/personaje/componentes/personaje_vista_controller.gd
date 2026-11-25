@@ -69,7 +69,9 @@ func actualizar_animacion(
 	direction: Vector2,
 	is_moving: bool,
 	ultima_direccion: Vector2,
-	en_reposo: bool
+	estado_actual: Personaje.Estado,
+	velocidad_actual: float = 0.0,
+	velocidad_referencia: float = 800.0
 ) -> void:
 	if sprite == null:
 		return
@@ -80,30 +82,28 @@ func actualizar_animacion(
 	elif dir.x > 0.05:
 		sprite.flip_h = false
 
-	var abs_x: float = absf(dir.x)
-	var abs_y: float = absf(dir.y)
-
-	if not is_moving and en_reposo:
-		if abs_x > abs_y:
-			reproducir_animacion_con_fallback(&"idle-lado", [&"idle", &"lado", &"idle-arriba"])
-		elif dir.y > 0.0:
-			reproducir_animacion_con_fallback(&"idle-abajo", [&"idle", &"idle-arriba", &"arriba"])
-		else:
-			reproducir_animacion_con_fallback(&"idle-arriba", [&"idle", &"arriba"])
-		return
-
-	if abs_x > 0.3 and abs_y > 0.3:
-		if dir.y > 0.0:
-			reproducir_animacion_con_fallback(&"diagonal-abajo", [&"diagonal-arriba", &"diagonal", &"lado"])
-		else:
-			reproducir_animacion_con_fallback(&"diagonal-arriba", [&"diagonal", &"lado"])
-	elif abs_y > abs_x:
-		if dir.y > 0.0:
-			reproducir_animacion_con_fallback(&"abajo", [&"idle-abajo", &"diagonal-abajo", &"lado"])
-		else:
-			reproducir_animacion_con_fallback(&"arriba", [&"idle-arriba", &"idle"])
-	else:
-		reproducir_animacion_con_fallback(&"lado", [&"idle-lado", &"diagonal-arriba"])
+	match estado_actual:
+		Personaje.Estado.SALTO:
+			sprite.speed_scale = 1.0
+			reproducir_animacion_con_fallback(&"salto", [&"saltar", &"correr", &"idle"])
+		Personaje.Estado.PLANCHA_AIRE, Personaje.Estado.RECUPERANDOSE:
+			sprite.speed_scale = 1.0
+			reproducir_animacion_con_fallback(&"plancha", [&"correr", &"idle"])
+		Personaje.Estado.REPOSO:
+			sprite.speed_scale = 1.0
+			reproducir_animacion_con_fallback(&"idle", [&"correr"])
+		_:
+			if is_moving:
+				var factor_vel: float = clampf(
+					(velocidad_actual / maxf(velocidad_referencia, 1.0)) * 1.25,
+					1.0,
+					1.8
+				)
+				sprite.speed_scale = factor_vel
+				reproducir_animacion_con_fallback(&"correr", [&"idle"])
+			else:
+				sprite.speed_scale = 1.0
+				reproducir_animacion_con_fallback(&"idle", [&"correr"])
 
 
 func reproducir_animacion_con_fallback(

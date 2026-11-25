@@ -1,186 +1,19 @@
 [gd_scene format=3 uid="uid://b3dierpagcaih"]
 
 [ext_resource type="Script" uid="uid://bm561vv7tuxt4" path="res://scripts/entidades/personaje/personaje.gd" id="1_5nfxw"]
-[ext_resource type="Texture2D" uid="uid://y5a2ch4xeco4" path="res://graficos/abajo boceto.png" id="2_im2y8"]
-[ext_resource type="Texture2D" uid="uid://c8532ifckormt" path="res://graficos/lsdo abajo boceto.png" id="3_im2y8"]
-[ext_resource type="Texture2D" uid="uid://dbk2wyrqh5vx0" path="res://graficos/lsdo arriba boceto.png" id="4_h42ap"]
 [ext_resource type="Texture2D" uid="uid://boneo8lfscjlb" path="res://recursos/iluminacion/textura_luz_cono.png" id="4_tbkpf"]
-[ext_resource type="Texture2D" uid="uid://23tsn8fcifgs" path="res://graficos/lado boceto.png" id="6_57ngn"]
-[ext_resource type="Texture2D" uid="uid://ow0ormrsy5nt" path="res://graficos/emgamex/animacion_correr.sprites/Comp 1/Comp 1_00000.tres" id="7_t6om7"]
-[ext_resource type="Texture2D" uid="uid://boh6wuffiggnq" path="res://graficos/emgamex/animacion_correr.sprites/Comp 1/Comp 1_00001.tres" id="8_cm0xs"]
+[ext_resource type="SpriteFrames" uid="uid://bxoq82bf0gv1k" path="res://recursos/personaje_sprite_frames.tres" id="6_kmopf"]
 [ext_resource type="Script" uid="uid://c1t6h1dv5pmy0" path="res://scripts/entidades/personaje/controlador_linterna.gd" id="8_kmopf"]
 [ext_resource type="Resource" uid="uid://cqqirq3y7pg12" path="res://recursos/iluminacion/config_iluminacion_defecto.tres" id="9_8xrj8"]
-[ext_resource type="Texture2D" uid="uid://b6wsrkru3b1wf" path="res://graficos/emgamex/animacion_correr.sprites/Comp 1/Comp 1_00002.tres" id="9_gar2u"]
-[ext_resource type="Texture2D" uid="uid://dke2sxgoyqjgf" path="res://graficos/emgamex/animacion_correr.sprites/Comp 1/Comp 1_00003.tres" id="10_m56mp"]
-[ext_resource type="Texture2D" uid="uid://beu3gvyi64xbp" path="res://graficos/emgamex idle sprite.png" id="10_tbkpf"]
 [ext_resource type="Texture2D" uid="uid://b8duj3viyr6eg" path="res://recursos/iluminacion/textura_halo_corporal.tres" id="11_41mom"]
-[ext_resource type="Texture2D" uid="uid://ce35a14njnly4" path="res://graficos/emgamex/animacion_correr.sprites/Comp 1/Comp 1_00004.tres" id="11_hdcbj"]
 [ext_resource type="PackedScene" uid="uid://bosn1xlpgwiqr" path="res://escenas/ui/indicador_estamina.tscn" id="11_kmopf"]
 [ext_resource type="PackedScene" uid="uid://dte8iac0uavl" path="res://escenas/ui/tutorial_cabeza.tscn" id="12_8xrj8"]
-[ext_resource type="Texture2D" uid="uid://c7pah6pc0qdty" path="res://graficos/emgamex/animacion_correr.sprites/Comp 1/Comp 1_00005.tres" id="12_awgho"]
-[ext_resource type="Texture2D" uid="uid://be02llpf0fbxg" path="res://graficos/emgamex/animacion_correr.sprites/Comp 1/Comp 1_00006.tres" id="13_lg6gk"]
-[ext_resource type="Texture2D" uid="uid://bas4xmg7se45t" path="res://graficos/emgamex/animacion_correr.sprites/Comp 1/Comp 1_00007.tres" id="14_dx81j"]
 [ext_resource type="AudioStream" uid="uid://drx0n7rux4x0r" path="res://sonido/sfx/gameplay/Footsteps.wav" id="14_qjgqo"]
 [ext_resource type="AudioStream" uid="uid://dmabbm7hr8uke" path="res://sonido/sfx/gameplay/salto.wav" id="15_3s3u2"]
-[ext_resource type="Texture2D" uid="uid://cg6qvacwuqhwh" path="res://graficos/emgamex/animacion_correr.sprites/Comp 1/Comp 1_00008.tres" id="15_rd2gl"]
-[ext_resource type="Texture2D" uid="uid://cuvjjc1mitq1n" path="res://graficos/emgamex/animacion_correr.sprites/Comp 1/Comp 1_00009.tres" id="16_cg5ro"]
 [ext_resource type="AudioStream" uid="uid://c6smiilytmrmm" path="res://sonido/sfx/gameplay/clavado.wav" id="16_pes16"]
-[ext_resource type="Texture2D" uid="uid://dxlskb0tca555" path="res://graficos/emgamex/animacion_correr.sprites/Comp 1/Comp 1_00010.tres" id="17_pew0j"]
-[ext_resource type="Texture2D" uid="uid://cso4ldd46rtn8" path="res://graficos/emgamex/animacion_correr.sprites/Comp 1/Comp 1_00011.tres" id="18_nm1ip"]
-[ext_resource type="Texture2D" uid="uid://b8s6cmplqirmu" path="res://graficos/emgamex/animacion_correr.sprites/Comp 1/Comp 1_00012.tres" id="19_1801n"]
-[ext_resource type="Texture2D" uid="uid://bayv4dbylb2wb" path="res://graficos/emgamex/animacion_correr.sprites/Comp 1/Comp 1_00013.tres" id="20_0ax3i"]
-[ext_resource type="Texture2D" uid="uid://bfeojo3wliuyr" path="res://graficos/emgamex/animacion_correr.sprites/Comp 1/Comp 1_00014.tres" id="21_m38py"]
-[ext_resource type="Texture2D" uid="uid://bowdiut5ue1r6" path="res://graficos/emgamex/animacion_correr.sprites/Comp 1/Comp 1_00015.tres" id="22_bma43"]
-[ext_resource type="Texture2D" uid="uid://cl4ofvmt207k3" path="res://graficos/emgamex/animacion_correr.sprites/Comp 1/Comp 1_00016.tres" id="23_5br8g"]
-[ext_resource type="Texture2D" uid="uid://wn3aqarhyrys" path="res://graficos/emgamex/animacion_correr.sprites/Comp 1/Comp 1_00017.tres" id="24_u8kdj"]
-[ext_resource type="Texture2D" uid="uid://b3qjm2ets0win" path="res://graficos/emgamex/animacion_correr.sprites/Comp 1/Comp 1_00018.tres" id="25_ursbt"]
-[ext_resource type="Texture2D" uid="uid://by38lshm08vft" path="res://graficos/emgamex/animacion_correr.sprites/Comp 1/Comp 1_00019.tres" id="26_1porb"]
-[ext_resource type="Texture2D" uid="uid://cdownhpxxo2gb" path="res://graficos/emgamex/animacion_correr.sprites/Comp 1/Comp 1_00020.tres" id="27_xntqm"]
-[ext_resource type="Texture2D" uid="uid://dgr0401gh7pv1" path="res://graficos/emgamex/animacion_correr.sprites/Comp 1/Comp 1_00021.tres" id="28_5ig3y"]
-[ext_resource type="Texture2D" uid="uid://bp5cgns5ruygr" path="res://graficos/emgamex/animacion_correr.sprites/Comp 1/Comp 1_00022.tres" id="29_cni5f"]
-[ext_resource type="Texture2D" uid="uid://begr3uowrjsad" path="res://graficos/emgamex/animacion_correr.sprites/Comp 1/Comp 1_00023.tres" id="30_tgpdr"]
-[ext_resource type="Texture2D" uid="uid://s1bgqgvapsbq" path="res://graficos/emgamex/animacion_correr.sprites/Comp 1/Comp 1_00024.tres" id="31_e26qn"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_5nfxw"]
 radius = 32.0
-
-[sub_resource type="SpriteFrames" id="SpriteFrames_g4v7s"]
-animations = [{
-"frames": [],
-"loop": 1,
-"name": &"Salto",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("2_im2y8")
-}],
-"loop": 1,
-"name": &"abajo",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("7_t6om7")
-}, {
-"duration": 1.0,
-"texture": ExtResource("8_cm0xs")
-}, {
-"duration": 1.0,
-"texture": ExtResource("9_gar2u")
-}, {
-"duration": 1.0,
-"texture": ExtResource("10_m56mp")
-}, {
-"duration": 1.0,
-"texture": ExtResource("11_hdcbj")
-}, {
-"duration": 1.0,
-"texture": ExtResource("12_awgho")
-}, {
-"duration": 1.0,
-"texture": ExtResource("13_lg6gk")
-}, {
-"duration": 1.0,
-"texture": ExtResource("14_dx81j")
-}, {
-"duration": 1.0,
-"texture": ExtResource("15_rd2gl")
-}, {
-"duration": 1.0,
-"texture": ExtResource("16_cg5ro")
-}, {
-"duration": 1.0,
-"texture": ExtResource("17_pew0j")
-}, {
-"duration": 1.0,
-"texture": ExtResource("18_nm1ip")
-}, {
-"duration": 1.0,
-"texture": ExtResource("19_1801n")
-}, {
-"duration": 1.0,
-"texture": ExtResource("20_0ax3i")
-}, {
-"duration": 1.0,
-"texture": ExtResource("21_m38py")
-}, {
-"duration": 1.0,
-"texture": ExtResource("22_bma43")
-}, {
-"duration": 1.0,
-"texture": ExtResource("23_5br8g")
-}, {
-"duration": 1.0,
-"texture": ExtResource("24_u8kdj")
-}, {
-"duration": 1.0,
-"texture": ExtResource("25_ursbt")
-}, {
-"duration": 1.0,
-"texture": ExtResource("26_1porb")
-}, {
-"duration": 1.0,
-"texture": ExtResource("27_xntqm")
-}, {
-"duration": 1.0,
-"texture": ExtResource("28_5ig3y")
-}, {
-"duration": 1.0,
-"texture": ExtResource("29_cni5f")
-}, {
-"duration": 1.0,
-"texture": ExtResource("30_tgpdr")
-}, {
-"duration": 1.0,
-"texture": ExtResource("31_e26qn")
-}],
-"loop": 1,
-"name": &"arriba",
-"speed": 60.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("3_im2y8")
-}],
-"loop": 1,
-"name": &"diagonal-abajo",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("4_h42ap")
-}],
-"loop": 1,
-"name": &"diagonal-arriba",
-"speed": 5.0
-}, {
-"frames": [],
-"loop": 1,
-"name": &"idle-abajo",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("10_tbkpf")
-}],
-"loop": 1,
-"name": &"idle-arriba",
-"speed": 5.0
-}, {
-"frames": [],
-"loop": 1,
-"name": &"idle-lado",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("6_57ngn")
-}],
-"loop": 1,
-"name": &"lado",
-"speed": 5.0
-}]
 
 [node name="EmGamex" type="CharacterBody2D" unique_id=1025630962 groups=["jugador"]]
 y_sort_enabled = true
@@ -215,13 +48,13 @@ texture_scale = 1.09375
 [node name="Visual" type="Node2D" parent="." unique_id=438058484]
 
 [node name="Sprite2D" type="AnimatedSprite2D" parent="Visual" unique_id=911995098]
-position = Vector2(1.9073486e-06, 16.000006)
-scale = Vector2(0.33963126, 0.33963123)
-sprite_frames = SubResource("SpriteFrames_g4v7s")
-animation = &"arriba"
-autoplay = "idle-arriba"
-frame = 5
-frame_progress = 0.7601048
+position = Vector2(0, 7.999998)
+scale = Vector2(0.5966924, 0.5966923)
+sprite_frames = ExtResource("6_kmopf")
+animation = &"salto"
+autoplay = "idle"
+frame = 9
+frame_progress = 0.8589727
 
 [node name="Sombra" type="Polygon2D" parent="Visual" unique_id=1928397469]
 position = Vector2(0, 48)
