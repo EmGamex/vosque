@@ -51,6 +51,13 @@ signal estado_cambiado(nuevo_estado: Estado, nombre_estado: String)
 @export_group("Audio")
 @export_range(0.1, 1.0, 0.02, "suffix:s") var step_interval_base: float = 0.32
 
+@export_group("Rebote al Correr")
+@export var run_bob_enabled: bool = true
+@export_range(0.0, 20.0, 0.5, "suffix:px") var run_bob_height: float = 4.0
+@export_range(0.0, 24.0, 0.5, "suffix:px") var sprint_bob_height: float = 6.5
+@export_range(0.7, 1.0, 0.01) var run_bob_shadow_scale: float = 0.94
+@export_range(1.0, 40.0, 1.0) var run_bob_return_speed: float = 18.0
+
 var estado_actual: Estado = Estado.REPOSO
 var god_mode: bool = false
 var sin_gasto_estamina: bool = false
@@ -114,6 +121,7 @@ func consumir_buffer_salto() -> void:
 func detener_por_captura() -> void:
 	_estamina_ctrl.limpiar_boost()
 	_vista_ctrl.restaurar_feedback_nota()
+	_vista_ctrl.restaurar_visuales_eje_z()
 	_audio_ctrl.detener_todo()
 	velocity = Vector2.ZERO
 	set_physics_process(false)

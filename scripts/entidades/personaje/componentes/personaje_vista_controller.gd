@@ -11,6 +11,8 @@ var tutorial_cabeza: Node2D = null
 
 var _host: Node2D = null
 var _tween_feedback_nota: Tween = null
+var _fase_rebote: float = 0.0
+var _offset_rebote_actual: float = 0.0
 
 
 func inicializar(host: Node2D) -> void:
@@ -44,6 +46,7 @@ func aplicar_elevacion_eje_z(
 
 
 func restaurar_visuales_eje_z() -> void:
+	resetear_rebote_carrera()
 	if visual != null:
 		visual.position = Vector2.ZERO
 		visual.rotation = 0.0
@@ -55,10 +58,60 @@ func restaurar_visuales_eje_z() -> void:
 		tutorial_cabeza.position = Vector2(0, -90)
 
 
-func actualizar_procedural_suelo(en_sprint: bool, direction: Vector2) -> void:
+func resetear_rebote_carrera() -> void:
+	_fase_rebote = 0.0
+	_offset_rebote_actual = 0.0
+
+
+func actualizar_procedural_suelo(
+	en_sprint: bool,
+	direction: Vector2,
+	delta: float = 0.0,
+	estado_actual: Personaje.Estado = Personaje.Estado.REPOSO,
+	velocidad_actual: float = 0.0,
+	stop_threshold: float = 15.0,
+	velocidad_referencia: float = 800.0,
+	intervalo_paso_base: float = 0.32,
+	rebote_habilitado: bool = true,
+	altura_rebote_caminar: float = 4.0,
+	altura_rebote_sprint: float = 6.5,
+	escala_sombra_rebote: float = 0.94,
+	velocidad_retorno_rebote: float = 18.0
+) -> void:
 	if visual == null:
 		return
-	visual.position = Vector2.ZERO
+
+	var en_movimiento_suelo: bool = (
+		estado_actual == Personaje.Estado.CAMINANDO
+		or estado_actual == Personaje.Estado.SPRINT
+		or estado_actual == Personaje.Estado.FATIGA
+	) and velocidad_actual > stop_threshold
+
+	var amplitud_maxima: float = maxf(altura_rebote_caminar, altura_rebote_sprint)
+	if rebote_habilitado and en_movimiento_suelo and delta > 0.0:
+		var factor_vel: float = clampf(velocidad_actual / maxf(velocidad_referencia, 1.0), 0.5, 1.8)
+		var intervalo_actual: float = maxf(intervalo_paso_base / factor_vel, 0.05)
+		_fase_rebote = fmod(_fase_rebote + (PI / intervalo_actual) * delta, TAU)
+
+		var amplitud_estado: float = altura_rebote_caminar
+		if estado_actual == Personaje.Estado.SPRINT:
+			amplitud_estado = altura_rebote_sprint
+		elif estado_actual == Personaje.Estado.FATIGA:
+			amplitud_estado = altura_rebote_caminar * 0.7
+
+		var escala_arranque: float = clampf(velocidad_actual / maxf(velocidad_referencia, 1.0), 0.0, 1.0)
+		_offset_rebote_actual = absf(sin(_fase_rebote)) * amplitud_estado * escala_arranque
+	else:
+		_offset_rebote_actual = lerpf(_offset_rebote_actual, 0.0, clampf(delta * velocidad_retorno_rebote, 0.0, 1.0))
+		if _offset_rebote_actual <= 0.05 or delta <= 0.0:
+			_offset_rebote_actual = 0.0
+			_fase_rebote = 0.0
+
+	visual.position = Vector2(0.0, -_offset_rebote_actual)
+	if sombra != null:
+		var factor_sombra: float = clampf(_offset_rebote_actual / maxf(amplitud_maxima, 0.01), 0.0, 1.0)
+		sombra.scale = Vector2.ONE.lerp(Vector2(escala_sombra_rebote, escala_sombra_rebote), factor_sombra)
+
 	if en_sprint and direction.x != 0.0:
 		visual.rotation = deg_to_rad(5.0 * signf(direction.x))
 	else:

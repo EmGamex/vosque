@@ -195,6 +195,7 @@ func _procesar_suelo(
 	if quiere_salto and not estamina_ctrl.fatigado and estamina_ctrl.puede_pagar(
 		personaje.jump_stamina_cost, sin_gasto
 	):
+		vista_ctrl.resetear_rebote_carrera()
 		iniciar_salto_libre(personaje, estamina_ctrl)
 		return true
 
@@ -230,7 +231,19 @@ func _procesar_suelo(
 		personaje.velocity = Vector2.ZERO
 
 	vista_ctrl.actualizar_procedural_suelo(
-		personaje.estado_actual == Personaje.Estado.SPRINT, direction
+		personaje.estado_actual == Personaje.Estado.SPRINT,
+		direction,
+		delta,
+		personaje.estado_actual,
+		personaje.velocity.length(),
+		personaje.stop_threshold,
+		personaje.speed,
+		personaje.step_interval_base,
+		personaje.run_bob_enabled,
+		personaje.run_bob_height,
+		personaje.sprint_bob_height,
+		personaje.run_bob_shadow_scale,
+		personaje.run_bob_return_speed
 	)
 	return estamina_consumida
 

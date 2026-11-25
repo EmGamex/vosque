@@ -21,7 +21,17 @@ collision_layer = 4
 collision_mask = 19
 motion_mode = 1
 script = ExtResource("1_5nfxw")
+sprint_drain_rate = 15.0
 stamina_regen_rate = 60.0
+fatigue_recovery_threshold = 10.0
+jump_stamina_cost = 10.0
+jump_height = 66.0
+dive_stamina_cost = 0.0
+dive_recovery_duration = 0.1
+run_bob_height = 20.0
+sprint_bob_height = 24.0
+run_bob_shadow_scale = 1.0
+run_bob_return_speed = 1.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=517982902]
 position = Vector2(0, 32)
@@ -51,15 +61,10 @@ texture_scale = 1.09375
 position = Vector2(0, 7.999998)
 scale = Vector2(0.5966924, 0.5966923)
 sprite_frames = ExtResource("6_kmopf")
-animation = &"salto"
+animation = &"correr"
 autoplay = "idle"
-frame = 9
-frame_progress = 0.8589727
-
-[node name="Sombra" type="Polygon2D" parent="Visual" unique_id=1928397469]
-position = Vector2(0, 48)
-color = Color(0, 0, 0, 0.45)
-polygon = PackedVector2Array(32, 0, 28, 6, 16, 12, 0, 14, -16, 12, -28, 6, -32, 0, -28, -6, -16, -12, 0, -14, 16, -12, 28, -6)
+frame = 23
+frame_progress = 0.9460093
 
 [node name="IndicadorEstamina" parent="." unique_id=21503489 instance=ExtResource("11_kmopf")]
 position = Vector2(0, -60)
@@ -85,3 +90,8 @@ stream = ExtResource("16_pes16")
 volume_db = 2.0
 max_polyphony = 2
 bus = &"sfx"
+
+[node name="Sombra" type="Polygon2D" parent="." unique_id=1928397469]
+position = Vector2(0, 48)
+color = Color(0, 0, 0, 0.45)
+polygon = PackedVector2Array(32, 0, 28, 6, 16, 12, 0, 14, -16, 12, -28, 6, -32, 0, -28, -6, -16, -12, 0, -14, 16, -12, 28, -6)
