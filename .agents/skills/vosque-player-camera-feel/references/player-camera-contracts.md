@@ -54,10 +54,12 @@ Referencia detallada de constantes, fórmulas, contratos de API y *gotchas* veri
   * `IndicadorEstamina.position.y = -60.0 - jump_height * factor_altura`
   * `TutorialCabeza.position.y = -90.0 - jump_height * factor_altura`
 
-### Fallbacks de `AnimatedSprite2D`
-* `REPOSO`: `idle-lado` $\to$ `[idle, lado, idle-arriba]`; `idle-abajo` $\to$ `[idle, idle-arriba, arriba]`; `idle-arriba` $\to$ `[idle, arriba]`.
-* Movimiento diagonal (`abs_x > 0.3 && abs_y > 0.3`): `diagonal-abajo` $\to$ `[diagonal-arriba, diagonal, lado]`; `diagonal-arriba` $\to$ `[diagonal, lado]`.
-* Movimiento cardinal: `abajo` $\to$ `[idle-abajo, diagonal-abajo, lado]`; `arriba` $\to$ `[idle-arriba, idle]`; `lado` $\to$ `[idle-lado, diagonal-arriba]`.
+### Fallbacks y Velocidad de `AnimatedSprite2D` (`res://recursos/personaje_sprite_frames.tres`)
+* Orientación horizontal mediante `sprite.flip_h` según el signo de `dir.x` (`< -0.05` / `> 0.05`).
+* `SALTO`: `salto` $\to$ `[saltar, correr, idle]` (`speed_scale = 1.0`).
+* `PLANCHA_AIRE` / `RECUPERANDOSE`: `plancha` $\to$ `[correr, idle]` (`speed_scale = 1.0`).
+* `REPOSO` (o suelo sin movimiento): `idle` $\to$ `[correr]` (`speed_scale = 1.0`).
+* Suelo en movimiento (`CAMINANDO`, `SPRINT`, `FATIGA`): `correr` $\to$ `[idle]` con `speed_scale = clamp((velocidad_actual / velocidad_referencia) * 1.25, 1.0, 1.8)`.
 
 ---
 
