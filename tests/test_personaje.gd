@@ -157,3 +157,119 @@ func test_nodos_audio_locomocion_configurados() -> void:
 	assert_eq(p._audio_ctrl._timer_paso, 0.0, "detener_por_captura debe reiniciar el temporizador de pasos")
 
 	p.free()
+
+
+func test_rebote_correr_eleva_visual_sin_alterar_colisiones_ni_ui() -> void:
+	var escena: PackedScene = load("res://escenas/personaje.tscn")
+	var p: Personaje = escena.instantiate() as Personaje
+	p._ready()
+
+	p._cambiar_estado(Personaje.Estado.CAMINANDO)
+	p.velocity = Vector2.RIGHT * p.speed
+	var max_offset_caminar: float = 0.0
+	for i in 20:
+		p._vista_ctrl.actualizar_procedural_suelo(
+			false,
+			Vector2.RIGHT,
+			0.016,
+			Personaje.Estado.CAMINANDO,
+			p.speed,
+			p.stop_threshold,
+			p.speed,
+			p.step_interval_base,
+			p.run_bob_enabled,
+			p.run_bob_height,
+			p.sprint_bob_height,
+			p.run_bob_shadow_scale,
+			p.run_bob_return_speed
+		)
+		max_offset_caminar = maxf(max_offset_caminar, -p._visual.position.y)
+
+	assert_true(max_offset_caminar > 0.0, "El rebote al caminar debe elevar Visual en Y")
+	assert_true(max_offset_caminar <= p.run_bob_height + 0.001, "El rebote al caminar no debe superar run_bob_height")
+	assert_true(p.get_collision_mask_value(2), "El rebote al correr no debe desactivar la máscara de Capa 2")
+	if p._vista_ctrl.indicador_estamina != null:
+		assert_true(is_equal_approx(p._vista_ctrl.indicador_estamina.position.y, -60.0), "IndicadorEstamina debe permanecer fijo durante el trote")
+
+	p._vista_ctrl.resetear_rebote_carrera()
+	p._cambiar_estado(Personaje.Estado.SPRINT)
+	var max_offset_sprint: float = 0.0
+	for i in 20:
+		p._vista_ctrl.actualizar_procedural_suelo(
+			true,
+			Vector2.RIGHT,
+			0.016,
+			Personaje.Estado.SPRINT,
+			p.sprint_speed,
+			p.stop_threshold,
+			p.speed,
+			p.step_interval_base,
+			p.run_bob_enabled,
+			p.run_bob_height,
+			p.sprint_bob_height,
+			p.run_bob_shadow_scale,
+			p.run_bob_return_speed
+		)
+		max_offset_sprint = maxf(max_offset_sprint, -p._visual.position.y)
+
+	assert_true(max_offset_sprint > max_offset_caminar, "El rebote en sprint debe ser mayor que al caminar")
+	assert_true(max_offset_sprint <= p.sprint_bob_height + 0.001, "El rebote en sprint no debe superar sprint_bob_height")
+
+	p.free()
+
+
+func test_rebote_correr_retorna_a_cero_en_reposo_salto_y_captura() -> void:
+	var escena: PackedScene = load("res://escenas/personaje.tscn")
+	var p: Personaje = escena.instantiate() as Personaje
+	p._ready()
+
+	p._vista_ctrl.actualizar_procedural_suelo(
+		false,
+		Vector2.RIGHT,
+		0.1,
+		Personaje.Estado.CAMINANDO,
+		p.speed,
+		p.stop_threshold,
+		p.speed,
+		p.step_interval_base,
+		p.run_bob_enabled,
+		p.run_bob_height,
+		p.sprint_bob_height,
+		p.run_bob_shadow_scale,
+		p.run_bob_return_speed
+	)
+	assert_true(p._visual.position.y < 0.0, "Debe haber desplazamiento negativo en Y al correr")
+
+	for i in 30:
+		p._vista_ctrl.actualizar_procedural_suelo(
+			false,
+			Vector2.ZERO,
+			0.05,
+			Personaje.Estado.REPOSO,
+			0.0,
+			p.stop_threshold,
+			p.speed,
+			p.step_interval_base,
+			p.run_bob_enabled,
+			p.run_bob_height,
+			p.sprint_bob_height,
+			p.run_bob_shadow_scale,
+			p.run_bob_return_speed
+		)
+	assert_eq(p._visual.position, Vector2.ZERO, "Al frenar a REPOSO el rebote debe volver a Vector2.ZERO")
+
+	p._vista_ctrl.actualizar_procedural_suelo(
+		true,
+		Vector2.RIGHT,
+		0.1,
+		Personaje.Estado.SPRINT,
+		p.sprint_speed,
+		p.stop_threshold,
+		p.speed,
+		p.step_interval_base
+	)
+	p.detener_por_captura()
+	assert_eq(p._visual.position, Vector2.ZERO, "detener_por_captura debe restaurar Visual a Vector2.ZERO")
+	assert_eq(p._vista_ctrl._offset_rebote_actual, 0.0, "detener_por_captura debe limpiar _offset_rebote_actual")
+
+	p.free()

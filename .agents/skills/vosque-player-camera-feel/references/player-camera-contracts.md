@@ -31,6 +31,12 @@ Referencia detallada de constantes, fórmulas, contratos de API y *gotchas* veri
 | `note_speed_boost_duration` | `1.5` | — | `0.0..5.0 s` |
 | `note_no_stamina_drain_duration` | `1.5` | — | `0.0..10.0 s` |
 | `note_boost_tint` | `Color(0.75, 1.0, 0.9, 1.0)` | — | — |
+| `step_interval_base` | `0.32` | — | `0.1..1.0 s` |
+| `run_bob_enabled` | `true` | — | `bool` |
+| `run_bob_height` | `4.0` | — | `0.0..20.0 px` |
+| `sprint_bob_height` | `6.5` | — | `0.0..24.0 px` |
+| `run_bob_shadow_scale` | `0.94` | — | `0.7..1.0` |
+| `run_bob_return_speed` | `18.0` | — | `1.0..40.0` |
 
 * **Señales:** `estamina_cambiada(actual: float, maxima: float, fatigado: bool)`, `estado_cambiado(nuevo_estado: Estado, nombre_estado: String)`.
 * **Acciones `InputMap` (`project.godot`):** `personaje-arriba`, `personaje-abajo`, `personaje-izquierda`, `personaje-derecha`, `personaje-salto` (`Espacio`), `sprint` (`Shift`) y soporte opcional si existe `personaje-sprint`.
@@ -54,10 +60,12 @@ Referencia detallada de constantes, fórmulas, contratos de API y *gotchas* veri
   * `IndicadorEstamina.position.y = -60.0 - jump_height * factor_altura`
   * `TutorialCabeza.position.y = -90.0 - jump_height * factor_altura`
 
-### Fallbacks de `AnimatedSprite2D`
-* `REPOSO`: `idle-lado` $\to$ `[idle, lado, idle-arriba]`; `idle-abajo` $\to$ `[idle, idle-arriba, arriba]`; `idle-arriba` $\to$ `[idle, arriba]`.
-* Movimiento diagonal (`abs_x > 0.3 && abs_y > 0.3`): `diagonal-abajo` $\to$ `[diagonal-arriba, diagonal, lado]`; `diagonal-arriba` $\to$ `[diagonal, lado]`.
-* Movimiento cardinal: `abajo` $\to$ `[idle-abajo, diagonal-abajo, lado]`; `arriba` $\to$ `[idle-arriba, idle]`; `lado` $\to$ `[idle-lado, diagonal-arriba]`.
+### Fallbacks y Velocidad de `AnimatedSprite2D` (`res://recursos/personaje_sprite_frames.tres`)
+* Orientación horizontal mediante `sprite.flip_h` según el signo de `dir.x` (`< -0.05` / `> 0.05`).
+* `SALTO`: `salto` $\to$ `[saltar, correr, idle]` (`speed_scale = 1.0`).
+* `PLANCHA_AIRE` / `RECUPERANDOSE`: `plancha` $\to$ `[correr, idle]` (`speed_scale = 1.0`).
+* `REPOSO` (o suelo sin movimiento): `idle` $\to$ `[correr]` (`speed_scale = 1.0`).
+* Suelo en movimiento (`CAMINANDO`, `SPRINT`, `FATIGA`): `correr` $\to$ `[idle]` con `speed_scale = clamp((velocidad_actual / velocidad_referencia) * 1.25, 1.0, 1.8)`.
 
 ---
 
@@ -96,6 +104,6 @@ Referencia detallada de constantes, fórmulas, contratos de API y *gotchas* veri
 
 ## 5. Registro de Gotchas Actuales en el Repo
 
-1. **`Sombra` anidada bajo `Visual`:** En `escenas/personaje.tscn`, `Sombra` está en `Visual/Sombra`, pero `personaje.gd` busca `get_node_or_null("Sombra")` en la raíz (`null`). Mientras no se mueva a raíz en la escena, la sombra se eleva con `Visual` al saltar.
+1. **`Sombra` en raíz de `escenas/personaje.tscn`:** `Sombra` fue reparentada a la raíz (`EmGamex/Sombra`) para que `PersonajeVistaController` la mantenga anclada al suelo y escale suavemente tanto en el rebote al correr como en `SALTO` y `PLANCHA_AIRE`.
 2. **Offset de `TutorialCabeza`:** La escena fija `Vector2(0, -112)`, pero `_aplicar_elevacion_eje_z()` / `_restaurar_visuales_eje_z()` usan `-90.0`.
 3. **`camara.tscn` sin script:** `agregar_trauma` aún no está implementado en `escenas/camara.tscn`; `ControladorLinterna` lo protege con `has_method("agregar_trauma")`.
