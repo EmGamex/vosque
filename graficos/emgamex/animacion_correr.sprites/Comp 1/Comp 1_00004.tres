@@ -1,0 +1,7 @@
+[gd_resource type="AtlasTexture" format=3 uid="uid://ce35a14njnly4"]
+
+[ext_resource type="Texture2D" uid="uid://8u2wc0fvj36h" path="res://graficos/emgamex/animacion_correr.png" id="1_wvvqu"]
+
+[resource]
+atlas = ExtResource("1_wvvqu")
+region = Rect2(741, 380, 237, 186)

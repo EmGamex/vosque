@@ -1,0 +1,18 @@
+[gd_resource type="SpriteFrames" format=3 uid="uid://bm6hg8juj4rc8"]
+
+[ext_resource type="Texture2D" uid="uid://dj8y1g2ylh8st" path="res://graficos/ui/peligro icono rojo.png" id="1_20rpw"]
+[ext_resource type="Texture2D" uid="uid://dldjky82krjt1" path="res://graficos/ui/peligro icono naranja.png" id="2_f3sli"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_20rpw")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_f3sli")
+}],
+"loop": 1,
+"name": &"peligro",
+"speed": 4.0
+}]

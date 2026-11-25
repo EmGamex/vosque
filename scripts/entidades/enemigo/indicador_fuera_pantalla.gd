@@ -16,6 +16,7 @@ extends Node2D
 var _notifier: VisibleOnScreenNotifier2D = null
 var _capa_canvas: CanvasLayer = null
 var _sprite: Sprite2D = null
+var _escala_base: Vector2 = Vector2.ONE
 var _indicador_visible: bool = false
 var _tween_fade: Tween = null
 var _padre_enemigo: Enemigo = null
@@ -66,13 +67,25 @@ func _inicializar_componentes() -> void:
 		_capa_canvas.layer = 15
 		add_child(_capa_canvas)
 
-		_sprite = Sprite2D.new()
-		_sprite.name = "SpriteIndicador"
-		_sprite.texture = textura
-		_sprite.scale = escala
-		_sprite.modulate = Color(color_modulacion.r, color_modulacion.g, color_modulacion.b, 0.0)
-		_sprite.visible = false
-		_capa_canvas.add_child(_sprite)
+		var sprite_escena := get_node_or_null("SpriteIndicador") as Sprite2D
+		if sprite_escena != null:
+			_sprite = sprite_escena
+			_sprite.reparent(_capa_canvas, false)
+			if _sprite.texture == null:
+				_sprite.texture = textura
+			_escala_base = _sprite.scale if escala == Vector2.ONE else escala
+			_sprite.scale = _escala_base
+			_sprite.modulate = Color(color_modulacion.r, color_modulacion.g, color_modulacion.b, 0.0)
+			_sprite.visible = false
+		else:
+			_sprite = Sprite2D.new()
+			_sprite.name = "SpriteIndicador"
+			_sprite.texture = textura
+			_escala_base = escala
+			_sprite.scale = _escala_base
+			_sprite.modulate = Color(color_modulacion.r, color_modulacion.g, color_modulacion.b, 0.0)
+			_sprite.visible = false
+			_capa_canvas.add_child(_sprite)
 
 
 func _on_screen_entered() -> void:
@@ -116,7 +129,7 @@ func _mostrar_fade() -> void:
 
 	_tween_fade = create_tween().set_parallel(true)
 	_tween_fade.tween_property(_sprite, "modulate:a", color_modulacion.a, duracion_fade)
-	_tween_fade.tween_property(_sprite, "scale", escala, duracion_fade).from(escala * 0.7)
+	_tween_fade.tween_property(_sprite, "scale", _escala_base, duracion_fade).from(_escala_base * 0.7)
 
 
 func _ocultar_fade(instantaneo: bool = false) -> void:
@@ -163,7 +176,7 @@ func _actualizar_posicion_pantalla() -> void:
 	if _sprite == null or not is_instance_valid(_sprite) or not _sprite.visible:
 		return
 
-	if _sprite.texture != textura:
+	if _sprite.texture == null and textura != null:
 		_sprite.texture = textura
 
 	var viewport := get_viewport()

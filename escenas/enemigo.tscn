@@ -3,7 +3,9 @@
 [ext_resource type="Script" uid="uid://ccr00dcd1n8h6" path="res://scripts/entidades/enemigo/enemigo.gd" id="1_sms58"]
 [ext_resource type="Material" uid="uid://c1pvk48d3mcik" path="res://recursos/iluminacion/mat_ojos_monstruo.tres" id="2_uhebs"]
 [ext_resource type="Script" uid="uid://h4hect76vhd8" path="res://scripts/entidades/enemigo/indicador_fuera_pantalla.gd" id="4_hpq8b"]
+[ext_resource type="Texture2D" uid="uid://dtr0gaiyi182j" path="res://graficos/fantasma placeholder.jpg" id="4_vu81h"]
 [ext_resource type="Script" uid="uid://dof8paqpquc1d" path="res://scripts/entidades/enemigo/depurador_visual_enemigo.gd" id="4_y7635"]
+[ext_resource type="SpriteFrames" uid="uid://bm6hg8juj4rc8" path="res://recursos/ui/peligro_icono_frames.tres" id="5_vu81h"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_uhebs"]
 radius = 42.0
@@ -47,9 +49,25 @@ target_position = Vector2(0, 0)
 
 [node name="IndicadorFueraPantalla" type="Node2D" parent="." unique_id=431340089]
 script = ExtResource("4_hpq8b")
+textura = ExtResource("4_vu81h")
+margen_pantalla = 80.0
 
 [node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="IndicadorFueraPantalla" unique_id=1517005535]
 rect = Rect2(-60, -60, 120, 120)
+
+[node name="SpriteIndicador" type="Sprite2D" parent="IndicadorFueraPantalla" unique_id=132576920]
+position = Vector2(54.745003, -113.23499)
+scale = Vector2(0.062779516, 0.062779516)
+texture = ExtResource("4_vu81h")
+
+[node name="IconoPeligroAnimado" type="AnimatedSprite2D" parent="IndicadorFueraPantalla/SpriteIndicador" unique_id=1794356141]
+position = Vector2(943.8587, 142.23471)
+scale = Vector2(1.121896, 1.1218959)
+sprite_frames = ExtResource("5_vu81h")
+animation = &"peligro"
+autoplay = "peligro"
+frame = 1
+frame_progress = 0.19613133
 
 [node name="DepuradorVisualEnemigo" type="Node2D" parent="." unique_id=2068635670]
 script = ExtResource("4_y7635")
